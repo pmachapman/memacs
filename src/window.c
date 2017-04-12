@@ -681,6 +681,15 @@ int n;	/* numeric argument */
 	EWINDOW *lastwp; /* last window scanned */
 	int lastline;	/* screen line of last line of current window */
 	int cmark;		/* current mark */
+#if	LOGFLG
+	FILE *fp;
+
+	/* append the current command to the log file */
+	fp = fopen("emacs.log", "a");
+	fprintf(fp, "<newsize %s %d>\n",
+			f == TRUE ? "TRUE" : "FALSE", n);
+	fclose(fp);
+#endif
 
 #if	WINDOW_MSWIN
 	++n;	/* in this implementation, the message line is not part
@@ -779,8 +788,19 @@ int n;	/* numeric argument */
 
 {
 	register EWINDOW *wp;
+#if	LOGFLG
+	FILE *fp;			/* file handle for log file */
+#endif
 
-	/* if the command defaults, assume the largest */
+#if	LOGFLG
+	/* append the current command to the log file */
+	fp = fopen("emacs.log", "a");
+	fprintf(fp, "<newwidth %s %d>\n",
+			f == TRUE ? "TRUE" : "FALSE", n);
+	fclose(fp);
+#endif
+
+		/* if the command defaults, assume the largest */
 	if (f == FALSE)
 		n = term.t_mcol;
 

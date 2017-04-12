@@ -4,6 +4,9 @@
 			(C)opyright 1995 by Daniel Lawrence
 */
 
+#define	OQUOTE_CHAR	34
+#define	CQUOTE_CHAR	34
+
 #define	TEXT1	"[Starting new CLI]"
 #define	TEXT2	"[Cannot write filter file]"
 #define	TEXT3	"[Execution failed]"

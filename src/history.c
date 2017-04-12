@@ -1,17 +1,16 @@
 /*
  *	HISTORY.C:	Revision History for
  *
- *	MicroEMACS 4.00
+ *	MicroEMACS 5.00
  *		written by Daniel M. Lawrence
- *		based on code by Dave G. Conroy.
  *
- *	(C)Copyright 1995 by Daniel M. Lawrence
- *	MicroEMACS 4.00 can be copied and distributed freely for any
+ *	(C)Copyright 2008 by Daniel M. Lawrence
+ *	MicroEMACS 5.00 can be copied and distributed freely for any
  *	non-commercial purposes. Commercial users may use MicroEMACS
- *	4.00 inhouse. Shareware distributors may redistribute
- *	MicroEMACS 4.00 for media costs only. MicroEMACS 4.00 can only
+ *	5.00 inhouse. Shareware distributors may redistribute
+ *	MicroEMACS 5.00 for media costs only. MicroEMACS 5.00 can only
  *	be incorporated into commercial software or resold with the
- *	permission of the current author.
+ *	permission of the author.
  *
  *
  * REVISION HISTORY:
@@ -2532,6 +2531,49 @@
  *	  This had been a problem in the Windows NT driver.......
  *	- some lowercase "void" function declarations in eval.c, screen.c
  *	  and undo.c has to be made "VOID". The SUN showed is this.
+ *	[Released version 4.00 final in april 1995]
+ *	20 May 97
+ *	- inserted missing color change calls in nteeop() in NTCONIO.C
+ *	  fixing color redraw problems under Windows NT
+ *	- took out printing of unknown input sequence from NTCONIO.C
+ *	  I think we have all that we are going to map by now
+ *	14 Sep 97
+ *	- added structure for WORDSETS... groups of words to highlight
+ *	  in different colors. This is preporatory to Syntactical coloring.
+ *	23 Jun 98
+ *	- fixed bug in &MID so that an empty string is returned if the
+ *	  start position is beyond the end of the string argument.
+ *	- fixed a bug in the cursor positioning in the completion
+ *	  functions that hid the completions under NT
+ *	- forced ALT- keys under NT to be uppercase like designed
+ *	24 Jun 98
+ *	- forced output of mlout() characters to work appropriately
+ *	  under NT. This kludge calls both the C library routine and
+ *	  the API update routines for each character. Got to figure
+ *	  out what is going on and fix this eventually.
+ *	29 Jun 98
+ *	- changed max string buffer, variable contents lengths to 512 bytes
+ *	- added $oquote and $cquote, open and close quote character strings.
+ *	  These get used during the fence matching activity. If they are
+ *	  not the same (like in french) they can even nest.
+ *	03 May 2001
+ *	- updated minor release # to 4 (4.04)
+ *	- describe-variable command no longer allows very long vars to
+ *	  overflow buffer when building list.
+ *	20 Oct 2001
+ *	- updated minor release # to 5 (4.05)
+ *	- Installed Malcom Kay's fixes for the extended horizontal line
+ *	  scrolling problem.
+ *	9-20 Jan 2008
+ *	- Changed major version number to 5.00
+ *	- created Windows XP version from NT code (added XP.C and XPCONIO.C)
+ *	- made changes to compile with Visual Studio 2008
+ *	- looks up window size and adjusts at startup
+ *	- updates console window title correctly
+ *	- extended LOGFLG code to show execkey() call contents and resizing info
+ *	- added mouse-resize2-window as a new simpler mouse resize command for XP to use
+ *	- caused XP code (in XPCONIO.C) to create new mouse input sequence
+ *	  [0 MOUS #col #row 2] as MS2 and bound it to mouse-resize2-window
  */
 
 history()

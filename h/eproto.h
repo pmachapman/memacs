@@ -76,7 +76,7 @@ extern int PASCAL NEAR screen_index(SCREEN *sp);
 extern int PASCAL NEAR insert_screen(SCREEN *sp);
 extern int PASCAL NEAR select_screen(SCREEN *sp, int announce);
 extern int PASCAL NEAR free_screen(SCREEN *sp);
-extern char *allocate(unsigned nbytes);
+extern char *Eallocate(unsigned nbytes);
 extern char *dolock(char *fname);
 extern char *getpath(char *filespec);
 extern char *gtname(char *filespec);
@@ -235,7 +235,7 @@ extern int PASCAL NEAR upscreen(int f, int n);
 extern int PASCAL NEAR vtinit(VOID);
 extern int PASCAL NEAR yank(int f, int n);
 extern int PASCAL NEAR yank_pop(int f, int n);
-extern int release(char *mp);
+extern int Erelease(char *mp);
 extern int set_key(KEYTAB *key, char *name);
 extern int xunlock(char *fname);
 extern KEYTAB *getbind(int c);
@@ -411,6 +411,7 @@ extern int PASCAL NEAR reposition(int f, int n);
 extern int PASCAL NEAR resetkey(VOID);
 extern int PASCAL NEAR resize(int f, int n);
 extern int PASCAL NEAR resizm(int f, int n);
+extern int PASCAL NEAR resizm2(int f, int n);
 extern int PASCAL NEAR resterr(VOID);
 extern int PASCAL NEAR restwnd(int f, int n);
 extern int PASCAL NEAR savewnd(int f, int n);
@@ -550,9 +551,11 @@ extern int PASCAL NEAR backtagword(int f, int n); /* return from tagged word */
 
 /* some library redefinitions */
 
+#if WINXP == 0
 char *strrev(char *);
+#endif
 
-#if WINNT || WINDOW_MSWIN || (MSDOS && IC) || GCC || VMS
+#if WINXP || WINNT || WINDOW_MSWIN || (MSDOS && IC) || GCC || VMS
 #include <stdlib.h>
 #include <string.h>
 #else
@@ -616,7 +619,7 @@ extern int PASCAL NEAR screen_index();
 extern int PASCAL NEAR insert_screen();
 extern int PASCAL NEAR select_screen();
 extern int PASCAL NEAR free_screen();
-extern char *allocate();
+extern char *Eallocate();
 extern char *dolock();
 extern char *getpath();
 extern char *gtname();
@@ -769,7 +772,7 @@ extern int PASCAL NEAR upscreen();
 extern int PASCAL NEAR vtinit();
 extern int PASCAL NEAR yank();
 extern int PASCAL NEAR yank_pop();
-extern int release();
+extern int Erelease();
 extern int set_key();
 extern int xunlock();
 extern KEYTAB *getbind();

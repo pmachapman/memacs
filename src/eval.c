@@ -188,7 +188,7 @@ char *fname;		/* name of function to evaluate */
 		case UFLOWER:	return(mklower(arg1));
 		case UFMID:	arg = asc_int(arg2);
 				if (arg > strlen(arg1))
-					arg = strlen(arg1);
+					return(strcpy(result, ""));
 				return(bytecopy(result, &arg1[arg-1],
 					asc_int(arg3)));
 		case UFMKCOL:	if ((arg = asc_int(arg1)) < 0 || arg >= NMARKS ||
@@ -359,6 +359,7 @@ char *vname;		/* name of environment variable to retrieve */
 		case EVCFNAME:	return(curbp->b_fname);
 		case EVCMDHK:	return(fixnull(getfname(&cmdhook)));
 		case EVCMODE:	return(int_asc(curbp->b_mode));
+		case EVCQUOTE:	return(int_asc(cquote));
 		case EVCURCHAR:
 			return(lused(curwp->w_dotp) ==
 					curwp->w_doto ? int_asc('\r') :
@@ -402,6 +403,7 @@ char *vname;		/* name of environment variable to retrieve */
 		case EVMSFLAG:	return(ltos(mouseflag));
 		case EVNEWSCRN:	return(ltos(newscreenflag));
 		case EVNUMWIND: return(int_asc(gettwnum()));
+		case EVOQUOTE:	return(int_asc(oquote));
 		case EVORGCOL:	return(int_asc(term.t_colorg));
 		case EVORGROW:	return(int_asc(term.t_roworg));
 		case EVOS:	return(os);
@@ -888,6 +890,8 @@ char *value;	/* value to set to */
 		case EVCMODE:	curbp->b_mode = asc_int(value);
 				curwp->w_flag |= WFMODE;
 				break;
+ 		case EVCQUOTE:	cquote = asc_int(value);
+				break;
 		case EVCURCHAR: ldelete(1L, FALSE);	/* delete 1 char */
 				c = asc_int(value);
 				if (c == '\r')
@@ -998,6 +1002,8 @@ char *value;	/* value to set to */
 		case EVNEWSCRN:	newscreenflag = stol(value);
 				break;
 		case EVNUMWIND: break;
+ 		case EVOQUOTE:	oquote = asc_int(value);
+				break;
 		case EVORGCOL:	status = new_col_org(TRUE, asc_int(value));
 				break;
 		case EVORGROW:	status = new_row_org(TRUE, asc_int(value));
@@ -1612,9 +1618,10 @@ int f,n;	/* prefix flag and argument */
 {
 	register BUFFER *varbuf;/* buffer to put variable list into */
 	register int uindex;	/* index into uvar table */
+	register int olen;		/* current length of output string */
 	UTABLE *ut;		/* user variable table pointer */
 	PARG *cur_arg;		/* ptr to buffers argument list */
-	char outseq[256];	/* output buffer for keystroke sequence */
+	char outseq[NSTRING];	/* output buffer for keystroke sequence */
 
 	/* and get a buffer for it */
 	varbuf = bfind(TEXT56, TRUE, BFINVS);
@@ -1638,7 +1645,9 @@ int f,n;	/* prefix flag and argument */
 		pad(outseq, 14);
 	        
 		/* add in the value */
-		strcat(outseq, gtenv(envars[uindex]));
+		olen = strlen(outseq);
+		strncat(outseq, gtenv(envars[uindex]), NSTRING - olen - 1);
+		outseq[NSTRING - 1] = 0;
 
 		/* and add it as a line into the buffer */
 		if (addline(varbuf, outseq) != TRUE)
@@ -1689,7 +1698,9 @@ int f,n;	/* prefix flag and argument */
 			pad(outseq, 14);
 		        
 			/* add in the value */
-			strcat(outseq, ut->uv[uindex].u_value);
+			olen = strlen(outseq);
+			strncat(outseq, ut->uv[uindex].u_value, NSTRING - olen - 1);
+			outseq[NSTRING - 1] = 0;
 	
 			/* and add it as a line into the buffer */
 			if (addline(varbuf, outseq) != TRUE)

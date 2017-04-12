@@ -11,7 +11,7 @@
 #include	"elang.h"
 #include	"epath.h"
 
-PASCAL NEAR help(f, n)	/* give me some help!!!!
+PASCAL NEAR help(f, n)	/* give me some help!!!!!
 		   bring up a fake buffer and read the help file
 		   into it with view mode			*/
 
@@ -1011,11 +1011,26 @@ int f, n;	/* agruments to C function */
 
 {
 	register int status;	/* error return */
+#if	LOGFLG
+	FILE *fp;			/* file handle for log file */
+	char outseq[32];
+#endif
 
 	if (key->k_type == BINDFNC) {
+
+#if	LOGFLG
+		/* append the current command to the log file */
+		cmdstr(key->k_code, &outseq);
+		fp = fopen("emacs.log", "a");
+		fprintf(fp, "<[%s] %s %s %d>\n", outseq, getfname(key),
+				f == TRUE ? "TRUE" : "FALSE", n);
+		fclose(fp);
+#endif
+
 		undo_insert(OP_CMND, 1, obj);
 		return((*(key->k_ptr.fp))(f, n));
 	}
+
 	if (key->k_type == BINDBUF) {
 		while (n--) {
 			status = dobuf(key->k_ptr.buf);

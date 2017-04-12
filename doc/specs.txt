@@ -1,0 +1,399 @@
+MicroEMACS 4.0 Specifications
+
+	MicroEMACS is a tool for creating and changing documents,
+programs, and other text files. It is both relatively easy for the
+novice to use, but also very powerful in the hands of an expert.
+MicroEMACS can be extensively customized for the needs of the individual
+user.
+
+	MicroEMACS allows several files to be edited at the same time.
+The screen can be split into different windows and screens, and text may
+be moved freely from one window on any screen to the next. Depending on
+the type of file being edited, MicroEMACS can change how it behaves to
+make editing simple. Editing standard text files, program files and
+word processing documents are all possible at the same time.
+
+	There are extensive capabilities to make word processing and
+editing easier. These include commands for string searching and
+replacing, paragraph reformatting and deleting, automatic word wrapping,
+word move and deletes, easy case controlling, and automatic word counts.
+
+	For complex and repetitive editing tasks editing macroes can be
+written. These macroes allow the user a great degree of flexibility in
+determining how MicroEMACS behaves. Also, any and all the commands can
+be used by any keystroke by changing, or rebinding, what commands
+various keys invoke. A full multilevel Undo facility allows the user to
+recover from most editing errors with little effort.
+
+	Special features are also available to perform a diverse set of
+operations such as file encryption, automatic backup file generation,
+entabbing and detabbing lines, executing operating system commands and
+filtering of text through other programs (like SORT to allow sorting
+text).
+
+Specifications include:
+
+# of key bindings				300
+# of loaded file buffers			256
+Max # of characters in file name		256
+Max # of characters in buffer name		128
+Max # of character in string variable		512
+Max keystokes in keyboard macro			4096
+Max # of characters in search pattern		512
+# of current marks in buffer			16
+Maximin # characters in line			unlimited
+
+Editor Commands include:
+
+abort-command
+add-abbrev
+add-global-mode
+add-keymap
+add-mode
+append-file
+apropos
+back-from-tag-word
+backward-character
+begin-macro
+beginning-of-file
+beginning-of-line
+bind-to-key
+bind-to-menu
+buffer-position
+cascade-screens
+case-region-lower
+case-region-upper
+case-word-capitalize
+case-word-lower
+case-word-upper
+change-file-name
+change-screen-column
+change-screen-row
+change-screen-size
+change-screen-width
+clear-and-redraw
+clear-message-line
+clip-region
+copy-region
+count-words
+ctlx-prefix
+cut-region
+cycle-ring
+cycle-screens
+define-abbrevs
+delete-abbrev
+delete-blank-lines
+delete-buffer
+delete-global-mode
+delete-kill-ring
+delete-mode
+delete-next-character
+delete-next-word
+delete-other-windows
+delete-previous-character
+delete-previous-word
+delete-screen
+delete-undos
+delete-window
+describe-abbrevs
+describe-bindings
+describe-functions
+describe-key
+describe-variables
+detab-region
+display
+end-macro
+end-of-file
+end-of-line
+end-of-word
+entab-region
+exchange-point-and-mark
+execute-buffer
+execute-command-line
+execute-file
+execute-macro
+execute-named-command
+execute-procedure
+execute-program
+exit-emacs
+fill-paragraph
+filter-buffer
+find-file
+find-screen
+forward-character
+global
+goto-line
+goto-mark
+goto-matching-fence
+grow-window
+handle-tab
+help
+help-engine
+hunt-backward
+hunt-forward
+i-shell
+incremental-search
+indent-region
+insert-abbrevs
+insert-clip
+insert-file
+insert-space
+insert-string
+kill-abbrevs
+kill-paragraph
+kill-region
+kill-to-end-of-line
+label-function-key
+list-buffers
+list-keymappings
+list-screens
+list-undos
+local
+macro-to-key
+macro-to-menu
+maximize-screen
+meta-prefix
+minimize-screen
+mouse-move
+mouse-move-down
+mouse-move-up
+mouse-region-down
+mouse-region-up
+mouse-resize-screen
+mouse-resize2-screen
+move-window-down
+move-window-up
+name-buffer
+narrow-to-region
+newline
+newline-and-indent
+next-buffer
+next-line
+next-page
+next-paragraph
+next-window
+next-word
+nop
+open-line
+overwrite-string
+pipe-command
+pop-buffer
+previous-line
+previous-page
+previous-paragraph
+previous-window
+previous-word
+print
+query-replace-string
+quick-exit
+quote-character
+re-tag-word
+read-file
+redraw-display
+remove-mark
+rename-screen
+replace-string
+resize-window
+restore-screen
+restore-window
+reverse-incremental-search
+run
+save-file
+save-window
+scroll-next-down
+scroll-next-up
+search-forward
+search-reverse
+select-buffer
+set
+set-encryption-key
+set-mark
+shell-command
+show-files
+shrink-window
+source
+split-current-window
+store-procedure
+suspend-emacs
+tag-word
+tile-screens
+transpose-characters
+trim-region
+unbind-key
+unbind-menu
+undent-region
+undo
+universal-argument
+unmark-buffer
+update-screen
+view-file
+widen-from-region
+wrap-word
+write-file
+write-message
+yank
+yank-pop
+
+Macro Language directives incldue:
+
+!endm		End a macro
+!if (cond)	conditional execution
+!else
+!endif
+!return	<rval>	Return (terminating current macro/
+!goto <label>	Jump to a label in the current macro
+!force		Force macro to continue...even if command fails
+!while (cond)	Execute a loop if the condition is true
+!endwhile
+
+
+Macro Language environment variables include:
+
+$abbell		ring bell on abbreviation expansion?
+$abcap		match capitolization in expansions
+$abquick	quick, aggressive expansions enabled?
+$acount		# of chars until next auto-save
+$asave		# of chars between auto-saves
+$bufhook	enter buffer switch hook
+$cbflags	current buffer flags
+$cbufname	current buffer name
+$cfname		current file name
+$cmdhook	command loop hook
+$cmode		mode of current buffer
+$cquote		close quote character
+$curchar	current character under the cursor
+$curcol		current column pos of cursor
+$curline	current line in file
+$curwidth	current screen width
+$curwind	current window ordinal on current screen
+$cwline		current screen line in window
+$debug		macro debugging
+$deskcolor	desktop color
+$diagflag	diagonal mouse movements enabled?
+$discmd		display commands on command line
+$disinp		display command line input characters
+$disphigh	display high bit characters escaped
+$dispundo	display undo depth on command line
+$exbhook	exit buffer switch hook
+$exithook	exiting emacs hook
+$fcol		first displayed column in curent window
+$fillcol	current fill column
+$flicker	flicker supression
+$fmtlead	format command lead characters
+$gflags		global internal emacs flags
+$gmode		global modes
+$hardtab	current hard tab size
+$hilight	region # to hilight (255 to turn off)
+$hjump		horizontal screen jump size
+$hscrlbar	horizontal scroll bar flag
+$hscroll	horizontal scrolling flag
+$isterm		incremental-search terminator character
+$kill		kill buffer (read only)
+$language	language of text messages
+$lastkey	last keyboard char struck
+$lastmesg	last string mlwrite()ed
+$line		text of current line
+$lterm		current line terminator for writes
+$lwidth		width of current line
+$match		last matched magic pattern
+$mmove		mouse moves events style
+$modeflag	Modelines displayed flag
+$msflag		activate mouse?
+$newscreen	new screen with new buffer?
+$numwind	number of windows on current screen
+$oquote		open quote character
+$orgcol		screen origin column
+$orgrow		screen origin row
+$os		what Operating System?
+$overlap	line overlap when paging
+$pagelen	number of lines used by editor
+$palette	current palette string
+$paralead	paragraph leadin characters
+$pending	type ahead pending flag
+$popflag	pop-up windows active?
+$popwait	user wait on end of pop-up window?
+$posflag	display point position on modeline?
+$progname	returns current prog name - "MicroEMACS"
+$ram		ram in use by malloc
+$readhook	read file execution hook
+$region		current region (read only)
+$replace	replacement pattern
+$rval		child process return value
+$scrname	current screen name
+$search		search pattern
+$searchpnt	differing search styles (term point)
+$seed		current random number seed
+$softtab	current soft tab size
+$sres		current screen resolution
+$ssave		safe save flag
+$sscroll	smooth scrolling flag
+$status		returns the status of the last command
+$sterm		search terminator character
+$target		target for line moves
+$time		date and time
+$timeflag	display time?
+$tpause		length to pause for paren matching
+$undoflag	currently processing undos
+$version	current version number
+$vscrlbar	vertical scroll bar flag
+$wchars		set of characters legal in words
+$wline		# of lines in current window
+$wraphook	wrap word execution hook
+$writehook	write file hook
+$xpos		current mouse X position
+$yankflag	point placement at yanked/included text
+$ypos		current mouse Y position
+
+
+Included Macro Language functions:
+
+&abbrev		look up abbreviation
+&abs		absolute value of a number
+&add		add two numbers together
+&and		logical and
+&ascii		char to integer conversion
+&band		bitwise and	 9-10-87  jwm
+&bind		loopup what function name is bound to a key
+&bnot		bitwise not
+&bor		bitwise or	 9-10-87  jwm
+&bxor		bitwise xor	 9-10-87  jwm
+&call		call a procedure
+&cat		concatenate string
+&chr		integer to char conversion
+&divide		division
+&env		retrieve a system environment var
+&equal		logical equality check
+&exist		check if a file exists
+&find		look for a file on the path...
+&greater	logical greater than
+&group		return group match in MAGIC mode
+&gtc		get 1 emacs command
+&gtk		get 1 charater
+&indirect	evaluate indirect value
+&isnum		is the arg a number?
+&left		left string(string, len)
+&length		string length
+&less		logical less than
+&lower		lower case string
+&mid		mid string(string, pos, len)
+&mkcol		column position of a mark
+&mkline		line number of a mark
+&modulo		mod
+&negate		negate
+&not		logical not
+&or		logical or
+&reverse	reverse
+&right		right string(string, pos)
+&rnd		get a random number
+&sequal		string logical equality check
+&sgreater	string logical greater than
+&sindex		find the index of one string in another
+&sless		string logical less than
+&slower		set lower to upper char translation
+&subtract	subtraction
+&supper		set upper to lower char translation
+&times		multiplication
+&trim		trim whitespace off the end of a string
+&true		Truth of the universe logical test
+&upper		uppercase string
+&xlate		XLATE character string translation

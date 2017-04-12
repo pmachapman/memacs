@@ -5,6 +5,9 @@
 			Translated by Jose Berrios
 */
 
+#define	OQUOTE_CHAR	34
+#define	CQUOTE_CHAR	34
+
 #define	TEXT1	"[Empezando un nuevo CLI]"
 #define	TEXT2	"[No puedo escribir el filtro de los archivos]"
 #define	TEXT3	"[Execution failed]"

@@ -157,6 +157,7 @@ NOSHARE NBIND	names[] = {
 	{"mouse-region-down",		mregdown},
 	{"mouse-region-up",		mregup},
 	{"mouse-resize-screen",		resizm},
+	{"mouse-resize2-screen",	resizm2},
 #endif
 	{"move-window-down",		mvdnwind},
 	{"move-window-up",		mvupwind},

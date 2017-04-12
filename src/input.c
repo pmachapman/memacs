@@ -563,6 +563,7 @@ int *cpos;	/* ptr to position of next character to insert */
 		/* remember we matched, and complete one character */
 		comflag = TRUE;
 		TTputc(name[(*cpos)++]);
+		++ttcol;
 		TTflush();
 	}
 
@@ -676,6 +677,7 @@ int *cpos;	/* ptr to position of next character to insert */
 		/* remember we matched, and complete one character */
 		comflag = TRUE;
 		TTputc(name[(*cpos)++]);
+		++ttcol;
 		TTflush();
 	}
 
@@ -785,6 +787,7 @@ int *cpos;	/* ptr to position of next character to insert */
 	for ( ; (*cpos < (NSTRING-1)) && (*cpos < longestlen); (*cpos)++) {
 		name[*cpos] = longestmatch[*cpos];
 		TTputc(name[*cpos]);
+		++ttcol;
 	}
 
 	name[*cpos] = 0;

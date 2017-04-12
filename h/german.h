@@ -6,6 +6,9 @@
 			(C)opyright 1995 by Daniel Lawrence
 */
 
+#define	OQUOTE_CHAR	34
+#define	CQUOTE_CHAR	34
+
 #define	TEXT1	"[neuer Kommando-Interpreter wird gestartet]"
 /* if `CLI' is the Amiga-specific term, better keep the keyword: */
 /* #define TEXT1	"[neuer CLI wird gestartet]" */

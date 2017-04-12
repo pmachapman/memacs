@@ -1158,6 +1158,7 @@ int f, n;				/* not used */
 	register char ch;	/* fence type to match against */
 	register char ofence;	/* open fence */
 	register char c;	/* current character in scan */
+	register int qlevel;	/* quote level */
 
 	/* save the original cursor position */
 	oldlp = curwp->w_dotp;
@@ -1203,6 +1204,7 @@ int f, n;				/* not used */
 
 	/* set up for scan */
 	count = 1;
+	qlevel = 0;
 
 	/* scan until we find it, or reach the end of file */
 	while (count > 0)
@@ -1216,10 +1218,33 @@ int f, n;				/* not used */
 			c = '\r';
 		else
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
-		if (c == ch)
-			++count;
-		if (c == ofence)
-			--count;
+
+		/* these only happen when we are outside quotes */
+		if ((oquote == 0) || (qlevel == 0)) {
+
+			if (c == ch)
+				++count;
+			if (c == ofence)
+				--count;
+		}
+
+		/* if we are quoting.... */
+		if (oquote != 0) {
+			if (oquote == cquote) {
+
+				/* only one quote character */
+				if (c == oquote)
+					qlevel = 1 - qlevel;
+			} else {
+				/* track opens and closes */
+				if (c == oquote)
+					++qlevel;
+				if (c == cquote)
+					--qlevel;
+			}
+		}
+
+		/* at the end/beginning of the buffer.... abort */
 		if (boundry(curwp->w_dotp, curwp->w_doto, sdir))
 			break;
 		}
@@ -1256,6 +1281,7 @@ char ch;	/* fence type to match against */
 	register int count;	/* current fence level count */
 	register char opench;	/* open fence */
 	register char c;	/* current character in scan */
+	register int qlevel;	/* quote level */
 	register int i;
 
 	/* first get the display update out there */
@@ -1276,20 +1302,44 @@ char ch;	/* fence type to match against */
 	/* find the top line and set up for scan */
 	toplp = lback(curwp->w_linep);
 	count = 1;
+	qlevel = 0;
 	backchar(FALSE, 1);
 
 	/* scan back until we find it, or reach past the top of the window */
-	while (count > 0 && curwp->w_dotp != toplp)
-		{
+	while (count > 0 && curwp->w_dotp != toplp) {
+
 		backchar(FALSE, 1);
 		if (curwp->w_doto == lused(curwp->w_dotp))
 			c = '\r';
 		else
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
-		if (c == ch)
-			++count;
-		if (c == opench)
-			--count;
+
+		/* these only happen when we are outside quotes */
+		if ((oquote == 0) || (qlevel == 0)) {
+
+			if (c == ch)
+				++count;
+			if (c == opench)
+				--count;
+		}
+
+		/* if we are quoting.... */
+		if (oquote != 0) {
+			if (oquote == cquote) {
+
+				/* only one quote character */
+				if (c == oquote)
+					qlevel = 1 - qlevel;
+			} else {
+				/* track opens and closes */
+				if (c == oquote)
+					++qlevel;
+				if (c == cquote)
+					--qlevel;
+			}
+		}
+
+		/* stop at the beginning of the buffer */
 		if (curwp->w_dotp == lforw(curwp->w_bufp->b_linep) &&
 			curwp->w_doto == 0)
 			break;

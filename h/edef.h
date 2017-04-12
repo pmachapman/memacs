@@ -144,6 +144,8 @@ NOSHARE int hilite = 10;		/* current region to highlight (255 if none) */
 
 /* uninitialized global definitions */
 
+NOSHARE int oquote;		/* open quote variable */
+NOSHARE int cquote;		/* close quote variable */
 NOSHARE int DNEAR currow;	/* Cursor row			*/
 NOSHARE int DNEAR curcol;	/* Cursor column		*/
 NOSHARE int DNEAR thisflag;	/* Flags, this command		*/
@@ -380,6 +382,8 @@ NOSHARE extern int hilite;		/* current region to highlight (255 if none) */
 
 /* uninitialized global external declarations */
 
+NOSHARE extern int oquote;		/* open quote variable */
+NOSHARE extern int cquote;		/* close quote variable */
 NOSHARE extern int DNEAR currow;	/* Cursor row			*/
 NOSHARE extern int DNEAR curcol;	/* Cursor column		*/
 NOSHARE extern int DNEAR thisflag;	/* Flags, this command		*/

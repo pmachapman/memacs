@@ -53,8 +53,8 @@ char *fname;
 }
 #endif
 
-#if	FILOCK && (MSDOS || WINNT || OS2 || SUN || USG || AIX || AUX || AVIION || BSD || FREEBSD || HPUX8 || HPUX9 || AMIGA)
-#if	OS2 || ((MSDOS || WINNT) && MSC) || BSD || FREEBSD
+#if	FILOCK && (MSDOS || WINNT || WINXP || OS2 || SUN || USG || AIX || AUX || AVIION || BSD || FREEBSD || HPUX8 || HPUX9 || AMIGA)
+#if	OS2 || ((MSDOS || WINNT || WINXP) && MSC) || BSD || FREEBSD
 #include	<sys/types.h>
 #endif
 #include	<sys/stat.h>
@@ -67,7 +67,7 @@ char *fname;
 #include	<signal.h>
 #endif
 
-#if	WINNT && MSC
+#if	(WINNT || WINXP) && MSC
 #include <direct.h>
 #define chdir	_chdir
 #define getcwd	_getcwd
@@ -237,7 +237,7 @@ char *filespec;		/* full file spec of file to lock */
 	printf("Locking [%s] [%s]\n", pathname, filename); tgetc();
 #endif
 
-#if	MSDOS == 0 && WINNT == 0 && OS2 == 0
+#if	MSDOS == 0 && WINNT == 0 && WINXP == 0 && OS2 == 0
 	/* check to see if we can access the path */
 	if (stat(pathname, &sb) != 0) {
 #if	LOCKDEBUG
@@ -268,7 +268,7 @@ char *filespec;		/* full file spec of file to lock */
 #if	LOCKDEBUG
 		printf("MKDIR(%s)\n", lockpath); tgetc();
 #endif
-#if	MSDOS || WINNT || OS2
+#if	MSDOS || WINNT || WINXP || OS2
 		if (mkdir(lockpath) != 0) {
 #else
 		if (mkdir(lockpath, 0777) != 0) {
@@ -307,7 +307,7 @@ char *filespec;		/* full file spec of file to lock */
 		}
 
 		/* and output the info needed */
-#if	MSDOS || WINNT || OS2
+#if	MSDOS || WINNT || WINXP || OS2
 		fprintf(fp, "0\n");		/* process ID */
 #endif
 #if	SUN
@@ -330,7 +330,7 @@ char *filespec;		/* full file spec of file to lock */
 		if (getenv("HOST"))
 			fprintf(fp, "%s\n", getenv("HOST"));
 		else {
-#if	MSDOS || WINNT || OS2
+#if	MSDOS || WINNT || WINXP || OS2
 			fprintf(fp, "<unknown>\n");
 #endif
 #if	SUN

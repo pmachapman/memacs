@@ -1,11 +1,11 @@
 /*
- *	MicroEMACS 4.00
+ *	MicroEMACS 5.00
  *		written by Daniel M. Lawrence
  *		based on code by Dave G. Conroy.
  *
- *	(C)Copyright 1988-1995 by Daniel M. Lawrence
- *	MicroEMACS 4.00 can be copied and distributed freely for any
- *	non-commercial purposes. MicroEMACS 4.00 can only be incorporated
+ *	(C)Copyright 1988-2009 by Daniel M. Lawrence
+ *	MicroEMACS 5.00 can be copied and distributed freely for any
+ *	non-commercial purposes. MicroEMACS 5.00 can only be incorporated
  *	into commercial software with the permission of the current author.
  *
  * This file contains the main driving routine, and some keyboard processing
@@ -658,6 +658,11 @@ char bname[];			/* name of buffer to initialize */
 	register BUFFER *bp;
 	register int index;
 
+	/* the quote characters are LANGUAGE SPECIFIC
+	   so they need to be inited here instrad of in the header file */
+	oquote = OQUOTE_CHAR;
+	cquote = CQUOTE_CHAR;
+
 	/* init the kill ring */
 	for (index = 0;  index < NRING;  index++) {
 		kbufp[index] = (KILL *) NULL;
@@ -1146,7 +1151,7 @@ char *sp;				/* string to copy */
 	with this code defined, the environment variable, $RAM, will
 	report on the number of bytes allocated via malloc.
 
-	with SHOWRAM defined, the number is also posted on the
+	with RAMSHOW defined, the number is also posted on the
 	end of the bottom mode line and is updated whenever it is changed.
 */
 
@@ -1158,7 +1163,7 @@ char *sp;				/* string to copy */
 #define free	VAXC$FREE_OPT
 #endif
 
-char *allocate(nbytes)	/* allocate nbytes and track */
+char *Eallocate(nbytes)	/* allocate nbytes and track */
 
 unsigned nbytes;	/* # of bytes to allocate */
 
@@ -1190,7 +1195,7 @@ unsigned nbytes;	/* # of bytes to allocate */
 	return(mp);
 }
 
-release(mp)	/* release malloced memory and track */
+Erelease(mp)	/* release malloced memory and track */
 
 char *mp;	/* chunk of RAM to release */
 

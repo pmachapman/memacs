@@ -6,6 +6,9 @@
 			(using a complex but neat MicroEMACS macro)
 */
 
+#define	OQUOTE_CHAR	34
+#define	CQUOTE_CHAR	34
+
 #define	TEXT1	"[Tartingsay ewnay LICAY]"
 #define	TEXT2	"[Annotcay riteway ilterfay ilefay]"
 #define	TEXT3	"[Executionway ailedfay]"
@@ -228,15 +231,20 @@
 #define	TEXT220	"Inelay %D/%D Olcay %d/%d Archay %D/%D (%d%%) archay = 0x%x%x"
 #define TEXT221 "Ootay anymay oupsgray"
 #define TEXT222 "Oupgray otnay endedway"
-#define	TEXT223 "%%Column origin out of range"
-#define	TEXT224 "%%Row origin out of range"
-#define	TEXT225 "[Switched to screen %s]"
-#define	TEXT226	"%%Can not kill an executing buffer"
-#define	TEXT227 "\n--- Press any key to Continue ---"
+#define	TEXT223 "%%Olumncay originway outway ofway angeray"
+#define	TEXT224 "%%Owray originway outway ofway angeray"
+#define	TEXT225 "[Witchedsay otay eenscray %s]"
+#define	TEXT226	"%%Ancay otnay illkay anway executingway ufferbay"
+#define	TEXT227 "\n--- Esspray anyway eykay otay Ontinuecay ---"
 #define TEXT228 "[Illkay ingray earedclay]"
 #define TEXT229 " inway < "
 #define TEXT230 "> atay inelay "
-
+#define	TEXT231	"Abbreviationway otay etsay: "
+#define	TEXT232	"Abbreviationway otay eleteday: "
+#define	TEXT233	"[Uildingbay Abbreviationway istlay]"
+#define	TEXT234	"Abbreviationway istlay"
+#define	TEXT235	"Ancay otnay isplayday abbreviationway istlay"
+#define TEXT236 "Efineday Abbreviationways inway ufferbay"
 #define TEXT240 "[Onay Uchsay Eenscray]"
 #define TEXT241 "%%An'tcay eleteday urrentcay eenscray"
 #define TEXT242 "Indfay Eenscray: "

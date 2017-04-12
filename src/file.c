@@ -175,7 +175,7 @@ int lockfl;		/* check the file for locks? */
 	char bname[NBUFN];	/* buffer name to put file */
 	char prompt[NSTRING];	/* string for collisions prompt */
 
-#if	MSDOS | WINNT | AOSVS | VMS | TOS
+#if	MSDOS | WINNT | WINXP | AOSVS | VMS | TOS
 	mklower(fname); 	       /* msdos isn't case sensitive */
 #endif
 	for (bp=bheadp; bp!=NULL; bp=bp->b_bufp) {
@@ -416,7 +416,7 @@ char *fname;
 	while (cp1!=&fname[0] && cp1[-1]!=':' && cp1[-1]!=']')
 		--cp1;
 #endif
-#if	MSDOS | OS2 | WINNT
+#if	MSDOS | OS2 | WINNT | WINXP
 	while (cp1!=&fname[0] && cp1[-1]!=':' && cp1[-1]!='\\'&&cp1[-1]!='/')
 		--cp1;
 #endif

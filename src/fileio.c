@@ -106,7 +106,7 @@ PASCAL NEAR ffclose()
 	putc(26, ffp);		/* add a ^Z at the end of the file */
 #endif
 	
-#if     USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | SUN | XENIX | BSD || FREEBSD | WMCS | VMS | (MSDOS & (LATTICE | MSC | TURBO | IC | ZTC)) | WINNT | OS2 | (TOS & MWC) | AVIION
+#if     USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | SUN | XENIX | BSD || FREEBSD | WMCS | VMS | (MSDOS & (LATTICE | MSC | TURBO | IC | ZTC)) | WINNT | WINXP | OS2 | (TOS & MWC) | AVIION
         if (fclose(ffp) != FALSE) {
                 mlwrite(TEXT156);
 /*                      "Error closing file" */

@@ -20,6 +20,7 @@ NOSHARE char *envars[] = {
 	"cfname",		/* current file name */
 	"cmdhook",		/* command loop hook */
 	"cmode",		/* mode of current buffer */
+	"cquote",		/* close quote character */
 	"curchar",		/* current character under the cursor */
 	"curcol",		/* current column pos of cursor */
 	"curline",		/* current line in file */
@@ -60,6 +61,7 @@ NOSHARE char *envars[] = {
 	"msflag",		/* activate mouse? */
 	"newscreen",		/* new screen with new buffer? */
 	"numwind",		/* number of windows on current screen */
+	"oquote",		/* open quote character */
 	"orgcol",		/* screen origin column */
 	"orgrow",		/* screen origin row */
 	"os",			/* what Operating System? */
@@ -118,87 +120,89 @@ NOSHARE char *envars[] = {
 #define EVCFNAME	8
 #define EVCMDHK 	9
 #define EVCMODE 	10
-#define EVCURCHAR	11
-#define EVCURCOL	12
-#define EVCURLINE	13
-#define EVCURWIDTH	14
-#define EVCURWIND	15
-#define EVCWLINE	16
-#define EVDEBUG         17
-#define EVDESKCLR	18
-#define EVDIAGFLAG      19
-#define EVDISCMD        20
-#define EVDISINP        21
-#define EVDISPHIGH	22
-#define EVDISPUNDO	23
-#define EVEXBHOOK       24
-#define EVEXITHOOK	25
-#define EVFCOL		26
-#define EVFILLCOL	27
-#define EVFLICKER	28
-#define EVFMTLEAD	29
-#define EVGFLAGS	30
-#define EVGMODE 	31
-#define EVHARDTAB	32
-#define EVHILITE	33
-#define EVHJUMP		34
-#define EVHSCRLBAR      35
-#define EVHSCROLL	36
-#define EVISTERM	37
-#define EVKILL          38
-#define EVLANG          39
-#define EVLASTKEY       40
-#define EVLASTMESG      41
-#define EVLINE          42
-#define EVLTERM		43
-#define EVLWIDTH        44
-#define EVMATCH         45
-#define EVMMOVE		46
-#define EVMODEFLAG      47
-#define EVMSFLAG        48
-#define EVNEWSCRN	49
-#define EVNUMWIND	50
-#define EVORGCOL	51
-#define EVORGROW	52
-#define EVOS		53
-#define EVOVERLAP	54
-#define EVPAGELEN       55
-#define EVPALETTE       56
-#define EVPARALEAD	57
-#define EVPENDING       58
-#define EVPOPFLAG	59
-#define EVPOPWAIT	60
-#define EVPOSFLAG	61
-#define EVPROGNAME      62
-#define EVRAM           63
-#define EVREADHK        64
-#define EVREGION	65
-#define EVREPLACE       66
-#define EVRVAL          67
-#define EVSCRNAME	68
-#define EVSEARCH        69
-#define EVSEARCHPNT	70
-#define EVSEED          71
-#define EVSOFTTAB	72
-#define EVSRES          73
-#define EVSSAVE         74
-#define EVSSCROLL	75
-#define EVSTATUS	76
-#define EVSTERM 	77
-#define EVTARGET	78
-#define EVTIME		79
-#define EVTIMEFLAG	80
-#define EVTPAUSE	81
-#define EVUNDOFLAG	82
-#define EVVERSION	83
-#define EVVSCRLBAR      84
-#define EVWCHARS	85
-#define EVWLINE 	86
-#define EVWRAPHK	87
-#define EVWRITEHK	88
-#define EVXPOS		89
-#define EVYANKFLAG	90
-#define EVYPOS		91
+#define	EVCQUOTE	11
+#define EVCURCHAR	12
+#define EVCURCOL	13
+#define EVCURLINE	14
+#define EVCURWIDTH	15
+#define EVCURWIND	16
+#define EVCWLINE	17
+#define EVDEBUG         18
+#define EVDESKCLR	19
+#define EVDIAGFLAG      20
+#define EVDISCMD        21
+#define EVDISINP        22
+#define EVDISPHIGH	23
+#define EVDISPUNDO	24
+#define EVEXBHOOK       25
+#define EVEXITHOOK	26
+#define EVFCOL		27
+#define EVFILLCOL	28
+#define EVFLICKER	29
+#define EVFMTLEAD	30
+#define EVGFLAGS	31
+#define EVGMODE 	32
+#define EVHARDTAB	33
+#define EVHILITE	34
+#define EVHJUMP		35
+#define EVHSCRLBAR      36
+#define EVHSCROLL	37
+#define EVISTERM	38
+#define EVKILL          39
+#define EVLANG          40
+#define EVLASTKEY       41
+#define EVLASTMESG      42
+#define EVLINE          43
+#define EVLTERM		44
+#define EVLWIDTH        45
+#define EVMATCH         46
+#define EVMMOVE		47
+#define EVMODEFLAG      48
+#define EVMSFLAG        49
+#define EVNEWSCRN	50
+#define EVNUMWIND	51
+#define	EVOQUOTE	52
+#define EVORGCOL	53
+#define EVORGROW	54
+#define EVOS		55
+#define EVOVERLAP	56
+#define EVPAGELEN       57
+#define EVPALETTE       58
+#define EVPARALEAD	59
+#define EVPENDING       60
+#define EVPOPFLAG	61
+#define EVPOPWAIT	62
+#define EVPOSFLAG	63
+#define EVPROGNAME      64
+#define EVRAM           65
+#define EVREADHK        66
+#define EVREGION	67
+#define EVREPLACE       68
+#define EVRVAL          69
+#define EVSCRNAME	70
+#define EVSEARCH        71
+#define EVSEARCHPNT	72
+#define EVSEED          73
+#define EVSOFTTAB	74
+#define EVSRES          75
+#define EVSSAVE         76
+#define EVSSCROLL	77
+#define EVSTATUS	78
+#define EVSTERM 	79
+#define EVTARGET	80
+#define EVTIME		81
+#define EVTIMEFLAG	82
+#define EVTPAUSE	83
+#define EVUNDOFLAG	84
+#define EVVERSION	85
+#define EVVSCRLBAR      86
+#define EVWCHARS	87
+#define EVWLINE 	88
+#define EVWRAPHK	89
+#define EVWRITEHK	90
+#define EVXPOS		91
+#define EVYANKFLAG	92
+#define EVYPOS		93
 
 /*	list of recognized user functions	*/
 

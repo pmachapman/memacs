@@ -21,6 +21,7 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{MOUS|'e',		BINDFNC,	mregdown},
 	{MOUS|'f',		BINDFNC,	mregup},
 	{MOUS|'1',		BINDFNC,	resizm},
+	{MOUS|'2',		BINDFNC,	resizm2},
 #endif 
 
 	{CTRL|'A',		BINDFNC,	gotobol},

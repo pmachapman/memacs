@@ -21,19 +21,19 @@
 		Full Screen Text Editor
 		Reference Manual @i(- Release Version)
 
-		Version 4.0
-		March 20, 1996
+		Version 5.0
+		Jan 20, 2009
 
-		(C)Copyright 1988 - 1996 by Daniel M. Lawrence
-		Reference Manual (C)opyright 1988 - 1996
-			by Brian Straight and Daniel M. Lawrence
+		(C)Copyright 1988 - 2009 by Daniel M. Lawrence
+		Reference Manual (C)opyright 1988 - 2009
+			by Daniel M. Lawrence
 		All Rights Reserved
 
-		@i[(C)Copyright 1988 - 1996 by Daniel M. Lawrence
-		MicroEMACS 4.0 can be copied and distributed freely for any
+		@i[(C)Copyright 1988 - 2009 by Daniel M. Lawrence
+		MicroEMACS 5.0 can be copied and distributed freely for any
 		non-commercial purposes. Commercial users may use MicroEMACS
 		4.0 inhouse. Shareware distributors may redistribute
-		MicroEMACS 4.0 for media costs only. MicroEMACS 4.0 can only
+		MicroEMACS 5.0 for media costs only. MicroEMACS 5.0 can only
 		be incorporated into commercial software or resold with the
 		permission of the current author.]
 @newpage
@@ -87,18 +87,14 @@ author can be contacted by writing to:
 
 @begin(verbatim)
 	USMAIL: Daniel Lawrence
-		617 New York St
-		Lafayette, IN 47901
+	1615 Virginia Street
+	Lafayette, IN 47905
 
 	Internet:	dan@@aquest.com
 
 	Support is provided through:
 
-	The Programmer's Room
-	14,400 Baud
-	Account: uemacs
-	Password: support
-	(317) 742-5533	no parity  8 databits  no stop bits
+	www.microemacs.com
 @end(verbatim)
 @newpage
 @flushleft(@b1[Credits])
@@ -159,7 +155,7 @@ using. But before using MicroEMACS, you must INSTALL it on your computer
 system. Since each computer is different, there is usually a different
 way to install MicroEMACS for each type of computer.
 
-@section(MSDOS, Windows 95, Windows NT, OS/2 - IBM-PCs)
+@section(MSDOS, Windows 95/98/NT/XP/Vista, OS/2 - IBM-PCs)
 	MicroEMACS is packaged for IBM-PC compatable machines as an
 installable package which will configure to the target machine.
 Instillation is very simple. Insert the distribution floppy in the
@@ -228,7 +224,7 @@ the system immediately after building it.
 
 @chapter(Basic Concepts)
 
-	The current version of MicroEMACS is 4.0 (Fourth major re-write,
+	The current version of MicroEMACS is 5.0 (Fifth major re-write,
 initial public release), and for the rest of this document, we shall
 simply refer to this version as "EMACS". Any modifications for later
 versions will be in the file README on the MicroEMACS distribution disk.
@@ -268,7 +264,7 @@ computer's command prompt. On UNIX and MSDOS machines, just type "emacs"
 from the command prompt and follow it with the <RETURN> or <ENTER> key
 (we will refer to this key as <NL> for "new-line" for the remainder of
 this manual). On the Macintosh, the Amiga, the ATARI ST, and under OS/2,
-Windows 95, Windows NT and other icon based operating systems, double
+Windows 95/98/NT/XP/Vista and other icon based operating systems, double
 click on the uEMACS icon. Shortly after this, a screen similar to the
 one below should appear.
 
@@ -294,7 +290,7 @@ f5 fkeys    f6 help	|  Available function key Pages include:
 f7 nxt wind f8 pg[    ] |    WORD  BOX	EMACS  PASCAL  C  cObal  Lisp
 f9 save     f10 exit	|  [use the f8 key to load Pages]
 ===============================================================================
-   MicroEMACS 4.0 ()	   Function Keys
+   MicroEMACS 5.0 ()	   Function Keys
 ===============================================================================
 
 
@@ -308,7 +304,7 @@ f9 save     f10 exit	|  [use the f8 key to load Pages]
 
 
 ===============================================================================
----- MicroEMACS 4.0 [13:28] L:1 C:0 () -- Main --------------------------------
+---- MicroEMACS 5.0 [15:22] L:1 C:0 () -- Main --------------------------------
 ===============================================================================
 		Fig 1:	EMACS screen on an IBM-PC
 @end(verbatim)
@@ -1181,7 +1177,7 @@ The missing text has not been deleted, it is simply not visible, off the
 left hand side of the screen. Notice the mode line has changed and now
 looks similar to this:
 
-@flushleft(==== MicroEMACS 4.0 [15:12] [<12] L:4 C:23 () == fang.txt == File: fang.txt ==============)
+@flushleft(==== MicroEMACS 5.0 [15:12] [<12] L:4 C:23 () == fang.txt == File: fang.txt ==============)
 
 	The number insided the brackets [] shows that the screen is now
 scrolled 12 characters from the left margin.
@@ -1255,6 +1251,10 @@ MicroEMACS will ignore size changes that can not be done, like
 attempting to pull the lower left corner above the upper right corner of
 the current screen.
 
+	Under Windows XP/Vista you can grab the operating system window
+displaying the MicroEMACS session and resize it like any other window.
+MicroEMACS will automatically resize to match the window.
+
 @section(Moving a Screen)
 
 	To change where on the desktop a screen is placed, move the
@@ -1287,13 +1287,13 @@ the rearmost screen to front.
 delete. Click the right mouse button, the screen will disapear. If you
 delete the only remaining screen on the desktop, MicroEMACS will exit.
 
-@section(Mousing under WINDOWS 95)
+@section(Mousing under WINDOWS)
 
-	The @ir(Windows 95) version of MicroEMACS loads a special macro
-when it comes up which makes the mousing more similar to the CUA
-standard. The left mouse button is used to outline regions which then
-can be cut and pasted to and from the clipboard from the menus. Text
-placed in the clipboard can be pasted to other documents.
+	The @ir(Windows 95/98/NY/XP/Vista) version of MicroEMACS loads a
+special macro when it comes up which makes the mousing more similar to
+the CUA standard. The left mouse button is used to outline regions which
+then can be cut and pasted to and from the clipboard from the menus.
+Text placed in the clipboard can be pasted to other documents.
 	If you wish to disable this and use the standard EMACS mousing,
 rename CUA.CMD in the installation directory to another name.
 @newpage
@@ -2491,6 +2491,9 @@ $orgrow@\The desktop row position of current screen.
 @index($orgcol)
 $orgcol@\The desktop column position of current screen.
 
+@index($os)
+$od@\The name f the operating system running MicroEMACS.
+
 @index($pagelen)
 $pagelen@\The number of screen lines used currently.
 
@@ -2676,7 +2679,7 @@ the name of RIGEL2, and it contains the text:
 	<*>Bloomington		(where <*> is the current point)
 	Indianapolis
 	Gary
-	=* MicroEMACS 4.0 (WRAP) == rigel2 == File: /data/rigel2.txt =====
+	=* MicroEMACS 5.0 (WRAP) == rigel2 == File: /data/rigel2.txt =====
 @end(group)
 @end(verbatim)
 
@@ -2698,7 +2701,7 @@ this:
 	Bloomington
 	<*>Indianapolis 	(where <*> is the current point)
 	Gary
-	=* MicroEMACS 4.0 (WRAP) == rigel2 == File: /data/rigel2.txt =====
+	=* MicroEMACS 5.0 (WRAP) == rigel2 == File: /data/rigel2.txt =====
 @end(group)
 @end(verbatim)
 
@@ -3771,6 +3774,8 @@ mouse-move-up		 MSb
 
 mouse-resize-screen	 MS1
 
+mouse-resize2-screen	 MS2
+
 mouse-region-down	 MSe
 
 mouse-region-up 	 MSf
@@ -3932,7 +3937,7 @@ yank			 ^Y	yank the kill buffer into the current
 This can be used as a wall chart reference for MicroEMACS commands.
 
 @begin(verbatim)
-@center(@b[Default Key Bindings for MicroEmacs 4.0])
+@center(@b[Default Key Bindings for MicroEMACS 5.0])
 
  ^A   Move to start of line	      ESC A   Apropos (list some commands)
  ^B   Move backward by characters     ESC B   Backup by words
@@ -4404,10 +4409,11 @@ IBM-PC		MSDOS 3.2	LATTICE 3	Large CODE/Large DATA
 				MSC 6.0
 				*MWC 86
 		SCO XENIX	native
-		FREEBSD 2.1	GCC
+		FREEBSD 5.0	GCC
 		Windows 3.1	MSC 6.0
 		WINDOWS 95	Visual C++ 4.1
 		WINDOWS NT	Visual C++ 4.1
+		WINDOWS XP/Vista	Visual Studio 2008
 
 HP150		MSDOS		Lattice 2.15	Function key labels
 				Turbo C 2.0		for the touch screen
@@ -4433,9 +4439,6 @@ NEC 9800	MSDOS		Turbo 2.0	Function key support
    series			MSC 6.0
 
 HP3000 series	MPE		native
-
-@u[Systems to be supported (IE some code is already written:)]
-Macintosh	System 7	Lightspeed C
 
 *means that I do not own or have access to the listed compiler and/or
  machine and must rely upon others to help support it. 

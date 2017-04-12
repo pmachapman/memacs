@@ -2,6 +2,9 @@
 		(C)Copyright 1995 by Daniel M. Lawrence
  		translated 1991 by Anthony Appleyard	*/
 
+#define	OQUOTE_CHAR	34
+#define	CQUOTE_CHAR	34
+
 #define TEXT1   "[incipio novum CLI]"
 #define TEXT2   "[non possum scribere filum percolationis]"
 #define TEXT3   "[executio cecidit]"

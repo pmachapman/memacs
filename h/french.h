@@ -11,6 +11,9 @@
 			picheral@cicb.fr
 */
 
+#define	OQUOTE_CHAR	174
+#define	CQUOTE_CHAR	175
+
 #define	TEXT1	"[Lancement d'un nouvel interpr\202teur]"		/*"[Starting new CLI]"*/
 #define	TEXT2	"[\220criture du fichier filtre impossible]"	/*"[Cannot write filter file]"*/
 #define	TEXT3	"[L'ex\202cution a \202chou\202]"			/*"[Execution failed]"*/

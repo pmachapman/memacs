@@ -11,6 +11,9 @@
                         picheral@cicb.fr
 */
 
+#define	OQUOTE_CHAR	34
+#define	CQUOTE_CHAR	34
+
 #define TEXT1   "[Lancement d'un nouvel interpr\351teur]"               /*"[Starting new CLI]"*/
 #define TEXT2   "[\311criture du fichier filtre impossible]"    /*"[Cannot write filter file]"*/
 #define TEXT3   "[L'ex\351cution a \351chou\351]"                       /*"[Execution failed]"*/

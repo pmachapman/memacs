@@ -694,6 +694,22 @@ int f, n;	/* these are ignored... we get the new size info from
 	return(TRUE);
 }
 
+PASCAL NEAR resizm2(f, n)
+
+int f, n;	/* these are ignored... we get the new size info from
+		   the mouse driver */
+{
+	/* make sure we are on the proper screen */
+	mouse_screen();
+
+	/* change to the new size */
+	newwidth(TRUE, xpos + 1);
+	newsize(TRUE, ypos + 1);
+
+	refresh_screen(first_screen);
+	return(TRUE);
+}
+
 #else
 mousehello()
 {

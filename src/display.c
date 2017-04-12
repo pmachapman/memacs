@@ -728,6 +728,19 @@ VOID PASCAL NEAR update_hilite()
 				vscreen[forline]->v_right -= lbound;
 			}
 
+			/* This is Malcolm Kay's fix for the horizontal
+			   scrolling problem after a search/replace command */
+			if (vscreen[forline]->v_left < 0)
+				vscreen[forline]->v_left = 0;
+			if (vscreen[forline]->v_right < 0)
+				vscreen[forline]->v_right = 0;
+			if (vscreen[forline]->v_left>term.t_ncol){
+				vscreen[forline]->v_left = FARRIGHT;
+				vscreen[forline]->v_right = 0;
+			}
+			else if (vscreen[forline]->v_right>term.t_ncol)
+				 vscreen[forline]->v_right = term.t_ncol;
+			
                 } else {
                         vscreen[forline]->v_left = FARRIGHT;
                         vscreen[forline]->v_right = 0;
@@ -1751,9 +1764,14 @@ int c;	/* character to write */
 #if WINDOW_MSWIN
 	if (ttcol + 1 < NSTRING)
 #else
-	if (ttcol + 1 < term.t_ncol)
+	if (ttcol + 1 < term.t_ncol) {
+#endif
+#if	WINNT || WINXP
+		putchar(c);
+		fflush(stdout);		
 #endif
 		TTputc(c);
+	}
 	if (c != '\b')
 		*lastptr++ = c;
 	else if (lastptr > &lastmesg[0])

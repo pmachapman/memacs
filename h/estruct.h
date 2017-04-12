@@ -1,7 +1,7 @@
 /*	ESTRUCT:	Structure and preprocesser defined for
-			MicroEMACS 4.00
+			MicroEMACS 4.01
 
-			(C)Copyright 1995 by Daniel Lawrence
+			(C)Copyright 1997 by Daniel Lawrence
 			written by Daniel Lawrence
 			based on code by Dave G. Conroy,
 				Steve Wilhite and George Jones
@@ -35,7 +35,7 @@
 */
 
 #define PROGNAME	"MicroEMACS"
-#define VERSION 	"4.00"
+#define VERSION 	"5.00"
 
 /*	Machine/OS definitions			*/
 /*	[Set one of these!!]			*/
@@ -53,6 +53,7 @@
 #define MPE	0			/* HP MPE/XL			*/
 #define MSDOS	0			/* MS-DOS			*/
 #define WINNT	0			/* MS-Win NT			*/
+#define	WINXP	1			/* Windows XP/Visual studio 2008*/
 #define OS2	0			/* Microsoft or IBM OS/2	*/
 #define SMOS	0			/* Supermax UNIX System V	*/
 #define SUN	0			/* SUN v4.0			*/
@@ -70,7 +71,7 @@
 #define GCC	0	/* the GNU C compiler */
 #define IC	0	/* Rational Systems Instant C */
 #define LATTICE 0	/* Lattice 2.14 through 3.0 compilers */
-#define MSC	0	/* MicroSoft C compile version 3 thru 7 */
+#define MSC	1	/* MicroSoft C compile version 3 and up */
 #define MWC	0	/* Mark Williams C */
 #define TURBO	0	/* Turbo C and Borland C++ under MSDOS */
 #define UNIX	0	/* a standard UNIX compiler (cc) */
@@ -91,7 +92,7 @@
 
 /*   Special keyboard/network definitions	     */
 
-#define ATKBD	0		/* AT-style keyboard with F11, F12 & grey keys */
+#define ATKBD	1		/* AT-style keyboard with F11, F12 & grey keys */
 #define WANGPC	0		/* WangPC - mostly escape sequences	*/
 #define VT100	0		/* Handle VT100 style keypad - NOT VMS. */
 #define KEYPAD	0		/* VMS - turn on and off application	*/
@@ -122,6 +123,7 @@
 #define TIPC	0			/* TI Profesional PC driver	*/
 #define VT52	0			/* VT52 terminal (Zenith).	*/
 #define NTCON	0			/* Windows NT console		*/
+#define	XPCON	1			/* windows XP console app	*/
 #define	XVT	0			/* XVT windowing system		*/
 #define Z309	0			/* Zenith 100 PC family driver	*/
 
@@ -150,7 +152,7 @@
 #define VISMAC	0	/* update display during keyboard macros	*/
 #define CTRLZ	0	/* add a ^Z at end of files under MSDOS only	*/
 #define CLEAN	0	/* de-alloc memory on exit			*/
-#define CALLED	0	/* is emacs a called subroutine? or stand alone */
+#define CALLED	1	/* is emacs a called subroutine? or stand alone */
 
 #define REVSTA	1	/* Status line appears in reverse video 	*/
 #define COLOR	1	/* color commands and windows			*/
@@ -268,14 +270,16 @@
 #undef  WINDOW_MSWIN
 #define WINDOW_MSWIN    1
 #endif
-#if     WINDOW_MSWIN && WINNT
+#if     WINDOW_MSWIN && (WINNT || WINXP)
 #undef  WINDOW_MSWIN32
 #define WINDOW_MSWIN32  1
 #endif
+#if 0
 #undef  VOID    /* windows.h will wind up defining this */
 #include <windows.h>    /* --------- Huge include file here !!! ---------*/
+#endif
 #if     NTCON
-#include <wincon.h>
+#include <WinCon.h>
 #include <stdio.h>
 #include <dos.h>
 #endif
@@ -297,7 +301,7 @@
 #endif
 #endif
 
-#if	WINNT
+#if	WINNT || WINXP
 #define	EXPORT	/* Windows NT doesn't like this */
 #endif
 
@@ -463,7 +467,7 @@ union REGS {
 #define MEMMAP	0
 #endif
 
-#if	MSDOS | WINNT | OS2 | USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | BSD | FREEBSD | (TOS & MWC) | WMCS | SUN | MPE
+#if	MSDOS | WINNT | WINXP | OS2 | USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | BSD | FREEBSD | (TOS & MWC) | WMCS | SUN | MPE
 #define ENVFUNC 1
 #else
 #define ENVFUNC 0
@@ -479,7 +483,7 @@ union REGS {
 #define DIRSEPSTR	"."
 #define DIRSEPCHAR	'.'
 #else
-#if	TOS || MSDOS || WINNT || OS2
+#if	TOS || MSDOS || WINNT || WINXP || OS2
 #define DIRSEPSTR	"\\"
 #define DIRSEPCHAR	'\\'
 #define DRIVESEPCHAR	':'
@@ -516,16 +520,16 @@ union REGS {
 /*	internal constants	*/
 
 #define NBINDS	300			/* max # of bound keys		*/
-#if	AOSVS | VMS | WINNT | SUN | BSD | FREEBSD | USG | ZENIX | HPUX8 | HPUX9 | OS2
+#if	AOSVS | VMS | WINNT | WINXP | SUN | BSD | FREEBSD | USG | ZENIX | HPUX8 | HPUX9 | OS2
 #define NFILEN	256
 #else
 #define NFILEN	80			/* # of bytes, file name	*/
 #endif
 #define NBUFN	128			/* # of bytes, buffer name	*/
-#define NLINE	256			/* # of bytes, input line	*/
-#define NSTRING 128			/* # of bytes, string buffers	*/
+#define NLINE	512			/* # of bytes, input line	*/
+#define NSTRING 512			/* # of bytes, string buffers	*/
 #define NKBDM	4096			/* # of strokes, keyboard macro */
-#define NPAT	128			/* # of bytes, pattern		*/
+#define NPAT	512			/* # of bytes, pattern		*/
 #define HUGE	1000			/* Huge number			*/
 #define NLOCKS	256			/* max # of file locks active	*/
 #define NCOLORS 16			/* number of supported colors	*/
@@ -669,8 +673,8 @@ union REGS {
 /*	Dynamic RAM tracking and reporting redefinitions	*/
 
 #if	RAMSIZE
-#define malloc	allocate
-#define free	release
+#define malloc	Eallocate
+#define free	Erelease
 #else
 #if	VMS & OPTMEM
 #define malloc	VAXC$MALLOC_OPT
@@ -687,6 +691,10 @@ union REGS {
 #else
 #define FILENAMEREPLY(p,b,nb)   mlreply(p,b,nb)
 #endif
+
+/* colors respresented as parameters to WORDs and Screen positions */
+
+#define	CLRVAL	unsigned int
 
 /* formal parameters to procedures are stored as a linked list
    of argument names using the following simple structure:
@@ -1126,6 +1134,23 @@ typedef struct WHBLOCK {
 
 #define BTWHILE 	1
 #define BTBREAK 	2
+
+/*	SWORDs are syntactical words to highlight in a different
+	foreground color. WORDSETs are named lists of these WORDs.
+*/
+
+typedef	struct SWORD {
+	struct SWORD *wd_next;	/* ptr to the next word in the list */
+	char *wd_text;		/* the actual word */
+	CLRVAL wd_color;	/* color to display in */
+	int wd_symflag;		/* TRUE  = symbol overiding word boundries
+				   FALSE = word w/ space/symbol delimiters */
+} SWORD;
+
+typedef	struct WORDSET {
+	struct WORDSET *next;
+	int tmp;
+} WORDSET;
 
 /*	Abbreviations are short symbols that expand to longer strings
 	when typed into a buffer with no intervening whitespace or commands.

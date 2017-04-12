@@ -6,6 +6,9 @@
 			(C)opyright 1995 by Daniel Lawrence
 */
 
+#define	OQUOTE_CHAR	34
+#define	CQUOTE_CHAR	34
+
 #define	TEXT1	"[Opstarten nieuwe CLI]"
 #define	TEXT2	"[Kan niet schrijven in filter file]"
 #define	TEXT3	"[Uitvoering mislukt]"

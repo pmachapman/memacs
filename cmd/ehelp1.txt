@@ -49,13 +49,12 @@ NEXT[History] PREV[Main Menu]
 
 	Information about MicroEMACS can be obtained via:
 
-	USMAIL:	Daniel Lawrence		BBS:	The Programmer's Room
-		617 New York St			(317) 742-5533
-		Lafayette, IN 47901		Fidonet 1:201/10
+	USMAIL:	Daniel Lawrence
+		1615 Virginia Street
+		Lafayette, IN 47905
 
-	Internet:		mdbs!dan@dynamo.ecn.purdue.edu
-	American Online:	bardor
-	Phone (nights):		(317) 742-5153
+	EMAIL:		dan@aquest.com
+	Phone:		(765) 426-3409
 
 	Register MicroEMACS for prefered phone support and information
 	on new releases by sending $25 US to the address above.
