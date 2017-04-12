@@ -1,0 +1,36 @@
+!
+! Linker option file used to create a VMS SMG MicroEMACS.
+!
+! If you don't want to link sharable, change
+!	sys$share:vaxcrtl/share
+! to
+!	sys$library:vaxcrtl/lib
+!
+basic.obj,-
+bind.obj,-
+buffer.obj,-
+char.obj,-
+crypt.obj,-
+display.obj,-
+eval.obj,-
+exec.obj,-
+file.obj,-
+fileio.obj,-
+input.obj,-
+isearch.obj,-
+line.obj,-
+lock.obj,-
+main.obj,-
+mouse.obj,-
+random.obj,-
+region.obj,-
+replace.obj,-
+screen.obj,-
+search.obj,-
+smg.obj,-
+tags.obj,-
+vms.obj,-
+window.obj,-
+word.obj,-
+sys$share:vaxcrtl/share
+universal=me$edit

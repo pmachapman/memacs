@@ -1,0 +1,8 @@
+obj\basic obj\bind obj\buffer obj\char obj\crypt obj\lock obj\dolock+
+obj\display obj\eval obj\exec obj\file obj\fileio obj\fmr obj\input+
+obj\isearch obj\line obj\main obj\random obj\region obj\screen+
+obj\search obj\replace obj\tags obj\window obj\word obj\fmrdos obj\mouse
+bin\emacs /stack:10000
+emacs.map
+c:\sys\c600\lib\llibcer
+;

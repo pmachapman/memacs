@@ -1,0 +1,35 @@
+/* editor external template: emacs16m -e -g%l -p%c -i%%error "%m" %f */
+#screen l 50
+ipath .
+ipath d:\usr\emacs\h
+/* __echoFile=1 */
+load d:\usr\emacs\src\basic.c
+load d:\usr\emacs\src\bind.c
+load d:\usr\emacs\src\buffer.c
+load d:\usr\emacs\src\char.c
+load d:\usr\emacs\src\crypt.c
+load d:\usr\emacs\src\display.c
+load d:\usr\emacs\src\dolock.c
+load d:\usr\emacs\src\eval.c
+load d:\usr\emacs\src\exec.c
+load d:\usr\emacs\src\file.c
+load d:\usr\emacs\src\fileio.c
+load d:\usr\emacs\src\ibmpc.c
+load d:\usr\emacs\src\input.c
+load d:\usr\emacs\src\isearch.c
+load d:\usr\emacs\src\keyboard.c
+load d:\usr\emacs\src\line.c
+load d:\usr\emacs\src\line.c
+load d:\usr\emacs\src\lock.c
+load d:\usr\emacs\src\main.c
+load d:\usr\emacs\src\mouse.c
+load d:\usr\emacs\src\msdos.c
+load d:\usr\emacs\src\random.c
+load d:\usr\emacs\src\region.c
+load d:\usr\emacs\src\replace.c
+load d:\usr\emacs\src\screen.c
+load d:\usr\emacs\src\search.c
+load d:\usr\emacs\src\tags.c
+load d:\usr\emacs\src\window.c
+load d:\usr\emacs\src\word.c
+

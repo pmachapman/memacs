@@ -1,0 +1,16 @@
+MicroEMACS 3.11c for MS-Windows, update 1.1         by Pierre Perret
+===========================================         October 12, 1992
+
+The following packages compose the distribution of the freeware text
+editor MicroEMACS for Windows:
+
+MEW11.ZIP:  Windows 3.1 executable package (.EXE, some macros, and README),
+            about 120KB
+
+MEWN11.ZIP: Windows NT i386 executable package, about 130KB
+
+MEWH11.ZIP: WinHelp file, about 160KB
+
+MEWS11.ZIP: C Sources, about 280KB
+
+MEWR11.ZIP: sources for the help file (.RTF and .HPJ), about 100KB

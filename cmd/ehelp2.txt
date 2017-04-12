@@ -1,0 +1,566 @@
+	[ENTER]	Picks a topic	  [PG UP] Last Screen		Cursor keys
+	  [F10]	Exit Help	[PG DOWN] Next Screen		are active
+	   [F6]	Index		   [HOME] Main Menu
+< >
+[ENTER]	Picks a topic	 [PG UP] Last Screen   [I] Index	   Cursor keys
+  [F10]	Exit Help      [PG DOWN] Next Screen   [HOME] Main Menu	   are active
+< >
+=>Index
+Next[Index 2] PREV[Main Menu]
+
+	Index to all HELP topics:
+
+	< > ASAVE Mode                      < > Credits
+	< > Advanced Text Editing           < > Customizing Command Keys
+	< > Alternative Basic Keys          < > Cutting and Pasting
+	< > Bindings                        < > EXACT Mode
+	< > Buffer Commands                 < > Even More Mousing
+	< > Buffers                         < > Getting at Files
+	< > CMODE Mode                      < > Glossary of Terms
+	< > CRYPT Mode                      < > History
+	< > Case Control                    < > Issuing Commands
+	< > Command Lines                   < > Keyboard Macros
+	< > Command List                    < > Keystrokes
+	< > Commands                        < > MAGIC Mode
+	< > Copying Text                    < > Macros
+	< > Creating New Commands 	    < > Main Menu
+
+		Press [PG DOWN] for more index topics
+
+=>Index 2
+Next[Main Menu] PREV[Index]
+
+	Index to all HELP topics (continued):
+
+	< > Memory Usage                    < > Screens
+	< > Modes of Operation              < > Searching and Replacing
+	< > Narrowing Your Scope            < > The Basics
+	< > Numeric Arguments               < > The Outside World
+	< > OVER Mode                       < > Unbinding Keys
+	< > Other Searches                  < > Using the Mouse
+	< > Pages                           < > VIEW Mode
+	< > Paragraphs                      < > WRAP Mode
+	< > REP Mode                        < > Window Commands
+	< > Regions                         < > Windows
+	< > Repetitive Tasks                < > Words
+	< > Replacements
+	< > Screen Commands
+
+
+		Press [PG DOWN] to return to main menu
+
+=>Reference Screens
+NEXT[Main Menu] PREV[Main Menu]
+
+	These screens are comprehensive lists of availible features
+
+	< > Command List
+
+	< > Function List
+
+	< > Environment Variable List
+
+
+
+
+
+
+
+
+
+
+
+
+
+=>Command List
+=Command Summary 1
+=>Command Summary 1
+NEXT[Command Summary 2] PREV[Reference Screens]
+
+^G      abort-command           Abort any command waiting for input
+M-M     add-global-mode         Add a global mode for all new buffers
+^XM     add-mode                Add a mode to the current buffer
+^X^A    append-file		Append current buffer to file
+M-A     apropos                 List out commands containing a given string
+^B      backward-character      Move one character to the left
+^X(     begin-macro             Begin recording a keyboard macro
+M-<     beginning-of-file       Move to the beginning of the current file
+^A      beginning-of-line       Move to the beginning of the current line
+M-K     bind-to-key             Bind a key to a function
+^X=     buffer-position         List cursor position
+^X^L    case-region-lower       Make a marked region all lower case
+^X^U    case-region-upper       Make a marked region all upper case
+M-C     case-word-capitalize    Capitalize the following word
+M-L     case-word-lower         Lower case the following word
+M-U     case-word-upper         Upper case the following word
+^XN     change-file-name        Change the name of the current file
+
+					[PG DOWN] for more commands
+=>Command Summary 2
+NEXT[Command Summary 3] PREV[Command Summary 1]
+
+unbound change-screen-column	Change column of upper left of current screen
+unbound change-screen-row	Change row of upper left of current screen
+unbound change-screen-size      Change the number of screen lines
+unbound change-screen-width     Change the number of screen columns
+^L      clear-and-redraw        Clear and redraw the physical screen
+unbound clear-message-line      Clear the command line
+M-W     copy-region             Copy the region to kill buffer
+M-^C    count-words             Count words, lines and characters in region
+^X      ctlx-prefix             Change the key used as the ^X prefix
+^XY     cycle-ring		Reposition current string in kill ring
+A-C	cycle-screens		Bring the rearmost screen to front
+^X^O    delete-blank-lines      Delete all blank lines around the cursor
+^XK     delete-buffer           Delete a non-displayed buffer
+M-^M    delete-global-mode      Turn off a global mode
+M-^Y    delete-kill-ring	Throw out all kill ring text
+^X^M    delete-mode             Turn off a mode in the current buffer
+^D      delete-next-character   Delete the character following the cursor
+
+					[PG DOWN] for more commands
+=>Command Summary 3
+NEXT[Command Summary 4] PREV[Command Summary 2]
+
+M-D     delete-next-word        Delete the word following the cursor
+^X1     delete-other-windows    Remove all other displayed windows
+^H    delete-previous-character Delete character to the left of the cursor
+M-^H    delete-previous-word    Delete the word to the left of the cursor
+A-D     delete-screen           Delete a non-displayed screen
+^X0     delete-window           Remove the current window from the screen
+unbound describe-bindings       List all legal commands
+unbound describe-functions      List all defined functions
+^X?     describe-key            Describe the command bound to a keystroke
+unbound describe-variables      List all variables
+^X^D    detab-region            Change tabs in region to equivalent spaces
+^XG     display                 Display variables current value
+^X)     end-macro               stop recording a keyboard macro
+M->     end-of-file             Move to the end of the current buffer
+^E      end-of-line             Move to the end of the current line
+unbound end-of-word             Move to the end of the current word
+^X^E    entab-region            Change spaces to tabs where possible
+
+					[PG DOWN] for more commands
+=>Command Summary 4
+NEXT[Command Summary 5] PREV[Command Summary 3]
+
+^X^X    exchange-point-and-mark Swap cursor and mark positions
+unbound execute-buffer          Execute a buffer as a macro
+M-^X    execute-command-line    Execute a command line
+M-^S    execute-file            Execute a file as a macro
+^XE     execute-macro           Play back a keyboard macro
+(none)	execute-macro-<n>       Execute numbered macro <N> (<N> = 1 thru 40)
+M-X     execute-named-command   Execute a command by name
+M-^E    execute-procedure       Execute a procedure by name
+^X$     execute-program         Execute a program directly (not thru a shell)
+^X^C    exit-emacs              Exit EMACS.
+M-Q     fill-paragraph          Fill the current paragraph
+^X#     filter-buffer           Filter current buffer thru external filter
+^X^F    find-file               Find a file to edit in the current window
+A-F     find-screen             Find and make current a named screen
+^F      forward-character       Move cursor one character to the right
+M-G     goto-line               Goto a numbered line
+M-^G    goto-mark               Goto a numbered mark (0 by default)
+
+					[PG DOWN] for more commands
+=>Command Summary 5
+NEXT[Command Summary 6] PREV[Command Summary 4]
+
+M-^F    goto-matching-fence     Goto the matching fence
+^X^     grow-window             Make the current window larger
+^I      handle-tab              Insert a tab or set tab stops
+M-?     help                    Read EMACS.HLP into a buffer and display it
+A-R     hunt-backward           Hunt for last match of previous search string
+A-S     hunt-forward            Hunt for next match of previous search string
+^XC     i-shell                 Shell up to a new command processor
+^XS     incremental-search      Search for a string, incrementally
+M-)     indent-region           Indent region one tab stop
+^X^I    insert-file             insert a file at cursor
+^C      insert-space            Insert a space to the right of the cursor
+unbound insert-string           Insert a string at the cursor
+M-^W    kill-paragraph          Delete the current paragraph
+^W      kill-region             Delete marked region, save to kill buffer
+^K      kill-to-end-of-line     Delete the rest of the current line
+unbound label-function-key      Label a function key (hp150 only)
+^X^B    list-buffers            List all existing buffers
+
+					[PG DOWN] for more commands
+=>Command Summary 6
+NEXT[Command Summary 7] PREV[Command Summary 5]
+
+A-B     list-screens		List all existing screens
+^X^K    macro-to-key		Bind a key to a macro
+^[      meta-prefix             Key used to precede all META commands
+^X^N    move-window-down        Move all lines in the current window down
+^X^P    move-window-up          Move all lines in the current window up
+M-^N    name-buffer             Change the name of the current buffer
+^X<     narrow-to-region        hides all text not in the current region
+^M      newline                 Insert <NL> at the cursor
+^J      newline-and-indent      Insert <NL> at the cursor and indent
+^XX     next-buffer             Switch to next buffer in buffer list
+^N      next-line               Move the cursor down one line
+^V      next-page               Move the cursor down one page
+M-N     next-paragraph          Move cursor to the next paragraph
+^XO     next-window             Move cursor to the next window
+M-F     next-word               Move cursor to beginning of next word
+unbound nop                     Does nothing
+^O      open-line               Open a line at the cursor
+
+					[PG DOWN] for more commands
+=>Command Summary 7
+NEXT[Command Summary 8] PREV[Command Summary 6]
+
+unbound overwrite-string        Overwrite a string at the cursor
+^X@     pipe-command            Execute an external command, record output
+unbound pop-buffer              Display named buffer as a pop-up
+^P      previous-line           Move cursor up one line
+^Z      previous-page           Move cursor up one page
+M-P     previous-paragraph      Move back one paragraph
+^XP     previous-window         Move the cursor to the last window
+M-B     previous-word           Delete the word to the left of the cursor
+unbound print                   Display a string on the command line
+M-^R    query-replace-string    Interactively replace one string with another
+M-Z     quick-exit              Exit EMACS, writing out all changed buffers
+^Q      quote-character         Insert the next character, literally
+^X^R    read-file               Read a file into the current buffer
+M-^L    redraw-display          Redraw display, centering current line
+^X      remove-mark             Erase numbered mark
+A-N     rename-screen		Change the name of the current screen
+M-R     replace-string          Replace one string with another
+
+					[PG DOWN] for more commands
+=>Command Summary 8
+NEXT[Command Summary 9] PREV[Command Summary 7]
+
+^XW     resize-window           Change number of lines in current window
+unbound restore-window          Move cursor to the last saved window
+^XR  reverse-incremental-search Search backwards, incrementally
+M-^E    run                     Execute a named procedure
+^X^S    save-file               Save the current buffer if it is changed
+unbound save-window             Remember current window (to restore later)
+M-^V    scroll-next-down        Scroll the next window down
+M-^Z    scroll-next-up          Scroll the next window up
+^S      search-forward          Search for a string
+^R      search-reverse          Search backwards for a string
+^XB     select-buffer           Select buffer to display in current window
+^XA     set                     Set a variable to a value
+M-E     set-encryption-key      Set encryption key of current buffer
+^XF     set-fill-column         Set current fill column
+M-      set-mark                Set a mark
+^X!     shell-command           Causes external shell to execute command
+unbound show-files              List contents of directory
+^X^Z    shrink-window           Make the current window smaller
+					[PG DOWN] for more commands
+=>Command Summary 9
+NEXT[Reference Screens] PREV[Command Summary 8]
+
+M-^S    source                  Execute a file as a macro
+^X2     split-current-window    Split the current window in two
+unbound store-macro             Store following macro lines to numbered macro
+unbound store-procedure         Store following macro lines to named procedure
+^T      transpose-characters    Transpose char at cursor with char to left
+^X^T    trim-region             Trim any trailing white space from a region
+M-^K    unbind-key              Unbind a key from a function
+M-(     undent-region		undent region one tab stop
+^U      universal-argument      Execute the following command 4 times
+M-~     unmark-buffer           Unmark the current buffer
+unbound update-screen           Force a screen update during macro execution
+^X^V    view-file               Find a file, and put it in view mode
+^X>     widen-from-region       restores hidden text
+unbound wrap-word               Wrap the current word
+^X^W    write-file              Write current buffer under new file name
+unbound write-message           Same as print
+^Y      yank                    yank kill buffer into current buffer at cursor
+M-Y     yank-pop		yank the next string in the kill ring
+			[PG DOWN] to return to Reference Screens
+=>Writing EMACS Macros
+NEXT[Main Menu] PREV[Menu Menu]
+
+	MicroEMACS lets you create your own programs to perform any editing
+	tasks, simple or complex. These macros are normally stored in files
+	with a .CMD extension.
+
+	In an effort to get this version of MicroEMACS out, this section
+	of the help system is not yet complete. For information on writing
+	these macros and command pages, look in the MicroEMACS reference
+	manual, and look at the .CMD files supplied as the default
+	environment for MicroEMACS.
+
+	Emacs.rc (or .emacsrc under UNIX) is the file which is executed
+	automatically whenever MicroEMACS is started. Newpage.cmd is the
+	command page loader, and all the ?page.cmd files contain the
+	code for each page. Ehelp.cmd contains the macro to run this
+	help system.
+
+
+
+
+=>Using the Mouse
+NEXT[More Mousing] PREV[Main Menu]
+
+	On some systems, MicroEMACS can use the mouse to perform many
+	basic editing tasks. If your platform and MicroEMACS support the
+	mouse you can do any of these operations. (Mouse behavior can be
+	changed inside a macro, like this help system, so try these
+	AFTER you exit from HELP).
+
+	Repositioning the POINT
+
+		Move the mouse to where you want the point to be, and click
+		once with the left mouse button and release. The point will
+		move there, making any screen or window active to do so.
+
+	Scrolling text inside a window
+
+		Position the mouse to the text to drag, press the left button,
+		move the mouse to where to display the text (horizontally
+		or vertically), and release the mouse button.
+
+				Press [PG DOWN] for more mouse operations
+=>More Mousing
+NEXT[Yet More Mousing] PREV[Using the Mouse]
+
+	Moving a Modeline
+
+		Position the mouse any any modeline except the last, press
+		the left button, move to another position and release the
+		button. The modeline will move, resizing the windows which
+		are above and below.
+
+	Copy a region
+
+		Position the mouse at the beginning of the region to copy,
+		press the right button, move the mouse to the end of the
+		region, release the button.
+
+	Kill a region
+
+		After copying a region, without moving the mouse, click the
+		right mouse button once. The text will disappear.
+
+			Press [PG DOWN] for yet more mousing operations
+=>Yet More Mousing
+NEXT[Even More Mousing] PREV[More Mousing]
+
+	Pasting Cut Text
+
+		Move anywhere away from the place the text was deleted,
+		and click the right button once. The last text placed in the
+		kill buffer will be inserted.
+
+	Resizing the current screen
+
+		Move the mouse to the last position of the command line.
+		Press the left button down. Move the mouse to a new place
+		for the lower right corner of the current screen and release.
+
+	Moving the current screen
+
+		Move the mouse to the upper left of the screen, Press down
+		the left button. Move to a new position and release the
+		button. The screen will move to the new position.
+
+			Press [PG DOWN] for yet even more mousing operations
+=>Even More Mousing
+NEXT[Main Menu] PREV[Yet More Mousing]
+
+	Create a New Screen
+
+		Move to the upper left corner of any existing screen. Press
+		down on the left mouse button. Move to a new position and
+		release the button. A new screen containing the buffer
+		current in the old will appear with the same size as the
+		copied screen.
+
+	Deleting a Screen
+
+		Click once on the command line of a screen with the right
+		mouse button. It will disappear. If it is the only screen
+		visible, MicroEMACS will exit.
+
+
+
+
+
+			Press [PG DOWN] to return to the main menu
+=>Function List
+=Function Summary 1
+=>Function Summary 1
+NEXT[Function Summary 2] PREV[Reference Screens]
+
+	MicroEMACS Function Summary		<num>	Numeric string
+						<str>	any string
+Return	Function				<log>	logical value
+Value	     Arguments		Description	-----	No return value
+-------------------------------------------
+<num>	&abs <num>		Returns the absolute value of <num>
+<num>	&add <num> <num>	Add two numbers
+<log>	&and <log1> <log2>	Returns TRUE if BOTH logical arguments are TRUE
+<num>	&asc <str>		get ASCII code of first char in str
+<num>	&ban <num> <num>	Bitwise AND function
+<str>	&bin <str>		return the function name bound to <str>
+<num>	&bno <num>		Bitwise NOT function
+<num>	&bor <num> <num>	Bitwise OR function
+<num>	&bxo <num> <num>	Bitwise XOR function
+<str>	&cat <str> <str>	Concatenate the two strings to form one
+<str>	&chr <num>		get character represented by ascii code <num>
+<num>	&div <num1> <num2>	Divide num1 by num2
+
+			[PG DOWN] for more functions
+=>Function Summary 2
+NEXT[Function Summary 3] PREV[Function Summary 1]
+
+<str>	&env <str>		get environment variable <str>
+<log>	&equ <num> <num>	Is <num> and <num> numerically equal?
+<log>	&exi <str>		Does the named file <str> exist?
+<str>	&fin <str>		Find file names <str> with full path
+<log>	&gre <num1> <num2>	Is <num1> > <num2> numerically?
+<str>	&gro <num>		Get <num> as set by a MAGIC mode search.
+<str>	&gtc			Get EMACS command input
+<str>	&gtk			Get single keystroke from user
+any	&ind <str>		Evaluate <str> as a variable.
+<log>	&isn <str>		Is str numeric?
+<str>	&lef <str> <num>	get <num> leftmost characters from <str>
+<num>	&len <str>		find length of str
+<log>	&les <num1> <num2>	Is <num1> < <num2> numerically?
+<str>	&low <str>		Lowercase <str>
+<str>	&mid <str> <num1> <num2> Get <num2> chars from <str> at <num1>
+<num>	&mod <num1> <num2>	Remainder of num1 / num2
+<num>	&neg <num>		Negates number
+
+			[PG DOWN] for more functions
+=>Function Summary 3
+NEXT[Reference Screens] PREV[Function Summary 2]
+
+<log>	&not <log>		Return the opposite logical value
+<log>	&or <log1> <log2>	Returns TRUE if either argument is TRUE
+<str>	&rev <str>		Return a string with reversed characters
+<str>	&rig <str> <num>	Get the <num> rightmost characters from <str>
+<num>	&rnd <num>		Returns a random integer between 1 and <num>
+<log>	&seq <str1> <str2>	Is <str1> = <str2> alphabetically?
+<log>	&sgr <str1> <str2>	Is <str1> >= <str2> alphabetically?
+<num>	&sin <str1> <str2>	find position of str2 in str1 (0 if fails)
+<log>	&sle <str1> <str2>	Is <str1> < <str2> alphabetically?
+-----	&slo <str1> <str2>	Set lowercasing table
+<num>	&sub <num> <num>	Subtract two numbers
+-----	&sup <str1> <str2>	Set uppercasing table
+<num>	&tim <num> <num>	Multiply two numbers
+<str>	&tri <str>		Trim the trailing whitespace from a string
+<log>	&tru <num>		Is num answer to Life, The Universe, Everything?
+<str>	&upp <str>		Uppercase <str>
+<str>	&xla <str1> <str2> <str3> Translate str1 via str2<->str3 table
+
+			[PG DOWN] to return to reference screens
+=>Environment Variable List
+=Environment Summary 1
+=>Environment Summary 1
+NEXT[Environment Summary 2] PREV[Reference Screens]
+
+$acount		countdown of inserted characters until the next autosave
+$asave		number of inserted characters between automatic file-saves
+$bufhook	macro called on buffer entry
+$cbflags	current buffer's attribute flags
+$cbufname	buffer name of the current buffer
+$cfname		file name of the current buffer
+$cmdhook	function run before each user command
+$cmode		mode of the current buffer
+$curchar	ascii value of the character currently at the point
+$curcol		current column of point in current buffer
+$curline	current line of point in current buffer
+$curwidth	number of columns in current screen
+$curwind	current window number
+$cwline		current display line in current window
+$debug		flag to trigger macro debugging
+$deskcolor	color to use for current desktop, default to BLACK
+$diagflag	allow diaganal mouse drags?
+
+		[PG DOWN] for more environment variables
+=>Environment Summary 2
+NEXT[Environment Summary 3] PREV[Environment Summary 1]
+
+$discmd		echo command prompts? Default is TRUE
+$disinp		echo input at the command prompts? Default is TRUE
+$disphigh	display high-bit characters symbolically? Default is FALSE
+$exbhook	macro to execute when exiting a buffer
+$fcol		text column being displayed in first column of current window
+$fillcol	current fill column
+$flicker	suppress screen flicker (for old IBM-PC CGA adapter)
+$fmtlead	list of all formatter lead characters
+$gflags		global flags controlling some EMACS internal functions
+$gmode		global mode flags
+$hardtab	number of spaces between hard tab stops
+$hilight	hilight selected region?
+$hjump		columns to scroll the screen horizontally when needed
+$hscrlbar	display horizontal scroll bars? (under windowing versions)
+$hscroll	scroll screen horizontally? or just current line
+$isterm		incremental search terminator character
+$kill		contains the first 127 characters in the kill buffer
+
+		[PG DOWN] for more environment variables
+=>Environment Summary 3
+NEXT[Environment Summary 4] PREV[Environment Summary 2]
+
+$language	[READ ONLY] name of the language which messages display
+$lastkey	[READ ONLY] last keyboard character typed
+$lastmesg	[READ ONLY] text of the last message written on command line
+$line		current line in the current buffer
+$lterm		line terminator characters. default are native ones
+$lwidth		[READ ONLY] number of characters in the current line
+$match		[READ ONLY] last string matched in a search
+$mmove		mode of mouse movement (0=none, 1=default, 2=always)
+$modeflag	display mode lines?
+$msflag		mouse present?
+$numwind	number of windows displayed
+$orgrow		desktop row position of current screen
+$orgcol		desktop column position of current screen
+$os		Operating system MicroEMACS is running under
+$overlap	number of lines to overlap during scroll
+$pagelen	number of screen lines used currently
+$palette	string used to control the palette register settings
+
+		[PG DOWN] for more environment variables
+=>Environment Summary 4
+NEXT[Environment Summary 5] PREV[Environment Summary 3]
+
+$paralead	string containing all paragraph start characters
+$pending	[READ ONLY] are there are user keystrokes pending?
+$popflag	use pop-up windows? Default is TRUE
+$posflag	display line and column position on modeline. Default is FALSE
+$progname	[READ ONLY] contains the string "MicroEMACS"
+$ram		amount of remaining memory if compiled with RAMSIZE
+$readhook	macro to execute before reading in a file
+$region		string of the current region. truncates at 255 characters
+$replace	current replace pattern used in replace commands
+$rval		return value from the last invoked subprocess
+$scrname	current screen name
+$search		current search pattern used in search and replace commands
+$searchpnt	control placement of cursor after searches. 0, 1 or 2
+$seed		integer seed of the random number generator
+$softtab	number of spaces inserted by EMACS when soft tabbing
+$sres		Current screen resolution
+$ssave		safe file saving? Default is TRUE
+
+		[PG DOWN] for more environment variables
+=>Environment Summary 5
+NEXT[Reference Screens] PREV[Environment Summary 4]
+
+$sscroll	smooth scrolling? Default is FALSE
+$status		[READ ONLY] Status of the success of the last command
+$sterm		search string input terminator, default is META
+$target		target for line moves
+$time		[READ ONLY] current date and time. "Mon May 09 10:10:58 1988"
+$timeflag	display time of day on modeline? Default is FALSE.
+$tpause		Controls length of the pause to display matched fence in CMODE
+$version	[READ ONLY] current MicroEMACS version number
+$vscrlbar	display vertical scroll bars?
+$wchars		letters legal in word. Default is alphanumerics and underscore
+$wline		display lines in current window
+$wraphook	macro to execute at word wrap time
+$writehook	macro to execute when writting file
+$xpos		last mouse column
+$yankflag	position at end of yanked text?
+$ypos		last mouse row
+
+
+		[PG DOWN] to return to reference screens
+=>ENDOFFILE
+< >

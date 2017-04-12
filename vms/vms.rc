@@ -1,0 +1,148 @@
+;	EMACS.RC:	Startup file for MicroEMACS 3.10+
+;
+;			This file is executed every time the
+;			editor is entered
+
+;
+; Turn off the message-line during the set-up.
+;
+set $discmd	FALSE
+write-message "Setting up..."
+
+;
+; Couple of machine dependent vars here - $flicker is
+; for IBM PCs with CGA monitors, and $ssave makes sense
+; for all machines except VAX/VMS.
+;
+set $flicker	FALSE
+set $ssave	FALSE
+
+;
+; I prefer the old line shift method, and high-bit characters
+; in 'control' form.
+;
+set $hscroll FALSE
+set $disphigh TRUE
+
+;add-global-mode blue
+;add-global-mode White
+
+;
+; Let CMODE paren flashing hang around for 50% longer.
+;
+set $tpause 150
+
+;
+; A delete-to-beginning-of-line procedure.
+;
+store-procedure		"Kill_to_BOL"
+	0 kill-to-end-of-line
+!endm
+
+;
+; An end-of-line/next-end-of-line macro.
+;
+store-procedure		"Next_EOL"
+	forward-character
+	end-of-line
+!endm
+
+;
+; A beginning-of-line/previous-beginning-of-line macro.
+;
+store-procedure		"Prev_BOL"
+	backward-character
+	beginning-of-line
+!endm
+
+;
+; Toggle insert/overwrite mode in current buffer.
+;
+store-procedure		"Toggle_Overwrite"
+	set $cmode &bxor 32 $cmode
+!endm
+
+;
+; At the tone, the time will be...
+;
+store-procedure		"Time_and_Temp"
+	display $time
+!endm
+
+;
+; Insert the date into the file.
+;
+store-procedure		"Insert_Date"
+	set %date $time
+	insert-string %date
+!endm
+
+;
+; A divide-window-into-thirds macro.
+; The argument of 1 to split-current-window
+; guarentees that the top window will be the
+; one the cursor is in.  The numeric argument
+; to resize-window is to specify the number of
+; lines in that window.
+;
+store-procedure		"TriWindow"
+	set %wlthird &div $wline 3
+	1 split-current-window
+	%wlthird resize-window
+	next-window
+	1 split-current-window
+	previous-window
+!endm
+
+;
+; Set up auto modes, depending upon file extension.
+; This is for the $readhook.
+;
+20	store-macro
+	set %rctmp &sin $cbufname "."
+	!if &equ %rctmp 0
+		!return
+	!endif
+	set %rctmp &mid $cbufname &add %rctmp 1 5
+	!if &or &or &or &seq %rctmp "c" &seq %rctmp "h" &seq %rctmp "cxx" &seq %rctmp "hxx"
+		add-mode "cmode"
+		add-mode "magic"
+		add-mode "exact"
+	!endif
+	!if &or &or &seq %rctmp "mss" &seq %rctmp "r" &seq %rctmp "txt"
+		add-mode "wrap"
+	!endif
+!endm
+
+set $readhook execute-macro-20
+
+bind-to-key	meta-prefix		`
+;bind-to-key	nop			^[	; Undo the escape key.
+
+bind-to-key	next-window		FN^1
+bind-to-key	next-buffer		FN^2
+bind-to-key	hunt-backward		FN^3
+bind-to-key	hunt-forward		FN^4
+bind-to-key	move-window-up		A-7
+bind-to-key	move-window-down	A-8
+bind-to-key	universal-argument	A-6
+bind-to-key	goto-matching-fence	A-,
+bind-to-key	search-reverse		A-1
+bind-to-key	search-forward		A-2
+bind-to-key	hunt-forward		M-/
+bind-to-key	hunt-backward		M-\
+bind-to-key	execute-macro		A-5
+bind-to-key	end-of-word		M-F	; Override standard next-word
+bind-to-key	buffer-position		A-9
+macro-to-key	Kill_to_BOL		^U
+macro-to-key	Next_EOL		^E
+macro-to-key	Prev_BOL		^H
+macro-to-key	Toggle_Overwrite	^A
+macro-to-key	Time_and_Temp		A--
+macro-to-key	Insert_Date		A-.
+macro-to-key	TriWindow		^X3
+
+;
+; Turn the message-line back on.
+;
+set $discmd	TRUE

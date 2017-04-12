@@ -1,0 +1,3 @@
+-o emacs amigados.o ansi.o basic.o bind.o buffer.o char.o crypt.o
+display.o eval.o exec.o file.o fileio.o input.o isearch.o line.o main.o
+mouse.o random.o region.o search.o replace.o window.o word.o -lc32

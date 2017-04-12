@@ -1,0 +1,8 @@
+WAITFORPRG DIALOG 10, 35, 141, 61
+FONT 8, "Helv"
+STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | 0xC0L
+BEGIN
+	ICON "WaitIcon", -1, 9, 9, 16, 16
+	CONTROL "Waiting for other program to terminate...", 102, "STATIC", SS_CENTER, 42, 8, 93, 21
+	PUSHBUTTON "Cancel", 2, 45, 37, 50, 16
+END

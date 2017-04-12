@@ -1,0 +1,5 @@
+prfile obj
+PRMODULE fclose.c, fopen.c, _file.c, _open.c, fflush.c
+PRMODULE stream.c, getenv.c, asctime.c, ctime.c, days.c, gmtime.c
+PRMODULE localtim.c, tzset.c, timeset.c, dtoxtime.c, dos\getcwd.c
+PRMODULE dos\stat.c, fullpath.c, fprintf.c

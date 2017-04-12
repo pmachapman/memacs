@@ -1,0 +1,8 @@
+obj\basic obj\bind obj\buffer obj\char obj\crypt obj\screen obj\keyboard+
+obj\display obj\eval obj\exec obj\file obj\fileio obj\os2 obj\input+
+obj\isearch obj\line obj\main obj\random obj\region obj\lock obj\dolock+
+obj\search obj\replace obj\tags obj\window obj\word obj\os2npm obj\mouse
+bin\emacs /m /linenumbers /stack:8192
+emacs.map
+c:\sys\c600\lib\os2.lib c:\sys\c600\lib\llibcep.lib
+emacs.def

@@ -1,0 +1,381 @@
+	MicroEMACS version 3.12		Release Notes
+
+			22-Apr-93
+
+------------------------------------------------------------------------
+	(C)Copyright 1988-1993 by Daniel M. Lawrence
+	MicroEMACS 3.12 can be copied and distributed freely for any
+	non-commercial purposes. Commercial users may use MicroEMACS
+	3.12 inhouse. Shareware distributors may redistribute
+	MicroEMACS 3.12 for media costs only. MicroEMACS 3.12 can only
+	be incorporated into commercial software or resold with the
+	permission of the current author.
+------------------------------------------------------------------------
+	IBM-PC and OS/2 are copywrighted by International Business
+	Machines, INC. MSDOS and MicroSoft Windows are copyrighted by
+	Microsoft Inc. AMIGA is copywrited by Commodore Business
+	Machines. Atari ST is copyrighted by Atari Coorporation. All
+	other product names used within this document are copyrighted by
+	their respective copyright holders. 
+----------------------------------------------------------------------
+
+	This is the offical release of version 3.12 of MicroEMACS.  This
+file gives information on registering MicroEMACS, features which have
+changed since version 3.11, notes on various installations, future
+directions for MicroEMACS, contact information and bug reporting
+procedures.
+
+********** Registering MicroEMACS **********
+
+	Keeping many environments up to date, fielding questions over
+the phone, applying bug fixes and adding new features is reasonably
+large task. I have been writing, maintaining and supporting MicroEMACS
+since 1985. I have bought numerous computers solely to port and support
+MicroEMACS on those platforms. I can not even begin to count the number
+of people using MicroEMACS, and I have recieved support calls,
+registrations and inquiries from many countries all over the globe. This
+keeps me very busy for a hobby that I do outside my normal employment.
+	If you like MicroEMACS, and want to see more work, new versions
+and other shareware software to go along with it, show your support by
+registering your copy. Send your registration of $25 US and I will place
+you on the registration list. You will recieve information on new
+releases and preferential support. If you have recieved MicroEMACS
+through a software library, a CDROM collection, or a user's group, none
+of those fees are passed along to the software author. Register with me
+and get the latest versions, info and have a voice into future
+directions.
+
+********** Installation Notes **************
+
+	MicroEMACS is supplied on two 3 1/2" inch diskettes in IBMPC
+format. The first disk is an MSDOS, MicroSoft Windows and OS/2
+installation disk. For any of these environments, insert the disk into
+your A: drive, and type:
+
+	a:install
+
+	The installation program will lead you through installing
+MicroEMACS and all of its related files on your system's hard drive.
+After installation, these are the names of the various executables:
+
+	EMACS.EXE	MSDOS real mode version (640K limit)
+	EMACS16M.EXE	MSDOS protected mode version
+			(will use all memory, slightly slower than real mode)
+	MEWIN.EXE	MicroSoft Windows 3.1 version
+	OS2EMACS.EXE	OS/2 1.3, 2.0 or 2.1 version
+
+	The second disk is a ZIP archive of all the sources, documents,
+command files and makefiles. Copy this file to an empty directory on
+your hard drive, and then use any unZIPper and allow it to extract this
+tree of files on your hard drive. Some of the resulting files and
+subdirectories will include:
+
+AIX          makefiles for AIX (a UNIX varient)
+AMIGA        makefiles for the Commodore AMIGA
+ATARI        makefiles for the Atari ST
+CMD          standard .CMD command files
+DGEN         makefiles for the Data General
+DOC          documentation files (including this!)
+FMR          makefiles for the Fujitsu FMR series MSDOS computers
+H            .H header files
+HP150        makefile for the HP150 MSDOS computer
+HPUX         makefile for the HP9000 workstations
+I55          makefile for the IBM 5550 Katakana computer
+MPE          makefile for the HP3000 series computer
+MSWIN        makefiles and auxillary files for MicroSoft Windows 3
+NEC          makefiles for the NEC 9800 series MSDOS machines
+NT           makefiles for Windows NT
+OS2          makefiles for OS/2
+PCDOS        makefiles for various IBM-PC compilers and versions
+POSIX        makefiles for POSIX (a UNIX varient)
+SRC          .C source files
+SUN4         makefiles for SUN-OS 4.1 and above (not Solaris)
+VMS          makefile for DEC's VMS operating system
+WINHELP      source code for the windows help files
+XENIX        makefiles for XENIX
+CLROBJ.BAT   MSDOS batch file to clear out all the object and executable files
+DE.BAT       MSDOS batch file to create a diff from an old version
+TODO         pending development tasks
+UTOD.CMD     emacs command file to fix line termination on file group
+
+	Included on this disk is a public domain MSDOS unzipping program
+called "unzip" written by a group of USENET programmers. Both the actual
+executable and the self unpacking package with all of its documention is
+provided. Copy the diskette to the target directory, and type:
+
+	unzip ue312
+
+	to extract all the sources, command files, makefiles and
+documentation to their proper directories within the that directory.
+
+	If you need to build a version from the source files, unpack
+these files, and move them and all its subdirectories to the target
+machine. Change to the directory most appropriate for the machine for
+which you are building MicroEMACS. Edit ESTRUCT.H, changing the
+definition from zero to one for the appropriate hardware, compiler,
+terminal driver. Edit any other parameters or options as appropriate.
+You may need to create an OBJ and a BIN subdirectory from this
+directory. Then run your make utility to compile and link a MicroEMACS
+executable.
+
+	Under MicroSoft windows, use the NEW option of the FILES menu of
+the file program manager to add a program item. Set the program
+executable to the drive where you installed MicroEMACS, remembering the
+name of the Windows executable is mewin.exe. The MicroEMACS icon will
+appear in the program window you have currently open.
+
+	Under OS/2, copy a program template to the desktop, and then use
+its settings menu to set the path to the program executable and the
+correct working directory. The name of the OS/2 executable is
+OS2EMACS.EXE. The icon for MicroEMACS should replace the template icon.
+Drag this to where you want it to be placed.
+
+	Under the differing varieties of UNIX, if you are installing
+MicroEMACS systemwide, you need to place it and all of its command files
+into a directory that all your users can access. Rename the emacs.rc
+startup file to .emacsrc. Once your users have this directory in their
+path, they will be able to use MicroEMACS. They can create a local
+.emacsrc file that will overide the code in the system MicroEMACS
+startup file. Be carefull to allow read permissions on all the
+MicroEMACS files.
+
+	On the Atari ST, be sure that MicroEMACS is installed as a GEM
+application from the GEM desktop.  If this is not done, MicroEMACS will
+grow confused about the state of the mouse, and ring the bell alot to
+alert the user to the problem.  (Mouse handling on the Atari is both
+complex and triple layered....).
+
+********** Major New Features since 3.11 *********
+
+>>> Windows and Windows NT GUI versions
+
+	Pierre Perret made an enormous effort and produced the code to
+allow MicroEMACS to run under MicroSoft Windows and Windows NT as a GUI
+style application. Its very good. Try it!
+
+>>> MSDOS DMPI version!
+
+	Under an agreement with Rational Systems, Inc, one version of
+the distributed executable, "emacs16m.exe" is GLUed to their 16 bit DOS
+extender product, which allows it to run as a protected mode program. If
+you have a 386 or better and use this executable, you can use ALL
+available extended memory to hold files to be edited. If you own this
+product you can rebuild this version from the supplied sources and
+makefiles.
+
+>>> New MSDOS, Windows, OS/2 installation
+
+	Using Knowledge Dynamics Corporations INSTALL 3.2 program, it is
+easier than ever to install versions of MicroEMACS on to your computer.
+Just put the disk in your A: drive and type "A:INSTALL".
+
+>>> Highlighted Regions
+
+	Using the mouse to cut and paste, the selected region is now
+displayed in reverse video. This works under all environments supporting
+both mice and reverse video.
+
+>>> Support for AUX
+
+	MicroEMACS now supports Apple's AUX UNIX-Like operating system.
+
+>>> Displays time in bottom modeline
+
+	if $timeflag is set to TRUE, the time of the last keystroke is
+displayed in the bottom most modeline.
+
+>>> Partial completion lists
+
+	Attempting a file/buffer/command completion when there are more
+than one remaining posibility will bring up a pop up buffer of possible
+completions. Keep typing letters and attempt the completion again when
+they are more unique.
+
+>>> Kill Ring implimented
+
+	New commands yank-pop (M-Y), delete-kill-ring (M-^Y), and
+cycle-ring (^X-Y) impliment a ring of kill buffers.
+
+>>> Current point position displayed
+
+	If $posflag is set to TRUE, the position of the point in the
+current window is displayed as a line and column value in that window's
+modeline. This defaults to TRUE with the standard startup files.
+
+>>> New function &rev
+
+	This returns the characters of its argument in reverse order.
+
+>>> Mouse support under OS/2
+
+	The OS/2 version now fully supports all MicroEMACS mouse handling.
+
+>>> Console style Windows NT support
+
+	A very fast console style driver for MicroEMACS under MicroSoft's
+Windows NT operating system is an alternative for the GUI driver.
+
+>>> Buffer variables now terminate
+
+	When using a buffer variable, like #<buffer name>, when the
+point in the buffer reaches the end, the variable will return "<END>".
+This makes your macros using these variables easier to write!
+
+>>> Improved 8 bit character handling
+
+	Many parts of the editor are much more 8 bit aware.
+
+>>> More Completion!!
+
+	The write-file (^X^W) and append-file (^X^A) commands now use
+file name completion.
+
+>>> Better Completion!!
+
+	While completing file names interactively, MicroEMACS will
+recognize and expand ~/ as the user's home directory, ~name/ as the
+named user's home directory and $<var>/ as a directory named in an
+environmental <var>. This uses the appropriate UNIX calls or looks in
+the USER environment variable depending on the OS.
+
+>>> Macros can query the Operating System
+
+	The $os variable returns the name of the operating system which
+MicroEMACS is running under.
+
+>>> Position point within line from command line
+
+	The -p<n> command line option positions the point within the
+first line of the first file listen on the command line. This can be
+used in conjunction with the -g flag to position the point anywhere
+within that file.
+
+>>> Labeling of Function Keys
+
+	On HP terminals connected up to a UNIX system, MicroEMACS can
+label the on screen function keys.
+
+>>> Line position switch alternative
+
+	Placing a +<n> on the command line is equivilant to -g<n>,
+allowing the point to be placed on any line of the first file listed on
+the command line. This makes many UNIX tools happier.
+
+>>> Slash Handling Improved
+
+	Forward slashes are now excepted as directory separators under
+MSDOS and OS/2 as well as the native backslashes. They are translated
+both on the command line and in file name completion.
+
+>>> Control-Space decoded under UNIX
+
+	UNIX users can now use control-<space> as a legal character.
+Most DOS style machines can not scan this combination, but under UNIX
+this is bound to set-mark by default.
+
+>>> Execute-Buffer now uses buffer name completion
+
+	When this command is called interactively, it does buffer name
+completion.
+
+>>> ISO French Header text
+
+	As an alternative to the IBM-PC French header files, there is
+also an ISO french header file for various UNIX versions. The proper
+version is chosen for the appropriate operating system.
+
+>>> Various Bug Fixes
+
+	Many bugs found by users have been squashed.
+
+********** Future Directions ***************
+
+	I am continuing work on MicroEMACS, and look forward to a number
+of improvements in the near to farther future. Ranked in approximate
+order are:
+
+	- Macintosh Support
+	- Multiple language support for macroes
+	- Parameters on macroes
+	- An OS/2 Presentation Manager version
+	- A possible VI user interface
+	- A code compiler	
+
+********** Contact Information *************
+
+To contact me: (MicroEMACS)
+
+	USMAIL:	Daniel Lawrence
+		617 New York St
+		Lafayette, IN 47901 USA
+	
+	Internet:	mdbs!dan@dynamo.ecn.purdue.edu
+	
+	American Online: bardor
+	
+	BBS:	The Programmer's Room
+		(317) 742-5533
+		Fido 1:201/10
+	
+	voice:	(317) 742-5153 evenings and weekends
+
+To contact Rational Systems Inc.: (DOS16M Dos Extender)
+
+	Rational Systems Inc.
+	220 North Main Street
+	Natick, Massachusette 01760
+	(508)653-6006
+
+To contact Knowledge Dynamics Corporation: (INSTALL 3.2 Installation program)
+
+	Knowledge Dynamics Corporation
+	P.O. Box 1558
+	Canyon Lake, TX 78130-1558 (USA)
+
+********** Reporting Bugs ******************
+
+If you need to report any bugs, you should be sure to include the this
+information:
+
+- Contact info of the reporter
+
+- Hardware where the bug manifests itself
+
+- Operating System and OS version number
+
+- a list of the ESTRUCT.H switches used to compile effected version
+	or file name of distributed .exe
+
+- compiler and makefile used to compile MicroEMACS
+
+- a clear, step by step method to reproduce the problem
+  any pertinate macro code or text files used
+
+- Under MSDOS:
+	- a list of any concurrent software (TSRs, etc)
+	- a copy of the autoexec.bat and config.sys files
+
+********** Support *************************
+
+	Support for MicroEMACS 3.12 is available in a couple of
+different ways.  First, it is available via my bulletin board
+system..... 
+
+	The Programmer's Room
+	FIDO 1:201/10
+	(317) 742-5533
+	24 hours  300/1200/2400/9600HST baud
+
+	There are message areas devoted to MicroEMACS where I and other
+people can answer your questions. Also there are file areas for staying
+abreast of the current development version and finding and trading macro
+files.
+	MicroSPELL 2.1 is also available.  This version is the first
+major update released in several years. These program allows you to
+spell check text files and use MicroEMACS to scan the file, making
+suggestions and doing various corrections.
+	As before, I will continue to support these programs, and
+encourage everyone to spread them around as much as they can. If you
+make what you think are changes that are useful to many, send me the
+updates, and as time permits, I will incorporate the ones I understand,
+and agree with into the master sources.
