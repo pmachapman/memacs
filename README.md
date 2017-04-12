@@ -9,7 +9,7 @@ This project seeks to collect the source code and binaries for MicroEMACS, and p
 
 ## Readme
 
-Please refer to [DOC/README](DOC/README) for the complete MicroEMACS readme file.
+Please refer to [DOC/README](doc/readme) for the complete MicroEMACS readme file.
 
 ## Copyright
 
