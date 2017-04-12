@@ -10,7 +10,7 @@
 
 #if	FILOCK
 
-#if	BSD || WMCS || SUN || XENIX || HPUX8 || HPUX9 || AVIION || USG || AUX
+#if	BSD || FREEBSD || WMCS || SUN || XENIX || HPUX8 || HPUX9 || AVIION || USG || AIX || AUX
 #include <sys/errno.h>
 extern int sys_nerr;		/* number of system error messages defined */
 extern char *sys_errlist[];	/* list of message texts */
@@ -56,8 +56,8 @@ char *fname;	/* file to check for a lock */
 		return(TRUE);
 
 	/* we have now locked it, add it to our table */
-	lname[++numlocks - 1] = (char *)malloc(strlen(fname) + 1);
-	if (lname[numlocks - 1] == NULL) {	/* malloc failure */
+	lname[++numlocks - 1] = (char *)room(strlen(fname) + 1);
+	if (lname[numlocks - 1] == NULL) {	/* room failure */
 		undolock(fname);		/* free the lock */
 		mlwrite(TEXT174);
 /*                      "Cannot lock, out of memory" */
@@ -158,7 +158,7 @@ char *errstr;		/* lock error string to print out */
 
 	strcpy(obuf, errstr);
 	strcat(obuf, " - ");
-#if	BSD || WMCS || SUN || XENIX || HPUX8 || HPUX9 || AVIION || USG || AUX
+#if	BSD || FREEBSD || WMCS || SUN || XENIX || HPUX8 || HPUX9 || AVIION || USG || AIX || AUX
 	if (errno < sys_nerr)
 		strcat(obuf, sys_errlist[errno]);
 	else
@@ -169,6 +169,7 @@ char *errstr;		/* lock error string to print out */
 	strcat(obuf, int_asc(errno));
 #endif
 	mlwrite(obuf);
+	update(TRUE);
 }
 #else
 lckhello()	/* dummy function */

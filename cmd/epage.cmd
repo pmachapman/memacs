@@ -4,16 +4,16 @@
 
 ; set the clean procedure up
 store-procedure clean
-	delete-buffer "[Macro 10]"
-	delete-buffer "[Macro 11]"
-	delete-buffer "[Macro 12]"
-	delete-buffer "[Macro 13]"
-	bind-to-key execute-macro-14 S-FN5
-	bind-to-key execute-macro-15 S-FN6
-	delete-buffer "[Macro 16]"
-	delete-buffer "[Macro 17]"
-	bind-to-key execute-macro-18 S-FN9
-	bind-to-key execute-macro-19 S-FN0
+	delete-buffer "[display-variable]"
+	delete-buffer "[eval-exp]"
+	delete-buffer "[compile-buffer]"
+	delete-buffer "[toggle-debugging]"
+	unbind-key S-FN5
+	unbind-key S-FN6
+	unbind-key S-FN7
+	unbind-key S-FN8
+	unbind-key S-FN9
+	unbind-key S-FN0
 !endm
 
 ; make sure the function key window is up
@@ -48,7 +48,7 @@ store-procedure clean
 
 ; display a variable
 
-10	store-macro
+store-procedure	display-variable
 	set %rcdebug $debug
 	set $debug FALSE
 	set %rctmp @&cat &cat "Variable to display[" %rcvar "]: "
@@ -58,10 +58,11 @@ store-procedure clean
 	write-message &cat &cat &cat %rcvar " = [" &ind %rcvar "]"
 	set $debug %rcdebug
 !endm
+macro-to-key display-variable	S-FN1
 
 ;	evaluate expresion
 
-11	store-macro
+store-procedure eval-exp
 	delete-buffer "[temp]"
 	set %rcbuf $cbufname
 	set %cline $cwline
@@ -75,17 +76,19 @@ store-procedure clean
 	%cline redraw-display
 	write-message &cat &cat "Value = [" %rcval "]"
 !endm
+macro-to-key eval-exp S-FN2
 
 ;	compile the current buffer
 
-12	store-macro
+store-procedure compile-buffer
 ;	here is where to add code to handle compiling the current buffer
 	write-message "[No Compiler module loaded]"
 !endm
+macro-to-key compile-buffer S-FN3
 
 ;	Toggle debug mode
 
-13	store-macro
+store-procedure toggle-debugging
 	set $debug FALSE
 	set %cbuf $cbufname
 	set %cline $cwline
@@ -107,56 +110,12 @@ store-procedure clean
 	write-message &cat &cat "[Debug Mode " %rcdebug "]"
 	set $debug %rcdebug
 !endm
+macro-to-key toggle-debugging S-FN4
 
 	bind-to-key execute-buffer S-FN5
 	bind-to-key execute-macro S-FN6
-
-;	indent region
-
-16	store-macro
-	write-message "[Indenting region]"
-	set %endline $curline
-	set %endpos $cwline
-	exchange-point-and-mark
-	set $discmd FALSE
-	set-mark
-	set $discmd TRUE
-
-	!while &gre %endline $curline
-		beginning-of-line
-		handle-tab
-		next-line
-	!endwhile
-
-	beginning-of-line	
-	set $cwline %endpos
-	write-message "[Region indented]"
-!endm
-
-;	undent region
-
-17	store-macro
-	write-message "[Undenting region]"
-	set %endline $curline
-	set %endpos $cwline
-	exchange-point-and-mark
-	set $discmd FALSE
-	set-mark
-	set $discmd TRUE
-
-	!while &gre %endline $curline
-		beginning-of-line
-		!if &gre $lwidth 0
-			delete-next-character
-		!endif
-		next-line
-	!endwhile
-
-	beginning-of-line	
-	set $cwline %endpos
-	write-message "[Region undented]"
-!endm
-
+	bind-to-key indent-region S-FN7
+	bind-to-key undent-region S-FN8
 	bind-to-key shell-command S-FN9
 	bind-to-key i-shell S-FN0
 	set %rcvar ""

@@ -23,9 +23,9 @@ HFILES = $(HDIR)\estruct.h $(HDIR)\edef.h $(HDIR)\efunc.h $(HDIR)\epath.h $(HDIR
 
 #list of source files
 
-F1 = $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
+F1 = $(OBJD)\abbrev.obj $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
 F2 = $(OBJD)\char.obj $(OBJD)\crypt.obj $(OBJD)\display.obj
-F3 = $(OBJD)\eval.obj $(OBJD)\exec.obj $(OBJD)\file.obj
+F3 = $(OBJD)\eval.obj $(OBJD)\exec.obj $(OBJD)\file.obj $(OBJD)\undo.obj
 F4 = $(OBJD)\fileio.obj $(OBJD)\ibmpc.obj $(OBJD)\input.obj $(OBJD)\keyboard.obj
 F5 = $(OBJD)\isearch.obj $(OBJD)\line.obj $(OBJD)\lock.obj $(OBJD)\dolock.obj
 F6 = $(OBJD)\main.obj $(OBJD)\mouse.obj $(OBJD)\msdos.obj $(OBJD)\screen.obj
@@ -41,6 +41,8 @@ bin\emacs.exe: $(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8)
 
 # compilation rules
 
+$(OBJD)\abbrev.obj: $(SRCD)\abbrev.c $(HFILES)
+	$(CC) $(CFLAGS) /Fo$(OBJD)\abbrev.obj $(SRCD)\abbrev.c
 $(OBJD)\basic.obj: $(SRCD)\basic.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\basic.obj $(SRCD)\basic.c
 $(OBJD)\bind.obj: $(SRCD)\bind.c $(HFILES)
@@ -101,5 +103,7 @@ $(OBJD)\word.obj: $(SRCD)\word.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\word.obj $(SRCD)\word.c
 $(OBJD)\keyboard.obj: $(SRCD)\keyboard.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\keyboard.obj $(SRCD)\keyboard.c
+$(OBJD)\undo.obj: $(SRCD)\undo.c $(HFILES)
+	$(CC) $(CFLAGS) /Fo$(OBJD)\undo.obj $(SRCD)\undo.c
 $(OBJD)\execpr.obj: $(SRCD)\execpr.asm
 	masm $(SRCD)\execpr.asm, $(OBJD)\execpr.obj, , ,

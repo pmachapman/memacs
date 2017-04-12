@@ -1,6 +1,6 @@
 /*	ELANG.H:	Language specific definitions for
-			MicroEMACS 3.12
-			(C)opyright 1993 by Daniel Lawrence
+			MicroEMACS 4.00
+			(C)opyright 1995 by Daniel Lawrence
 */
 
 #if	ENGLISH
@@ -8,7 +8,7 @@
 #define	LANGUAGE "english"
 #endif
 #if	FRENCH
-#if BSD || USG || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION
+#if WINDOW_MSWIN || AIX || BSD || USG || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION
 #include	"frenchis.h"	/* ISO version */
 #else
 #include	"french.h"	/* IBM-PC char set */

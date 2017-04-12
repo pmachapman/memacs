@@ -2,7 +2,7 @@ obj\basic obj\bind obj\buffer obj\char obj\crypt obj\lock obj\dolock+
 obj\display obj\eval obj\exec obj\file obj\fileio obj\ibmpc obj\input+
 obj\isearch obj\line obj\main obj\random obj\region obj\screen obj\keyboard+
 obj\search obj\replace obj\tags obj\window obj\word obj\msdos obj\mouse+
-obj\execpr
+obj\execpr obj\abbrev obj\undo
 bin\emacs /m /linenumbers
 emacs.map
 c:\sys\m7\lib\llibc7.lib

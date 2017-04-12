@@ -26,8 +26,8 @@ HFILES = ..\..\h\estruct.h ..\..\h\edef.h ..\..\h\efunc.h ..\..\h\epath.h ..\..\
 
 #list of source files
 
-F1 = $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
-F2 = $(OBJD)\char.obj $(OBJD)\crypt.obj $(OBJD)\display.obj
+F1 = $(OBJD)\abbrev.obj $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
+F2 = $(OBJD)\char.obj $(OBJD)\crypt.obj $(OBJD)\display.obj $(OBJD)\undo.obj
 F3 = $(OBJD)\eval.obj $(OBJD)\exec.obj $(OBJD)\file.obj
 F4 = $(OBJD)\fileio.obj $(OBJD)\ansi.obj $(OBJD)\input.obj $(OBJD)\keyboard.obj
 F5 = $(OBJD)\isearch.obj $(OBJD)\line.obj $(OBJD)\lock.obj $(OBJD)\dolock.obj
@@ -47,6 +47,8 @@ bin\cmdfix.exe: $(OBJD)\cmdfix.obj
 
 # compilation rules
 
+$(OBJD)\abbrev.obj: $(SRCD)\abbrev.c $(HFILES)
+	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
 $(OBJD)\basic.obj: $(SRCD)\basic.c $(HFILES)
 	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
 $(OBJD)\bind.obj: $(SRCD)\bind.c $(HFILES)
@@ -102,6 +104,8 @@ $(OBJD)\replace.obj: $(SRCD)\replace.c $(HFILES)
 $(OBJD)\screen.obj: $(SRCD)\screen.c $(HFILES)
 	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
 $(OBJD)\tags.obj: $(SRCD)\tags.c $(HFILES)
+	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
+$(OBJD)\undo.obj: $(SRCD)\undo.c $(HFILES)
 	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
 $(OBJD)\window.obj: $(SRCD)\window.c $(HFILES)
 	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c

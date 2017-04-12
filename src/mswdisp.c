@@ -25,7 +25,7 @@ static COLORREF EmacsPalette [16] = {
     0x00000000,     /* black */
     0x00000080,     /* red */
     0x00008000,     /* green */
-    0x0000FFFF,     /* yellow */
+    0x00008080,     /* yellow */
     0x00800000,     /* blue */
     0x00800080,     /* magenta */
     0x00808000,     /* cyan */
@@ -33,9 +33,9 @@ static COLORREF EmacsPalette [16] = {
     0x00808080,     /* gray (dark) */
     0x000000FF,     /* light red */
     0x0000FF00,     /* light green */
-    0x0080FFFF,     /* light yellow*/
-    0x00FF0000,     /* light  blue */
-    0x00800080,     /* light magenta*/
+    0x0000FFFF,     /* light yellow*/
+    0x00FF0000,     /* light blue */
+    0x00FF00FF,     /* light magenta*/
     0x00FFFF00,     /* light cyan */
     0x00FFFFFF      /* white */
 };
@@ -221,11 +221,11 @@ static void PASCAL UpdateEmacsCaretPos (void)
     pt.x = CaretCol;
     pt.y = CaretRow;
     CellToClient (hCaretWnd, pt, &pt);
-#if CARETSHAPE == 0
-    if (hCaretWnd != hFrameWnd) {
-	pt.y += EmacsCM.SizeY - (EmacsCM.SizeY / 4);
+
+    if (caret_shape == 0 && hCaretWnd != hFrameWnd) {
+		pt.y += EmacsCM.SizeY - (EmacsCM.SizeY / 4);
     }
-#endif
+
     SetCaretPos (pt.x, pt.y + EmacsCM.HalfLeadingY);
 } /* UpdateEmacsCaretPos */
 
@@ -237,38 +237,36 @@ void FAR PASCAL EmacsCaret (BOOL Show)
 /* the Show parameter is TRUE if the caret should be created and FALSE
    if it should be destroyed */
 {
+	short xsize, ysize;
+
     if (Show) {
         if (hCaretWnd == 0) return;
-	if (hFrameWnd == GetActiveWindow ()) {
-	    if (!IsWindow (hCaretWnd)) {
-	        /* this may happen in some transient cases when closing
-		   down a screen */
-	        hCaretWnd = 0;
-	        return;
-	    }
-            CreateCaret (hCaretWnd, NULL,
-			 hCaretWnd == hFrameWnd ?
-			 	      GetSystemMetrics (SM_CXBORDER) :
-#if CARETSHAPE == 1
-				      EmacsCM.SizeX / 4,
-#else
-				      EmacsCM.SizeX,
-#endif
-#if CARETSHAPE == 0
-			 hCaretWnd == hFrameWnd ?
-			 	      EmacsCM.SizeY :
-                                      EmacsCM.SizeY / 4);
-#else
-                         EmacsCM.SizeY);
-#endif
-            UpdateEmacsCaretPos ();
-            if (CaretVisible && !IsIconic (hCaretWnd)) ShowCaret (hCaretWnd);
+		if (hFrameWnd == GetActiveWindow ()) {
+		    if (!IsWindow (hCaretWnd)) {
+		        /* this may happen in some transient cases when closing
+			   down a screen */
+		        hCaretWnd = 0;
+		        return;
+		    }
+
+		    if (hCaretWnd == hFrameWnd) {
+		    	xsize = GetSystemMetrics (SM_CXBORDER);
+		    	ysize = EmacsCM.SizeY;
+		    }
+		    else {
+		    	xsize = (caret_shape == 1)? EmacsCM.SizeX/4: EmacsCM.SizeX;
+		    	ysize = (caret_shape == 0)? EmacsCM.SizeY/4: EmacsCM.SizeY;
+		    }
+
+            CreateCaret (hCaretWnd, NULL, xsize, ysize);
+            UpdateEmacsCaretPos();
+            if (CaretVisible && !IsIconic (hCaretWnd))
+				ShowCaret (hCaretWnd);
         }
     }
-    else {
-	/* destroy the caret */
-	DestroyCaret ();
-    }
+    else /* destroy the caret */
+		DestroyCaret ();
+
 } /* EmacsCaret */
 
 /* MoveEmacsCaret:  updates the caret position */

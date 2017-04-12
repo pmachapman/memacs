@@ -2,6 +2,9 @@ del fmr\*.map
 del fmr\bin\*.exe
 del fmr\estruct.h
 del fmr\obj\*.obj
+del freebsd\emacs
+del freebsd\estruct.h
+del freebsd\obj\*.o
 del hp150\*.map
 del hp150\bin\*.exe
 del hp150\estruct.h

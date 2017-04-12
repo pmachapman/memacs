@@ -331,7 +331,6 @@ void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, UINT wParam, LONG lParam)
     }
 } /* MouseMessage */
 
-#if !WIN30SDK
 /* DropMessage:    handles WM_DROPFILES messages */
 /* ===========                                   */
 
@@ -388,4 +387,3 @@ void FAR PASCAL DropMessage (HWND hWnd, HDROP hDrop)
     }
     DragFinish (hDrop);
 } /* DropMessage */
-#endif

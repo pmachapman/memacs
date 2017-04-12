@@ -48,7 +48,7 @@ store-procedure execline
 
 ;	prompt and execute a command
 
-4	store-macro
+store-procedure do-command
 	run getline
 	!if &not &seq %shline ""
 		!if &or &seq &left %shline 2 "cd" &seq &right %shline 1 ":"
@@ -74,7 +74,7 @@ store-procedure checkmode
 	!if &and &not %shmode &seq $cbufname "[I-SHELL]"
 		set $discmd FALSE
 		write-message "[Entering Shell window]"
-		bind-to-key execute-macro-4 ^M
+		macro-to-key do-command ^M
 		run getdir
 		add-mode black
 		add-mode GREEN
@@ -87,38 +87,38 @@ store-procedure checkmode
 
 ;	window movement (and deactivate us)
 
-5	store-macro
+store-procedure do-next-window
 	next-window
 	run checkmode
 !endm
 
-6	store-macro
+store-procedure do-previous-window
 	previous-window
 	run checkmode
 !endm
 
-7	store-macro
+store-procedure do-delete-window
 	delete-window
 	run checkmode
 !endm
 
-8	store-macro
+store-procedure do-find-file
 	find-file @"Find file:"
 	run checkmode
 !endm
 
-9	store-macro
+store-procedure do-next-buffer
 	next-buffer
 	run checkmode
 !endm
 
 store-procedure openshell
 	set $discmd FALSE
-	bind-to-key execute-macro-5 ^XO
-	bind-to-key execute-macro-6 ^XP
-	bind-to-key execute-macro-7 ^X0
-	bind-to-key execute-macro-8 ^X^F
-	bind-to-key execute-macro-9 ^XX
+	macro-to-key do-next-window ^XO
+	macro-to-key do-previous-window ^XP
+	macro-to-key do-previous-window ^X0
+	macro-to-key do-find-file ^X^F
+	macro-to-key do-next-buffer ^XX
 	select-buffer "[I-SHELL]"
 	run checkmode
 	set $discmd TRUE

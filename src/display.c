@@ -55,7 +55,7 @@ int PASCAL NEAR vtinit()
 	TTrev(FALSE);
 
 	/* allocate the virtual screen pointer array */
-	vscreen = (VIDEO **) malloc(term.t_mrow*sizeof(VIDEO *));
+	vscreen = (VIDEO **)room(term.t_mrow*sizeof(VIDEO *));
 	
 	if (vscreen == NULL)
 #if     WINDOW_MSWIN
@@ -67,7 +67,7 @@ int PASCAL NEAR vtinit()
 
 #if	MEMMAP == 0
 	/* allocate the physical shadow screen array */
-	pscreen = (VIDEO **) malloc(term.t_mrow*sizeof(VIDEO *));
+	pscreen = (VIDEO **)room(term.t_mrow*sizeof(VIDEO *));
 	if (pscreen == NULL)
 #if     WINDOW_MSWIN
 		return(FALSE);
@@ -80,7 +80,7 @@ int PASCAL NEAR vtinit()
 	for (i = 0; i < term.t_mrow; ++i) {
 
 		/* allocate a virtual screen line */
-		vp = (VIDEO *) malloc(sizeof(VIDEO)+term.t_mcol);
+		vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol);
 		if (vp == NULL)
 #if     WINDOW_MSWIN
 			return(FALSE);
@@ -100,7 +100,7 @@ int PASCAL NEAR vtinit()
 
 #if	MEMMAP == 0
 		/* allocate and initialize physical shadow screen line */
-		vp = (VIDEO *) malloc(sizeof(VIDEO)+term.t_mcol);
+		vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol);
 		if (vp == NULL)
 #if     WINDOW_MSWIN
 			return(FALSE);
@@ -214,7 +214,7 @@ int PASCAL NEAR vtsizescr(SCREEN *sp, int nrow, int ncol)
 	oldncol = sp->s_ncol;
 	if (vtinitscr(sp, nrow, ncol) == TRUE) {
 		/* success! let's free the old VIDEO structures */
-		WINDOW	*wp;
+		EWINDOW *wp;
 	    
 		vscreen = oldvvp;
 		pscreen = oldpvp;
@@ -293,7 +293,7 @@ int c;
 	/* this is the line to put this character! */
 	vp = vscreen[vtrow];
 
-	if (c == '\t') {
+	if (c == '\t' && tabsize > 0) {
 
 		/* output a hardware tab as the right number of spaces */
 		do {
@@ -374,7 +374,7 @@ VOID PASCAL NEAR update(force)
 int force;	/* force update past type ahead? */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 #if     WINDOW_MSWIN
 	SCREEN  *sp;
 #endif
@@ -407,7 +407,7 @@ int force;	/* force update past type ahead? */
 	do {
 		char scroll_flag = 0;
 		int  scroll_fcol;
-		static WINDOW *scroll_wp = (WINDOW *)NULL;
+		static EWINDOW *scroll_wp = (EWINDOW *)NULL;
 	    
 		sp = sp->s_next_screen;
 		if (sp == (SCREEN *)NULL) {
@@ -512,7 +512,7 @@ int force;	/* force update past type ahead? */
 
 VOID PASCAL NEAR reframe(wp)
 
-WINDOW *wp;
+EWINDOW *wp;
 
 {
 	register LINE *lp;	/* search pointer */
@@ -554,6 +554,7 @@ WINDOW *wp;
 		/* search thru the buffer looking for the point */
 		tp = lp = rp = wp->w_linep;
 		hp = wp->w_bufp->b_linep;
+
 		while ((lp != hp) || (rp != hp)) {
 
 			/* did we scroll downward? */
@@ -747,7 +748,7 @@ VOID PASCAL NEAR update_hilite()
 
 VOID PASCAL NEAR updone(wp)
 
-WINDOW *wp;     /* window to update current line in */
+EWINDOW *wp;     /* window to update current line in */
 
 {
         register LINE *lp;      /* line to update */
@@ -782,7 +783,7 @@ WINDOW *wp;     /* window to update current line in */
 
 VOID PASCAL NEAR updall(wp)
 
-WINDOW *wp;     /* window to update lines in */
+EWINDOW *wp;     /* window to update lines in */
 
 {
         register LINE *lp;      /* line to update */
@@ -833,8 +834,6 @@ VOID PASCAL NEAR updpos()
 
 {
         register LINE *lp;
-        register int c;
-        register int i;
 
         /* find the current row */
         lp = curwp->w_linep;
@@ -845,22 +844,7 @@ VOID PASCAL NEAR updpos()
         }
 
         /* find the current column */
-        curcol = 0;
-        i = 0;
-        while (i < curwp->w_doto) {
-                c = lgetc(lp, i++);
-                if (c == '\t')
-                        curcol += - (curcol % tabsize) + (tabsize - 1);
-                else {
-                        if (disphigh && c > 0x7f) {
-                                curcol += 2;
-                                c -= 0x80;
-                        }
-                        if (c < 0x20 || c == 0x7f)
-                                ++curcol;
-                }
-                ++curcol;
-        }
+	curcol = getccol(FALSE);
 
         /* adjust by the current first column position */
         curcol -= curwp->w_fcol;
@@ -899,7 +883,7 @@ VOID PASCAL NEAR updpos()
 VOID PASCAL NEAR upddex()
 
 {
-        register WINDOW *wp;
+        register EWINDOW *wp;
         register LINE *lp;
         register int i,j;
         register int nlines;    /* number of lines in the current window */
@@ -1037,7 +1021,7 @@ BUFFER *popbuf;
 
         /* set up to scan pop up buffer */
         lp = lforw(popbuf->b_linep);
-        numlines = term.t_nrow-2;
+        numlines = term.t_nrow-2 + !modeflag;
         cline = 0;
 	mmove_flag = FALSE;	/* disable mouse move events */
 
@@ -1067,7 +1051,7 @@ BUFFER *popbuf;
                         TTflush();
 
                         /* and see if they want more */
-                        if ((c = tgetc()) != ' ') {
+                        if ((popwait) && ((c = tgetc()) != ' ')) {
                                 cpending = TRUE;
                                 charpending = c;
                                 upwind();
@@ -1078,20 +1062,25 @@ BUFFER *popbuf;
                         }
 
                         /* reset the line counters */
-                        numlines = term.t_nrow-2;
+                        numlines = term.t_nrow-2 + !modeflag;
                         cline = 0;
+
+			/* if we at the end, don't requeue for more */
+			if (lforw(lp) == popbuf->b_linep)
+				numlines = -1;
+
                 }
 
                 /* on to the next line */
                 lp = lforw(lp);
         }
-        if (numlines > 0) {
+        if (numlines >= 0) {
 
                 /* update the virtual screen to the physical screen */
                 updupd(FALSE);
                 TTflush();
 
-                if ((c = tgetc()) != ' ') {
+                if ((popwait) && ((c = tgetc()) != ' ')) {
                         cpending = TRUE;
                         charpending = c;
                 }
@@ -1404,7 +1393,7 @@ struct VIDEO *pp;       /* physical screen image */
  */
 VOID PASCAL NEAR modeline(wp)
 
-WINDOW *wp;	/* window to update modeline for */
+EWINDOW *wp;	/* window to update modeline for */
 
 {
 	register char *cp;
@@ -1473,13 +1462,14 @@ WINDOW *wp;	/* window to update modeline for */
 
 	n  = 4;
 	strcpy(tline, " "); 			/* Buffer name. */
+#if     !WINDOW_MSWIN
 	strcat(tline, PROGNAME);
 	strcat(tline, " ");
 	strcat(tline, VERSION);
 	strcat(tline, " ");
-
+#endif
 	/* display the time on the bottom most modeline if active */
-	if (timeflag && wp->w_wndp == (WINDOW *)NULL) {
+	if (timeflag && wp->w_wndp == (EWINDOW *)NULL) {
 
 		/* get the current time/date string */
 		getdtime(time);
@@ -1491,6 +1481,13 @@ WINDOW *wp;	/* window to update modeline for */
 			strcat(tline, "] ");
 			strcpy(lasttime, time);
 		}
+	}
+
+	/* display the size of the undo stack on the current modeline */
+	if (dispundo && wp == curwp) {
+		strcat(tline, "{");
+		strcat(tline, long_asc(wp->w_bufp->undo_count));
+		strcat(tline, "} ");
 	}
 
 	/* are we horizontally scrolled? */
@@ -1605,7 +1602,7 @@ char *ts;
 VOID PASCAL NEAR upmode()	/* update all the mode lines */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 #if     WINDOW_MSWIN
     SCREEN  *sp;
 
@@ -1632,7 +1629,7 @@ VOID PASCAL NEAR upmode()	/* update all the mode lines */
 VOID PASCAL NEAR upwind()	/* force hard updates on all windows */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 #if     WINDOW_MSWIN
     SCREEN  *sp;
 
@@ -1854,8 +1851,13 @@ va_dcl		/* variable argument list
 	va_end(ap);
 }
 #else
+#if PROTO
 VOID CDECL NEAR mlwrite(char *fmt, ...)
 /* char * fmt;*/
+#else
+VOID CDECL NEAR mlwrite()
+char *fmt;
+#endif
 
 		/* variable argument list
 			arg1 = format string
@@ -2046,7 +2048,7 @@ char *s;	/* string to force out */
 
 	oldcmd = discmd;	/* save the discmd value */
 	discmd = TRUE;		/* and turn display on */
-	mlwrite(s);		/* write the string out */
+	mlwrite("%s", s);	/* write the string out */
 	discmd = oldcmd;	/* and restore the original setting */
 }
 
@@ -2158,3 +2160,67 @@ int s;	/* scaled integer to output */
 	mlout((f % 10) + '0');
 	ttcol += 3;
 }
+
+#if HANDLE_WINCH
+winch_vtresize(rows, cols)
+     int rows, cols;
+{
+  int i;
+  register VIDEO *vp;
+
+  for (i = 0; i < term.t_mrow; ++i) {
+    free(vscreen[i]);
+    free(pscreen[i]);
+  }
+  free(vscreen);
+  free(pscreen);
+
+  term.t_mrow=term.t_nrow=rows-1;
+  term.t_mcol=term.t_ncol=cols;
+
+  vscreen = (VIDEO **)room(term.t_mrow*sizeof(VIDEO *));
+  
+  if (vscreen == NULL)
+    meexit(1);
+  
+  pscreen = (VIDEO **)room(term.t_mrow*sizeof(VIDEO *));
+  
+  if (pscreen == NULL)
+    meexit(1);
+  
+  for (i = 0; i < term.t_mrow; ++i)
+    {
+      vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol);
+      
+      if (vp == NULL)
+	meexit(1);
+      
+      vp->v_flag = 0;
+      vp->v_left = FARRIGHT;
+      vp->v_right = 0;
+      vp->v_flag = VFNEW;
+#if	COLOR
+      vp->v_rfcolor = 7;
+      vp->v_rbcolor = 0;
+#endif
+#if	INSDEL
+      vp->v_rline = i;
+#endif
+      vscreen[i] = vp;
+      vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol);
+      
+      if (vp == NULL)
+	meexit(1);
+      
+      vp->v_flag = VFNEW;
+      vp->v_left = FARRIGHT;
+      vp->v_right = 0;
+#if	INSDEL
+      vp->v_rline = i;	/* set requested line position */
+#endif
+      
+      pscreen[i] = vp;
+    }
+}
+#endif
+

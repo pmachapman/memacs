@@ -1,8 +1,8 @@
 /* editor external template: emacs16m -e -g%l -p%c -i%%error "%m" %f */
-#screen l 50
 ipath .
 ipath d:\usr\emacs\h
 /* __echoFile=1 */
+load d:\usr\emacs\src\abbrev.c
 load d:\usr\emacs\src\basic.c
 load d:\usr\emacs\src\bind.c
 load d:\usr\emacs\src\buffer.c
@@ -30,6 +30,7 @@ load d:\usr\emacs\src\replace.c
 load d:\usr\emacs\src\screen.c
 load d:\usr\emacs\src\search.c
 load d:\usr\emacs\src\tags.c
+load d:\usr\emacs\src\undo.c
 load d:\usr\emacs\src\window.c
 load d:\usr\emacs\src\word.c
 

@@ -13,7 +13,7 @@ HFILES = estruct.h edef.h efunc.h epath.h ebind.h eproto.h
 
 #list of object files
 
-F1 = basic.o bind.o buffer.o
+F1 = abbrev.o basic.o bind.o buffer.o
 F2 = char.o crypt.o display.o dolock.o
 F3 = eval.o exec.o file.o
 F4 = fileio.o unix.o input.o

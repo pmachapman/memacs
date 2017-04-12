@@ -24,7 +24,7 @@ hfiles=		ebind.h edef.h-
 		efunc.h evar.h-
 		estruct.h
 
-ofiles=		ansi.obj,-
+ofiles=		abbrev.obj,  ansi.obj,-
 		basic.obj,   bind.obj,   buffer.obj,-
 		char.obj,    crypt.obj,-
 		display.obj,-
@@ -36,6 +36,7 @@ ofiles=		ansi.obj,-
 		random.obj,  region.obj, replace.obj,-
 		screen.obj,  search.obj,-
 		tags.obj,-
+		undo.obj,-
 		vms.obj,-
 		window.obj,  word.obj-
 
@@ -52,6 +53,8 @@ ofiles=		ansi.obj,-
 meansi.exe : $(ofiles) meansi.mms meansi.opt
 	LINK $(lopts)	meansi/option
 
+abbrev.obj : abbrev.c $(HFILES)
+    CC $(copts) abbrev
 ansi.obj : ansi.c $(HFILES)
     CC $(copts) ansi
 basic.obj : basic.c $(HFILES)
@@ -96,6 +99,8 @@ screen.obj : screen.c $(HFILES)
     CC $(copts) screen
 search.obj : search.c $(HFILES)
     CC $(copts) search
+undo.obj : undo.c $(HFILES)
+    CC $(copts) undo
 vms.obj : vms.c $(HFILES)
     CC $(copts) vms
 window.obj : window.c $(HFILES)

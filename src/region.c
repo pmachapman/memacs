@@ -5,10 +5,10 @@
  * commands. Some functions are just for
  * internal use.
  */
-#include        <stdio.h>
+#include	<stdio.h>
 #include	"estruct.h"
 #include	"eproto.h"
-#include        "edef.h"
+#include	"edef.h"
 #include	"elang.h"
 
 /*	reglines:	how many lines in the current region
@@ -18,31 +18,31 @@
 int PASCAL NEAR reglines()
 
 {
-        register LINE *linep;	/* position while scanning */
-	register int n;		/* number of lines in this current region */
-        REGION region;
+	register LINE *linep;	/* position while scanning */
+	register int n; 	/* number of lines in this current region */
+	REGION region;
 
 	/* check for a valid region first */
-        if (getregion(&region) != TRUE)
-                return(0);
+	if (getregion(&region) != TRUE)
+		return(0);
 
 	/* start at the top of the region.... */
-        linep = region.r_linep;
+	linep = region.r_linep;
 	region.r_size += region.r_offset;
-        n = 0;
+	n = 0;
 
-        /* scan the region... counting lines */
-        while (region.r_size > 0L) {
+	/* scan the region... counting lines */
+	while (region.r_size > 0L) {
 		region.r_size -= lused(linep) + 1;
 		linep = lforw(linep);
 		n++;
 	}
 
 	/* place us at the beginning of the region */
-        curwp->w_dotp = region.r_linep;
-        curwp->w_doto = region.r_offset;
+	curwp->w_dotp = region.r_linep;
+	curwp->w_doto = region.r_offset;
 
-        return(n);
+	return(n);
 }
 
 /*
@@ -56,19 +56,29 @@ PASCAL NEAR killregion(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-        register int    s;
-        REGION          region;
+	register int	s;
+	REGION		region;
 
-	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
-		return(rdonly());	/* we are in read only mode	*/
-        if ((s=getregion(&region)) != TRUE)
-                return(s);
-        if ((lastflag&CFKILL) == 0)             /* This is a kill type  */
-                next_kill();                      /* command, so do magic */
-        thisflag |= CFKILL;                     /* kill buffer stuff.   */
-        curwp->w_dotp = region.r_linep;
-        curwp->w_doto = region.r_offset;
-        return(ldelete(region.r_size, TRUE));
+	/* Don't do this command in read-only mode */
+	if (curbp->b_mode&MDVIEW)
+		return(rdonly());
+
+	/* get the boundries of the region to kill */
+	if ((s=getregion(&region)) != TRUE)
+		return(s);
+
+	/* flag this command as a kill */
+	if ((lastflag&CFKILL) == 0)
+		next_kill();
+	thisflag |= CFKILL;
+
+	/* make sure the cursor gets back to the right place on an undo */
+	undo_insert(OP_CPOS, 0L, obj);
+
+	/* delete the region */
+	curwp->w_dotp = region.r_linep;
+	curwp->w_doto = region.r_offset;
+	return(ldelete(region.r_size, TRUE));
 }
 
 /*
@@ -82,33 +92,33 @@ PASCAL NEAR copyregion(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-        register LINE   *linep;
-        register int    loffs;
-        register int    s;
-        REGION          region;
+	register LINE	*linep;
+	register int	loffs;
+	register int	s;
+	REGION		region;
 
-        if ((s=getregion(&region)) != TRUE)
-                return(s);
-        if ((lastflag&CFKILL) == 0)             /* Kill type command.   */
-                next_kill();
-        thisflag |= CFKILL;
-        linep = region.r_linep;                 /* Current line.        */
-        loffs = region.r_offset;                /* Current offset.      */
-        while (region.r_size--) {
-                if (loffs == lused(linep)) {  /* End of line.         */
-                        if ((s=kinsert(FORWARD, '\r')) != TRUE)
-                                return(s);
-                        linep = lforw(linep);
-                        loffs = 0;
-                } else {                        /* Middle of line.      */
-                        if ((s=kinsert(FORWARD, lgetc(linep, loffs))) != TRUE)
-                                return(s);
-                        ++loffs;
-                }
-        }
+	if ((s=getregion(&region)) != TRUE)
+		return(s);
+	if ((lastflag&CFKILL) == 0)		/* Kill type command.	*/
+		next_kill();
+	thisflag |= CFKILL;
+	linep = region.r_linep; 		/* Current line.	*/
+	loffs = region.r_offset;		/* Current offset.	*/
+	while (region.r_size--) {
+		if (loffs == lused(linep)) {  /* End of line.	      */
+			if ((s=kinsert(FORWARD, '\r')) != TRUE)
+				return(s);
+			linep = lforw(linep);
+			loffs = 0;
+		} else {			/* Middle of line.	*/
+			if ((s=kinsert(FORWARD, lgetc(linep, loffs))) != TRUE)
+				return(s);
+			++loffs;
+		}
+	}
 	mlwrite(TEXT70);
-/*              "[region copied]" */
-        return(TRUE);
+/*		"[region copied]" */
+	return(TRUE);
 }
 
 /*
@@ -124,36 +134,61 @@ PASCAL NEAR lowerregion(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-        register LINE   *linep;
-        register int    loffs;
-        register int    s;
-        int c;
-        REGION          region;
+	register LINE *save_dotp;/* pointer and offset to position to preserve */
+	register int save_doto;
+	register int status;	/* return status from fetching region */
+	int c;			/* current character */
+	REGION region;		/* region which is being used */
 
-	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
-		return(rdonly());	/* we are in read only mode	*/
-        if ((s=getregion(&region)) != TRUE)
-                return(s);
-        lchange(WFHARD);
-        linep = region.r_linep;
-        loffs = region.r_offset;
-        while (region.r_size--) {
-                if (loffs == lused(linep)) {
-                        linep = lforw(linep);
-                        loffs = 0;
-                } else {
-                        c = lgetc(linep, loffs);
-			c = lowerc(c);
-                        lputc(linep, loffs, c);
-                        ++loffs;
-                }
-        }
-        return(TRUE);
+	/* don't bother if we are in read only mode */
+	if (curbp->b_mode&MDVIEW)
+		return(rdonly());
+
+	/* get the limits of the current region */
+	if ((status = getregion(&region)) != TRUE)
+		return(status);
+
+	/* flag that we are changing this text */
+	lchange(WFHARD);
+
+	/* save the current dot */
+	save_dotp = curwp->w_dotp;
+	save_doto = curwp->w_doto;
+
+	/* scan the region.... */
+	curwp->w_dotp = region.r_linep;
+	curwp->w_doto = region.r_offset;
+	while (region.r_size--) {
+
+		if (curwp->w_doto == lused(curwp->w_dotp)) {
+
+			/* skip to the next line */
+			curwp->w_dotp = lforw(curwp->w_dotp);
+			curwp->w_doto = 0;
+
+		} else {
+
+			/* lowercase this character */
+			c = lgetc(curwp->w_dotp, curwp->w_doto);
+			if (is_upper(c)) {
+				obj.obj_char = c;
+				c = lowerc(c);
+				lputc(curwp->w_dotp, curwp->w_doto, c);
+				undo_insert(OP_REPC, 1L, obj);
+			}
+			++curwp->w_doto;
+		}
+	}
+
+	/* restore the dot position */
+	curwp->w_dotp = save_dotp;
+	curwp->w_doto = save_doto;
+	return(TRUE);
 }
 
 /*
  * Upper case region. Zap all of the lower
- * case characters in hSRCo upper case. Use
+ * case characters in the region to upper case. Use
  * the region code to set the limits. Scan the buffer,
  * doing the changes. Call "lchange" to ensure that
  * redisplay is done in all buffers. Bound to
@@ -164,31 +199,56 @@ PASCAL NEAR upperregion(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-        register LINE   *linep;
-        register int    loffs;
-        register int    s;
-        int c;
-        REGION          region;
+	register LINE *save_dotp;/* pointer and offset to position to preserve */
+	register int save_doto;
+	register int status;	/* return status from fetching region */
+	int c;			/* current character */
+	REGION region;		/* region which is being used */
 
-	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
-		return(rdonly());	/* we are in read only mode	*/
-        if ((s=getregion(&region)) != TRUE)
-                return(s);
-        lchange(WFHARD);
-        linep = region.r_linep;
-        loffs = region.r_offset;
-        while (region.r_size--) {
-                if (loffs == lused(linep)) {
-                        linep = lforw(linep);
-                        loffs = 0;
-                } else {
-                        c = lgetc(linep, loffs);
-			c = upperc(c);
-                        lputc(linep, loffs, c);
-                        ++loffs;
-                }
-        }
-        return(TRUE);
+	/* don't bother if we are in read only mode */
+	if (curbp->b_mode&MDVIEW)
+		return(rdonly());
+
+	/* get the limits of the current region */
+	if ((status = getregion(&region)) != TRUE)
+		return(status);
+
+	/* flag that we are changing this text */
+	lchange(WFHARD);
+
+	/* save the current dot */
+	save_dotp = curwp->w_dotp;
+	save_doto = curwp->w_doto;
+
+	/* scan the region.... */
+	curwp->w_dotp = region.r_linep;
+	curwp->w_doto = region.r_offset;
+	while (region.r_size--) {
+
+		if (curwp->w_doto == lused(curwp->w_dotp)) {
+
+			/* skip to the next line */
+			curwp->w_dotp = lforw(curwp->w_dotp);
+			curwp->w_doto = 0;
+
+		} else {
+
+			/* uppercase this character */
+			c = lgetc(curwp->w_dotp, curwp->w_doto);
+			if (is_lower(c)) {
+				obj.obj_char = c;
+				c = upperc(c);
+				lputc(curwp->w_dotp, curwp->w_doto, c);
+				undo_insert(OP_REPC, 1L, obj);
+			}
+			++curwp->w_doto;
+		}
+	}
+
+	/* restore the dot position */
+	curwp->w_dotp = save_dotp;
+	curwp->w_doto = save_doto;
+	return(TRUE);
 }
 
 /*	Narrow-to-region (^X-<) makes all but the current region in
@@ -200,10 +260,10 @@ PASCAL NEAR narrow(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-        register int status;	/* return status */
+	register int status;	/* return status */
 	BUFFER *bp;		/* buffer being narrowed */
 	SCREEN *scrp;		/* screen to fix pointers in */
-	WINDOW *wp;		/* windows to fix up pointers in as well */
+	EWINDOW *wp;		/* windows to fix up pointers in as well */
 	REGION creg;		/* region boundry structure */
 	int cmark;		/* current mark */
 
@@ -211,19 +271,19 @@ int f,n;	/* prefix flag and argument */
 	bp = curwp->w_bufp;		/* find the right buffer */
 	if (bp->b_flag&BFNAROW) {
 		mlwrite(TEXT71);
-/*                      "%%This buffer is already narrowed" */
+/*			"%%This buffer is already narrowed" */
 		return(FALSE);
 	}
 
 	/* find the boundries of the current region */
-        if ((status=getregion(&creg)) != TRUE)
-                return(status);
-        curwp->w_dotp = creg.r_linep;	/* only by full lines please! */
-        curwp->w_doto = 0;
+	if ((status=getregion(&creg)) != TRUE)
+		return(status);
+	curwp->w_dotp = creg.r_linep;	/* only by full lines please! */
+	curwp->w_doto = 0;
 	creg.r_size += (long)creg.r_offset;
 	if (creg.r_size <= (long)lused(curwp->w_dotp)) {
 		mlwrite(TEXT72);
-/*                      "%%Must narrow at least 1 full line" */
+/*			"%%Must narrow at least 1 full line" */
 		return(FALSE);
 	}
 
@@ -279,8 +339,8 @@ int f,n;	/* prefix flag and argument */
 	/* and now remember we are narrowed */
 	bp->b_flag |= BFNAROW;
 	mlwrite(TEXT73);
-/*              "[Buffer is narrowed]" */
-        return(TRUE);
+/*		"[Buffer is narrowed]" */
+	return(TRUE);
 }
 
 /*	widen-from-region (^X->) restores a narrowed region	*/
@@ -293,14 +353,14 @@ int f,n;	/* prefix flag and argument */
 	LINE *lp;	/* temp line pointer */
 	BUFFER *bp;	/* buffer being narrowed */
 	SCREEN *scrp;	/* screen to fix pointers in */
-	WINDOW *wp;	/* windows to fix up pointers in as well */
+	EWINDOW *wp;	/* windows to fix up pointers in as well */
 	int cmark;	/* current mark */
 
 	/* find the proper buffer and make sure we are narrow */
 	bp = curwp->w_bufp;		/* find the right buffer */
 	if ((bp->b_flag&BFNAROW) == 0) {
 		mlwrite(TEXT74);
-/*                      "%%This buffer is not narrowed" */
+/*			"%%This buffer is not narrowed" */
 		return(FALSE);
 	}
 
@@ -325,7 +385,7 @@ int f,n;	/* prefix flag and argument */
 			curwp->w_dotp = bp->b_botline;
 			curwp->w_doto = 0;		/* this should be redundent */
 		}
-	
+        
 		/* if any marks are at EOF, move them to
 		   the beginning of the bottom fragment */
 		for (cmark = 0; cmark < NMARKS; cmark++) {
@@ -365,8 +425,8 @@ int f,n;	/* prefix flag and argument */
 	/* and now remember we are not narrowed */
 	bp->b_flag &= (~BFNAROW);
 	mlwrite(TEXT75);
-/*              "[Buffer is widened]" */
-        return(TRUE);
+/*		"[Buffer is widened]" */
+	return(TRUE);
 }
 
 /*
@@ -383,56 +443,56 @@ PASCAL NEAR getregion(rp)
 register REGION *rp;
 
 {
-        register LINE   *flp;
-        register LINE   *blp;
-        long fsize;
-        long bsize;
+	register LINE	*flp;
+	register LINE	*blp;
+	long fsize;
+	long bsize;
 
-        if (curwp->w_markp[0] == (LINE *)NULL) {
-                mlwrite(TEXT76);
-/*                      "No mark set in this window" */
-                return(FALSE);
-        }
-        if (curwp->w_dotp == curwp->w_markp[0]) {
-                rp->r_linep = curwp->w_dotp;
-                if (curwp->w_doto < curwp->w_marko[0]) {
-                        rp->r_offset = curwp->w_doto;
-                        rp->r_size = (long)(curwp->w_marko[0]-curwp->w_doto);
-                } else {
-                        rp->r_offset = curwp->w_marko[0];
-                        rp->r_size = (long)(curwp->w_doto-curwp->w_marko[0]);
-                }
-                return(TRUE);
-        }
-        blp = curwp->w_dotp;
-        bsize = (long)curwp->w_doto;
-        flp = curwp->w_dotp;
-        fsize = (long)(lused(flp)-curwp->w_doto+1);
-        while (flp!=curbp->b_linep || lback(blp)!=curbp->b_linep) {
-                if (flp != curbp->b_linep) {
-                        flp = lforw(flp);
-                        if (flp == curwp->w_markp[0]) {
-                                rp->r_linep = curwp->w_dotp;
-                                rp->r_offset = curwp->w_doto;
-                                rp->r_size = fsize+curwp->w_marko[0];
-                                return(TRUE);
-                        }
-                        fsize += lused(flp)+1;
-                }
-                if (lback(blp) != curbp->b_linep) {
-                        blp = lback(blp);
-                        bsize += lused(blp)+1;
-                        if (blp == curwp->w_markp[0]) {
-                                rp->r_linep = blp;
-                                rp->r_offset = curwp->w_marko[0];
-                                rp->r_size = bsize - curwp->w_marko[0];
-                                return(TRUE);
-                        }
-                }
-        }
-        mlwrite(TEXT77);
-/*              "Bug: lost mark" */
-        return(FALSE);
+	if (curwp->w_markp[0] == (LINE *)NULL) {
+		mlwrite(TEXT76);
+/*			"No mark set in this window" */
+		return(FALSE);
+	}
+	if (curwp->w_dotp == curwp->w_markp[0]) {
+		rp->r_linep = curwp->w_dotp;
+		if (curwp->w_doto < curwp->w_marko[0]) {
+			rp->r_offset = curwp->w_doto;
+			rp->r_size = (long)(curwp->w_marko[0]-curwp->w_doto);
+		} else {
+			rp->r_offset = curwp->w_marko[0];
+			rp->r_size = (long)(curwp->w_doto-curwp->w_marko[0]);
+		}
+		return(TRUE);
+	}
+	blp = curwp->w_dotp;
+	bsize = (long)curwp->w_doto;
+	flp = curwp->w_dotp;
+	fsize = (long)(lused(flp)-curwp->w_doto+1);
+	while (flp!=curbp->b_linep || lback(blp)!=curbp->b_linep) {
+		if (flp != curbp->b_linep) {
+			flp = lforw(flp);
+			if (flp == curwp->w_markp[0]) {
+				rp->r_linep = curwp->w_dotp;
+				rp->r_offset = curwp->w_doto;
+				rp->r_size = fsize+curwp->w_marko[0];
+				return(TRUE);
+			}
+			fsize += lused(flp)+1;
+		}
+		if (lback(blp) != curbp->b_linep) {
+			blp = lback(blp);
+			bsize += lused(blp)+1;
+			if (blp == curwp->w_markp[0]) {
+				rp->r_linep = blp;
+				rp->r_offset = curwp->w_marko[0];
+				rp->r_size = bsize - curwp->w_marko[0];
+				return(TRUE);
+			}
+		}
+	}
+	mlwrite(TEXT77);
+/*		"Bug: lost mark" */
+	return(FALSE);
 }
 
 /*
@@ -456,7 +516,7 @@ REGION *region;
 	loffs = region->r_offset;		/* Current offset.	*/
 	rsize = region->r_size;
 	while (rsize--) {
-		if (loffs == lused(linep)) {	/* End of line.		*/
+		if (loffs == lused(linep)) {	/* End of line. 	*/
 			*ptr = '\r';
 			linep = lforw(linep);
 			loffs = 0;
@@ -470,7 +530,7 @@ REGION *region;
 	return buf;
 }
 
-char *PASCAL NEAR getreg(value)	/* return some of the contents of the current region */
+char *PASCAL NEAR getreg(value) /* return some of the contents of the current region */
 
 char *value;
 
@@ -488,7 +548,7 @@ char *value;
 }
 
 
-PASCAL NEAR indent_region(f, n)	/* indent a region n tab-stops */
+PASCAL NEAR indent_region(f, n) /* indent a region n tab-stops */
 
 int f,n;	/* default flag and numeric repeat count */
 
@@ -527,7 +587,7 @@ int f,n;	/* default flag and numeric repeat count */
 	return(TRUE);
 }
 
-PASCAL NEAR undent_region(f, n)	/* undent a region n tab-stops */
+PASCAL NEAR undent_region(f, n) /* undent a region n tab-stops */
 
 int f,n;	/* default flag and numeric repeat count */
 

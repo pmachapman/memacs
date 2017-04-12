@@ -1,7 +1,7 @@
 /*      NT.C:           Operating specific I/O and Spawning functions
  *                      for the Window NT operating system (console mode)
- *                      for MicroEMACS 3.12
- *                      (C)Copyright 1993 by Daniel M. Lawrence
+ *                      for MicroEMACS 4.00
+ *                      (C)Copyright 1995 by Daniel M. Lawrence
  *                      Windows NT version by Walter Warniaha
  *
  * Note:  don't try to compile this on non Windows NT systems....  The header
@@ -119,13 +119,12 @@ PASCAL NEAR execprg(f, n)
  */
 PASCAL NEAR pipecmd(f, n)
 {
-        register WINDOW *wp;    /* pointer to new window */
+        register EWINDOW *wp;    /* pointer to new window */
         register BUFFER *bp;    /* pointer to buffer to zot */
         register char *tmp;     /* ptr to TMP DOS environment variable */
         char line[NLINE];       /* command line send to shell */
         static char bname[] = "command";
         static char filnam[NSTRING];
-        char *getenv();
 
         /* don't allow this command if restricted */
         if (restflag)
@@ -314,7 +313,6 @@ execprog( char *cmd)
 {
         char             args[NSTRING];         /* args passed to program */
         char            *sp;
-        char             failName[NFILEN];
         char             prog[NSTRING];         /* name of program */
         USHORT           i;
 
@@ -403,7 +401,7 @@ char *fspec;    /* pattern to match */
 
         /* and call for the first file */
         num_found = 1;
-        if ((lDir = _findfirst(fname, &pBuf)) == NULL)
+        if ((lDir = _findfirst(fname, &pBuf)) == -1)
                 return(NULL);
 
         /* return the first file name! */
@@ -418,11 +416,6 @@ char *fspec;    /* pattern to match */
 char *PASCAL NEAR getnfile()
 
 {
-        register int index;             /* index into various strings */
-        register int point;             /* index into other strings */
-        register int extflag;           /* does the file have an extention? */
-        char fname[NFILEN];             /* file/path for DOS call */
-
         /* and call for the next file */
         if (_findnext(lDir, &pBuf) != 0)
                 return(NULL);

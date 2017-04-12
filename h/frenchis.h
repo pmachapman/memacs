@@ -1,7 +1,7 @@
 /*      FRENCHISO.H:    French language text strings for
-                        MicroEMACS 3.12
+                        MicroEMACS 4.00
 
-                        (C)opyright 1988 by Daniel Lawrence
+                        (C)opyright 1995 by Daniel Lawrence
                         Translated by Bertrand DECOUTY, 10/88
                         Modified 12/89 (accent...)
                         decouty@caroline.irisa.fr,
@@ -71,7 +71,7 @@
 #define TEXT56  "Liste des variables"                           /*"Variable list"*/
 #define TEXT57  "Affichage impossible de la liste des variables"        /*"Can not display variable list"*/
 #define TEXT58  "[Construction de la liste des variables]"      /*"[Building variable list]"*/
-#define TEXT59  "[Marge droite colonne: %d]"                   /*"[Fill column is %d]"*/
+#define TEXT59  UNUSED
 
 /*              "Line %d/%d Col %d/%d Char %D/%D (%d%%) char = 0x%x"*/
 #define TEXT60  "Ligne %D/%D Col %d/%d Car %D/%D (%d%%) car = 0x%x"
@@ -100,8 +100,8 @@
 #define TEXT79  "Pas trouv\351"                                 /*"Not found"*/
 #define TEXT80  "Cha\356ne non initialis\351e"                  /*"No pattern set"*/
 #define TEXT81  "Recherche arri\350re "                         /*"Reverse search"*/
-#define TEXT82  "Prenant en compte %d avec un saut de %d"       /*"Considering %d with jump %d"*/
-#define TEXT83  "Un autre cas est %d"                           /*"Its other case is %d"*/
+#define TEXT82  UNUSED
+#define TEXT83  UNUSED
 #define TEXT84  "Remplacer "                                    /*"Replace"*/
 #define TEXT85  "Remplacer avec confirmation "                  /*"Query replace"*/
 #define TEXT86  "par "                                          /*"with"*/
@@ -113,7 +113,7 @@
 #define TEXT90  "(O)Oui, (N)on, (!)Remp.tout, (U)ndo prec., (^G)Fin,(.)Fin debut, (?)Aide: "
 
 #define TEXT91  "Cha\356ne vide remplac\351e, arr\352t"                 /*"Empty string replaced, stopping."*/
-#define TEXT92  "%d substitutions"                              /* same in French */
+#define TEXT92  "%D substitutions"                              /* same in French */
 #define TEXT93  "%%ERREUR pendant la suppression"               /*"%%ERROR while deleting"*/
 #define TEXT94  "%%Plus de m\351moire disponible"                       /*"%%Out of memory"*/
 #define TEXT95  "%%mceq: qu'est-ce que %d?"                     /*"%%mceq: what is %d?"*/
@@ -276,7 +276,12 @@
 #define TEXT228 "[Anneau des effacements vid\351]\n"
 #define TEXT229 " dans <"                                       /*" in <"*/
 #define TEXT230 "> ligne "                                      /*" > at line "*/
-
+#define TEXT231 "Abr\351viation \340 d\351finir: "		/*"Abbreviation to set: "*/
+#define TEXT232 "Abr\351viation \340 supprimer: "		/*"Abbreviation to delete: "*/
+#define TEXT233 "[Construction liste des abr\351viations]"	/*"[Building Abbreviation list]"*/
+#define TEXT234 "Liste des abr\351viations"			/*"Abbreviation list"*/
+#define TEXT235 "Impossible d'afficher la liste des abr\351viations"	/*"Can not display abbreviation list"*/
+#define TEXT236 "D\351finition abr\351viations dans un tampon"	/*"Define Abbreviations in buffer"*/
 #define TEXT240 "[Aucun \351cran de ce nom]"                            /*"[No such screen]"*/
 #define TEXT241 "%%Impossible de supprimer l'\351cran courant"     /*"%%Can't delete current screen"*/
 #define TEXT242 "Chercher l'\351cran: "                           /*"Find Screen: "*/
@@ -285,7 +290,9 @@
 #define TEXT245 "%%Division par z\351ro interdite"                 /*"%%Division by Zero is illegal"*/
 #define TEXT246 "%%Il faut un num\351ro de touche fonction"  /*"%%Need function key number"*/
 #define TEXT247 "%%num\351ro de touche fonction hors limite"    /*"%%Function key number out of range"*/
-#define	TEXT248 "Entrer une \202tiquette: "                    /*"Enter Label String: "*/
+#define	TEXT248 "Entrer une \351tiquette: "                    /*"Enter Label String: "*/
+#define TEXT249 "Variable globale \340 d\351clarer : "
+#define	TEXT250 "Variable locale  \340 d\351clarer : "
 
 /* some of these are just used in the microsoft windows version */
 #define TEXT300 "[Menu incorrect]"                              /*"[Incorrect menu]"*/
@@ -326,4 +333,3 @@
 #define TEXT335 "Changer le nom de l'\351cran en: "                    /*"Change screen name to: "*/
 #define TEXT336 "[Nom d'\351cran d\351j\340 utilis\351]"                      /*"[Screen name already in use]"*/
 #define TEXT337 "impossible de contr\364ler un programme externe"       /*"cannot monitor external program"*/
-

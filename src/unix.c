@@ -1,10 +1,10 @@
-/***
-	UNIX driver/Microemacs 3.10b/3.10k,
-	Copyright 1989/1993 D. Lawrence, C. Smith
- ***/
+/*	UNIX:	Unix specific terminal driver
+		for MicroEMACS 4.0
+	(C)Copyright 1995 D. Lawrence, C. Smith
+*/
 
 /**
-	New features:
+	New features: (as of version 3.10)
 
 	1. Timeouts waiting on a function key have been changed from
 	35000 to 500000 microseconds.
@@ -14,9 +14,9 @@
 	xxx is a string as follows:
 		"KEYMAP keybinding escape-sequence".
 	To add "<ESC><[><A>" as a keybinding of FNN, issue:
-		"KEYMAP FNN ^[[A".
-	Note that the escape character!  It is a real escape character
-	and it's pretty difficult to enter.
+		"KEYMAP FNN ~e[A".
+	Note that the "~e" sequence represents the escape character in
+	the MicroEMACS command language.
 
 	3. Colors are supported.  Under AIX the colors will be pulled
 	in automaticly.  For other environments, you can either add
@@ -27,7 +27,7 @@
 	The number is a number from 0 to 15, where 0 to 7 is the
 	foreground colors, and 8 to 15 as background colors.
 	To add foreground color 0 for ansi terminals, issue:
-		"CLRMAP 0 ^[[30m".
+		"CLRMAP 0 ~e[30m".
 	
 	'Porting notes:
 
@@ -65,6 +65,9 @@
 				use "-ltermcap";
 			IBM-RT, IBM-AIX, ATT UNIX, Altos UNIX, Interactive:
 				use "-lcurses".
+
+	- 20 feb 95	New version 4.00 features
+	  We added new code to implient a TERMIOS driver
 **/
 
 /** Include files **/
@@ -78,7 +81,7 @@ int scnothing()
 }
 
 /** Only compile for UNIX machines **/
-#if BSD || USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION
+#if BSD || FREEBSD || USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || (AVVION || TERMIOS)
 
 /** Include files **/
 #include "eproto.h"			/* Function definitions		*/
@@ -88,24 +91,34 @@ int scnothing()
 /** Kill predefined **/
 #undef CTRL				/* Problems with CTRL		*/
 
+
 /** Overall include files **/
 #include <sys/types.h>			/* System type definitions	*/
 #include <sys/stat.h>			/* File status definitions	*/
 #include <sys/ioctl.h>			/* I/O control definitions	*/
 
 /** Additional include files **/
-#if BSD
+#if	FREEBSD
+#define TERMIOS 1
+#include <sys/time.h>
+#undef	BSD
+#include <sys/param.h>
+#undef BSD
+#define	BSD	0
+#endif
+#if (BSD && !TERMIOS)
 #include <sys/time.h>			/* Timer definitions		*/
-#endif /* BSD */
-#if BSD || SUN || HPUX8 || HPUX9 || AVIION
+#endif /* (BSD && !TERMIOS) */
+#if BSD || FREEBSD || SUN || HPUX8 || HPUX9 || (AVVION || TERMIOS) || AIX
 #include <signal.h>			/* Signal definitions		*/
-#endif /* BSD || SUN || HPUX8 || HPUX9 || AVIION */
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX
+#endif /* BSD || FREEBSD || SUN || HPUX8 || HPUX9 || (AVVION || TERMIOS) */
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX
 #include <termio.h>			/* Terminal I/O definitions	*/
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
-#if AVIION
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
+#if (AVVION || TERMIOS)
 #include <termios.h>			/* Terminal I/O definitions	*/
-#endif /* AVIION */
+#include <unistd.h>
+#endif /* (AVVION || TERMIOS) */
 #if CURSES
 #include <curses.h>			/* Curses screen output		*/
 #undef WINDOW				/* Oh no!			*/
@@ -113,28 +126,27 @@ int scnothing()
 
 /** Completion include files **/
 /** Directory accessing: Try and figure this out... if you can! **/
-#if BSD
+#if ((BSD || FREEBSD) && !TERMIOS)
 #include <sys/dir.h>			/* Directory entry definitions	*/
 #define DIRENTRY	direct
-#endif /* BSD */
+#endif /* (BSD && !TERMIOS) */
 #if XENIX || VAT
 #include <sys/ndir.h>			/* Directory entry definitions	*/
 #define DIRENTRY	direct
 #endif /* XENIX */
-#if ((USG || AUX) && !VAT) || SMOS || HPUX8 || HPUX9 || SUN || AVIION
+#if ((USG || AIX || AUX) && !VAT) || SMOS || HPUX8 || HPUX9 || SUN || (AVVION || TERMIOS)
 #include <dirent.h>			/* Directory entry definitions	*/
 #define DIRENTRY	dirent
-#endif /* ((USG || AUX) && !VAT) || SMOS || HPUX8 || HPUX9 || SUN || AVIION */
+#endif /* ((USG || AIX || AUX) && !VAT) || SMOS || HPUX8 || HPUX9 || SUN || (AVVION || TERMIOS) */
 
 /** Restore predefined definitions **/
 #undef CTRL				/* Restore CTRL			*/
 #define CTRL 0x0100
 
 /** Parameters **/
-#define NKEYENT		300		/* Number of keymap entries	*/
 #define NINCHAR		64		/* Input buffer size		*/
 #define NOUTCHAR	256		/* Output buffer size		*/
-#if TERMCAP
+#if TERMCAP || TERMIOS
 #define NCAPBUF		1024		/* Termcap storage size		*/
 #endif /* TERMCAP */
 #define MARGIN		8		/* Margin size			*/
@@ -144,14 +156,7 @@ int scnothing()
 /** CONSTANTS **/
 #define TIMEOUT		255		/* No character available	*/
 
-/** Type definitions **/
-struct keyent {				/* Key mapping entry		*/
-	struct keyent * samlvl;		/* Character on same level	*/
-	struct keyent * nxtlvl;		/* Character on next level	*/
-	unsigned char ch;		/* Character			*/
-	int code;			/* Resulting keycode		*/
-};
-#if TERMCAP
+#if TERMCAP || TERMIOS
 struct capbind {			/* Capability binding entry	*/
 	char * name;			/* Termcap name			*/
 	char * store;			/* Storage variable		*/
@@ -164,23 +169,23 @@ char *reset = (char*) NULL;		/* reset string kjc */
 #endif /* TERMCAP */
 
 /** Local variables **/
-#if BSD
+#if (BSD && !TERMIOS)
 static struct sgttyb cursgtty;		/* Current modes		*/
 static struct sgttyb oldsgtty;		/* Original modes		*/
 static struct tchars oldtchars;		/* Current tchars		*/
 static struct ltchars oldlchars;	/* Current ltchars		*/
 static char blank[6] =			/* Blank out character set	*/
 	{ -1, -1, -1, -1, -1, -1 };
-#endif /* BSD */
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX
+#endif /* (BSD && !TERMIOS) */
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX
 static struct termio curterm;		/* Current modes		*/
 static struct termio oldterm;		/* Original modes		*/
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
-#if AVIION
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX */
+#if (AVVION || TERMIOS)
 static struct termios curterm;		/* Current modes		*/
 static struct termios oldterm;		/* Original modes		*/
-#endif /* AVIION */
-#if TERMCAP
+#endif /* (AVVION || TERMIOS) */
+#if TERMCAP || TERMIOS
 static char tcapbuf[NCAPBUF];		/* Termcap character storage	*/
 #define CAP_CL		0		/* Clear to end of page		*/
 #define CAP_CM		1		/* Cursor motion		*/
@@ -208,10 +213,10 @@ static char tcapbuf[NCAPBUF];		/* Termcap character storage	*/
 #define CAP_D5		22		/* Background color #5		*/
 #define CAP_D6		23		/* Background color #6		*/
 #define CAP_D7		24		/* Background color #7		*/
-#if USG || AUX
+#if USG || AIX || AUX
 #define CAP_SF		25		/* Set foreground color		*/
 #define CAP_SB		26		/* Set background color		*/
-#endif /* USG || AUX */
+#endif /* USG || AIX || AUX */
 #endif /* COLOR */
 static struct capbind capbind[] = {	/* Capability binding list	*/
 	{ "cl" },			/* Clear to end of page		*/
@@ -240,10 +245,10 @@ static struct capbind capbind[] = {	/* Capability binding list	*/
 	{ "d5" },			/* Background color #5		*/
 	{ "d6" },			/* Background color #6		*/
 	{ "d7" },			/* Background color #7		*/
-#if USG || AUX
+#if USG || AIX || AUX
 	{ "Sf" },			/* Set foreground color		*/
 	{ "Sb" },			/* Set background color		*/
-#endif /* USG || AUX */
+#endif /* USG || AIX || AUX */
 #endif /* COLOR */
 };
 #if COLOR
@@ -290,7 +295,13 @@ static struct keybind keybind[] = {	/* Keybinding list		*/
 	{ "kP", SPEC|'Z' },		/* Previous page key		*/
 	{ "kR", CTRL|'Z' },		/* Scroll backward key		*/
 	{ "kr", SPEC|'F' },		/* Right arrow key		*/
-	{ "ku", SPEC|'P' }		/* Up arrow key			*/
+	{ "ku", SPEC|'P' },		/* Up arrow key			*/
+        { "K1", SPEC|'<' },		/* Keypad 7 -> Home		*/
+        { "K2", SPEC|'V' },		/* Keypad 9 -> Page Up		*/
+        { "K3", ' ' },			/* Keypad 5 			*/
+        { "K4", SPEC|'>' },		/* Keypad 1 -> End		*/
+        { "K5", CTRL|'V' },		/* Keypad 3 -> Page Down	*/
+ 	{ "kw", CTRL|'E' }		/* End of line			*/
 };
 #endif /* TERMCAP */
 static int inbuf[NINCHAR];		/* Input buffer			*/
@@ -303,10 +314,7 @@ static unsigned char outbuf[NOUTCHAR];	/* Output buffer		*/
 static unsigned char * outbuft = 	/* Output buffer tail		*/
 	outbuf;
 #endif /* TERMCAP */
-static unsigned char keyseq[256];	/* Prefix escape sequence table	*/
-static struct keyent keymap[NKEYENT];	/* Key map			*/
-static struct keyent * nxtkey =		/* Next free key entry		*/
-	keymap;
+
 static DIR *dirptr = NULL;		/* Current directory stream	*/
 static char path[NFILEN];		/* Path of file to find		*/
 static char rbuf[NFILEN];		/* Return file buffer		*/
@@ -363,7 +371,7 @@ int hpterm;				/* global flag braindead HP-terminal */
 int ttopen()
 {
 	strcpy(os, "UNIX");
-#if BSD
+#if (BSD && !TERMIOS)
 	/* Get tty modes */
 	if (ioctl(0, TIOCGETP, &oldsgtty) ||
 		ioctl(0, TIOCGETC, &oldtchars) ||
@@ -382,8 +390,8 @@ int ttopen()
 		ioctl(0, TIOCSETC, blank) ||
 		ioctl(0, TIOCSLTC, blank))
 		return(-1);
-#endif /* BSD */
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX
+#endif /* (BSD && !TERMIOS) */
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX
 
 #if SMOS
 	/* Extended settings; 890619mhs A3 */
@@ -409,7 +417,8 @@ int ttopen()
 #else
 	curterm.c_iflag &= ~(INLCR|ICRNL|IGNCR|IXON|IXANY|IXOFF);
 #endif
-	curterm.c_lflag &= ~(ICANON|ISIG|ECHO);
+
+	curterm.c_lflag &= ~(ICANON|ISIG|ECHO|IEXTEN);
 	curterm.c_cc[VMIN] = 1;
 	curterm.c_cc[VTIME] = 0;
 
@@ -436,8 +445,8 @@ int ttopen()
 		perror("Cannot TCSETA");
 		return(-1);
 	}
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
-#if AVIION
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX */
+#if (AVVION || TERMIOS)
 	/* Get modes */
 	if (tcgetattr(0, &oldterm)) {
 		perror("Cannot tcgetattr");
@@ -448,22 +457,26 @@ int ttopen()
 	curterm = oldterm;
 
 	/* Set new modes */
-	curterm.c_iflag &= ~(INLCR|ICRNL|IGNCR);
-	curterm.c_lflag &= ~(ICANON|ISIG|ECHO);
+        /* disable XON/XOFF. We want to use ^S/^Q */
+	curterm.c_iflag &= ~(INLCR|ICRNL|IGNCR|IXON|IXANY|IXOFF);
+	curterm.c_lflag &= ~(ICANON|ISIG|ECHO|IEXTEN);
 	curterm.c_cc[VMIN] = 1;
 	curterm.c_cc[VTIME] = 0;
+#ifdef	VLNEXT
+	curterm.c_cc[VLNEXT] = -1;
+#endif
 
-#if AVIION
+#if	AVVION
 	/* Set line discipline for Data General */
 	curterm.c_line = 0;
-#endif /* AVIION */
+#endif
 
 	/* Set tty mode */
 	if (tcsetattr(0, TCSANOW, &curterm)) {
 		perror("Cannot tcsetattr");
 		return(-1);
 	}
-#endif /* AVIION */
+#endif /* (AVVION || TERMIOS) */
 
 	/* Success */
 	return(0);
@@ -472,31 +485,35 @@ int ttopen()
 /** Close terminal device **/
 int ttclose()
 {
+#if ((AIX == 0) && (TERMIOS == 0)) || (FREEBSD == 1)
 	/* Restore original terminal modes */
 	if (reset != (char*)NULL)
 		write(1, reset, strlen(reset));
+#endif
 
-#if BSD
+#if (BSD && !TERMIOS)
 	if (ioctl(0, TIOCSETP, &oldsgtty) ||
 		ioctl(0, TIOCSETC, &oldtchars) ||
 		ioctl(0, TIOCSLTC, &oldlchars))
 		return(-1);
-#endif /* BSD */
+#endif /* (BSD && !TERMIOS) */
 
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX
 #if SMOS
 	/* Extended settings; 890619mhs A3 */
 	set_parm(0,-1,-1);
 #endif /* SMOS */
 	if (ioctl(0, TCSETA, &oldterm))
 		return(-1);
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX */
 
-#if AVIION
+#if (AVVION || TERMIOS)
 	/* Set tty mode */
-	if (tcsetattr(0, TCSANOW, &oldterm))
+	if (tcsetattr(0, TCSANOW, &oldterm)) {
+		perror("Cannot tcsetattr");
 		return(-1);
-#endif /* AVIION */
+	}
+#endif /* (AVVION || TERMIOS) */
 
 	/* Success */
 	return(0);
@@ -519,12 +536,11 @@ int ttflush()
 	/* Perform write to screen */
 	return(write(1, outbuf, len) != len);
 #else /* TERMCAP */
-#if CURSES
+#if	CURSES
 	refresh();
-#else /* CURSES */
-	return(0);
 #endif /* CURSES */
-#endif /* TERMCAP */
+	return(0);
+#endif	/* TERMCAP */
 }
 
 /** Put character onto display **/
@@ -548,87 +564,11 @@ char ch;				/* Character to display		*/
 	return(0);
 }
 
-/** Add character sequence to keycode entry **/
-void addkey(seq, fn)
-unsigned char * seq;			/* Character sequence		*/
-int fn;					/* Resulting keycode		*/
-{
-	int first;
-	struct keyent * cur, * nxtcur;
-
-	/* Skip on null sequences */
-	if (!seq)
-		return;
-
-	/* Skip single character sequences */
-	if (strlen(seq) < 2)
-		return;
-
-	/* If no keys defined, go directly to insert mode */
-	first = 1;
-	if (nxtkey != keymap) {
-		
-		/* Start at top of key map */
-		cur = keymap;
-		
-		/* Loop until matches exhast */
-		while (*seq) {
-			
-			/* Do we match current character */
-			if (*seq == cur->ch) {
-				
-				/* Advance to next level */
-				seq++;
-				cur = cur->nxtlvl;
-				first = 0;
-			} else {
-				
-				/* Try next character on same level */
-				nxtcur = cur->samlvl;
-				
-				/* Stop if no more */
-				if (nxtcur)
-					cur = nxtcur;
-				else
-					break;
-			}
-		}
-	}
-	
-	/* Check for room in keymap */
-	if (strlen(seq) > NKEYENT - (nxtkey - keymap))
-		return;
-		
-	/* If first character in sequence is inserted, add to prefix table */
-	if (first)
-		keyseq[*seq] = 1;
-		
-	/* If characters are left over, insert them into list */
-	for (first = 1; *seq; first = 0) {
-		
-		/* Make new entry */
-		nxtkey->ch = *seq++;
-		nxtkey->code = fn;
-		
-		/* If root, nothing to do */
-		if (nxtkey != keymap) {
-			
-			/* Set first to samlvl, others to nxtlvl */
-			if (first)
-				cur->samlvl = nxtkey;
-			else
-				cur->nxtlvl = nxtkey;
-		}
-
-		/* Advance to next key */
-		cur = nxtkey++;
-	}
-}
 
 /** Grab input characters, with wait **/
 unsigned char grabwait()
 {
-#if BSD
+#if (BSD && !TERMIOS)
 	unsigned char ch;
 
 	/* Perform read */
@@ -637,37 +577,43 @@ unsigned char grabwait()
 		exit(1);
 	}
 	return(ch);
-#endif /* BSD */
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION
+#endif /* (BSD && !TERMIOS) */
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX || (AVVION || TERMIOS)
 	unsigned char ch;
 
 	/* Change mode, if necessary */
 	if (curterm.c_cc[VTIME]) {
 		curterm.c_cc[VMIN] = 1;
 		curterm.c_cc[VTIME] = 0;
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX
 		ioctl(0, TCSETA, &curterm);
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
-#if AVIION
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
+#if (AVVION || TERMIOS)
 		tcsetattr(0, TCSANOW, &curterm);
-#endif /* AVIION */		
+#endif /* (AVVION || TERMIOS) */		
 	}
 
 	/* Perform read */
+#if HANDLE_WINCH
+	while (read(0, &ch, 1) != 1) {
+		if (winch_flag)
+			return 0;
+	}
+#else
 	if (read(0, &ch, 1) != 1) {
 		puts("** Horrible read error occured **");
 		exit(1);
 	}
-
+#endif
 	/* Return new character */
 	return(ch);
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION */
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX || (AVVION || TERMIOS) */
 }
 
 /** Grab input characters, short wait **/
 unsigned char grabnowait()
 {
-#if BSD
+#if (BSD && !TERMIOS)
 	static struct timeval timout = { 0, 500000L };
 	int count, r;
 
@@ -683,8 +629,8 @@ unsigned char grabnowait()
 
 	/* Perform read */
 	return(grabwait());
-#endif /* BSD */
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION
+#endif /* (BSD && !TERMIOS) */
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || (AVVION || TERMIOS)
 	int count;
 	unsigned char ch;
 
@@ -692,35 +638,47 @@ unsigned char grabnowait()
 	if (curterm.c_cc[VTIME] == 0) {
 		curterm.c_cc[VMIN] = 0;
 		curterm.c_cc[VTIME] = 5;
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX
 		ioctl(0, TCSETA, &curterm);
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
-#if AVIION
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX */
+#if (AVVION || TERMIOS)
 		tcsetattr(0, TCSANOW, &curterm);
-#endif /* AVIION */		
+#endif /* (AVVION || TERMIOS) */		
 	}
 
 	/* Perform read */
+#if HANDLE_WINCH
+	while ((count = read(0, &ch, 1)) < 0) {
+		if (winch_flag)
+			return 0;
+	}
+#else
 	count = read(0, &ch, 1);
 	if (count < 0) {
 		puts("** Horrible read error occured **");
 		exit(1);
 	}
+#endif
 	if (count == 0)
 		return(TIMEOUT);
 
 	/* Return new character */
 	return(ch);
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION */
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || (AVVION || TERMIOS) */
 }
 
-/** Queue input character **/
-void qin(ch)
-int ch;					/* Character to add		*/
+/*
+ * qin - queue in a character to the input buffer.
+ */
+#if PROTO
+VOID qin(int ch)
+#else
+VOID qin( ch)
+int ch;
+#endif
 {
 	/* Check for overflow */
 	if (inbuft == &inbuf[sizeof(inbuf)]) {
-		
 		/* Annoy user */
 		scbeep();
 		return;
@@ -730,65 +688,26 @@ int ch;					/* Character to add		*/
 	*inbuft++ = ch;
 }
 
-/** Cook input characters **/
-void cook()
+/*
+ * qrep - replace a key sequence with a single character in the input buffer.
+ */
+#if PROTO
+VOID qrep(int ch)
+#else
+VOID qrep( ch)
+int ch;
+#endif
 {
-	unsigned char ch;
-	struct keyent * cur;
-	
-	/* Get first character untimed */
-	ch = grabwait();
+	inbuft = inbuf;
 	qin(ch);
-	
-	/* Skip if the key isn't a special leading escape sequence */
-	if (keyseq[ch] == 0) {
-		/* if it is a null, make it a (0/1/32) */
-		if (ch == 0) {
-			qin(CTRL >> 8);	/* control */
-			qin(32);	/* space */
-		}
-		return;
-	}
-
-	/* Start at root of keymap */
-	cur = keymap;
-
-	/* Loop until keymap exhasts */
-	while (cur) {
-
-		/* Did we find a matching character */
-		if (cur->ch == ch) {
-
-			/* Is this the end */
-			if (cur->nxtlvl == NULL) {
-
-				/* Replace all character with new sequence */
-				inbuft = inbuf;
-				qin(cur->code);
-				return;
-			} else {
-				/* Advance to next level */
-				cur = cur->nxtlvl;
-			
-				/* Get next character, timed */
-				ch = grabnowait();
-				if (ch == TIMEOUT)
-					return;
-
-				/* Queue character */
-				qin(ch);
-			}
-		} else
-			/* Try next character on same level */
-			cur = cur->samlvl;
-	}
 }
+
 
 /** Return cooked characters **/
 int ttgetc()
 {
 	int ch;
-
+ttflush();
 	/* Loop until character is in input buffer */
 	while (inbufh == inbuft)
 		cook();
@@ -834,7 +753,7 @@ int typahead()
 }
 #endif /* TYPEAH */
 
-#if TERMCAP
+#if TERMCAP || TERMIOS
 /** Put out sequence, with padding **/
 void putpad(seq)
 char * seq;				/* Character sequence		*/
@@ -851,14 +770,14 @@ char * seq;				/* Character sequence		*/
 /** Initialize screen package **/
 int scopen()
 {
-#if TERMCAP
+#if TERMCAP || TERMIOS
 	char * cp, tcbuf[1024];
 	int status;
 	struct capbind * cb;
 	struct keybind * kp;
 	char err_str[NSTRING];
 
-	char * getenv(), * tgetstr();
+	char  * tgetstr();
 
 #ifndef VAT
 #define TGETSTR(a,b)	tgetstr((a), (b))
@@ -866,7 +785,8 @@ int scopen()
 #define TGETSTR(a,b)	tgetstr((a), *(b))
 #endif
 
-#if HPUX8 || HPUX9 || VAT || AUX
+#if HPUX8 || HPUX9 || VAT || AUX || (AVVION || TERMIOS) || AIX
+
 	/* HP-UX and AUX doesn't seem to have these in the termcap library */
 	char PC, * UP;
 	short ospeed;
@@ -957,18 +877,20 @@ int scopen()
 	}
 
 	/* Set speed for padding sequences */
-#if BSD
+#if (BSD && !TERMIOS)
 	ospeed = cursgtty.sg_ospeed;
-#endif /* BSD */
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX
+#endif /* (BSD && !TERMIOS) */
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX
 	ospeed = curterm.c_cflag & CBAUD;
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX */
-#if AVIION
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || (SUN && !TERMIOS) || XENIX */
+#if (AVVION || TERMIOS)
 	ospeed = cfgetospeed(&curterm);
-#endif /* AVIION */
+#endif /* (AVVION || TERMIOS) */
 	
 	/* Send out initialization sequences */
+#if AIX == 0
 	putpad(capbind[CAP_IS].store);
+#endif
 	putpad(capbind[CAP_KS].store);
 	sckopen();
 #endif /* TERMCAP */
@@ -1004,6 +926,12 @@ int scclose()
 	ttflush();
 	ttclose();
 #endif /* TERMCAP */
+
+#if	TERMIOS
+	/* Close terminal device */
+	ttflush();
+	ttclose();
+#endif	/* TERMIOS */
 
 #if CURSES
 	/* Turn off curses */
@@ -1049,7 +977,7 @@ int col;				/* Column number		*/
 {
 	char *tgoto();
 
-#if TERMCAP
+#if TERMCAP || TERMIOS
 	/* Call on termcap to create move sequence */
 	putpad(tgoto(capbind[CAP_CM].store, col, row));
 #endif /* TERMCAP */
@@ -1065,7 +993,7 @@ int col;				/* Column number		*/
 /** Erase to end of line **/
 int sceeol()
 {
-#if TERMCAP
+#if TERMCAP || TERMIOS
 	/* Send erase sequence */
 	putpad(capbind[CAP_CE].store);
 #endif /* TERMCAP */
@@ -1081,7 +1009,7 @@ int sceeol()
 /** Clear screen **/
 int sceeop()
 {
-#if TERMCAP
+#if TERMCAP || TERMIOS
 #if COLOR
 	scfcol(gfcolor);
 	scbcol(gbcolor);
@@ -1103,7 +1031,7 @@ int sceeop()
 int screv(state)
 int state;				/* New state			*/
 {
-#if TERMCAP
+#if TERMCAP || TERMIOS
 #if COLOR
 	int ftmp, btmp;		/* temporaries for colors */
 #endif /* COLOR */
@@ -1137,7 +1065,7 @@ int state;				/* New state			*/
 /** Beep **/
 scbeep()
 {
-#if TERMCAP
+#if TERMCAP || TERMIOS
 #if !NOISY
 	/* Send out visible bell, if it exists */
 	if (capbind[CAP_VB].store)
@@ -1163,7 +1091,7 @@ static char cmap[8] = { 0, 4, 2, 6, 1, 5, 3, 7 };
 int scfcol(color)
 int color;		/* Color to set			*/
 {
-#if TERMCAP
+#if TERMCAP || TERMIOS
 	/* Skip if already the correct color */
 	if (color == cfcolor)
 		return(0);
@@ -1191,7 +1119,7 @@ int color;		/* Color to set			*/
 int scbcol(color)
 int color;			/* Color to set			*/
 {
-#if TERMCAP
+#if TERMCAP || TERMIOS
 	/* Skip if already the correct color */
 	if (color == cbcolor)
 		return(0);
@@ -1274,7 +1202,7 @@ char * cmd;				/* Palette command		*/
 	return(0);
 }
 
-#if BSD || SUN || HPUX8 || HPUX9 || AVIION
+#if BSD || FREEBSD || SUN || HPUX8 || HPUX9 || (AVVION || TERMIOS)
 /* Surely more than just BSD systems do this */
 
 /** Perform a stop signal **/
@@ -1297,7 +1225,7 @@ int bktoshell(f, n)
 	return(0);
 }
 
-#endif /* BSD || SUN || HPUX8 || HPUX9 || AVIION */
+#endif /* BSD || FREEBSD || SUN || HPUX8 || HPUX9 || (AVVION || TERMIOS) */
 
 /** Get time of day **/
 char * timeset()
@@ -1356,7 +1284,7 @@ char * file2;				/* New file name		*/
 	/* Unlink original file */
 	return(unlink(file1));
 }
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || XENIX */
+#endif /* USG || AUX || SMOS || HPUX8 || XENIX */
 
 /** Callout to system to perform command **/
 int callout(cmd)
@@ -1392,8 +1320,6 @@ int n;					/* Argument count		*/
 {
 	char * sh;
 
-	char * getenv();
-
 	/* Don't allow this command if restricted */
 	if (restflag)
 		return(resterr());
@@ -1401,12 +1327,12 @@ int n;					/* Argument count		*/
 	/* Get shell path */
 	sh = getenv("SHELL");
 	if (!sh)
-#if BSD || SUN
+#if BSD || FREEBSD || SUN
 		sh = "/bin/csh";
-#endif /* BSD || SUN */
-#if USG || AUX || SMOS || HPUX8 || HPUX9 || XENIX || AVIION
+#endif /* BSD || FREEBSD || SUN */
+#if USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || XENIX || (AVVION || TERMIOS)
 		sh = "/bin/sh";
-#endif /* USG || AUX || SMOS || HPUX8 || HPUX9 || XENIX || AVIION */
+#endif /* USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || XENIX || (AVVION || TERMIOS) */
 
 	/* Do shell */
 	return(callout(sh));
@@ -1458,7 +1384,7 @@ int n;					/* Argument count		*/
 	char line[NLINE];
 	int s;
 	BUFFER * bp;
-	WINDOW * wp;
+	EWINDOW * wp;
 	static char filnam[] = "command";
 
 	/* Don't allow this command if restricted */
@@ -1590,8 +1516,7 @@ char *fspec;				/* Filename specification	*/
 	/* First parse the file path off the file spec */
 	strcpy(path, fspec);
 	index = strlen(path) - 1;
-	while (index >= 0 && (path[index] != '/' &&
-		path[index] != '\\' && path[index] != ':'))
+	while (index >= 0 && (path[index] != '/'))
 		--index;
 	path[index+1] = '\0';
 
@@ -1777,4 +1702,28 @@ char *name;	/* name of directory to delete */
 }
 #endif /* XENIX & FILOCK */
 
-#endif /* BSD || USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION */
+#if HANDLE_WINCH
+/*
+ * Window size changes handled via signals.
+ */
+void winch_changed()
+{
+	signal(SIGWINCH,winch_changed);
+	winch_flag = 1;
+}
+
+void winch_new_size()
+{
+	EWINDOW *wp;
+	struct winsize win;
+  
+	winch_flag=0;
+	ioctl(fileno(stdin),TIOCGWINSZ,&win);
+	winch_vtresize(win.ws_row,win.ws_col);
+	onlywind(0,0);
+	TTmove(0,0);
+	TTeeop();
+}
+#endif
+
+#endif /* BSD || FREEBSD || USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || (AVVION || TERMIOS) */

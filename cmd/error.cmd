@@ -1,5 +1,5 @@
 ;	ERROR.CMD:	Parse error files
-;			using MicroEMACS 3.12
+;			using MicroEMACS 4.0
 ;
 ;	(C)opyright 1993 by Daniel M. Lawrence
 ;

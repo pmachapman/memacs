@@ -7,9 +7,10 @@
 # modify the following lines with the proper relative directories
 
 OBJD = OBJ  			# object file directory
+BIND = BIN			# binary file directory
 SRCD = ..\src          		# source file directory
 HDIR = ..\h            		# header file directory
-INCD = c:\mstools\h            	# system include directory
+INCD = d:\msvc20\include       	# system include directory
 
 # Nmake macros for building Windows 32-Bit apps
 
@@ -28,11 +29,11 @@ CPUTYPE=1
 cdebug = -Zi -Od
 cvtomfdebug = -g
 
-cc = cl386
+cc = cl
 
 #First clags is for debugging, second one is for not
-#cflags	= -c -G3d -W3 -D_X86_=1 $(cdebug) -D_MT /J /I. /I$(HDIR) /I$(INCD)
-cflags	= -c -G3d -W3 -D_X86_=1 -D_MT /J /I. /I$(HDIR) /I$(INCD)
+cflags	= -c -G3d -W3 -D_X86_=1 $(cdebug) -D_MT /J /I. /I$(HDIR) /I$(INCD)
+#cflags	= -c -G3d -W3 -D_X86_=1 -D_MT /J /I. /I$(HDIR) /I$(INCD)
 
 #cvtobj = cvtomf $(cvtomfdebug)
 cvtobj = REM MIPS only version
@@ -57,7 +58,7 @@ cvtdebug =
 
 cvars = -DWIN32
 linkdebug = -debug:full -debugtype:cv
-link = link32 $(linkdebug)
+link = link $(linkdebug)
 
 
 # link flags - must be specified after $(link)
@@ -76,7 +77,7 @@ guiflags =  -subsystem:windows -entry:WinMainCRTStartup
 # note : $(LIB) is set in environment variables
 
 
-conlibs = libcmt.lib ntdll.lib kernel32.lib
+conlibs = libcmt.lib kernel32.lib
 
 guilibs    = libc.lib ntdll.lib kernel32.lib \
 	     user32.lib gdi32.lib winspool.lib \
@@ -92,8 +93,8 @@ HFILES = $(HDIR)\estruct.h $(HDIR)\edef.h $(HDIR)\efunc.h $(HDIR)\epath.h $(HDIR
 #list of source files
 
 F1 = $(OBJD)\main.obj $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
-F2 = $(OBJD)\char.obj $(OBJD)\crypt.obj $(OBJD)\display.obj
-F3 = $(OBJD)\eval.obj $(OBJD)\exec.obj $(OBJD)\file.obj
+F2 = $(OBJD)\char.obj $(OBJD)\crypt.obj $(OBJD)\display.obj $(OBJD)\undo.obj
+F3 = $(OBJD)\eval.obj $(OBJD)\exec.obj $(OBJD)\file.obj $(OBJD)\abbrev.obj
 F4 = $(OBJD)\fileio.obj $(OBJD)\nt.obj $(OBJD)\input.obj $(OBJD)\keyboard.obj
 F5 = $(OBJD)\isearch.obj $(OBJD)\line.obj $(OBJD)\lock.obj $(OBJD)\dolock.obj
 F6 = $(OBJD)\mouse.obj $(OBJD)\ntconio.obj $(OBJD)\screen.obj $(OBJD)\replace.obj
@@ -102,11 +103,14 @@ F8 = $(OBJD)\window.obj $(OBJD)\word.obj
 
 # product list
 
-emacs.exe: $(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8)
-    $(link) $(conflags) -out:$(PROGRAM).exe -stack:18000 $(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8) $(conlibs)
+$(BIND)\emacs.exe: $(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8)
+    $(link) $(conflags) -out:$(BIND)\$(PROGRAM).exe -stack:18000 $(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8) $(conlibs)
 
 # compilation rules
 
+$(OBJD)\abbrev.obj: $(SRCD)\abbrev.c $(HFILES)
+    $(cc) $(cflags) $(cvars) /Fo$(OBJD)\abbrev.obj $(SRCD)\abbrev.c
+    $(cvtobj) $(OBJD)\abbrev.obj
 $(OBJD)\basic.obj: $(SRCD)\basic.c $(HFILES)
     $(cc) $(cflags) $(cvars) /Fo$(OBJD)\basic.obj $(SRCD)\basic.c
     $(cvtobj) $(OBJD)\basic.obj
@@ -197,6 +201,9 @@ $(OBJD)\screen.obj: $(SRCD)\screen.c $(HFILES)
 $(OBJD)\tags.obj: $(SRCD)\tags.c $(HFILES)
     $(cc) $(cflags) $(cvars) /Fo$(OBJD)\tags.obj $(SRCD)\tags.c
     $(cvtobj) $(OBJD)\tags.obj
+$(OBJD)\undo.obj: $(SRCD)\undo.c $(HFILES)
+    $(cc) $(cflags) $(cvars) /Fo$(OBJD)\undo.obj $(SRCD)\undo.c
+    $(cvtobj) $(OBJD)\undo.obj
 $(OBJD)\window.obj: $(SRCD)\window.c $(HFILES)
     $(cc) $(cflags) $(cvars) /Fo$(OBJD)\window.obj $(SRCD)\window.c
     $(cvtobj) $(OBJD)\window.obj
@@ -205,4 +212,4 @@ $(OBJD)\word.obj: $(SRCD)\word.c $(HFILES)
     $(cvtobj) $(OBJD)\word.obj
 
 clean::
-    del *.obj *.exe *.bak
+    del $(OBJD)\*.obj $(BIND)\*.*

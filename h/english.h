@@ -1,7 +1,7 @@
 /*	ENGLISH.H:	English language text strings for
-                        MicroEMACS 3.12
+                        MicroEMACS 4.00
 
-			(C)opyright 1993 by Daniel Lawrence
+			(C)opyright 1995 by Daniel Lawrence
 */
 
 #define	TEXT1	"[Starting new CLI]"
@@ -33,7 +33,7 @@
 #define	TEXT27	"Pop buffer"
 #define	TEXT28	"Buffer is being displayed"
 #define	TEXT29	"Change buffer name to: "
-#define	TEXT30	"ACTN   Modes       Size Buffer          File"
+#define	TEXT30	"ACTN   Modes        Size Buffer          File"
 #define	TEXT31	"         Global Modes"
 #define	TEXT32	"Discard changes"
 #define	TEXT33	"Encryption String: "
@@ -62,7 +62,7 @@
 #define	TEXT56	"Variable list"
 #define	TEXT57	"Can not display variable list"
 #define	TEXT58	"[Building variable list]"
-#define	TEXT59	"[Fill column is %d]"
+#define	TEXT59	UNUSED
 #define	TEXT60	"Line %D/%D Col %d/%d Char %D/%D (%d%%) char = 0x%x"
 #define	TEXT61	"<Not Used>"
 #define	TEXT62	"Global mode to "
@@ -85,8 +85,8 @@
 #define	TEXT79	"Not found "
 #define	TEXT80	"No pattern set"
 #define	TEXT81	"Reverse search "
-#define	TEXT82	"Considering %d with jump %d"
-#define	TEXT83	"Its other case is %d"
+#define	TEXT82	UNUSED
+#define	TEXT83	UNUSED
 #define	TEXT84	"Replace "
 #define	TEXT85	"Query replace "
 #define	TEXT86	"with "
@@ -95,7 +95,7 @@
 #define	TEXT89	"Aborted!"
 #define	TEXT90	"(Y)es, (N)o, (!)Do rest, (U)ndo last, (^G)Abort, (.)Abort back, (?)Help: "
 #define	TEXT91	"Empty string replaced, stopping."
-#define	TEXT92	"%d substitutions"
+#define	TEXT92	"%D substitutions"
 #define	TEXT93	"%%ERROR while deleting"
 #define	TEXT94	"%%Out of memory"
 #define	TEXT95	"%%mceq: what is %d?"
@@ -234,7 +234,12 @@
 #define TEXT228 "[Kill ring cleared]"
 #define TEXT229 " in < "
 #define TEXT230 "> at line "
-
+#define	TEXT231	"Abbreviation to set: "
+#define	TEXT232	"Abbreviation to delete: "
+#define	TEXT233	"[Building Abbreviation list]"
+#define	TEXT234	"Abbreviation list"
+#define	TEXT235	"Can not display abbreviation list"
+#define TEXT236 "Define Abbreviations in buffer"
 #define TEXT240 "[No such screen]"
 #define TEXT241 "%%Can't delete current screen"
 #define TEXT242 "Find Screen: "
@@ -244,6 +249,8 @@
 #define TEXT246 "%%Need function key number"
 #define TEXT247 "%%Function key number out of range"
 #define	TEXT248 "Enter Label String: "
+#define TEXT249 "Global variable to declare: "
+#define	TEXT250 "Local variable to declare: "
 
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrect menu]"

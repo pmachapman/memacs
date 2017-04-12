@@ -107,7 +107,7 @@ BOOL EXPORT FAR PASCAL LaunchPrgEnumProc (HWND hWnd, LONG lParam)
 static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
                                char *InFile, char *OutFile)
 
-/* Returns TRUE if all went well, FALSE if wait cancelled and FAILED if
+/* Returns TRUE if all went well, FALSE if wait cancelled and FAILD if
    failed to launch.
 
    Cmd is the command string to launch.
@@ -154,7 +154,9 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
     }
     if (DOSApp) {
 #if WINDOW_MSWIN32
-        GetProfileString (ProgName, "Shell", "cmd.exe", FullCmd, CMDLENGTH);
+        GetPrivateProfileString (ProgName, "Shell", "cmd.exe", FullCmd,
+			CMDLENGTH, IniFile);
+
 	/* the Shell profile string should contain the name of the shell
            to be used for pipe-command, filter buffer, shell-command and
            i-shell. The ShellExecOption profile string should contain
@@ -164,8 +166,9 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
 	if (Cmd) {
 	    char ExecOption [10];
 	    
-            GetProfileString (ProgName, "ShellExecOption", " /c ",
-                              ExecOption, 10);
+            GetPrivateProfileString (ProgName, "ShellExecOption", " /c ",
+                              ExecOption, 10, IniFile);
+
 	    if ((strlen (FullCmd) + strlen (ExecOption) + strlen (Cmd)) >=
                 CMDLENGTH) return FALSE;
 	    strcat (FullCmd, ExecOption);
@@ -173,8 +176,9 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
 	}
 #else
         if (Synchronize || !Cmd) {
-	    GetProfileString (ProgName, "DOSExec", "",
-			      FullCmd, CMDLENGTH);
+	    GetPrivateProfileString (ProgName, "DOSExec", "",
+			      FullCmd, CMDLENGTH, IniFile);
+
             if (FullCmd[0] == '\0') {   /* try to find it on the "path" */
                 char    *s;
 
@@ -185,8 +189,9 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
         }
 	else FullCmd[0] = '\0';
 	if (FullCmd[0] == '\0') {
-	    GetProfileString (ProgName, "DOSBox", "",
-	                      FullCmd, CMDLENGTH);
+	    GetPrivateProfileString (ProgName, "DOSBox", "",
+	                      FullCmd, CMDLENGTH, IniFile);
+
             if (FullCmd[0] == '\0') {   /* try to find it on the "path" */
                 char    *s;
 
@@ -260,7 +265,7 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
 
     if (hModule < 32) {
         mlwrite (TEXT3);    /* "[Execution failed]" */
-        return FAILED;
+        return FAILD;
     }
     if (!Synchronize) return TRUE;  /* no synchronization */
     hPrgWnd = 0;
@@ -331,7 +336,7 @@ PASCAL execprg (int f, int n)
     if (f) SynchOption = &Line[0];  /* any not NULL will do */
     else SynchOption = NULL;
     Result = LaunchPrg (Line, FALSE, NULL, SynchOption);
-    if (Result == FAILED) {
+    if (Result == FAILD) {
         mlwrite (TEXT3);    /* "[Execution failed]" */
     }
     return Result;
@@ -350,7 +355,7 @@ PASCAL pipecmd (int f, int n)
     char    OutFile[NFILEN];
     static  char bname[] = "command";
     BUFFER  *bp;
-    WINDOW  *wp;
+    EWINDOW  *wp;
     int     Result;
     int     bmode;
     char    bflag;
@@ -384,7 +389,7 @@ PASCAL pipecmd (int f, int n)
     GetTempFileName (0, "UE", 0, OutFile);
 #endif
     Result = LaunchPrg (Line, TRUE, NULL, OutFile);
-    if (Result == FAILED) {
+    if (Result == FAILD) {
 	mlwrite (TEXT3);
         /* [execution failed] */
 	unlink (OutFile);
@@ -428,7 +433,7 @@ PASCAL filter (int f, int n)
     char    OutFile[NFILEN];
     char    fname[NFILEN];
     BUFFER  *bp;
-    WINDOW  *wp;
+    EWINDOW  *wp;
     int     Result;
 #if WINDOW_MSWIN32
     char    TempDir[NFILEN] = "\\";
@@ -460,7 +465,7 @@ PASCAL filter (int f, int n)
         GetTempFileName (0, "UE", 0, OutFile);
 #endif
 	Result = LaunchPrg (Line, TRUE, InFile, OutFile);
-        if (Result == FAILED) {
+        if (Result == FAILD) {
 	    mlwrite (TEXT3);
 	    /* [execution failed] */
             unlink (OutFile);

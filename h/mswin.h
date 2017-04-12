@@ -10,12 +10,6 @@
 #define GRINDERS    8   /* 0 to use the hourglass, 8 to use the animated
                            grinder (8 is the number of animation steps) */
                            
-#define WIN30SDK   0   /* 1 to be compatible with the Windows 3.0 SDK */
-
-#define CARETSHAPE  0   /* 2 to have a cell-sized caret when within a
-			   screen, 1 for a vertical bar, 0 for an
-                           horizontal bar */
-
 #define MEMTRACE    1   /* adds a debugging trace to mswmem.c (used only
                            if SUBALLOC (below) is 1) */
 
@@ -43,18 +37,10 @@
 
 #endif	/* WINDOW_MSWIN32 */
 
-#if !WIN30SDK
 #include    <shellapi.h>
-#endif
 
 #include    "mswrid.h"  /* contains all the Resource IDs */
 
-/* SDK-compatibility (Win3.0, Win3.1, WIN32) */
-#if WIN30SDK
-#define UINT    WORD
-#define MDITILE_VERTICAL    0x0000
-#define MDITILE_HORIZONTAL  0x0001
-#endif
 #if WINDOW_MSWIN32
 #define LPDATA(p) ((LPARAM)(LPSTR)(p))
 #define HDROP HANDLE
@@ -88,12 +74,14 @@ typedef struct  CellMetrics {   /* coordinate-related parameters of a font */
 } CellMetrics;
 
 #ifdef  termdef     /* in mswdrv.c only */
+char	IniFile[] = "EMACS.INI";
 char    ProgName [] = PROGNAME;
 int     CurrentRow = 0;
 int     CurrentCol = 0;
 BOOL    MouseTracking = FALSE;
 BOOL    InternalRequest = FALSE;
 BOOL    TakingANap = FALSE;
+int	caret_shape = 0;
 
 /* Global uninitialized variables */
 HWND    hFrameWnd;          /* main (frame) window */
@@ -119,17 +107,19 @@ BOOL    MainHelpUsed;
 char    HelpEngineFile [NFILEN];/* user help file and useage flag */
 BOOL    ColorDisplay;       /* TRUE if the display is color-capable */
 #else
+extern char IniFile[DUMMYSZ];
 extern char ProgName [DUMMYSZ];/* used all over the place for captions,
 			          etc... */
 extern int  CurrentRow;
-extern int  CurrentCol;     /* caret positions (in text coordinates) */
-extern BOOL MouseTracking;  /* TRUE if mouse in tracking/dragging mode */
+extern int  CurrentCol;		/* caret positions (in text coordinates) */
+extern BOOL MouseTracking;	/* TRUE if mouse in tracking/dragging mode */
 extern BOOL InternalRequest;
     /* TRUE for a request that originates from the mswxxx modules. This
        is meant to avoid infinite recursions for requests that could
        come from both MS-Windows or the editor's core (for instance
        resizing, screen activation...) */
-extern BOOL TakingANap;     /* TRUE during execution of TakeANap() */
+extern BOOL TakingANap;		/* TRUE during execution of TakeANap() */
+extern int  caret_shape;	/* 0 = HorzBar, 1 = VertBar, 2 = CellSize */
 
 /* Global uninitialized variables */
 extern HWND    hFrameWnd;          /* main (frame) window */
@@ -178,9 +168,7 @@ HMENU FAR PASCAL GetScreenMenuHandle (void);
 
 BOOL FAR PASCAL EatKey (UINT MsgCode, UINT wParam, LONG lParam);
 void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, UINT wParam, LONG lParam);
-#if !WIN30SDK
 void FAR PASCAL DropMessage (HWND hWnd, HANDLE hDrop);
-#endif
 
 void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont);
 void FAR PASCAL InvalidateCells (HWND hWnd, int leftcol, int toprow,

@@ -100,7 +100,7 @@ NoClipboardMemory:
 /* cutregion:   move the current region to the clipboard */
 /* =========                                             */
 
-PASCAL cutregion (int f, int n)
+int PASCAL cutregion (int f, int n)
 {
     REGION  Region;
     int     Result;
@@ -119,7 +119,7 @@ PASCAL cutregion (int f, int n)
 /* clipregion:  copy the current region into the clipboard */
 /* ==========                                              */
 
-PASCAL clipregion (int f, int n)
+int PASCAL clipregion (int f, int n)
 {
     REGION  Region;
     int     Result;
@@ -132,7 +132,7 @@ PASCAL clipregion (int f, int n)
 /* insertclip:  insert the clipboard contents at dot */
 /* ==========                                        */
 
-PASCAL insertclip (int f, int n)
+int PASCAL insertclip (int f, int n)
 {
     BOOL    Result = TRUE;
     char    *Text, *TextHead;
@@ -145,7 +145,7 @@ PASCAL insertclip (int f, int n)
     if (OpenClipboard (hFrameWnd)) {
 	if ((hClipData = GetClipboardData (CF_TEXT)) != NULL) {
 	    /* Save the local pointers to hold global "." */
-	    if (yankflag == SRBEGIN) {
+	    if (yankflag) {
 		/* Find the *previous* line, since the line we are on
 		   may disappear due to re-allocation.  This works even
 		   if we are on the first line of the file. */
@@ -176,7 +176,7 @@ bail_out:
                 hClipData = NULL;   /* for ClipboardCleanup */
                 /* If requested, set global "." back to the beginning of
 		   the yanked text. */
-		if (yankflag == SRBEGIN) {
+		if (yankflag) {
 		    curwp->w_dotp = lforw(curline);
 		    curwp->w_doto = curoff;
 		}
@@ -203,7 +203,7 @@ void FAR PASCAL ClipboardCleanup (void)
 /* helpengine:  invoke the MS-Windows help engine */
 /* ==========                                     */
 
-PASCAL helpengine (int f, int n)
+int PASCAL helpengine (int f, int n)
 {
     char    OldHelpFile [NFILEN];
     char    HelpKey [NLINE];
@@ -406,14 +406,13 @@ void FAR PASCAL ScrollBars (void)
         if (hscrollbar != HScroll) {
             ShowScrollBar ((HWND)sp->s_drvhandle, SB_HORZ, hscrollbar);
         }
-#if !WIN30SDK
+
         if ((Enabled != Quiescence) && Win31API && !TakingANap) {
             /* note: no disabling of scroll bars during naps (i.e. fence
                matching), to avoid annoying blinking */
             EnableScrollBar ((HWND)sp->s_drvhandle, SB_BOTH,
                              Quiescence ? ESB_ENABLE_BOTH : ESB_DISABLE_BOTH);
 	}
-#endif
     }
 
     if ((Enabled != Quiescence) && Win31API && !TakingANap) {
@@ -474,7 +473,7 @@ PASCAL  updscrollbars (SCREEN *sp, char w_flag)
         /*-figure-out where we stand horizontally */
         int     row;
         LINE    *lp;
-        WINDOW  *wp = sp->s_cur_window;
+        EWINDOW  *wp = sp->s_cur_window;
         int     maxlength = 0;
 
         lp = wp->w_linep;

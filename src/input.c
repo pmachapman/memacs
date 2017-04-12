@@ -1,6 +1,6 @@
 /*	Input:	Various input routines for MicroEMACS
 		written by Daniel Lawrence
-		copyright 1986-1993 by Daniel M. Lawrence
+		(C)Copyright 1995 by Daniel M. Lawrence
 
 	Notes:
 
@@ -36,7 +36,7 @@
 
 	A ^<space> sequence (0/1/32) is generated when an actual
 	null is being input from the control-space key under many
-	unix systems.  These values are then interpreted by getkey()
+	unix systems.  These values are then interpreted by get_key()
 	to construct the proper extended character sequences to pass
 	to the MicroEMACS kernel.
 */
@@ -47,7 +47,7 @@
 #include	"edef.h"
 #include	"elang.h"
 
-#if USG | AUX | BSD | V7 | SUN | HPUX8 | HPUX9
+#if USG | AIX | AUX | BSD | FREEBSD | SUN | HPUX8 | HPUX9
 #include	<pwd.h>
 extern struct passwd *getpwnam();
 #endif
@@ -244,11 +244,8 @@ int maxlen;		/* maximum length of input field */
 	char *ptr;		/* string pointer */
 	char user_name[NSTRING]; /* user name for directory */
 	static char buf[NSTRING];/* buffer to hold tentative name */
-#if USG | AUX | BSD | V7 | SUN | HPUX8 | HPUX9
+#if USG | AIX | AUX | BSD | FREEBSD | SUN | HPUX8 | HPUX9
 	struct passwd *pwd;	/* password structure */
-#endif
-#if	ENVFUNC
-	char *getenv(); 		/* get environment string */
 #endif
 
 	/* if we are executing a command line get the next arg and match it */
@@ -274,7 +271,7 @@ int maxlen;		/* maximum length of input field */
 	while (TRUE) {
 
 		/* get the keystroke and decode it */
-		ec = getkey();
+		ec = get_key();
 		c = ectoc(ec);		
 
 		/* if it is from the mouse, or is a function key, blow it off */
@@ -332,7 +329,7 @@ int maxlen;		/* maximum length of input field */
 			}
 
 			TTflush();
-			if (buf[cpos - 1] == 0)
+			if (cpos > 0 && buf[cpos - 1] == 0)
 				return(buf);
 			goto clist;
 
@@ -356,7 +353,7 @@ int maxlen;		/* maximum length of input field */
 				--ttcol;
 			}
 
-#if USG | AUX | BSD | V7 | SUN | HPUX8 | HPUX9
+#if USG | AIX | AUX | BSD | FREEBSD | SUN | HPUX8 | HPUX9
 			/* lookup someone else's home directory! */
 			if (user_name[0] != 0) {
 				pwd = getpwnam(user_name);
@@ -495,7 +492,7 @@ clist:			/* make a completion list! */
 
 /*	comp_command:	Attempt a completion on a command name	*/
 
-comp_command(name, cpos)
+VOID PASCAL NEAR comp_command(name, cpos)
 
 char *name;	/* command containing the current name to complete */
 int *cpos;	/* ptr to position of next character to insert */
@@ -507,6 +504,10 @@ int *cpos;	/* ptr to position of next character to insert */
 	register NBIND *match;	/* last command that matches string */
 	register int matchflag;	/* did this command name match? */
 	register int comflag;	/* was there a completion at all? */
+
+	/* everything (or nothing) matches an empty string */
+	if (*cpos == 0)
+		return;
 
 	/* start attempting completions, one character at a time */
 	comflag = FALSE;
@@ -571,7 +572,7 @@ int *cpos;	/* ptr to position of next character to insert */
 
 /*	clist_command:	Make a completion list based on a partial name */
 
-clist_command(name, cpos)
+VOID PASCAL NEAR clist_command(name, cpos)
 
 char *name;	/* command containing the current name to complete */
 int *cpos;	/* ptr to position of next character to insert */
@@ -607,7 +608,7 @@ int *cpos;	/* ptr to position of next character to insert */
 
 /*	comp_buffer:	Attempt a completion on a buffer name	*/
 
-comp_buffer(name, cpos)
+VOID PASCAL NEAR comp_buffer(name, cpos)
 
 char *name;	/* buffer containing the current name to complete */
 int *cpos;	/* ptr to position of next character to insert */
@@ -618,6 +619,10 @@ int *cpos;	/* ptr to position of next character to insert */
 	register BUFFER *match;	/* last buffer that matches string */
 	register int matchflag;	/* did this buffer name match? */
 	register int comflag;	/* was there a completion at all? */
+
+	/* everything (or nothing) matches an empty string */
+	if (*cpos == 0)
+		return;
 
 	/* start attempting completions, one character at a time */
 	comflag = FALSE;
@@ -680,7 +685,7 @@ int *cpos;	/* ptr to position of next character to insert */
 
 /*	clist_buffer:	Make a completion list based on a partial buffer name */
 
-clist_buffer(name, cpos)
+VOID PASCAL NEAR clist_buffer(name, cpos)
 
 char *name;	/* command containing the current name to complete */
 int *cpos;	/* ptr to position of next character to insert */
@@ -719,7 +724,7 @@ int *cpos;	/* ptr to position of next character to insert */
 #if	!WINDOW_MSWIN
 /*	comp_file:	Attempt a completion on a file name	*/
 
-comp_file(name, cpos)
+VOID PASCAL NEAR comp_file(name, cpos)
 
 char *name;	/* file containing the current name to complete */
 int *cpos;	/* ptr to position of next character to insert */
@@ -798,7 +803,7 @@ int *cpos;	/* ptr to position of next character to insert */
 
 /*	clist_file:	Make a completion list based on a partial file name */
 
-clist_file(name, cpos)
+VOID PASCAL NEAR clist_file(name, cpos)
 
 char *name;	/* command containing the current name to complete */
 int *cpos;	/* ptr to position of next character to insert */
@@ -898,11 +903,11 @@ int PASCAL NEAR tgetc()
 	return(c);
 }
 
-/*	getkey:	Get one keystroke. The legal prefixs here
+/*	get_key:	Get one keystroke. The legal prefixs here
 			are the SPEC, MOUS and CTRL prefixes.
 */
 
-PASCAL NEAR getkey()
+int PASCAL NEAR get_key()
 
 {
 	int c;		/* next input character */
@@ -942,20 +947,20 @@ PASCAL NEAR getkey()
 /*	GETCMD:	Get a command from the keyboard. Process all applicable
 		prefix keys
 							*/
-PASCAL NEAR getcmd()
+int PASCAL NEAR getcmd()
 
 {
 	int c;		/* fetched keystroke */
 	KEYTAB *key;	/* ptr to a key entry */
 
 	/* get initial character */
-	c = getkey();
+	c = get_key();
 	key = getbind(c);
 
 	/* resolve META and CTLX prefixes */
 	if (key) {
 		if (key->k_ptr.fp == meta) {
-			c = getkey();
+			c = get_key();
 #if	SMOS
 			c = upperc(c&255) | (c & ~255); /* Force to upper */
 #else
@@ -963,7 +968,7 @@ PASCAL NEAR getcmd()
 #endif
 			c |= META;
 		} else if (key->k_ptr.fp == cex) {
-			c = getkey();
+			c = get_key();
 #if	SMOS
 			c = upperc(c&255) | (c & ~255); /* Force to upper */
 #else
@@ -983,7 +988,7 @@ PASCAL NEAR getcmd()
 							*/
 int PASCAL NEAR getstring(buf, nbuf, eolchar)
 
-char *buf;
+unsigned char *buf;
 int nbuf;
 int eolchar;
 
@@ -1000,7 +1005,7 @@ int eolchar;
 
 	for (;;) {
 		/* get a character from the user */
-		ec = getkey();
+		ec = get_key();
 
 		/* if they hit the line terminate, wrap it up */
 		if (ec == eolchar && quotef == FALSE) {
@@ -1190,6 +1195,7 @@ int iterm;
 			tcol += strlen(buf) + 4;
 	}
 	mlputs(">: ");
+	movecursor(term.t_nrow, tcol);	/* Position the cursor	*/
 	TTflush();
 	return(tcol);
 }
@@ -1204,7 +1210,8 @@ int uptocol;	/* last column to be echoed in */
 {
 	if (str != NULL) {
 		while (*str) {
-			tcol = echochar(*str++, tcol);
+			movecursor(term.t_nrow, tcol);	/* Position the cursor	*/
+			tcol += echochar(*str++);
 			if (tcol >= uptocol) {
 				mlout('$');
 				tcol++;
@@ -1212,25 +1219,26 @@ int uptocol;	/* last column to be echoed in */
 			}
 		}
 	}
+	movecursor(term.t_nrow, tcol);	/* Position the cursor	*/
 	return(tcol);
 }
 
 /*
  * Routine to echo i-search and message-prompting characters.
  */
-int PASCAL NEAR echochar(c, col)
+int PASCAL NEAR echochar(c)
 
 unsigned char c;	/* character to be echoed */
-int col;		/* column to be echoed in */
 
 {
-	movecursor(term.t_nrow, col);	/* Position the cursor	*/
+	int col = 0;			/* column to be echoed in */
+
 	if (c == '\r') {		/* Newline character?	*/
 		mlout('<');
 		mlout('N');
 		mlout('L');
 		mlout('>');
-		col += 3;
+		col = 3;
 	}
 #if 0
 	else if (c == '\t') {		/* Tab character?	*/
@@ -1239,7 +1247,7 @@ int col;		/* column to be echoed in */
 		mlout('A');
 		mlout('B');
 		mlout('>');
-		col += 4;
+		col = 4;
 	}
 #endif
 	else if ((c < ' ') || (c == 0x7F)) {	/* Vanilla control char and Rubout:   */

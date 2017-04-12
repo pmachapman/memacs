@@ -1,5 +1,5 @@
 #		MicroSoft C makefile for
-#		MicroEMACS 3.12
+#		MicroEMACS 4.00
 #		written by Pierre Perret
 #
 # for Microsoft C compiler (6.0 or 7.0) on i386 or MIPS or ALPHA CPU
@@ -38,7 +38,7 @@ DEBUG = 0
 !ENDIF
 
 !IFNDEF TARGET
-TARGET = C7
+TARGET = C6
 !ENDIF
 
 !IFNDEF CPU
@@ -157,7 +157,7 @@ OBJ_FILES = $(OBJ)\BASIC.obj $(OBJ)\BIND.obj $(OBJ)\BUFFER.obj $(OBJ)\CHAR.obj\
         $(OBJ)\MSWFONT.obj $(OBJ)\MSWINPUT.obj $(OBJ)\MSWMEM.obj\
         $(OBJ)\MSWMENU.obj $(OBJ)\MSWSYS.obj $(OBJ)\RANDOM.obj\
         $(OBJ)\REGION.obj $(OBJ)\REPLACE.obj $(OBJ)\SCREEN.obj\
-        $(OBJ)\SEARCH.obj $(OBJ)\WINDOW.obj $(OBJ)\WORD.obj
+        $(OBJ)\SEARCH.obj $(OBJ)\UNDO.obj $(OBJ)\WINDOW.obj $(OBJ)\WORD.obj
 
 all: $(PROG)
 
@@ -231,6 +231,8 @@ $(OBJ)\REPLACE.obj : $(SRC)\REPLACE.C $(H_FILES)
 $(OBJ)\SCREEN.obj : $(SRC)\SCREEN.C $(H_FILES)
 
 $(OBJ)\SEARCH.obj : $(SRC)\SEARCH.C $(H_FILES)
+
+$(OBJ)\UNDO.obj : $(SRC)\UNDO.C $(H_FILES)
 
 $(OBJ)\WINDOW.obj : $(SRC)\WINDOW.C $(H_FILES)
 

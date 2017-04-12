@@ -1,6 +1,6 @@
 /*	DOLOCK.C:	Machine specific code for File Locking
 			for MicroEMACS
-			(C)Copyright 1987,1993 by Daniel M Lawrence
+			(C)Copyright 1995 by Daniel M Lawrence
 */
 
 #include	<stdio.h>
@@ -53,8 +53,8 @@ char *fname;
 }
 #endif
 
-#if	FILOCK && (MSDOS || WINNT || OS2 || SUN || USG || AUX || V7 || BSD || HPUX8 || HPUX9)
-#if	OS2 || ((MSDOS || WINNT) && MSC) || BSD
+#if	FILOCK && (MSDOS || WINNT || OS2 || SUN || USG || AIX || AUX || AVIION || BSD || FREEBSD || HPUX8 || HPUX9 || AMIGA)
+#if	OS2 || ((MSDOS || WINNT) && MSC) || BSD || FREEBSD
 #include	<sys/types.h>
 #endif
 #include	<sys/stat.h>
@@ -152,7 +152,7 @@ char *filespec;
 		return(rbuff);
 	}
 
-	*(rname) = '\0';	/* point just beyond slash */
+	*(rname + 1) = '\0';	/* point just beyond slash */
 
 	/* no skip beyond any drive spec */
 	rname = rbuff;
@@ -221,7 +221,6 @@ char *filespec;		/* full file spec of file to lock */
 	char buf[NSTRING];		/* input buffer */
 	char host[NSTRING];		/* current host name */
 	static char result[NSTRING];	/* error return string */
-	char *getenv(); 
 
 	/* separate filespec into components */
 	strcpy(filename, parse_name(filespec));
@@ -262,20 +261,18 @@ char *filespec;		/* full file spec of file to lock */
 #if	LOCKDEBUG
 	printf("Lockdir [%s]\n", lockpath); tgetc();
 #endif
-#if	MSDOS || WINNT || OS2
-	if (TRUE) {
-#else
+
 	if (stat(lockpath, &sb) != 0) {
-#endif
 
 		/* create it! */
 #if	LOCKDEBUG
 		printf("MKDIR(%s)\n", lockpath); tgetc();
 #endif
 #if	MSDOS || WINNT || OS2
-		mkdir(lockpath);
+		if (mkdir(lockpath) != 0) {
 #else
 		if (mkdir(lockpath, 0777) != 0) {
+#endif
 			strcpy(result, LOCKMSG);
 			switch (errno) {
 
@@ -289,7 +286,6 @@ char *filespec;		/* full file spec of file to lock */
 			}
 			return(result);
 		}
-#endif
 	}
 
 	/* check for the existance of this lockfile */
@@ -318,9 +314,15 @@ char *filespec;		/* full file spec of file to lock */
 		fprintf(fp, "%u\n", getpid());
 #endif
 
+#if HPUX8 | HPUX9
+		/* user name */
+		if (getenv("LOGNAME"))
+			fprintf(fp, "%s\n", getenv("LOGNAME"));
+#else
 		/* user name */
 		if (getenv("USER"))
 			fprintf(fp, "%s\n", getenv("USER"));
+#endif
 		else
 			fprintf(fp, "<unknown>\n");
 

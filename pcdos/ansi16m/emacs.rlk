@@ -2,7 +2,7 @@ c:\sys\turbo\lib\c0l obj\basic obj\bind obj\buffer obj\char obj\crypt+
 obj\display obj\eval obj\exec obj\file obj\fileio obj\ibmpc obj\input+
 obj\isearch obj\line obj\main obj\random obj\region obj\lock obj\dolock+
 obj\nsearch obj\replace obj\tags obj\window obj\word obj\msdos obj\mouse+
-obj\execpr obj\screen /i:2 /prdefinition:emacs.pdf
+obj\screen /i:2 /prdefinition:emacs.pdf
 
 bin\emacs/m/linenumbers
 c:\sys\turbo\lib\cl

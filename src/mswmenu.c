@@ -102,7 +102,6 @@ static MENUTAB MenuStaticBind [] = {
     {IDM_TWIDDLE,	twiddle},
     {IDM_TAB,		tab},
     {IDM_QUOTE,		quote},
-    {IDM_SETFILLCOL,	setfillcol},
     {IDM_FORWSEARCH,	forwsearch},
     {IDM_BACKSEARCH,	backsearch},
     {IDM_FORWHUNT,	forwhunt},
@@ -183,13 +182,13 @@ static unsigned int meta_key = 0;       /* for GetKeyText */
 /* This function is called by the edit loop in main.c, when a MENU
    extended character is detected. */
 
-PASCAL execmenu (int f, int n)
+int PASCAL execmenu (int f, int n)
 /* f, n: arguments to target function */
 {
     register UINT    ID;
     register MENUTAB *MTp;
 
-    ID = (xpos << 8) + ypos;    /* getkey sees MENU sequences as MOUS */
+    ID = (xpos << 8) + ypos;    /* get_key sees MENU sequences as MOUS */
     if (ID >= IDM_DYNAMIC) {
         MTp = &MenuDynBind[ID - IDM_DYNAMIC];
         if (MTp->m_word & MB_FNC) return (*(MTp->m_ptr.fp)) (f, n);
@@ -202,13 +201,13 @@ PASCAL execmenu (int f, int n)
                 if (status != TRUE) return status;
             }
         }
-        else return FAILED;
+        else return FAILD;
         return TRUE;
     }
     else for (MTp = &MenuStaticBind[0]; MTp->m_word != 0; MTp++) {
         if (ID == MTp->m_word) return (*(MTp->m_ptr.fp)) (f, n);
     }
-    return FAILED;      /* not found !!! */
+    return FAILD;      /* not found !!! */
 } /* execmenu */
 
 /* GenerateMenuSeq: send a menu sequence into the input stream */
@@ -970,7 +969,7 @@ static BOOL PASCAL  ParseMenu (char *Name, char *Title, int *Posp)
 /* Puts the text part of the menu name in Title (at most MAXMENUTITLE
    characters including the \0) and the position number in *Posp. If no
    position is specified, *Posp is set to -1. The returned BOOL is TRUE
-   if no error occured and FAILED if a syntax problem was diagnosed */
+   if no error occured and FAILD if a syntax problem was diagnosed */
 {
     register int i;
 
@@ -978,7 +977,7 @@ static BOOL PASCAL  ParseMenu (char *Name, char *Title, int *Posp)
     for (i = 0; Name[i] != '\0'; i++) {
         if (i >= MAXMENUTITLE - 1) {
             mlwrite (TEXT300);  /* "[Incorrect menu]" */
-            return FAILED;
+            return FAILD;
         }
         if (Name[i] == '>') break;
         if (Name[i] == '@') {   /* must parse a position index */
@@ -991,7 +990,7 @@ static BOOL PASCAL  ParseMenu (char *Name, char *Title, int *Posp)
                 }
                 else {      /* non numerical character! */
                     mlwrite (TEXT300);  /* "[Incorrect menu]" */
-                    return FAILED;
+                    return FAILD;
                 }
             }
             break;
@@ -1008,7 +1007,7 @@ static BOOL PASCAL  ParseMenu (char *Name, char *Title, int *Posp)
 static BOOL PASCAL  LocateMenu (char *Name, CURMENU *CM)
 
 /* The returned BOOL is TRUE if a matching menu entry was found, FALSE
-   if no such entry was found and FAILED if a syntax problem was
+   if no such entry was found and FAILD if a syntax problem was
    diagnosed. The CURMENU structure is updated if the entry was found.
    */
 {
@@ -1133,7 +1132,7 @@ static BOOL PASCAL  AddMenuEntry (char *Name, UINT ID, CURMENU *CM,
 	    CM->cm_pos = -1;
 	    ++Name;     /* skip the '>' */
 	    if ((Result = AddMenuEntry (Name, ID, CM, MenuType)) != TRUE) {
-		/* Menu creation failed at some point, we must undo our own */
+		/* Menu creation FAILD at some point, we must undo our own */
 		DeleteMenu (hMenu, Pos + MenuEntryOffset (hMenu),
                             MF_BYPOSITION);
 	    }

@@ -1,0 +1,8 @@
+obj\abbrev obj\basic obj\bind obj\buffer obj\char obj\crypt obj\lock obj\dolock+
+obj\display obj\eval obj\exec obj\file obj\fileio obj\ibmpc obj\input+
+obj\isearch obj\line obj\main obj\random obj\region obj\screen obj\undo+
+obj\search obj\tags obj\window obj\word obj\msdos obj\mouse obj\execpr
+
+bin\emacs /m /linenumbers /i:2 /prdefinition:emacs.pdf
+c:\sys\m6\lib\llibce
+

@@ -1,6 +1,6 @@
 /*	CMDFIX.C:	Translate pre 3.10 command and startup
 			files to 3.10 and above files
-			(C)Copyright 1993 by Daniel Lawrence
+			(C)Copyright 1995 by Daniel Lawrence
 			All Rights reserved
 
 	The names of function key command strings have been changed to
@@ -87,9 +87,10 @@ char *trans[][2] = {
 	"FNv",	"FN^V",
 	"FNw",	"FN^<",
 	"FN„",	"FN^Z",
+	"set-fill-column", "set $fillcol",
 };
 
-#define NUMTRAN	70
+#define NUMTRAN	71
 
 char *trans1[][2] = {
 	"FN^P",	"A-Q",
@@ -127,7 +128,7 @@ char *argv[];	/* text of command line arguments */
 	/* help people out! */
 	if (argc < 2) {
 		puts("Converts MicroEMACS 3.9n and earlier keybindings to");
-		puts("version 3.12 keybindings.");
+		puts("version 4.00 keybindings.");
 		puts("\nUsage:	cmdfix <file list>");
 		exit(-1);
 	}

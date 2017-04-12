@@ -1,4 +1,4 @@
-;	Example startup program for Micro-EMACS 3.12 for Windows
+;	Example startup program for Micro-EMACS 4.00 for Windows
 ;
 ; Pierre Perret - April 1993
 
@@ -56,7 +56,7 @@ store-procedure  Set-Fill-Column
 unbind-menu     ">S&creen>Si&ze>= &Width"
 unbind-menu     "= &Height"
 macro-to-menu   Set-Screen-Size "&Set:"
-unbind-menu     ">&Edit>= &Fill column"
+;unbind-menu     ">&Edit>= &Fill column"
 macro-to-menu   Set-Fill-Column "&Fill column:"
 
 ; load Windows-specific macros

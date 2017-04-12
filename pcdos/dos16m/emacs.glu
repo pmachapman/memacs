@@ -2,6 +2,7 @@
 e(bin\emacs)
 c:\sys\dos16m\turboc2.0l\preload
 ;c:\sys\turbo\lib\c0l
+obj\abbrev
 obj\basic
 obj\bind
 obj\buffer
@@ -28,6 +29,7 @@ obj\screen
 obj\search
 obj\replace
 obj\tags
+obj\undo
 obj\window
 obj\word
 c:\sys\dos16m\turboc2.0l\tc20l.lib

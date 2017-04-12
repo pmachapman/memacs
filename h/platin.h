@@ -1,7 +1,7 @@
 /*	PLATIN.H	Pig Latin Text strings for
-                        MicroEMACS 3.12
+                        MicroEMACS 4.00
 
-			(C)opyright 1993 by Daniel Lawrence
+			(C)opyright 1995 by Daniel Lawrence
 			translated by Daniel Lawrence
 			(using a complex but neat MicroEMACS macro)
 */
@@ -64,7 +64,7 @@
 #define	TEXT56	"Ariablevay istlay"
 #define	TEXT57	"Ancay otnay isplayday ariablevay istlay"
 #define	TEXT58	"[Uildingbay ariablevay istlay]"
-#define	TEXT59	"[Illfay olumncay isway %d]"
+#define	TEXT59	UNUSEDWAY
 #define	TEXT60	"Inelay %D/%D Olcay %d/%d Archay %D/%D (%d%%) archay = 0x%x"
 #define	TEXT61	"<OTNAY USEDWAY>"
 #define	TEXT62	"Lobalgay odemay otay "
@@ -87,8 +87,8 @@
 #define	TEXT79	"Otnay oundfay"
 #define	TEXT80	"Onay atternpay etsay"
 #define	TEXT81	"Everseray earchsay "
-#define	TEXT82	"Onsideringcay %d ithway umpjay %d"
-#define	TEXT83	"Itsway otherway asecay isway %d"
+#define	TEXT82	UNUSED
+#define	TEXT83	UNUSED
 #define	TEXT84	"Eplaceray "
 #define	TEXT85	"Ueryqay eplaceray "
 #define	TEXT86	"ithway "
@@ -97,7 +97,7 @@
 #define	TEXT89	"Abortedway!"
 #define	TEXT90	"(Y)es, (N)o, (!)Do rest, (U)ndo last, (^G)Abort, (.)Abort back, (?)Help: "
 #define	TEXT91	"Emptyway tringsay eplacedray, toppingsay."
-#define	TEXT92	"%d ubstitutionssay"
+#define	TEXT92	"%D ubstitutionssay"
 #define	TEXT93	"%%ERRORWAY hileway eletingday"
 #define	TEXT94	"%%Outway ofway emorymay"
 #define	TEXT95	"%%mceq: hatway isway %d?"
@@ -246,6 +246,8 @@
 #define TEXT246 "%%Eednay unctionfay eykay umbernay"
 #define TEXT247 "%%Unctionfay eykay umbernay outway ofway angeray"
 #define	TEXT248 "Enterway Abelay Ingstray: "
+#define TEXT249 "Obalglay ariablevay otay eclareday: "
+#define	TEXT250 "Ocallay ariablevay otay eclareday: "
 
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrectway enumay]"

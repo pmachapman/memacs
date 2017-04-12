@@ -1,7 +1,7 @@
 /*	JAPANESE.H:	Japanese language text strings (Shift JIS) for
-                        MicroEMACS 3.12
+                        MicroEMACS 4.00
 
-			(C)opyright 1993 by Daniel Lawrence
+			(C)opyright 1995 by Daniel Lawrence
 			Translated by Junio Hamano (Twin Sun, Inc.)
 */
 
@@ -63,7 +63,7 @@
 #define	TEXT56	"\225\317\220\224\203\212\203X\203g"
 #define	TEXT57	"\225\317\220\224\203\212\203X\203g\202\252\225\\\216\246\202\305\202\253\202\334\202\271\202\361"
 #define	TEXT58	"[\225\317\220\224\203\212\203X\203g\215\354\220\254\222\206]"
-#define	TEXT59	"[\213l\202\337\215\236\202\335\214\205 \202\315 %d \202\305\202\267]"
+#define	TEXT59	UNUSED
 #define	TEXT60	"\215s %D/%D \214\205 %d/%d \225\266\216\232 %D/%D (%d%%) \225\266\216\232 = 0x%x"
 #define	TEXT61	"<NOT USED>"
 #define	TEXT62	"\203O\203\215\201[\203o\203\213\201E\203\202\201[\203h"
@@ -86,8 +86,8 @@
 #define	TEXT79	"\214\251\202\302\202\251\202\350\202\334\202\271\202\361"
 #define	TEXT80	"\203p\203^\201[\203\223\202\252\220\335\222\350\202\263\202\352\202\304\202\242\202\334\202\271\202\361"
 #define	TEXT81	"\213t\225\373\214\374\222T\215\365 "
-#define	TEXT82	"Considering %d WITH jump %d"
-#define	TEXT83	"Its other case is %d"
+#define	TEXT82	UNUSED
+#define	TEXT83	UNUSED
 #define	TEXT84	"\222u\212\267 "
 #define	TEXT85	"\226\342\202\242\215\207\202\355\202\271\222u\212\267 "
 #define	TEXT86	"\222u\212\267\225\266\216\232\227\361 "
@@ -96,7 +96,7 @@
 #define	TEXT89	"\222\206\222f"
 #define	TEXT90	"(Y)es, (N)o, (!)Do rest, (U)ndo last, (^G)Abort, (.)Abort back, (?)Help: "
 #define	TEXT91	"\213\363\225\266\216\232\227\361\202\360\222u\212\267\201A\222\206\216~\202\265\202\334\202\267"
-#define	TEXT92	"%d \214\302\222u\212\267\202\265\202\334\202\265\202\275"
+#define	TEXT92	"%D \214\302\222u\212\267\202\265\202\334\202\265\202\275"
 #define	TEXT93	"%%\215\355\217\234\222\206\202\314\203G\203\211\201[ "
 #define	TEXT94	"%%\203\201\203\202\203\212\202\252\221\253\202\350\202\334\202\271\202\361"
 #define	TEXT95	"%%mceq: what is %d?"
@@ -245,6 +245,8 @@
 #define TEXT246 "%%Need function key number"
 #define TEXT247 "%%Function key number out of range"
 #define	TEXT248 "Enter Label String: "
+#define TEXT249 "Global variable to declare: "
+#define	TEXT250 "Local variable to declare: "
 
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrect menu]"

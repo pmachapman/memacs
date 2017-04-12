@@ -24,7 +24,8 @@ hfiles=		ebind.h edef.h-
 		efunc.h evar.h-
 		estruct.h
 
-ofiles=		basic.obj,   bind.obj,   buffer.obj,-
+ofiles=		abbrev.obj,-
+		basic.obj,   bind.obj,   buffer.obj,-
 		char.obj,    crypt.obj,-
 		display.obj,-
 		eval.obj,    exec.obj,-
@@ -35,6 +36,7 @@ ofiles=		basic.obj,   bind.obj,   buffer.obj,-
 		random.obj,  region.obj, replace.obj,-
 		screen.obj,  search.obj, smg.obj,-
 		tags.obj,-
+		undo.obj,-
 		vms.obj,-
 		window.obj,  word.obj-
 
@@ -51,6 +53,8 @@ ofiles=		basic.obj,   bind.obj,   buffer.obj,-
 mesmg.exe : $(ofiles) mesmg.mms mesmg.opt
 	LINK $(lopts)	mesmg/option
 
+abbrev.obj : abbrev.c $(HFILES)
+    CC $(copts) abbrev
 basic.obj : basic.c $(HFILES)
     CC $(copts) basic
 bind.obj : bind.c epath.h $(HFILES)
@@ -93,6 +97,8 @@ screen.obj : screen.c $(HFILES)
     CC $(copts) screen
 search.obj : search.c $(HFILES)
     CC $(copts) search
+undo.obj : undo.c $(HFILES)
+    CC $(copts) undo
 vms.obj : vms.c $(HFILES)
     CC $(copts) vms
 smg.obj : smg.c $(HFILES)

@@ -30,6 +30,7 @@ Link_Exclude =  \
   mewin.res
 
 Link_Include =  \
+  $(OBJ)\abbrev.obj \
   $(OBJ)\basic.obj \
   $(OBJ)\bind.obj \
   $(OBJ)\buffer.obj \
@@ -52,6 +53,8 @@ Link_Include =  \
   $(OBJ)\replace.obj \
   $(OBJ)\screen.obj \
   $(OBJ)\search.obj \
+  $(OBJ)\tags.obj \
+  $(OBJ)\undo.obj \
   $(OBJ)\window.obj \
   $(OBJ)\word.obj \
   $(OBJ)\mswdisp.obj \
@@ -70,6 +73,7 @@ Link_Include =  \
 $(BIN)\MEWIN.exe: MEWIN.cfg $(Link_Include) $(Link_Exclude)
   $(TLINK) /v/s/c/Twe/P-/L$(LIBPATH) @&&|
 c0wl.obj+
+$(OBJ)\abbrev.obj+
 $(OBJ)\basic.obj+
 $(OBJ)\bind.obj+
 $(OBJ)\buffer.obj+
@@ -92,6 +96,8 @@ $(OBJ)\region.obj+
 $(OBJ)\replace.obj+
 $(OBJ)\screen.obj+
 $(OBJ)\search.obj+
+$(OBJ)\tags.obj+
+$(OBJ)\undo.obj+
 $(OBJ)\window.obj+
 $(OBJ)\word.obj+
 $(OBJ)\mswdisp.obj+
@@ -124,6 +130,9 @@ mewin.res: $(RES)\mewin.rc $(INC)\mswrid.h $(INC)\mswmenu.h $(RES)\mswmenu.rc \
            $(RES)\mswgrin5.cur $(RES)\mswgrin6.cur $(RES)\mswgrin7.cur \
 	   $(RES)\mswgrin8.cur
 	RC -R -I $(INC) -i $(RES) -I$(INCLUDEPATH) -FO mewin.res $(RES)\MEWIN.RC
+
+$(OBJ)\abbrev.obj: $(SRC)\abbrev.c 
+	$(CC) $(COPTS) -c -o$(OBJ)\abbrev.obj $(SRC)\abbrev.c
 
 $(OBJ)\basic.obj: $(SRC)\basic.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\basic.obj $(SRC)\basic.c
@@ -209,6 +218,9 @@ $(OBJ)\mswsys.obj: $(SRC)\mswsys.c
 $(OBJ)\search.obj: $(SRC)\search.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\search.obj $(SRC)\search.c
 
+$(OBJ)\tags.obj: $(SRC)\tags.c 
+	$(CC) $(COPTS) -c -o$(OBJ)\tags.obj $(SRC)\tags.c
+
 $(OBJ)\random.obj: $(SRC)\random.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\random.obj $(SRC)\random.c
 
@@ -220,6 +232,9 @@ $(OBJ)\replace.obj: $(SRC)\replace.c
 
 $(OBJ)\screen.obj: $(SRC)\screen.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\screen.obj $(SRC)\screen.c
+
+$(OBJ)\undo.obj: $(SRC)\undo.c 
+	$(CC) $(COPTS) -c -o$(OBJ)\undo.obj $(SRC)\undo.c
 
 $(OBJ)\window.obj: $(SRC)\window.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\window.obj $(SRC)\window.c

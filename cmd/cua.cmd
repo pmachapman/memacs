@@ -1,4 +1,4 @@
-; CUA-feel macros for MicroEMACS 3.12
+; CUA-feel macros for MicroEMACS 4.0
 ;
 ; Pierre Perret - April 1993
 

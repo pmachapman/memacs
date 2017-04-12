@@ -1,13 +1,8 @@
 @style(spacing 1 lines, margins .7 inches, indent 8 chars, font Times10)
 @Define(goodstuff, fill n, font Helvetica10)
 @Define(col3, columns 3, fill n)
+@Form(ir() = "@b(@eval)@index(@eval)")
 @style(indent 8 chars, spacing 1 lines, BindingMargin .5 inches)
-@comment(This manual is normally generated using Mark of the Unicorn's
-Final Word II product. Alternativily, Borland's SPRINT (derived from
-Final Word II) should also build it properly. Both of these formatters
-are based on the SCRIBE language originally used on the DECSystem-20,
-and will form the basis of a shareware text formatter I hope, but not
-promise, to complete some day.)
 @pagefooting()
 
 
@@ -21,28 +16,28 @@ promise, to complete some day.)
 
 
 
-		@big(@b[MicroEMACS])
+		@b1(@b[MicroEMACS])
 
 		Full Screen Text Editor
-		Reference Manual @i(- Preliminary Version)
+		Reference Manual @i(- Release Version)
 
-		Version 3.12
-		April 22, 1993
+		Version 4.0
+		March 20, 1996
 
-		(C)Copyright 1988 - 1993 by Daniel M. Lawrence
-		Reference Manual (C)opyright 1988 - 1993
+		(C)Copyright 1988 - 1996 by Daniel M. Lawrence
+		Reference Manual (C)opyright 1988 - 1996
 			by Brian Straight and Daniel M. Lawrence
 		All Rights Reserved
 
-		@i[(C)Copyright 1988 - 1993 by Daniel M. Lawrence
-		MicroEMACS 3.12 can be copied and distributed freely for any
+		@i[(C)Copyright 1988 - 1996 by Daniel M. Lawrence
+		MicroEMACS 4.0 can be copied and distributed freely for any
 		non-commercial purposes. Commercial users may use MicroEMACS
-		3.12 inhouse. Shareware distributors may redistribute
-		MicroEMACS 3.12 for media costs only. MicroEMACS 3.12 can only
+		4.0 inhouse. Shareware distributors may redistribute
+		MicroEMACS 4.0 for media costs only. MicroEMACS 4.0 can only
 		be incorporated into commercial software or resold with the
 		permission of the current author.]
 @newpage
-@flushleft(@big[Introduction])
+@flushleft(@b1[Introduction])
 
 	MicroEMACS is a tool for creating and changing documents,
 programs, and other text files. It is both relatively easy for the
@@ -66,7 +61,8 @@ word move and deletes, easy case controlling, and automatic word counts.
 written. These macroes allow the user a great degree of flexibility in
 determining how MicroEMACS behaves. Also, any and all the commands can
 be used by any keystroke by changing, or rebinding, what commands
-various keys invoke.
+various keys invoke. A full multilevel Undo facility allows the user to
+recover from most editing errors with little effort.
 
 	Special features are also available to perform a diverse set of
 operations such as file encryption, automatic backup file generation,
@@ -84,7 +80,7 @@ versions, rewrites and clones have made an appearance since.
 G. Conroy in 1985. Later modifications were performed by Steve Wilhite
 and George Jones. In December of 1985 Daniel Lawrence picked up the then
 current source (version 2.0) and made extensive modifications and
-additions to it over the course of the next eight years. Updates and
+additions to it over the course of the next eleven years. Updates and
 support for the current version are still available. Commercial support
 and usage and resale licences are also available. The current program
 author can be contacted by writing to:
@@ -94,18 +90,18 @@ author can be contacted by writing to:
 		617 New York St
 		Lafayette, IN 47901
 
-	UUCP:	pur-ee!mdbs!dan
-	ARPA:	mdbs!dan@@ee.ecn.purdue.edu
+	Internet:	dan@@aquest.com
 
 	Support is provided through:
 
 	The Programmer's Room
-	Opus 201/10
-	300/1200/2400 and 9600 (Hayes V series only)
+	14,400 Baud
+	Account: uemacs
+	Password: support
 	(317) 742-5533	no parity  8 databits  no stop bits
 @end(verbatim)
 @newpage
-@flushleft(@big[Credits])
+@flushleft(@b1[Credits])
 
 	Many people have been involved in creating this software and we
 wish to credit some of them here. Dave Conroy, of course, wrote the very
@@ -114,11 +110,12 @@ so much work was able to be done to expand it. John Gamble is
 responsible for writing the MAGIC mode search routines, and for
 maintaining all the search code. Jeff Lomicka wrote the appendix on DEC
 VMS and has supplied a lot of code to support VMS and the ATARI 1040ST
-versions. Curtis Smith wrote the original VMS code and help support the
-Commodore AMIGA. Also Lance Jones has done a lot of work on the AMIGA
-code. Professor Suresh Konda at Carnegie Mellon University has put a lot
-of effort into writing complex macroes and finding all the bugs in the
-macro language before anyone else does.
+versions. Curtis Smith wrote the original VMS code, helped supporting
+the Commodore AMIGA and did much development on various UNIX versions.
+Also Lance Jones has done a lot of work on the AMIGA code. Professor
+Suresh Konda at Carnegie Mellon University has put a lot of effort into
+writing complex macroes and finding all the bugs in the macro language
+before anyone else does.
 
 	A special thanks to Dana Hoggatt who has provided an almost
 daily sounding board for ideas, algorythms and code. He is responsible
@@ -138,6 +135,12 @@ can be listed here. [The comments in the edit history in the history.c
 file mention each and the piece they contributed]. All these people
 should be thanked for the hard work they have put into MicroEMACS.
 
+	And after all this is the patients of the people waiting for my
+all too infrequent releases. A lot of work goes into each release, and
+as it is not my primary vocation, often much time passes between
+releases. We are committed to continue to improve and strenghten
+MicroEMACS with each new release into the indefinite future.
+
 @closing(Daniel M. Lawrence)
 @newpage
 @string(ChapterTitle="")
@@ -156,14 +159,77 @@ using. But before using MicroEMACS, you must INSTALL it on your computer
 system. Since each computer is different, there is usually a different
 way to install MicroEMACS for each type of computer.
 
-@section(MSDOS - IBM-PCs)
+@section(MSDOS, Windows 95, Windows NT, OS/2 - IBM-PCs)
+	MicroEMACS is packaged for IBM-PC compatable machines as an
+installable package which will configure to the target machine.
+Instillation is very simple. Insert the distribution floppy in the
+target machine's A: drive. Then type, from the command prompt:
+
+	a:install
+
+	The install program will lead you through the intallation
+process, step by step, installing the appropriate versions on your
+computer's hard drive.
+
+	Under @ir(Windows 95) or @ir(Windows NT), bring up the file
+manager, select the A: drive, and double click on the icon forthe
+install program.
+
 @section(UNIX)
-@section(ATARI ST)
+	There are more available varieties of UNIX than any other
+currently popular operating system. MicroEMACS is provided in source to
+attempt to allow the compilation of a version appropriate to any UNIX
+system. This usually consists of a TAR or .zip file containing the tree
+of directories needed to build any version of MicroEMACS. Follow these
+steps to build an executable:
+
+@begin(enumerate)
+Copy the distribution file to an appropriate empty directory on the
+target system.
+
+Unpack the distribution file, using tar or unzip or whatever
+appropriate unpacking program.
+
+Change directory to the directory most closely approximating the
+target system's version of unix. These include:
+
+@begin(verbatim)
+	AIX		IBM's propriatary UNIX varient
+	BSD		University of Berkeley's popular BSD varients
+	DGUX		Data General UNIX
+	FREEBSD		FreeBSD running on an IBM-PC
+	HPUX		Hewlett Packard's UNIX
+	SUN		Sun Microsystem's UNIX
+	XENIX		Microsoft UNIX
+@end(verbatim)
+
+Copy ../h/estruct.h to the current directory.
+
+Edit estruct.h to turn on the proper Operating system, Compiler and
+option switches by changing the value of their #defines from 0 to 1.
+
+Issue a "make" command to build the executable.
+
+Change to the BIN subdirectory.
+
+copy the resulting executable, and the files of the CMD subdirectory
+from the root of the package into an appropriate directory on the UNIX
+system which will be in the user's path.
+
+Rename the emacs.rc startup file to .emacsrc.
+
+Make sure the copied executables have the proper permissions to allow
+them to be executed and read by the target users.
+@end(enumerate)
+
+	At this point, MicroEMACS should be ready for use. Remember to
+issue a REHASH command if you want to invoke it before logging out of
+the system immediately after building it.
 
 @chapter(Basic Concepts)
 
-	The current version of MicroEMACS is 3.12 (Third major re-write,
-twelveth public release), and for the rest of this document, we shall
+	The current version of MicroEMACS is 4.0 (Fourth major re-write,
+initial public release), and for the rest of this document, we shall
 simply refer to this version as "EMACS". Any modifications for later
 versions will be in the file README on the MicroEMACS distribution disk.
 
@@ -201,9 +267,10 @@ conventions, and also the name of the command in @i(italics).
 computer's command prompt. On UNIX and MSDOS machines, just type "emacs"
 from the command prompt and follow it with the <RETURN> or <ENTER> key
 (we will refer to this key as <NL> for "new-line" for the remainder of
-this manual). On the Macintosh, the Amiga, the ATARI ST, and under OS/2
-and other icon based operating systems, double click on the uEMACS icon.
-Shortly after this, a screen similar to the one below should appear.
+this manual). On the Macintosh, the Amiga, the ATARI ST, and under OS/2,
+Windows 95, Windows NT and other icon based operating systems, double
+click on the uEMACS icon. Shortly after this, a screen similar to the
+one below should appear.
 
 @section(Parts and Pieces)
 
@@ -218,7 +285,7 @@ appears and is manipulated. Since each window has its own mode line,
 below the text window is it's mode line. The last line of the screen is
 the @b(command line) where EMACS takes commands and reports on what it
 is doing. 
-
+@newpage
 @begin(verbatim)
 ===============================================================================
 f1 search-> f2 <-search |    MicroEMACS:  Text Editor
@@ -227,7 +294,7 @@ f5 fkeys    f6 help	|  Available function key Pages include:
 f7 nxt wind f8 pg[    ] |    WORD  BOX	EMACS  PASCAL  C  cObal  Lisp
 f9 save     f10 exit	|  [use the f8 key to load Pages]
 ===============================================================================
-   MicroEMACS 3.12 ()	   Function Keys
+   MicroEMACS 4.0 ()	   Function Keys
 ===============================================================================
 
 
@@ -241,7 +308,7 @@ f9 save     f10 exit	|  [use the f8 key to load Pages]
 
 
 ===============================================================================
----- MicroEMACS 3.12 () -- Main -----------------------------------------------
+---- MicroEMACS 4.0 [13:28] L:1 C:0 () -- Main --------------------------------
 ===============================================================================
 		Fig 1:	EMACS screen on an IBM-PC
 @end(verbatim)
@@ -250,11 +317,11 @@ f9 save     f10 exit	|  [use the f8 key to load Pages]
 
 Entering text in EMACS is simple. Type the following sentence fragment:
 
-@quotation<Fang Rock lighthouse, center of a series of mysterious and>
+@example<Fang Rock lighthouse, center of a series of mysterious and>
 
 @flushleft(The text is displayed at the top of the text window. Now type:)
 
-@quotation<terrifying events at the turn of the century>
+@example<terrifying events at the turn of the century>
 
 Notice that some of your text has dissapeared off the left side of the
 screen. Don't panic--your text is safe!!! You've just discovered that
@@ -277,14 +344,15 @@ Now let's type a longer insert. Hit <NL> a couple of times to tab
 down from the text you just entered. Now type the following paragraphs. 
 Press <NL> twice to indicate a paragraph break. 
 
-@quotation<Fang Rock lighthouse, center of a series of mysterious and
-terrifying events at the turn of the century, is built on a rocky island
-a few miles of the Channel coast. So small is the island that wherever
-you stand its rocks are wet with sea spray. 
+@example<Fang Rock lighthouse, center of a series of mysterious
+and terrifying events at the turn of the century, is
+built on a rocky island a few miles of the Channel
+coast. So small is the island that wherever you stand
+its rocks are wet with sea spray.
 
-The lighthouse tower is in the center of the island. A steep flight of
-steps leads to the heavy door in its base. Winding stairs lead up to
-the crew room.>
+The lighthouse tower is in the center of the island. A
+steep flight of steps leads to the heavy door in its
+base. Winding stairs lead up to the crew room.>
 
 @section<Basic cursor movement>
 
@@ -348,6 +416,9 @@ temporary storage area for your text, and is lost when the computer is
 turned off. You can save the buffer to a file by entering @b<^X^S>
 @i(save-file) @index(save-file). Notice that EMACS informs you that
 your file has no name and will not let you save it.
+
+@i(On the IBM-PC and other machines with function keys, the F9 key can
+often be used do the same as ^X^S).
 
 To save your buffer to a file with a different name than it's current
 one (which is empty), press @b<^X^W> @i(write-file) @index(write-file). 
@@ -451,22 +522,23 @@ the modes which are used by all new buffers, called @b<global> modes.
 
 Your previously-saved text should look like this:
 
-@quotation<Fang Rock lighthouse, center of a series of mysterious and
-terrifying events at the turn of the century, is built on a rocky island
-a few miles of the Channel coast. So small is the island that wherever
-you stand its rocks are wet with sea spray. 
+@example<Fang Rock lighthouse, center of a series of mysterious
+and terrifying events at the turn of the century, is
+built on a rocky island a few miles of the Channel
+coast. So small is the island that wherever you stand
+its rocks are wet with sea spray. 
 
-The lighthouse tower is in the center of the island. A steep flight of
-steps leads to the heavy door in its base. Winding stairs lead up to
-the crew room.>
+The lighthouse tower is in the center of the island. A
+steep flight of steps leads to the heavy door in its
+base. Winding stairs lead up to the crew room.>
 
 Let's assume you want to add a sentence in the second paragraph after
 the word "base."  Move the cursor until it is on the "W" of "Winding".
 Now type the following:
 
-@quotation<This gives entry to the lower floor where the big steam
-generator throbs steadily away, providing power for the electric
-lantern.>
+@example<This gives entry to the lower floor where the big steam
+generator throbs steadily away, providing power for the
+electric lantern.>
 
 If the line fails to wrap and you end up with a '$' sign in the right
 margin, just enter @b{M-Q} @i(fill-paragraph) @index(fill-paragraph) to
@@ -567,22 +639,26 @@ Let's begin by entering some new text. Don't forget to add @b(wrap)
 mode if its not set on this buffer. Start EMACS and open a file called
 @b{PUBLISH.TXT}. Type in the following text:
 
-@quotation{One of the largest growth areas in personal computing is
-electronic publishing. There are packages available for practically
-every machine from elegantly simple programs for the humble Commodore 64
-to sophisticated professional packages for PC and Macintosh computers. 
+@example{One of the largest growth areas in personal computing is
+electronic publishing. There are packages available for
+practically every machine from elegantly simple programs
+for the humble Commodore 64 to sophisticated
+professional packages for PC and Macintosh computers. 
 
-Electronic publishing is as revolutionary in its way as the Gutenburg
-press. Whereas the printing press allowed the mass production and
-distribution of the written word, electronic publishing puts the means
-of production in the hands of nearly every individual. From the class
-magazine to the corporate report, electronic publishing is changing the
-way we produce and disseminate information. 
+Electronic publishing is as revolutionary in its way as
+the Gutenburg press. Whereas the printing press allowed
+the mass production and distribution of the written
+word, electronic publishing puts the means of production
+in the hands of nearly every individual. From the class
+magazine to the corporate report, electronic publishing
+is changing the way we produce and disseminate
+information. 
 
-Personal publishing greatly increases the utility of practically every
-computer. Thousands of people who joined the computer revolution of
-this decade only to hide their machines unused in closets have
-discovered a new use for them as dedicated publishing workstations.}
+Personal publishing greatly increases the utility of
+practically every computer. Thousands of people who
+joined the computer revolution of this decade only to
+hide their machines unused in closets have discovered a
+new use for them as dedicated publishing workstations.}
 
 Now let's do some editing. The last paragraph seems a little out of
 place. To see what the document looks like without it we can cut it
@@ -600,21 +676,25 @@ well to support and strengthen the argument. Move the cursor to the end
 of the first paragraph and enter @b<^Y> @i(yank) @index(yank). Your
 text should now look like this:
 
-@quotation{One of the largest growth areas in personal computing is
-electronic publishing. There are packages available for practically
-every machine from elegantly simple programs for the humble Commodore 64
-to sophisticated professional packages for PC and Macintosh computers. 
-Personal publishing greatly increases the utility of practically every
-computer. Thousands of people who joined the computer revolution of
-this decade only to hide their machines unused in closets have
-discovered a new use for them as dedicated publishing workstations. 
+@example{One of the largest growth areas in personal computing is
+electronic publishing. There are packages available for
+practically every machine from elegantly simple programs
+for the humble Commodore 64 to sophisticated
+professional packages for PC and Macintosh computers. 
+Personal publishing greatly increases the utility of
+practically every computer. Thousands of people who
+joined the computer revolution of this decade only to
+hide their machines unused in closets have discovered a
+new use for them as dedicated publishing workstations. 
 
-Electronic publishing is as revolutionary in its way as the Gutenburg
-press. Whereas the printing press allowed the mass production and
-distribution of the written word, electronic publishing puts the means
-of production in the hands of nearly every individual. From the class
-magazine to the corporate report, electronic publishing is changing the
-way we produce and disseminate information.}
+Electronic publishing is as revolutionary in its way as
+the Gutenburg press. Whereas the printing press allowed
+the mass production and distribution of the written
+word, electronic publishing puts the means of production
+in the hands of nearly every individual. From the class
+magazine to the corporate report, electronic publishing
+is changing the way we produce and disseminate
+information.}
 
 @section(Yanking a Region)
 
@@ -646,7 +726,7 @@ that is lost when the machine is powered down or switched off. In order
 to make your changes permanent, they must be saved to a file before you
 leave EMACS. Let's delete the section of text we just added and save
 the file to disk. 
-
+@newpage
 @heading(Chapter @value(chapter) Summary)
 
 In Chapter @value(chapter), you learned how to achieve longer insertions
@@ -676,21 +756,25 @@ yank-text	@b{^Y}		Inserts a copy of the KILL buffer into
 Load EMACS and bring in the file you just saved. Your file should look
 like the one below.
 
-@quotation{One of the largest growth areas in personal computing is electronic
-publishing. There are packages available for practically every machine
-from elegantly simple programs for the humble Commodore 64 to
-sophisticated professional packages for PC and Macintosh computers. 
-Personal publishing greatly increases the utility of practically every
-computer. Thousands of people who joined the computer revolution of
-this decade only to hide their machines unused in closets have
-discovered a new use for them as dedicated publishing workstations. 
+@example{One of the largest growth areas in personal computing is
+electronic publishing. There are packages available for
+practically every machine from elegantly simple programs
+for the humble Commodore 64 to sophisticated
+professional packages for PC and Macintosh computers. 
+Personal publishing greatly increases the utility of
+practically every computer. Thousands of people who
+joined the computer revolution of this decade only to
+hide their machines unused in closets have discovered a
+new use for them as dedicated publishing workstations. 
 
-Electronic publishing is as revolutionary in its way as the Gutenburg
-press. Whereas the printing press allowed the mass production and
-distribution of the written word, electronic publishing puts the means
-of production in the hands of nearly every individual. From the class
-magazine to the corporate report, electronic publishing is changing the
-way we produce and disseminate information.}
+Electronic publishing is as revolutionary in its way as
+the Gutenburg press. Whereas the printing press allowed
+the mass production and distribution of the written
+word, electronic publishing puts the means of production
+in the hands of nearly every individual. From the class
+magazine to the corporate report, electronic publishing
+is changing the way we produce and disseminate
+information.}
 
 Let's use EMACS to search for the word "revolutionary" in the second
 paragraph. Because EMACS searches from the current cursor position
@@ -732,10 +816,12 @@ last line.
 
 @section<Exact Searches>
 
-If the mode EXACT is active in the current buffer, EMACS searches on a case
-sensitive basis. Thus, for example you could search for @b{Publishing}
-as distinct from @b{publishing}. 
-
+Most of the time EMACS does not take the case of the strings being
+searched for into account. Thus @b(And) matches @b(AND) and @b(and).
+However, if the mode EXACT is active in the current buffer, EMACS will
+only look for matches with the same upper and lower case for each
+character. Thus, for example you could search for @b{Publishing} as
+distinct from @b{publishing}. 
 
 @section<Backward Search>
 
@@ -808,7 +894,7 @@ response:
 	^G	Abort the replacement command (This action does not
 		undo previously-authorized replacements
 
-	. Same effect as ^G, but cursor returns to the point at
+	.	Same effect as ^G, but cursor returns to the point at
 		which the replacement command was given
 
 	?	This lists help for the query replacement command
@@ -816,13 +902,14 @@ response:
 
 Practice searching and searching and replacing until you feel
 comfortable with the commands and their effects.
-@begin(group)
+@newpage
 @heading(Chapter @value(chapter) Summary)
 
 In this chapter, you learned how to search for specified strings of text
 in EMACS. The chapter also dealt with searching for and replacing
 elements within a buffer. 
 
+@begin(group)
 @begin(verbatim)
 @u(Key Binding		Keystroke			 Effect)
 
@@ -834,11 +921,11 @@ search-backward 	@b{^R}	Searches from point to beginning of buffer.
 				Point is moved from current location to
 				beginning of found string
 
-replace 		@b{M-R} Replace ALL occurrences of search string with 
+replace 		@b{M-R}	Replace ALL occurrences of search string with 
 				specified (null) string from point to the
 				end of the current buffer
 
-query-replace	       @b{M-^R} As above, but pause at each found string
+query-replace	       @b{M-^R}	As above, but pause at each found string
 				and query for action
 @end(verbatim)
 @end(group)
@@ -863,7 +950,7 @@ buffers. In effect, you can edit several files at the same time.
 Let's invoke EMACS and pull back our file on desktop publishing by
 typing
 
-@quotation<emacs publish.txt>
+@example<emacs publish.txt>
 
 When the text appears, type the @b{^X2} @i(split-current-window)
 @index{split-current-window} command. The window splits into two
@@ -889,7 +976,7 @@ menu by entering these commands.
 Now move to the upper window. Let's open a new file. On the EMACS disk
 is a tutorial file. Let's call it into the upper window by typing:
 
-@quotation<^X^F>
+@example<^X^F>
 
 and press return.
 
@@ -974,7 +1061,7 @@ display) then press @b{^XW} @i{resize-window}@index{resize-window}.
 The current window will be enlarged or shrunk to the number of lines
 specified in the numeric argument. For example entering:
 
-@quotation{@b[M-8 ^XW]}will resize the current window to 8 lines.
+@example{@b[M-8 ^XW]}will resize the current window to 8 lines.
 
 @section(Repositioning within a Window)
 
@@ -991,7 +1078,7 @@ The @b{^L} @i{clear-and-redraw} @index{clear-and-redraw} command is
 useful for 'cleaning up' a 'messy' screen that can result of using EMACS
 on a mainframe system and being interrupted by a system message. 
 @newpage
-@u<Chapter @value(chapter) summary>
+@heading(Chapter @value(chapter) summary)
 
 In Chapter @value(chapter) you learned how to manipulate windows and the
 editing flexibility they offer. 
@@ -999,7 +1086,7 @@ editing flexibility they offer.
 @begin(verbatim)
 @u(Key Binding	Keystroke	Effect)
 
-open-window	@b{^X2}		Splits current window into two windows if
+open-window	@b{^X2} 	Splits current window into two windows if
 				space available
 
 close-windows	@b{^X1} 	Closes all windows except current window
@@ -1092,9 +1179,9 @@ directly to the left. Release the button and watch as the entire
 window slides, or @b(scrolls) @index(horizontal scrolling) to the left. 
 The missing text has not been deleted, it is simply not visible, off the
 left hand side of the screen. Notice the mode line has changed and now
-looks like:
+looks similar to this:
 
-@flushleft(==== MicroEMACS 3.12 [<12] () == fang.txt == File: fang.txt ==============)
+@flushleft(==== MicroEMACS 4.0 [15:12] [<12] L:4 C:23 () == fang.txt == File: fang.txt ==============)
 
 	The number insided the brackets [] shows that the screen is now
 scrolled 12 characters from the left margin.
@@ -1199,6 +1286,16 @@ the rearmost screen to front.
 	Place the mouse on the command line of the screen you want to
 delete. Click the right mouse button, the screen will disapear. If you
 delete the only remaining screen on the desktop, MicroEMACS will exit.
+
+@section(Mousing under WINDOWS 95)
+
+	The @ir(Windows 95) version of MicroEMACS loads a special macro
+when it comes up which makes the mousing more similar to the CUA
+standard. The left mouse button is used to outline regions which then
+can be cut and pasted to and from the clipboard from the menus. Text
+placed in the clipboard can be pasted to other documents.
+	If you wish to disable this and use the standard EMACS mousing,
+rename CUA.CMD in the installation directory to another name.
 @newpage
 @heading(Chapter @value(chapter) Summary)
 
@@ -1392,6 +1489,15 @@ red, green, and black. If the computer you are running on does not have
 eight colors, EMACS will attempt to make some intelligent guess at what
 color to use when you ask for one which is not there. 
 
+@section(ABBREV mode)@index(ABBREV mode)
+
+	EMACS can save much tedious typing by automatically expanding
+predefined abrreviations as you type. Placing EMACS into ABBREV mode
+tells to to access its table of abbreviations, and look for these
+abbreviations while you type. When EMACS sees that you have typed one of
+these, it replaces it with the expanded definition. Information on
+setting up abbreviation definitions is in chapter @ref(abbrevs).
+
 @section(ASAVE mode)@index(ASAVE mode)
 
 	Automatic Save mode tells EMACS to automatically write out the
@@ -1445,9 +1551,9 @@ the files produced by CRYPT mode in EMACS.
 
 @section(EXACT mode)@index(EXACT mode)
 
-	All string searches and replacements will take upper/lower case
-into account. Normally the case of a string during a search or replace
-is not taken into account.
+	When this mode is active, all string searches and replacements
+will take upper/lower case into account. Normally the case of a string
+during a search or replace is not taken into account.
 
 @section(MAGIC mode)@index(MAGIC mode)
 
@@ -1459,7 +1565,7 @@ search command. They have no affect on the incremental search
 command. 
 
      The symbols that have special meaning in MAGIC mode are
-^, $, ., &, ?, *, +, [ (and ], used with it), and \.
+^, $, ., &, ?, *, +, <, >, [ (and ], used with it), and \.
 
      The characters ^ and $ fix the search pattern to the beginning and
 end of line, respectively. The ^ character must appear at the beginning
@@ -1491,7 +1597,7 @@ it has no special meaning. So, a search for [^aeiou] will match any
 character except a vowel, but a search for [aeiou^] will match any vowel
 or a ^.
 
-If you have many characters in order, that you want to put in the
+     If you have many characters in order, that you want to put in the
 character class, you may use a dash (-) as a range character. So, [a-z]
 will match any letter (or any lower case letter if EXACT mode is on),
 and [0-9a-f] will match any digit or any letter 'a' through 'f', which
@@ -1515,7 +1621,7 @@ character.
      The notion of zero or more characters is important. If, for
 example, your cursor was on the line
 
-@quotation(This line is missing two vowels.)
+@example(This line is missing two vowels.)
 
 and a search was made for "a*", the cursor would not move, because it is
 guaranteed to match no letter 'a' , which satisfies the search
@@ -1527,8 +1633,9 @@ more of them. A better way, however, is to use the + character.
 the exception that its minimum match range is one, not zero. Thus the
 pattern "a+" is identical to "aa*".
 
-     Under older versions of MicroEMACS, the closure symbols would not
-operate on newlines. The current versions no longer have this restriction.
+     The < and > characters matches a position at the beginning and end
+of a word respectively. Thus a pattern like \<wo only matches the string
+"wo" if it is at the beginning of a word.
 
      The \ is the escape character. With the exception of groups, which
 are explained below, the \ is used at those times when you want to be in
@@ -1550,7 +1657,7 @@ number in the replacement string of @i(replace-string)
 example, a search for "INDEX\([0-9]+\)", to be replaced by "getind(\1)"
 would change
 
-@quotation(indptr := INDEX42) to @quotation(indptr := getind(42)).
+@example(indptr := INDEX42) to @example(indptr := getind(42)).
 
      There may be up to nine groups. Groups may be nested.
 
@@ -1571,7 +1678,7 @@ This is very useful for adjusting tables and diagrams.
 @section(WRAP mode)@index(WRAP mode)
 
 	Wrap mode is used when typing in continuous text. Whenever the
-cursor is past the currently set fill column @index(fill column) (72 by
+cursor is past the currently set $fillcol @index($fillcol) (72 by
 default) and the user types a space or a <NL>, the last word of the line
 is brought down to the beginning of the next line. Using this, one just
 types a continuous stream of words and EMACS automatically inserts <NL>s
@@ -1579,10 +1686,11 @@ at appropriate places.
 
 @center(NOTE to programmers:)
 
-@quotation{The EMACS variable $wraphook contains the name of the
-function which executes when EMACS detects it is time to wrap. This is
-set to the function @i(wrap-word) @index(wrap-word) by default, but can
-be changed to activate different functions and macroes at wrap time.}
+@example{The EMACS variable $wraphook contains the name of the
+function which executes when EMACS detects it is time to
+wrap. This is set to the function @i(wrap-word)
+@index(wrap-word) by default, but can be changed to
+activate different functions and macroes at wrap time.}
 
 @section(VIEW mode)@index(VIEW mode)
 
@@ -1719,19 +1827,14 @@ length (default is 75 characters). You will recall that WRAP is enabled
 by entering @b{^XM} and responding to the command line prompt with
 @b{wrap}. 
 
-You can also set your own wrap margin with the command @b{^XF}
-@i(set-fill-column) @index(set-fill-column). Notice EMACS responds
-"[Fill column is 1]." Now try typing some text. You'll notice some very
-strange things happening -- your text wraps at every word!! This effect
-occurs because the set wrap margin command must be preceded by a
-numeric argument or EMACS sets it to the first column. Thus any text
-you type that extends past the first column will wrap at the most
-convenient line break. 
+	You can also set your own wrap margin by changing the $fillcol
+variable. Do this by typing ^XA $fillcol <NL> 20. Now the fill column is
+set at column 20. Now try typing some text. You'll notice that EMACS
+only allows you to input text in a 20 character wide column!
 
-To reset the wrap column to 72 characters, press the @b{<META>} key and
-enter 72. EMACS will respond "Arg: 72". Now press @b<^XF>. EMACS
-will respond "[Fill column is 72]". Your text will again wrap at the
-margin you've been using up to this point.
+	To reset the wrap column to 72 characters, type ^XA $fillcol
+<NL> 72. Your text will again wrap at the margin you've been using up to
+this point.
 
 @section<Reformatting Paragraphs>
 
@@ -1752,10 +1855,11 @@ large amounts of text with ease. Let's try and convert a few of the
 office traditionalists to the joy of word processing. Type in the
 following text:
 
-@quotation{Throw away your typewriter and learn to use a word processor. 
-Word processing is relatively easy to learn and will increase your
-productivity enormously. Enter the Computer Age and find out just how
-much fun it can be!!}
+@example{Throw away your typewriter and learn to use a word
+processor.  Word processing is relatively easy to learn
+and will increase your productivity enormously. Enter
+the Computer Age and find out just how much fun it can
+be!!}
 
 Let's give it a little more impact by capitalizing the first four words. 
 The first step is to define the region of text just as you would if you
@@ -1764,10 +1868,11 @@ paragraph with @b{M-<space>} @i(set-mark) and move the cursor to the
 space beyond "typewriter." Now enter @b{^X^U} @i(case-region-upper). 
 Your text should now look like this:
 
-@quotation{THROW AWAY YOUR TYPEWRITER and learn to use a word processor. 
-Word processing is relatively easy to learn and will increase your
-productivity enormously. Enter the Computer Age and find out just how
-much fun it can be!!}
+@example{THROW AWAY YOUR TYPEWRITER and learn to use a word
+processor.  Word processing is relatively easy to learn
+and will increase your productivity enormously. Enter
+the Computer Age and find out just how much fun it can
+be!!}
 
 If you want to change the text back to lower case, type @b{^X^L}
 @i(case-region-lower) @index(case-region-lower). You can also
@@ -1868,9 +1973,6 @@ add-mode/WRAP		@b{^XM}[WRAP]	Add wrap mode to current buffer
 
 delete-mode/WRAP	@b{^X^M}[WRAP]	Remove wrap mode from current buffer
 
-set-fill-column 	@b{^XF} 	Set fill column to given numeric
-					argument  
-
 fill-paragraph		@b{M-Q} 	Logically reformats the current
 					paragraph
 
@@ -1898,6 +2000,65 @@ detab-region		@b(^X^D)	Changes tab characters to the
 
 trim-region		@b(^X^T)	Trims white space from the end
 					of the lines in the current region
+@end{verbatim}
+@chapter(Undoing the Damage)
+
+Often, while editing, we make mistakes. It would be hard not to do so.
+But when you are in EMACS, most commands can be undone. Each buffer in
+EMACS stores a list of the changes made to that buffer since the last
+time it was read from the disk. This list holds every character typed
+in, every character deleted, and where these occured. If you make a
+mistake while editing, typing the @b(^_) @ir(undo) command undoes the
+last command you typed. If you precede this with a numeric argument, it
+undoes that many commands. For example:
+
+@b(<META>12^_)
+
+undoes the last 12 commands.
+
+You can actually look at the list of commands stored to be undone by
+typing the @b(^XU) @ir(list-undos) command. It will place a list of
+positions, repeat counts, actions and text arguments in a pop-up buffer.
+This was mostly useful for the authors to debug the undo code, but is
+interesting to examine. You can see how EMACS records actions, as basic
+insertions and deletions, seperated by command bounderies.
+
+When undo information is collected by EMACS, it does occupy memory. On
+most machines this presents no difficulty, but on some machines without
+virtual memory, and in smaller memory models, @i(Like real mode under
+MSDOS), EMACS will discard the oldest actions in the most ancient
+visited buffer as it needs more memory. 
+
+You can cause EMACS to discard its list of actions to be undone on the
+current buffer by using the @b(M-^U) @ir(delete-undos) command. This can
+be helpfull in speeding up the operation of a few of the very memory
+intensive commands. Normally you should not need to use this command,
+but its use is recommended in macros that manupulate large amounts
+of text to reclaim the memory used by the undo stack of temporary
+buffers.
+
+Two environment variables control the actions of the undo mechanism.
+$undoflag, which defaults to TRUE, can be set to FALSE to disable the
+undo mechanism altogether. $dispundo directs EMACS to display an
+additional number on the current modeline which contains the number of
+primitive actions currently stored in its list of actions for the
+current buffer.
+@newpage
+@heading(Chapter @value(chapter) Summary)
+
+In Chapter @value(chapter) We learned how to undo recent editing
+changes. The commands in the following table were covered in this
+chapter. 
+
+@begin{verbatim}
+
+@u(Key Binding		Keystroke		    Effect)
+delete-undos		@b{M-^U}	Clear out all undo information
+
+list-undos		@b{^XU}		Pop up a list of all undo
+					information for the current buffer
+
+undo			@b(^_)		Undo the last editing operation
 @end{verbatim}
 @chapter(Access to the Outside World)
 
@@ -2104,6 +2265,7 @@ tilde is interpreted according to the following table:
 ~l		^J	linefeed
 ~~		~	tilde
 ~b		^H	backspace
+~e		^[	escape
 ~f		^L	formfeed
 ~t		^I	tab
 ~"		"	quote
@@ -2147,6 +2309,16 @@ part of an expression. All environmental variable names begin with a
 dollar sign ($) and are in lower case.
 
 @begin(description)
+@index($abbell)
+$abbell@\Ring the bell on an expansion of an abbreviation.
+
+@index($abcap)
+$abcap@\Match capitols typed in abbreviation while expanding.
+
+@index($abquick)
+$abquick@\Expand abbreviations whenever any character is typed, instead
+of just when whitespace is typed.
+
 @index($acount)
 $acount@\The countdown of inserted characters until the next save-file.
 
@@ -2218,9 +2390,18 @@ that are greater than 127 in value) will be displayed in a
 pseudo-control format. The characters "^!" will lead off the sequence,
 followed by the character stripped of its high bit. Default is FALSE.
 
+@index($dispundo)
+$dispundo@\If TRUE, EMACS displays the current depth of the undo stack
+on the current modeline.
+
 @index($exbhook)
 $exbhook@\This variable holds the name of a function or macro which is
 run whenever you are switching out of a buffer.
+
+@index($exithook)
+$exithook@\The procedure named in this variable is run when MicroEMACS is
+about to exit. Setting $gflags bit 4 during the execution of this
+procedure prevents the exit from occuring.
 
 @index($fcol)
 $fcol@\The current line position being displayed in the first column of
@@ -2265,7 +2446,8 @@ buffer and can be used to set the contents of the kill buffer.
 @index($language)
 $language@\[READ ONLY]Contains the name of the language which the
 current EMACS's message will display. (Currently EMACS is available in
-English, French, Spanish, Latin, Portuguese, Dutch, German, and Pig Latin).
+English, French, Spanish, Latin, Portuguese, Dutch, German, Japanese,
+and Pig Latin).
 
 @index($lastkey)
 $lastkey@\[READ ONLY]Last keyboard character typed.
@@ -2296,12 +2478,12 @@ $modeflag@\Determines if mode lines are currently displayed.
 $msflag@\If TRUE, the mouse (if present) is active. If FALSE, no mouse
 cursor is displayed, and no mouse actions are taken.@index(mouse)
 
+@index($newscreen)
+$newscreen@\Create a new screen for every newly created buffer. This
+variable is most usefull when using a windowing system.
+
 @index($numwind)
 $numwind@\The number of windows displayed.
-
-@index($oldcrypt)
-$oldcrypt@\Use the old method of encryption (which had a bug in it). 
-Default is FALSE.  This variable was dropped from EMACS with version 3.12.
 
 @index($orgrow)
 $orgrow@\The desktop row position of current screen.
@@ -2326,6 +2508,13 @@ waiting to be processed.
 
 @index($popflag)
 $popflag@\Use pop-up windows. Default is TRUE.
+
+@index($popwait)
+$popwait@\When TRUE, popup windows prompt the user to
+type a key before they disappear. When FALSE, they do
+not stick around to be seen. Usefull when a pop-up
+buffer conatins info needed from a macro. Default is
+TRUE.
 
 @index($posflag)
 $posflag@\Display the line and column position on the modeline. Default
@@ -2421,6 +2610,9 @@ modeline. Default is FALSE. The time is updated only after a keystroke.
 $tpause@\Controls the length of the pause to display a matched fence
 when the current buffer is in CMODE and a close fence has been typed.
 
+@index($undoflag)
+$undoflag@\Enable collection of undo information and undo commands.
+
 @index($version)
 $version@\[READ ONLY]Contains the current MicroEMACS version number.
 
@@ -2466,9 +2658,9 @@ tested, inserted into buffers, and otherwise used to control the way
 your macroes execute. At the moment, up to 512 user variables may be in
 use in one editing session. All users variable names must begin with a
 percent sign (%) and may contain any printing characters. Only the first
-10 characters are significant (IE differences beyond the tenth character
-are ignored). Most operators will truncate strings to a length of 128
-characters. 
+16 characters are significant (IE differences beyond the sixteenth
+character are ignored). Most operators will truncate strings to a length
+of 128 characters. 
 
 @subsection(Buffer Variables)
 
@@ -2484,7 +2676,7 @@ the name of RIGEL2, and it contains the text:
 	<*>Bloomington		(where <*> is the current point)
 	Indianapolis
 	Gary
-	=* MicroEMACS 3.12 (WRAP) == rigel2 == File: /data/rigel2.txt =====
+	=* MicroEMACS 4.0 (WRAP) == rigel2 == File: /data/rigel2.txt =====
 @end(group)
 @end(verbatim)
 
@@ -2506,7 +2698,7 @@ this:
 	Bloomington
 	<*>Indianapolis 	(where <*> is the current point)
 	Gary
-	=* MicroEMACS 3.12 (WRAP) == rigel2 == File: /data/rigel2.txt =====
+	=* MicroEMACS 4.0 (WRAP) == rigel2 == File: /data/rigel2.txt =====
 @end(group)
 @end(verbatim)
 
@@ -2547,14 +2739,14 @@ example, if we wanted to increase the current fill column by two, using
 emacs's set (^XA) command, we would write:
 
 @begin(group)
-@begin(verbatim)
+@begin(verbatim)@begin(example)
 	set $fillcol &add $fillcol 2
 	 \	\      \      \     \____second operand
 	  \	 \	\      \_________first operand
 	   \	  \	 \_______________function to execute
 	    \	   \_____________________variable to set
 	     \___________________________set (^XA) command
-@end(verbatim)
+@end(example)@end(verbatim)
 @end(group)
 
 	Function names always begin with the ampersand (&) character,
@@ -2606,6 +2798,7 @@ Numeric Functions:	(returns <num>)
 
 String manipulation functions:	(returns <str>)
 
+&ABBREV		<str>		return the expansion of <str>
 &CAT		<str> <str>	Concatenate the two strings to form one
 &LEFt		<str> <num>	return the <num> leftmost characters
 				from <str>
@@ -2887,6 +3080,76 @@ example:
 
 	insert-string "You are on a MONOCHROME machine!~n"
 @end(verbatim)
+
+	This directive can also allow the currently executing procedure
+to return a value which is automatically placed in the $rval environment
+value and passed back as the procedure's value if the procedure is
+called by the &call function. For example:
+
+@begin(verbatim)
+store-procedure squared %arg
+
+	!return &times %arg %arg
+!endm
+
+	set %a &call squared 6
+@end(verbatim)
+
+	This code sets the value of user variable %a to 36, the square
+of 6. The expresion after the !RETURN directive is evaluated as the
+value returned by the procedure when used as an argument to the &call
+function.
+
+@section(Local and Global Variables)
+
+	Most user variables are considered @ir(global). That means that
+once they are defined, they can be referenced and changed from any
+procedure or interactively. If you wish a variable to be defined only
+within the currently executing procedure, you can declare it as
+@ir(local). Local variables only can be seen and changed within the
+procedure where they have been defined. To declare a local variable, use
+the @b(local) keyword.
+
+	local %tempvar
+
+	This declares %tempvar as a local user variable within the
+procedure that the statement executes. Local declarations happen when
+the statement executes, not automatically when the procedure is entered,
+so make sure to put the local statement before any line that references
+that user variable. If the name of a user variable matches an already
+declared variable, the local variable overides the global variable while
+still in the function where it is declared.
+
+	There is a @ir(global) keyword which can be used to declare a
+user variable to be global, and to initialize its value to an empty
+string. Since user variables are created on the fly when they are first
+referenced, this statement is not strictly needed, but is provided for
+documentation purposes.
+
+@section(Parameters to Procedures)
+
+	When you store a procedure, you can follow the procedure name
+with a list of parameters. These parameters are treated as local
+variables to the procedure, and their initial values are taken from the
+list of expresions following the call to that procedure. For example:
+
+	store-procedure to-the-power %base %exp
+
+		local %result
+
+		set %result %base
+		!while &gre %exp 1
+			set %result &times %result %base
+			set %exp &sub %exp 1
+		!endwhile
+		!return %result
+	!endm
+	insert-string to-the-power 2 8
+
+	When this example is executed, the number 256 (which is 2^8) is
+inserted into the current position of the current buffer. The function
+perameters are treated just like local variables in scope.
+
 @chapter(Debugging MicroEMACS Procedures)
 
 	@index(debugging)@index($debug)When developing new procedures,
@@ -2916,7 +3179,7 @@ assigned the value of TRUE. Press the space bar to continue.
 normally toggles the function key window. The first thing that appears
 is:
 
-@flushleft{<<<[Macro 01]:!if %rcfkeys>>>}
+@flushleft{<<<[toggle-fkeys]:!if %rcfkeys>>>}
 
 	At this point, emacs is waiting for a command. It is prepared
 to see if the user variable %rcfkeys is TRUE, and execute some lines if
@@ -2930,18 +3193,95 @@ screen.
 Emacs will decide that it is TRUE, and then display the next command to
 execute.
 
-@flushleft{<<<[Macro 01]:!goto rcfoff>>>}
+@flushleft{<<<[toggle-fkeys]:!goto rcfoff>>>}
 
 	Notice emacs tells us what procedure we are currently executing
-(in this case, the macro bound to execute-macro-1). Press the space bar
+(in this case, the macro bound to toggle-fkeys). Press the space bar
 again to execute the !goto directive.
 
-@flushleft{<<<[Macro 01]:save-window>>>}
+@flushleft{<<<[toggle-fkeys]:save-window>>>}
 
 	Emacs is saving the position of the current window so that it
-can attempt to return to it after it has brought up the function key window.
+can attempt to return to it after it has brought up the function key
+window. Press the space bar to continue. Now emacs displays:
 
-[...THIS CHAPTER IS NOT FINISHED...]
+@flushleft(<<<[toggle-fkeys]:1 next-window>>>)
+
+	The @i(next-window) command moves the current point to the next
+window down, or when it has an argument like now, to that window from
+the top. This puts the point in the top window, the one with the
+function key window in it.
+
+	Sometimes when debugging we will want to keep track of the value
+of a variable or expresion. To do this, type a 't' character to
+@b(t)rack an expression. For now, type n $numwind and hit the return.
+The display on the command line changes to:
+
+@flushleft(<<<[=2][toggle-fkeys]:1 next-window>>>)
+
+	The expresion we typed, in this case the environment variable
+$numwind, is currently evaluated as 2. Press space to execute the
+@i(next-window) command. Now the command line shows:
+
+@flushleft(<<<[=2][toggle-fkeys]:!if &sequal "Function Keys" $cbufname>>>)
+
+	This macro is now checking to see if the current buffer is
+really named "Function Keys". If it is not, then it does not want to
+delete that window. But since the function window is displayed at the
+moment, and is at the top of the screen, this statement is true. So we
+press the space to go on.
+
+@flushleft(<<<[=2][toggle-fkeys]:delete-window>>>)
+
+	We press the space again and let emacs delete the function key
+window. Notice the value of $numwind changes to 1 with one less window
+beying displayed.
+
+@flushleft(<<<[=1][toggle-fkeys]:!endif>>>)
+
+	We are at the end of the conditional code. Press space again to
+see:
+
+@flushleft(<<<[=1][toggle-fkeys]:!force restore-window>>>)
+
+	This restores the point to the window we started in. This
+command could have failed if the cursor started in the function key
+window, and that would have normally stopped the macro in its tracks.
+But the !force directive tells it to ignore any failures. Press the
+space again:
+
+@flushleft(<<<[=1][toggle-fkeys]:write-message "[Function key window OFF]">>>)
+
+	Well, this lets the user know what we have done, and that we are
+done. Press the space again.
+
+@flushleft(<<<[=1][toggle-fkeys]:set %rcfkeys FALSE>>>)
+
+	Lastly, we set the user variable that the macro uses to tell if
+it should be turning the function key window on or off to FALSE, letting
+it know that it is off. When we press the space bar for the last time,
+the command line shows that variable being set to FALSE.
+
+	Anytime while we were debuging, we can hit ? to list the
+different keystrokes that are legal when debugging. The ^G key will stop
+a macro immediatly.
+
+	If a macro is executing and hits an error (without the !force
+directive overriding the error), it stops and prints a list of all the
+macroes it is in the middle of executing, and the lines that those
+macroes are executing at. You can then go back and examine the offending
+statement and correct it.
+
+	While you are debugging, the 'c' key lets you execute any emacs
+command interactively. Be carefull with this, you can easily confuse
+emacs as to where it is or what it is doing by changing things in the
+middle of a macro. But this is very usefull for testing out changes in
+variables or the position of the cursor, or any number of environment
+variables controlling emacs while your macro is running.
+
+	Lastly, hitting the current META key while debugging sets $debug
+to FALSE and finishes running your macro with no more debugging.
+
 @chapter(Key Bindings, What they are and why)
 
 	One of the features which makes MicroEMACS very adaptable is its
@@ -2987,6 +3327,20 @@ bind-to-key split-current-window FN1
 	This example would make function key 1 activate the command
 that splits the current window in two. 
 
+
+	You can also bind your own macroes to keys. You do this by using
+the ^X^K @ir(macro-to-key) command. This works just like the
+@i(bind-to-key) command, but binds that key to your own macro,
+
+@begin(example)
+store-procedure insert-stuff
+	insert-string "<Page Header>		page <nn>~n"
+!endm
+macro-to-key insert-stuff A-P
+@end(example)
+	This example when run causes emacs to insert a page header at
+the current point whenever the ALT-E combination is typed.
+
 	EMACS will let you define a large number of keys, but will report 
 "Binding table FULL!" when it runs out of space to bind keys. Normally 
 EMACS will allow up to 512 key bindings (including approx. 300 originally 
@@ -3003,7 +3357,87 @@ for ^X, META, ^G, and ^U (which bind respectively to ctlx-prefix,
 meta-prefix, abort-command, and universal-argument) must be made before
 re-binding ^X, META, ^G, or ^U. The reason is to protect the innocent
 user from losing the prefix and other commands inadvertantly.
+@newpage
+@heading(Chapter @value(chapter) Summary)
 
+	In chapter @value(chapter), you learned how change what commands
+and macroes are executed when a particular key is typed.
+
+@begin{verbatim}
+@u(Key Binding		Keystroke	Effect)
+
+bind-to-key		M-K		Associate a particular keystroke
+					with an emacs built in command.
+macro-to-key		^X^K		Associate a particular keystroke
+					with a user written macro.
+@end(verbatim)
+@chapter(Abbreviations and Their Definitions)
+@tag(abbrevs)
+	If you have a lot of repetitive typing of large terms, names or
+strings of any kind, EMACS can make this simpler by looking for simple
+words or abbreviations that expand to these larger strings. To use this
+feature, you need to place the buffer you are typing in into @b(ABBREV)
+mode, and you need to define a table of the abbreviations to expand.
+
+	The @i(add-abbrev)@index(add-abbrev) command lets you add an
+abbreviation EMACS's current table of abbreviations. This command is
+usually used as part of a procedure, and can be conviniently placed at
+the end of your emacs.rc startup file. Here is an example abbreviation
+definition:
+
+	add-abbrev "um" "MicroEMACS"
+
+	When you type @i(um) into a buffer, it is instantly replaced
+with the word @i(MicroEMACS). Another way to define a large number of
+abbreviations at one time is to place them in a buffer, one to a line,
+with the first space or tab seperating the abbreviation from its
+definition. Then use the @i(define-abbrevs)@index(define-abbreves)
+command, giving it the name of that buffer, and it will memorize all the
+definitions in that buffer.
+
+	You can always look at the list of currently defined
+abbreviations by using the @b(describe-abbrevs) command. If you wish to
+create a buffer to be used to define abbreviations, the
+@i(insert-abbrevs)@index(insert-abbrevs) command inserts a table of them
+into the current buffer at the point. And since these abbreviations take
+up memory, you can dispose of the lot by issuing the
+@i(kill-abbrevs)@index(kill-abbreves) command.
+
+	If you want EMACS to beep at you when it expands an
+abbreviation, set the $abbell@index($abbell) environment variable to
+TRUE. If you wish EMACS to match the definition to your capitalization
+of the typed in abbreviation, set $abcap to TRUE.@index(abcap)
+
+	Normally EMACS will only attempt an abbreviation when it thinks
+that you have finished typing a word. This means these only happen when
+you type white space, or the return key. If you want it to be more
+agressive and attempt completions when the last letter of the
+abbreviation are typed, set $abquick to TRUE.@index(abquick)
+
+	Inside your own preocedures, the &abbrev function will return
+the definition of any abbreviation given it as an argument.
+@newpage
+@heading(Chapter @value(chapter) Summary)
+
+	In chapter @value(chapter), you learned how to set up
+abbreviations and their definitions, and how to control their use. Here
+is a table of the commands covered in this chapter and their
+corresponding key bindings:
+
+@begin{verbatim}
+@u(Key Binding		Keystroke	Effect)
+
+add-abbrev		(none)		Add an abbreviation to the
+					global table of abbreviations
+delete-abbrev		(none)		Delete an abbreviation
+kill-abbrevs		(none)		Kill all abbreviations
+define-abbrevs		(none)		Add abbreviations in <buffer>
+					to the global abbreviation table
+insert-abbrevs		(none)		Insert the current global
+					abbreviation table at the point
+describe-abbevs		(none)		Pop-up a list of defined abbreviations
+@end(verbatim)
+@newpage
 @appendix(MicroEMACS Command Line Switches and Startup Files)
 
 @index(startup files)
@@ -3210,6 +3644,8 @@ delete-previous-word	 M-^H	Delete the word to the left of the cursor
 
 delete-screen		 A-D	Delete a screen
 
+delete-undos		 M-^U	Delete all undo information
+
 delete-window		 ^X0	Remove the current window from the screen
 
 describe-bindings	(none)	Make a list of all legal commands
@@ -3255,8 +3691,6 @@ execute-file		(none)	Execute a file as a macro
 
 execute-macro		 ^XE	Execute the keyboard macro (play back
 				the recorded keystrokes)
-execute-macro-<n>	(none)	Execute numbered macro <N> where <N> is
-				an integer from 1 to 40
 
 execute-named-command	 M-X	Execute a command by name
 
@@ -3325,7 +3759,9 @@ list-buffers		 ^X^B	List all existing buffers
 
 list-screens		 A-B	List all existing screens
 
-macro-to-key		 M-^K	Bind a key to a macro
+list-undos		 ^XU	List current buffer's undo information
+
+macro-to-key		 ^X^K	Bind a key to a macro
 
 meta-prefix		 <ESC>	Key used to precede all META commands
 
@@ -3414,7 +3850,7 @@ replace-string		 M-R	Replace all occurrences of one string
 				with another string from the cursor
 				to the end of the buffer
 
-reverse-incremental-search^XR	Search backwards, incrementally
+reverse-incremental-search ^XR	Search backwards, incrementally
 
 run			 M-^E	Execute a named procedure
 
@@ -3436,8 +3872,6 @@ select-buffer		 ^XB	Select a buffer to display in the
 set			 ^XA	Set a variable to a value
 
 set-encryption-key	 M-E	Set the encryption key of the current buffer
-
-set-fill-column 	 ^XF	Set the current fill column
 
 set-mark			Set the mark
 
@@ -3468,6 +3902,8 @@ unbind-key		 M-^K	Unbind a key from a function
 
 undent-region		 M-)	Remove a leading indent from a region
 
+undo			 ^_	Undo the last editing operation
+
 universal-argument	 ^U	Execute the following command 4 times
 
 unmark-buffer		 M-~	Unmark the current buffer (so it is
@@ -3496,7 +3932,7 @@ yank			 ^Y	yank the kill buffer into the current
 This can be used as a wall chart reference for MicroEMACS commands.
 
 @begin(verbatim)
-@center(@b[Default Key Bindings for MicroEmacs 3.12])
+@center(@b[Default Key Bindings for MicroEmacs 4.0])
 
  ^A   Move to start of line	      ESC A   Apropos (list some commands)
  ^B   Move backward by characters     ESC B   Backup by words
@@ -3508,7 +3944,7 @@ This can be used as a wall chart reference for MicroEMACS commands.
  ^H   Backward delete		      
  ^I   Insert tab/Set tab stops
  ^J   Insert <NL>, then indent		    
- ^K   Kill forward		      ESC K   Bind Key to function
+ ^K   Kill forward		      ESC K   Bind Function to a key
  ^L   Refresh the screen	      ESC L   Lower case word
  ^M   Insert <NL>		      ESC M   Add global mode
  ^N   Move forward by lines	      ESC N   Goto End paragraph
@@ -3523,6 +3959,7 @@ This can be used as a wall chart reference for MicroEMACS commands.
  ^W   Kill region		      ESC W   Copy region to kill buffer
  ^Y   Yank back from killbuffer       ESC X   Execute named command
  ^Z   Move backward by pages	      ESC Z   Save all buffers and exit
+ ^_   Undo last editing operation
 
  ESC ^C   Count words in region       ESC ~   Unmark current buffer
  ESC ^E   Execute named procedure
@@ -3534,6 +3971,7 @@ This can be used as a wall chart reference for MicroEMACS commands.
  ESC ^N   Rename current buffer       ESC rubout   Delete backward word
  ESC ^R   Search & replace w/query	  rubout   Backward delete
  ESC ^S   Source command file
+ ESC ^U   Delete undo information
  ESC ^V   Scroll next window down
  ESC ^W   Delete Paragraph
  ESC ^X   Execute command line
@@ -3549,11 +3987,11 @@ This can be used as a wall chart reference for MicroEMACS commands.
 				   ^X A   Set variable value
  ^X ^B	 Display buffer list	   ^X B   Switch a window to a buffer
  ^X ^C	 Exit MicroEMACS	   ^X C   Start a new command processor
- ^X ^D	 Detab line		   ^X D   Suspend MicroEMACS (BSD4.2 only)
+ ^X ^D	 Detab line		   ^X D   Suspend MicroEMACS (UNIX only)
  ^X ^E	 Entab line		   ^X E   Execute macro
- ^X ^F	 Find file		   ^X F   Set fill column
+ ^X ^F	 Find file		   
  ^X ^I	 Insert file
-				   ^X K   Delete buffer
+ ^X ^K   Bind Macro to a key	   ^X K   Delete buffer
  ^X ^L	 Lower case region
  ^X ^M	 Delete Mode		   ^X M   Add a mode
  ^X ^N	 Move window down	   ^X N   Rename current filename
@@ -3561,24 +3999,25 @@ This can be used as a wall chart reference for MicroEMACS commands.
  ^X ^P	 Move window up 	   ^X P   Move to the previous window
  ^X ^R	 Get a file from disk	   ^X R   Incremental reverse search
  ^X ^S	 Save current file	   ^X S   Incremental forward search
- ^X ^T	 Trim line		   (Incremental search
- ^X ^U	 Upper case region		  not always available)
+ ^X ^T	 Trim line		   
+ ^X ^U	 Upper case region	   ^X U   List undo information
  ^X ^V	 View file
  ^X ^W	 Write a file to disk	   ^X W   resize Window
  ^X ^X	 Swap "." and mark	   ^X X   Use next buffer
  ^X ^Z	 Shrink window		   ^X Z   Enlarge display window
 
 @u(Usable Modes)
-WRAP	 Lines going past right margin "wrap" to a new line
-VIEW	 Read-Only mode where no modifications are allowed
-CMODE	 Change behavior of some commands to work better with C
-EXACT	 Exact case matching on search strings
-OVER	 Overwrite typed characters instead of inserting them
-CRYPT	 Current buffer will be encrypted on write, decrypted on read
-MAGIC	 Use regular expression matching in searches
+ABBREV   Enable abbreviation expantions
 ASAVE	 Save the file every 256 inserted characters
-SPELL	 Invoke MicroSPELL to check for spelling errors
+CMODE	 Change behavior of some commands to work better with C
+CRYPT	 Current buffer will be encrypted on write, decrypted on read
+EXACT	 Exact case matching on search strings
+MAGIC	 Use regular expression matching in searches
+OVER	 Overwrite typed characters instead of inserting them
 REP	 Similar to OVER, handles double-byte characters and tabs differently
+SPELL	 Invoke MicroSPELL to check for spelling errors
+VIEW	 Read-Only mode where no modifications are allowed
+WRAP	 Lines going past right margin "wrap" to a new line
 
 WHITE/CYAN/MAGENTA/YELLOW/BLUE/RED/GREEN/BLACK/GREY/GRAY/LRED/LGREEN/LYELLO/LBLUE/LMAGENTA/LCYAN	Sets foreground color
 white/cyan/magenta/yellow/blue/red/green/black/grey/gray/lred/lgreen/lyello/lblue/lmagenta/lcyan	Sets background color
@@ -3825,10 +4264,6 @@ is identical to
 	<number> set <variable name>
 @end(verbatim)
 
-@index(set-fill-column)
-set-fill-column@\With an argument, the fill column is set to @b(n). The
-default argument is 1.
-
 @index(set-mark)
 set-mark@\Set mark number @b(n). Without an argument, @b(n) defaults to
 0. 
@@ -3885,6 +4320,7 @@ delete-global-mode
 delete-mode
 delete-other-windows
 delete-screen
+delete-undos
 delete-window
 describe-bindings
 describe-functions
@@ -3906,6 +4342,7 @@ i-shell
 incremental-search
 insert-file
 kill-region
+list-undos
 macro-to-key
 mouse-move-down
 mouse-move-up
@@ -3948,7 +4385,6 @@ first hand report of it running.
 @begin(verbatim)
 @u(Hardware	OS		Compiler	Comments)
 VAX 780 	UNIX V5 	native
-		UNIX V7 	native
 		BSD 4.2 	native		job control supported
 		VMS		native		SMG & ANSI support
 
@@ -3962,14 +4398,16 @@ IBM-RT PC	BSD 4.3 	native
 
 HP9000		UNIX V5 	native
 
-Fortune 32:16	UNIX V7 	native
-
-IBM-PC		MSDOS		LATTICE 3	Large CODE/Large DATA
-		 2.0 & 3.2	AZTEC 3.4e	Large CODE/Large DATA
+IBM-PC		MSDOS 3.2	LATTICE 3	Large CODE/Large DATA
+		 and above	AZTEC 3.4e	Large CODE/Large DATA
 				TURBO C 2.0	LARGE memory model
 				MSC 6.0
 				*MWC 86
 		SCO XENIX	native
+		FREEBSD 2.1	GCC
+		Windows 3.1	MSC 6.0
+		WINDOWS 95	Visual C++ 4.1
+		WINDOWS NT	Visual C++ 4.1
 
 HP150		MSDOS		Lattice 2.15	Function key labels
 				Turbo C 2.0		for the touch screen
@@ -4113,6 +4551,30 @@ environment with the following options:
 	Names: Code names
 		Segment name	*
 @newpage
+@appendixsection(Windows 3.1, OS/2, Windows 95 and Windows NT)
+
+	On the IBM-PC there is a very nice window oriented version of
+MicroEMACS prepared by Pierre Perot. It has all the functionality of the
+character oriented version, but in addition has drop down menus, and
+mouse functionality more in line with how the mouse is used in these
+environments.
+
+	There is an extensive on-line help facility for the windows
+version, which can be accessed from the HELP menu when MicroEMACS is
+running. Much of the CUA style of mousing and editing is provided by an
+extra startup file, @ir(CUA.CMD), which is run when MicroEMACS for
+Windows is started. If you prefer the original style of mousing (if, for
+instance, you work on many platforms) rename the CUA.CMD file to
+something else.
+
+	The windows version has been tested under Windows 3.1, Windows
+95, Windows NT v3.5 and under OS/2 in the windows emulation box.
+
+	In addition, there is also a WINDOWS NT console mode version
+which runs under Windows NT and WIndows 95. This version is recommended
+for those environments, as its performance (as a 32 BIT application) is
+much better than the DOS version running in a DOS box on these machines.
+
 @appendixsection(HP 150)
 
 	This machine from Hewlett Packard is very unusual for an MSDOS
@@ -4124,7 +4586,7 @@ eight) and then the program prompts for a 16 character label, which will
 be used as two lines of eight characters. To label function key three
 with "save file" from a macro, you would use:
 
-@verbatim(3 label-function-key "save	file")
+@verbatim(3 label-function-key "save    file")
 
 	Notice the 4 spaces after "save". This forces "file" to begin on
 the second line of the label.
@@ -4137,7 +4599,7 @@ screen resolutions on each monitor.
 
 @center(@b[NOTE])
 
-@quotation(When you set MicroEMACS up on your system, please remember to
+@i(When you set MicroEMACS up on your system, please remember to
 install it on the desktop as a GEM application. If you have EMACS set
 as a TOS application, the mouse will not function properly, and EMACS
 will alert you to this problem by beeping the bell.)
@@ -4206,7 +4668,7 @@ compiler has sufficient stack space to successfully complete
 compilation.
 @end(quotation)
 @newpage
-@appendixsection(UNIX V5, V7, and BSD4.[23])
+@appendixsection(UNIX V5, FREEBSD and BSD4.[23])
 
 	MicroEMACS under UNIX utilizes the @b(TERMCAP) @index(termcap)
 library to provide machine independent screen functions. Make sure that
@@ -4374,24 +4836,22 @@ before entering MicroEMACS, and you will get mouse support:
 @flushleft(@b[Search List for EMACS.RC])
 
 	VMS MicroEMACS will first search logical name MICROEMACS$LIB:,
-then SYS$LOGIN:, then the current directory, and finally
-"sys$sysdevice:[vmstools]" when looking for startup files or help files.
+then SYS$LOGIN:, then finally the current directory when looking for
+startup files or help files.
 
-	Please use MICROEMACS$LIB:, and allow the secondary search of
-[vmstools] to become archaic. If desired, MICROEMACS$LIB may be
-defined to be a VMS search list that first searches a user directory,
-and then a system directory. 
+	If desired, MICROEMACS$LIB may be defined to be a VMS search
+list that first searches a user directory, and then a system directory. 
 
 	Generally, you should create a private directory where you keep
 all your .CMD files, and in your LOGIN.COM $DEFINE a logical name to
 point to this area.
 
 	In addition to whatever commands you have in your EMACS.RC file,
-one command you should certainly include is "set $ssave FALSE". The
-"safe save" mechanism, which writes a buffer to a temporary file,
-deletes the old version of a file, and then moves the temporary file to
-its permanent name, works wonderfully on most systems, but makes no
-sense on VMS, which maintains older versions of a file.
+one command you should certainly include is "set $ssave FALSE".
+@index($ssave) The "safe save" mechanism, which writes a buffer to a
+temporary file, deletes the old version of a file, and then moves the
+temporary file to its permanent name, works wonderfully on most systems,
+but makes no sense on VMS, which maintains older versions of a file.
 
 @flushleft(@b[Using MicroEMACS as a subprocess])
 	MicroEmacs can now be kept in a subprocess. You can arrange to
@@ -4598,15 +5058,17 @@ the editor as a whole. These are encoded as the sum of the following
 numbers for each of the possible modes:
 
 @begin(verbatim)
-WRAP	  1		Word wrap
-CMODE	  2		C indentation and fence match
-SPELL	  4		Interactive spell checking (Not Implemented Yet)
-EXACT	  8		Exact matching for searches
-VIEW	 16		Read-only buffer
-OVER	 32		Overwrite mode
-MAGIC	 64		Regular expressions in search
-CRYPT	128		Encryption mode active
-ASAVE	256		Auto-save mode
+WRAP		  1		Word wrap
+CMODE		  2		C indentation and fence match
+SPELL		  4		Interactive spell checking (Not Implemented Yet)
+EXACT		  8		Exact matching for searches
+VIEW		 16		Read-only buffer
+OVER		 32		Overwrite mode
+MAGIC		 64		Regular expressions in search
+CRYPT		128		Encryption mode active
+ASAVE		256		Auto-save mode
+REP		512		Character replace mode
+ABBREV		1024		Abbreviation expantion mode
 @end(verbatim)
 
 	So, if you wished to set the current buffer to have CMODE,
@@ -4632,6 +5094,8 @@ GFFLAG		1	If this bit is set to zero, EMACS will not
 			automatically switch to the buffer of the
 			first file after executing the startup macroes.
 GFSDRAW		2	If this bit is set to one, supress redraw events.
+GFEXIT		4	This bit is set to one while executing the
+			$exithook. If reset to zero, the exit is canceled.
 @end(verbatim)
 
 @flushleft(@big[Current buffer flags])

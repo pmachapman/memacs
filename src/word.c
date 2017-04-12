@@ -174,8 +174,10 @@ int f,n;	/* prefix flag and argument */
 		while (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_lower(c)) {
+				obj.obj_char = c;
 				c = upperc(c);
 				lputc(curwp->w_dotp, curwp->w_doto, c);
+				undo_insert(OP_REPC, 1L, obj);
 				lchange(WFHARD);
 			}
 			if (forwchar(FALSE, 1) == FALSE)
@@ -209,8 +211,10 @@ int f,n;	/* prefix flag and argument */
 		while (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_upper(c)) {
+				obj.obj_char = c;
 				c = lowerc(c);
 				lputc(curwp->w_dotp, curwp->w_doto, c);
+				undo_insert(OP_REPC, 1L, obj);
 				lchange(WFHARD);
 			}
 			if (forwchar(FALSE, 1) == FALSE)
@@ -245,8 +249,10 @@ int f,n;	/* prefix flag and argument */
 		if (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_lower(c)) {
+				obj.obj_char = c;
 				c = upperc(c);
 				lputc(curwp->w_dotp, curwp->w_doto, c);
+				undo_insert(OP_REPC, 1L, obj);
 				lchange(WFHARD);
 			}
 			if (forwchar(FALSE, 1) == FALSE)
@@ -254,8 +260,10 @@ int f,n;	/* prefix flag and argument */
 			while (inword() != FALSE) {
 				c = lgetc(curwp->w_dotp, curwp->w_doto);
 				if (is_upper(c)) {
+					obj.obj_char = c;
 					c = lowerc(c);
 					lputc(curwp->w_dotp, curwp->w_doto, c);
+					undo_insert(OP_REPC, 1L, obj);
 					lchange(WFHARD);
 				}
 				if (forwchar(FALSE, 1) == FALSE)
@@ -384,6 +392,10 @@ int f,n;	/* prefix flag and argument */
 		next_kill();
 	thisflag |= CFKILL;	/* this command is a kill */
 
+	/* make sure the cursor gets back to the right place on an undo */
+	undo_insert(OP_CPOS, 0L, obj);
+
+	/* backup for the deletion */
 	if (backchar(FALSE, 1) == FALSE)
 		return(FALSE);
 	size = 0;
@@ -412,24 +424,28 @@ bckdel:	if (forwchar(FALSE, size) == FALSE)
  * has been set by the user, use that instead
  */
 
-PASCAL NEAR inword()
+int PASCAL NEAR inword()
 
 {
-	register int c;
-
 	/* the end of a line is never in a word */
 	if (curwp->w_doto == lused(curwp->w_dotp))
 		return(FALSE);
 
 	/* grab the word to check */
-	c = lgetc(curwp->w_dotp, curwp->w_doto);
+	return(isinword(lgetc(curwp->w_dotp, curwp->w_doto)));
+}
 
+int PASCAL NEAR isinword(c)
+
+char c;
+
+{
 	/* if we are using the table.... */
 	if (wlflag)
 		return(wordlist[c]);
 
 	/* else use the default hard coded check */
-	if (isletter(c))
+	if (is_letter(c))
 		return(TRUE);
 	if (c>='0' && c<='9')
 		return(TRUE);
@@ -489,7 +505,7 @@ int f, n;	/* Default flag and Numeric argument */
 		return(TRUE);
 
 	/* create a buffer to hold this stuff */
-	para = malloc(psize + 10);	/* this probably could be + 1 */
+	para = room(psize + 10);	/* this probably could be + 1 */
 	if (para == NULL) {
 		mlabort(TEXT94);
 /*                      "%%Out of memory" */
@@ -536,7 +552,7 @@ int f, n;	/* Default flag and Numeric argument */
 	return(status);
 }
 
-PASCAL NEAR reform(para)	/* reformat a paragraph as stored in a string */
+VOID PASCAL NEAR reform(para)	/* reformat a paragraph as stored in a string */
 
 char *para;	/* string buffer containing paragraph */
 
@@ -663,8 +679,7 @@ int f, n;	/* ignored numeric arguments */
 		}
 
 		/* and tabulate it */
-		wordflag = ((ch >= 'a' && ch <= 'z') ||
-			    (ch >= 'A' && ch <= 'Z') ||
+		wordflag = (is_letter(ch) ||
 			    (ch >= '0' && ch <= '9'));
 		if (wordflag == TRUE && lastword == FALSE)
 			++nwords;

@@ -49,8 +49,8 @@ static int   PASCAL mswtopscr();
 /* Standard terminal interface dispatch table.
 */
 NOSHARE TERM term    = {
-        50,
-        50,
+        128,
+        128,
         HUGE,
         HUGE,
         0,
@@ -118,7 +118,7 @@ static void PASCAL  PushMLHist (void)
     for (e = MLSIZE - 1; e >= 0; e--) if (MLBuf[e] != ' ') break;
         /* e = index of the last non-space char */
     if (e < 0) return;
-    if ((ml = MLHistory[MLHistNew] = malloc (e + 2)) != NULL) {
+    if ((ml = MLHistory[MLHistNew] = room (e + 2)) != NULL) {
         for (i = 0; i <= e; i++) *ml++ = MLBuf[i];
         *ml = '\0';     /* terminate the string */
 	MLHistNew = (MLHistNew + 1) & MLHISTMASK;
@@ -221,7 +221,7 @@ static int PASCAL mswopen ()
 	eolexist = TRUE;
 	strcpy (sres, "MSWIN");		/* $SRES emacs variable */
 	strcpy(os, "MSWIN");		/* $OS emacs variable */
-	MLBuf = (char*)malloc(MLSIZE);
+	MLBuf = (char*)room(MLSIZE);
 	for (x = 0; x < MLSIZE;) MLBuf[x++] = ' ';
 	FirstTime = FALSE;
     }
@@ -527,9 +527,8 @@ static int PASCAL mswsizscr (SCREEN *sp)
     int     RetryCount = -1;    /* prevents infinite loop if frame
 				   window can't be resized properly */
     BOOL    FrameIconic;
-#if !WIN30SDK
+
     WINDOWPLACEMENT WindowPlacement;
-#endif
 
     if (InternalRequest) return;
     InternalRequest = TRUE;
@@ -577,15 +576,12 @@ static int PASCAL mswsizscr (SCREEN *sp)
 	    BoundingRect.left = BoundingRect.top = 0;
 	    BoundingRect.right = GetSystemMetrics (SM_CXSCREEN);
 	    BoundingRect.bottom = GetSystemMetrics (SM_CYSCREEN);
-#if WIN30SDK
-            {
-#else
+
             if (FrameIconic && Win31API) {
                 GetWindowPlacement (hFrameWnd, &WindowPlacement);
                 TargetRect = WindowPlacement.rcNormalPosition;
             }
             else {
-#endif
 	        GetWindowRect (hFrameWnd, &TargetRect);
 	    }
 	}
@@ -626,15 +622,11 @@ static int PASCAL mswsizscr (SCREEN *sp)
 	}
 	else TargetRect.bottom += Delta;
 
-#if WIN30SDK
-        {
-#else
         if (Maximized && FrameIconic && Win31API) {
             WindowPlacement.rcNormalPosition = TargetRect;
             SetWindowPlacement (hFrameWnd, &WindowPlacement);
         }
         else {
-#endif
 	    SetWindowPos (Maximized ? hFrameWnd : hScrWnd, 0,
                         TargetRect.left, TargetRect.top,
 	                TargetRect.right - TargetRect.left,

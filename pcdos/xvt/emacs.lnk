@@ -1,0 +1,10 @@
+obj\basic obj\bind obj\buffer obj\char obj\crypt obj\lock obj\dolock+
+obj\display obj\eval obj\exec obj\file obj\fileio obj\xvt obj\input+
+obj\isearch obj\line obj\main obj\random obj\region obj\screen obj\keyboard+
+obj\search obj\replace obj\tags obj\window obj\word obj\xvtdos obj\mouse+
+obj\execpr obj\abbrev obj\undo
+bin\emacs /m /linenumbers /align:16 /stack:20000
+emacs.map
+lmxvtw xvtw xvtwtx llibcew libw/nod/noe
+d:\sys\xvt\lib\universl.def
+

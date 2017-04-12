@@ -121,8 +121,6 @@ BEGIN
 		MENUITEM "&Transpose characters", IDM_TWIDDLE
 		MENUITEM "T&ab", IDM_TAB
 		MENUITEM "&Quote", IDM_QUOTE
-		MENUITEM SEPARATOR
-		MENUITEM "= &Fill column", IDM_SETFILLCOL
 	END
 
 	POPUP "&Search"

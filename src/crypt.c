@@ -38,8 +38,8 @@ int n;		/* numeric argument */
                 return(status);
 
 	/* and encrypt it */
-	crypt((char *)NULL, (unsigned int) 0);
-	crypt(key, (unsigned int) strlen(key));
+	ecrypt((char *)NULL, (unsigned int) 0);
+	ecrypt(key, (unsigned int) strlen(key));
 
 	/* and save it off */
 	strcpy(curbp->b_key, key);
@@ -87,9 +87,9 @@ int n;		/* numeric argument */
  *	Before using this routine for encrypting data, you are expected 
  *	to specify an encryption key.  This key is an arbitrary string,
  *	to be supplied by the user.  To set the key takes two calls to 
- *	crypt().  First, you call 
+ *	ecrypt().  First, you call 
  *
- *		crypt(NULL, vector)
+ *		ecrypt(NULL, vector)
  *
  *	This resets all internal control information.  Typically (and 
  *	specifically in the case on MICRO-emacs) you would use a "vector" 
@@ -100,9 +100,9 @@ int n;		/* numeric argument */
  *
  *	Then, you "encrypt" your password by calling 
  *
- *		crypt(pass, strlen(pass))
+ *		ecrypt(pass, strlen(pass))
  *
- *	where "pass" is your password string.  Crypt() will destroy 
+ *	where "pass" is your password string.  Ecrypt() will destroy 
  *	the original copy of the password (it becomes encrypted), 
  *	which is good.  You do not want someone on a multiuser system 
  *	to peruse your memory space and bump into your password.  
@@ -140,7 +140,7 @@ int n;		/* numeric argument */
  *
  **********/
 
-VOID PASCAL NEAR crypt(bptr, len)
+VOID PASCAL NEAR ecrypt(bptr, len)
 register char *bptr;	/* buffer of characters to be encrypted */
 register unsigned len;	/* number of characters in the buffer */
 {

@@ -5,19 +5,18 @@
 
 ; set up the "clean" procedure
 store-procedure clean
-	delete-buffer "[Macro 10]"
-	delete-buffer "[Macro 11]"
-	delete-buffer "[Macro 12]"
-	delete-buffer "[Macro 13]"
-	delete-buffer "[Macro 14]"
-	delete-buffer "[Macro 15]"
-	delete-buffer "[Macro 16]"
-	delete-buffer "[Macro 17]"
-	delete-buffer "[Macro 18]"
-	delete-buffer "[Macro 19]"
+	delete-buffer "[c-new-proc]"
+	delete-buffer "[c-new-func]"
+	delete-buffer "[c-new-if]"
+	delete-buffer "[c-new-while]"
+	delete-buffer "[c-new-repeat]"
+	delete-buffer "[c-new-switch]"
+	delete-buffer "[c-value]"
+	delete-buffer "[c-keys-up]"
+	delete-buffer "[c-find-com]
+	delete-buffer "[c-comment-block]"
 	delete-buffer "[drawbox]"
 	delete-buffer "[setpoints]"
-	delete-buffer "[findcom]"
 	set $cmode %oldmode
 	set $gmode %oldgmode
 !endm
@@ -54,7 +53,7 @@ store-procedure clean
 
 ;
 
-10	store-macro
+store-procedure c-new-proc
 ;	set $debug TRUE
         set %proc @"Procedure Name: "
         insert-string &cat &cat "Procedure " %proc "~n"
@@ -68,10 +67,9 @@ store-procedure clean
         insert-string "   "
 	!force set $debug FALSE
 !endm
-bind-to-key execute-macro-10 S-FN1
 
 ;	Function
-11	store-macro
+store-procedure c-new-func
         set %func @"Function Name: "
         set %type @"Return type: "
 	insert-string %type
@@ -82,11 +80,10 @@ bind-to-key execute-macro-10 S-FN1
         3 backward-character
 	!force set $debug FALSE
 !endm
-bind-to-key execute-macro-11 S-FN2
 
 ;
 
-12	store-macro
+store-procedure	c-new-if
         set %cond @"Condition Expr: "
         insert-string &cat &cat "if (" %cond ") {"
 	newline-and-indent
@@ -102,11 +99,10 @@ bind-to-key execute-macro-11 S-FN2
         end-of-line
         handle-tab
 !endm
-bind-to-key execute-macro-12 S-FN3
 
 ;
 
-13	store-macro
+store-procedure	c-new-while
         set %cond @"Condition Expr: "
 	;set $debug TRUE
         insert-string &cat &cat "while (" %cond ") {"
@@ -117,9 +113,8 @@ bind-to-key execute-macro-12 S-FN3
         end-of-line
 	handle-tab
 !endm
-bind-to-key execute-macro-13 S-FN4
 
-14	store-macro
+store-procedure c-new-repeat
         set %cond @"Condition Expr: "
 	;set $debug TRUE
         set %curcol $curcol
@@ -137,9 +132,8 @@ bind-to-key execute-macro-13 S-FN4
         insert-string "   "
 	!force set $debug FALSE
 !endm
-bind-to-key execute-macro-14 S-FN5
 
-15	store-macro
+store-procedure c-new-switch
         set %expr @"Switch Expr: "
 	;set $debug TRUE
         set %curcol $curcol
@@ -153,9 +147,8 @@ bind-to-key execute-macro-14 S-FN5
 	insert-string "case "
 	!force set $debug FALSE
 !endm
-bind-to-key execute-macro-15 S-FN6
 
-16	store-macro
+store-procedure c-value
 ;	set $debug TRUE
         set %curcol $curcol
         set %value @"Value: "
@@ -170,9 +163,8 @@ bind-to-key execute-macro-15 S-FN6
         insert-string "       "
 	!force set $debug FALSE
 !endm
-bind-to-key execute-macro-16 S-FN7
 
-17	store-macro
+store-procedure	c-keys-up
 ;	set $debug TRUE
         set %curcol $curcol
 	;save-file
@@ -204,19 +196,11 @@ bind-to-key execute-macro-16 S-FN7
         exchange-point-and-mark
 	!force set $debug FALSE
 !endm
-bind-to-key execute-macro-17 S-FN8
 
-18	store-macro
-	beginning-of-file
-	run findcom
-!endm
-bind-to-key execute-macro-18 S-FN9
-
-store-procedure	findcom
+store-procedure	c-find-com
 ;	This hunts down mismatched comment problems in C
 
-;	start from the current position in the file
-
+	beginning-of-file
 	!force search-forward "/*"
 	!if &seq $status FALSE
 		!goto nend
@@ -272,7 +256,7 @@ store-procedure	findcom
 	!goto nxtopen 
 !endm
 
-19	store-macro
+store-procedure c-comment-block
 	set %c1 "/"
 	set %c2 "*"
 	set %c3 "\"
@@ -281,8 +265,6 @@ store-procedure	findcom
 	set %c6 "*"
 	run drawbox	
 !endm
-bind-to-key execute-macro-19 S-FN0
-bind-to-key execute-macro-19 A-FN0
 
 store-procedure drawbox
 	run setpoints
@@ -340,12 +322,23 @@ store-procedure setpoints
 	set $curline %pline
 	set $curcol %pcol
 !endm
-bind-to-key execute-macro-19 S-FN0
+
+macro-to-key c-new-proc		S-FN1
+macro-to-key c-new-func		S-FN2
+macro-to-key c-new-if		S-FN3
+macro-to-key c-new-while	S-FN4
+macro-to-key c-new-repeat	S-FN5
+macro-to-key c-new-switch	S-FN6
+macro-to-key c-value		S-FN7
+macro-to-key c-keys-up		S-FN8
+macro-to-key c-find-com		S-FN9
+macro-to-key c-comment-block	S-FN0
+macro-to-key c-comment-block	A-FN0
 
 ; Set up CMODE
-	set %oldmode $cmode
-	set %oldgmode $gmode
-	add-mode CMODE
-	add-global-mode CMODE
+set %oldmode $cmode
+set %oldgmode $gmode
+add-mode CMODE
+add-global-mode CMODE
 
 write-message "[C MENU page loaded]"

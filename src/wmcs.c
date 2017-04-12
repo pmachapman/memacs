@@ -1,7 +1,7 @@
 /*	WMCS.C:	Operating specific I/O and Spawning functions
 		for the WICAT computer/operating system
-		for MicroEMACS 3.12
-		(C)Copyright 1993 by Daniel M. Lawrence
+		for MicroEMACS 4.00
+		(C)Copyright 1995 by Daniel M. Lawrence
 */
 
 #include        <stdio.h>
@@ -130,7 +130,6 @@ typahead()
 spawncli(f, n)
 {
         register char *cp;
-        char *getenv();
 
 	/* don't allow this command if restricted */
 	if (restflag)
@@ -218,7 +217,7 @@ execprg(f, n)
 pipecmd(f, n)
 {
         register int    s;	/* return status from CLI */
-	register WINDOW *wp;	/* pointer to new window */
+	register EWINDOW *wp;	/* pointer to new window */
 	register BUFFER *bp;	/* pointer to buffer to zot */
         char	line[NLINE];	/* command line send to shell */
 	static char bname[] = "command";

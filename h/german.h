@@ -1,9 +1,9 @@
 /*	GERMAN.H:	German language text strings for
-                        MicroEMACS 3.12
+                        MicroEMACS 4.00
 
 			translated by Martin Neitzel
 			unido!sigserv!neitzel@uunet.uu.net
-			(C)opyright 1993 by Daniel Lawrence
+			(C)opyright 1995 by Daniel Lawrence
 */
 
 #define	TEXT1	"[neuer Kommando-Interpreter wird gestartet]"
@@ -77,7 +77,7 @@
 #define	TEXT56	"Variablen-Liste"
 #define	TEXT57	"kann Variablen-Liste nicht anzeigen"
 #define	TEXT58	"[Variablen-Liste wird aufgebaut...]"
-#define	TEXT59	"[Umbruchspalte ist %d]"
+#define	TEXT59	UNUSED
 #define	TEXT60	"Zeile %D/%D Spalte %d/%d Zeichen %D/%D (%d%%) Zeichen = 0x%x"
 #define	TEXT61	"<NOT USED>"
 #define	TEXT62	"Globaler Modus, der "
@@ -100,20 +100,8 @@
 #define	TEXT79	"Nicht gefunden"
 #define	TEXT80	"Kein Such-Muster gesetzt"
 #define	TEXT81	"Rueckwaerts-Suche "
-
-/* The next two most probably need to be rewritten: */
-#define	TEXT82	"Bedenke %d mit Sprung %d"
-/* What should that mean????
- */
-
-/* #define	TEXT83	"Its other case is %d"
- * Are we talking about upper/lower case conversions or something
- * completely different here?  I suspected so.  Otherwise, take the other
- * translation.
- */
-#define	TEXT83	"Die andere zugehoerige Gross/Kleinschreibung ist %d"
-/* #define	TEXT83	"Der andere zugehoerige Fall ist %d" */
-
+#define	TEXT82	UNUSED
+#define	TEXT83	UNUSED
 #define	TEXT84	"Ersetze "
 #define	TEXT85	"Ersetze interaktiv "
 #define	TEXT86	"durch "
@@ -128,7 +116,7 @@
 /* >  ^^^^   make sure this is not longer than 72 characters */
 
 #define	TEXT91	"leeren Text ersetzt, gestoppt."
-#define	TEXT92	"%d Ersetzungen"
+#define	TEXT92	"%D Ersetzungen"
 #define	TEXT93	"%%Fehler waehrend des Loeschens"
 #define	TEXT94	"%%Kein Speicherplatz mehr frei"
 #define	TEXT95	"%%mceq: Was ist %d?"
@@ -305,6 +293,8 @@
 #define TEXT246 "%%Need function key number"
 #define TEXT247 "%%Function key number out of range"
 #define	TEXT248 "Enter Label String: "
+#define TEXT249 "Global variable to declare: "
+#define	TEXT250 "Local variable to declare: "
 
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrect menu]"

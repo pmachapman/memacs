@@ -20,6 +20,7 @@ $ ! Let's do it!
 $ !
 $	set default 'medir'
 $ !
+$	cc_cmd abbrev
 $	cc_cmd basic
 $	cc_cmd bind
 $	cc_cmd buffer
@@ -46,6 +47,7 @@ $	cc_cmd search
 $	cc_cmd screen
 $	cc_cmd smg
 $	cc_cmd tags
+$	cc_cmd undo
 $	cc_cmd vms
 $	cc_cmd window
 $	cc_cmd word

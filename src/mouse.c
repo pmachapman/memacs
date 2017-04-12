@@ -1,5 +1,5 @@
 /*	MOUSE.C:	Mouse functionality commands
-			for MicroEMACS 3.12
+			for MicroEMACS 4.00
 			originally written by Dave G. Conroy
 			modified by Jeff Lomicka and Daniel Lawrence
 */
@@ -34,8 +34,8 @@ PASCAL NEAR movemd(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW	*wp;
-	register WINDOW	*lastwp;
+	register EWINDOW *wp;
+	register EWINDOW *lastwp;
 	register LINE	*lp;
 
 	/* make sure we are on the proper screen */
@@ -91,8 +91,8 @@ PASCAL NEAR mmove(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW	*wp;
-	register WINDOW	*lastwp;
+	register EWINDOW *wp;
+	register EWINDOW *lastwp;
 	register LINE *lp;
 	register int lastmodeline;	/* was the dowbclick on a modeline? */
 	register int lastcmdline;	/* was the downclick on the command line? */
@@ -151,8 +151,8 @@ PASCAL NEAR mregdown(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW	*wp;
-	register WINDOW	*lastwp;
+	register EWINDOW *wp;
+	register EWINDOW *lastwp;
 	register LINE	*lp;
 	SCREEN *sp;
 	char scr_name[12];		/* constructed temp screen name */
@@ -259,8 +259,8 @@ PASCAL NEAR mregup(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW	*wp;
-	register WINDOW	*lastwp;
+	register EWINDOW *wp;
+	register EWINDOW *lastwp;
 	register LINE *lp;
 	register SCREEN *sp;		/* ptr to screen to delete */
 	register int lastmodeline;	/* was the dowbclick on a modeline? */
@@ -377,8 +377,8 @@ PASCAL NEAR movemu(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW	*lastwp;
-	register WINDOW	*wp;
+	register EWINDOW *lastwp;
+	register EWINDOW *wp;
 	register int lastmodeline;	/* was the downclick on a modeline? */
 	register int deltay;
 	register int deltax;
@@ -507,12 +507,12 @@ int f,n;	/* prefix flag and argument */
  * considered to be part of the window.
  */
 
-WINDOW *PASCAL NEAR mousewindow(row)
+EWINDOW *PASCAL NEAR mousewindow(row)
 
 register int	row;
 
 {
-	register WINDOW	*wp;
+	register EWINDOW *wp;
 
 	/* must be a positiove row! */
 	if (row < 0)
@@ -544,7 +544,7 @@ register int	row;
 
 LINE *PASCAL NEAR mouseline(wp, row)
 
-register WINDOW	*wp;
+register EWINDOW *wp;
 register int	row;
 
 {
@@ -570,7 +570,7 @@ register int	row;
 
 PASCAL NEAR mouseoffset(wp, lp, col)
 
-register WINDOW *wp;
+register EWINDOW *wp;
 register LINE	*lp;
 register int	col;
 
@@ -585,10 +585,16 @@ register int	col;
 	col += wp->w_fcol;	/* adjust for extended lines */
 	while (offset != lused(lp)) {
 		newcol = curcol;
-		if ((c=lgetc(lp, offset)) == '\t')
+		if ((c=lgetc(lp, offset)) == '\t' && tabsize > 0)
 			newcol += -(newcol % tabsize) + (tabsize - 1);
-		else if (c<32)	/* ISCTRL */
-			++newcol;
+		else {
+			if (disphigh && c > 0x7f) {
+				newcol += 2;
+				c -= 0x80;
+			}
+			if (c < 0x20 || c == 0x7f)	/* ISCTRL */
+				++newcol;
+		}
 		++newcol;
 		if (newcol > col)
 			break;
@@ -633,12 +639,12 @@ PASCAL NEAR mouse_screen()
 
 PASCAL NEAR ismodeline(wp, row)
 
-WINDOW	*wp;
+EWINDOW *wp;
 int row;
 
 {
 	/* not on a legal window, say we aren't on a mode line either */
-	if (wp == (WINDOW *)NULL)
+	if (wp == (EWINDOW *)NULL)
 		return(FALSE);
 
 	/* are we on a modeline? */

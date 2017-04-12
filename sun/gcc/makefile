@@ -6,12 +6,13 @@
 # modify the following lines with the proper relative directories
 
 OBJD = obj			# object file directory
-SRCD = ../src			# source file directory
-HDIR = ../h				# header file directory
+SRCD = ../../src		# source file directory
+HDIR = ../../h			# header file directory
 
 # options and arguments to the C compiler
 
-CFLAGS=	-O -I. -I$(HDIR)
+CC = gcc
+CFLAGS=	-O -I. -I$(HDIR) -g
 
 # list of header files
 
@@ -19,24 +20,26 @@ HFILES = estruct.h $(HDIR)/edef.h $(HDIR)/efunc.h $(HDIR)/epath.h $(HDIR)/ebind.
 
 #list of object files
 
-F1 = $(OBJD)/basic.o $(OBJD)/bind.o $(OBJD)/buffer.o
+F1 = $(OBJD)/abbrev.o $(OBJD)/basic.o $(OBJD)/bind.o $(OBJD)/buffer.o
 F2 = $(OBJD)/char.o $(OBJD)/crypt.o $(OBJD)/display.o $(OBJD)/dolock.o
-F3 = $(OBJD)/eval.o $(OBJD)/exec.o $(OBJD)/file.o
+F3 = $(OBJD)/eval.o $(OBJD)/exec.o $(OBJD)/file.o $(OBJD)/keyboard.o
 F4 = $(OBJD)/fileio.o $(OBJD)/unix.o $(OBJD)/input.o
 F5 = $(OBJD)/isearch.o $(OBJD)/line.o $(OBJD)/lock.o
-F6 = $(OBJD)/main.o $(OBJD)/mouse.o
-F7 = $(OBJD)/random.o $(OBJD)/region.o $(OBJD)/msearch.o $(OBJD)\replace.o
-F8 = $(OBJD)/tags.o $(OBJD)/window.o $(OBJD)/word.o
+F6 = $(OBJD)/main.o $(OBJD)/mouse.o $(OBJD)/screen.o
+F7 = $(OBJD)/random.o $(OBJD)/region.o $(OBJD)/search.o $(OBJD)/replace.o
+F8 = $(OBJD)/tags.o $(OBJ)/undo.o $(OBJD)/window.o $(OBJD)/word.o
 
 # product list
 
-all:	bin/emacs.exe
+all:	bin/emacs
 
 OFILES =	$(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8)
 
-bin/emacs.exe:	$(OFILES)
+bin/emacs:	$(OFILES)
 		$(CC) $(CFLAGS) $(OFILES) -ltermcap -lc -o bin/emacs
 
+$(OBJD)/abbrev.o: $(SRCD)/abbrev.c $(HFILES)
+	$(CC) $(CFLAGS) -c -o $(OBJD)/abbrev.o $(SRCD)/abbrev.c
 $(OBJD)/basic.o: $(SRCD)/basic.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/basic.o $(SRCD)/basic.c
 $(OBJD)/bind.o: $(SRCD)/bind.c $(HFILES)
@@ -65,6 +68,8 @@ $(OBJD)/input.o: $(SRCD)/input.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/input.o $(SRCD)/input.c
 $(OBJD)/isearch.o: $(SRCD)/isearch.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/isearch.o $(SRCD)/isearch.c
+$(OBJD)/keyboard.o: $(SRCD)/keyboard.c $(HFILES)
+	$(CC) $(CFLAGS) -c -o $(OBJD)/keyboard.o $(SRCD)/keyboard.c
 $(OBJD)/line.o: $(SRCD)/line.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/line.o $(SRCD)/line.c
 $(OBJD)/lock.o: $(SRCD)/lock.c $(HFILES)
@@ -73,6 +78,8 @@ $(OBJD)/main.o: $(SRCD)/main.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/main.o $(SRCD)/main.c
 $(OBJD)/mouse.o: $(SRCD)/mouse.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/mouse.o $(SRCD)/mouse.c
+$(OBJD)/screen.o: $(SRCD)/screen.c $(HFILES)
+	$(CC) $(CFLAGS) -c -o $(OBJD)/screen.o $(SRCD)/screen.c
 $(OBJD)/unix.o: $(SRCD)/unix.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/unix.o $(SRCD)/unix.c
 $(OBJD)/random.o: $(SRCD)/random.c $(HFILES)
@@ -85,6 +92,8 @@ $(OBJD)/replace.o: $(SRCD)/replace.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/replace.o $(SRCD)/replace.c
 $(OBJD)/tags.o: $(SRCD)/tags.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/tags.o $(SRCD)/tags.c
+$(OBJD)/undo.o: $(SRCD)/undo.c $(HFILES)
+	$(CC) $(CFLAGS) -c -o $(OBJD)/undo.o $(SRCD)/undo.c
 $(OBJD)/window.o: $(SRCD)/window.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/window.o $(SRCD)/window.c
 $(OBJD)/word.o: $(SRCD)/word.c $(HFILES)

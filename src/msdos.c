@@ -1,7 +1,7 @@
 /*	MSDOS.C:	Operating specific I/O and Spawning functions
 			under the MS/PCDOS operating system
-			for MicroEMACS 3.12
-			(C)Copyright 1993 by Daniel M. Lawrence
+			for MicroEMACS 4.00
+			(C)Copyright 1995 by Daniel M. Lawrence
 */
 
 #include        <stdio.h>
@@ -32,7 +32,7 @@ struct ffblk fileblock;	/* structure for directory searches */
 struct find_t fileblock;	/* structure for directory searches */
 #endif
 
-#if     LATTICE | MSC | DTL | TURBO | IC | AZTEC | MWC | ZTC
+#if     LATTICE | MSC | TURBO | IC | MWC | ZTC
 union REGS rg;		/* cpu register for use of DOS calls */
 struct SREGS segreg;	/* cpu segment registers	     */
 int nxtchar = -1;	/* character held from type ahead    */
@@ -118,7 +118,7 @@ int PASCAL NEAR ttopen()
 #if	MOUSE
 	/* check if the mouse drive exists first */
 	rg.x.ax = 0x3533;	/* look at the interrupt 33 address */
-#if	MSC | TURBO | IC | DTL | LATTICE | MWC
+#if	MSC | TURBO | IC | LATTICE | MWC
 	int86x(0x21, &rg, &rg, &segreg);
 	miaddr = (((long)segreg.es) << 16) + (long)rg.x.bx;
 	if (miaddr == 0 || *(char * far)miaddr == 0xcf) {
@@ -127,11 +127,6 @@ int PASCAL NEAR ttopen()
 	int86x(0x21, &rg, &rg, &segreg);
 	miaddr = (((long)segreg.es) << 16) + (long)rg.x.bx;
 	if (miaddr == 0 || *(char far *)miaddr == 0xcf) {
-#endif
-#if	AZTEC
-	sysint(0x21, &rg, &rg);
-	miaddr = (((long)rg.x.es) << 16) + (long)rg.x.bx;
-	if (miaddr == 0 || *(char *)miaddr == 0xcf) {
 #endif
 		mexist = FALSE;
 		return(TRUE);
@@ -209,7 +204,7 @@ int c;
         putcnb(c);
 #endif
 
-#if	(LATTICE | AZTEC | TURBO | IC | MSC | ZTC) & ~IBMPC
+#if	(LATTICE | TURBO | IC | MSC | ZTC) & ~IBMPC
 	bdos(6, c, 0);
 #endif
 }
@@ -434,11 +429,11 @@ int PASCAL NEAR typahead()
 #else
 	rg.x.ax = 0x4406;	/* IOCTL input status */
 	rg.x.bx = 0;		/* File handle = stdin */
-#if	MSC | DTL
+#if	MSC
 	int86(0x21,&rg,&rg);
 	flags = rg.h.al;
 #else
-#if	LATTICE | AZTEC | TURBO | IC | ZTC
+#if	LATTICE | TURBO | IC | ZTC
 	flags = intdos(&rg, &rg);
 #else
 	intcall(&rg, &rg, 0x21);
@@ -506,8 +501,10 @@ int f, n;
 
 	/* if we are interactive, pause here */
 	if (clexec == FALSE) {
+#if	XVT == 0
 		printf(TEXT227);
 /*			"\n--- Press any key to Continue ---" */
+#endif
 		tgetc();
         }
 #if	WINDOW_TEXT
@@ -561,14 +558,13 @@ int PASCAL NEAR pipecmd(f, n)
 int f, n;
 
 {
-	register WINDOW *wp;	/* pointer to new window */
+	register EWINDOW *wp;	/* pointer to new window */
 	register BUFFER *bp;	/* pointer to buffer to zot */
 	register char *tmp;	/* ptr to TMP DOS environment variable */
 	FILE *fp;
         char line[NLINE];	/* command line send to shell */
 	static char bname[] = "command";
 	static char filnam[NSTRING] = "command";
-	char *getenv();
 
 	/* don't allow this command if restricted */
 	if (restflag)
@@ -720,7 +716,7 @@ int f, n;
 extern int _oserr;
 #endif
 
-#if	AZTEC | MWC
+#if	MWC
 extern int errno;
 #endif
 
@@ -739,7 +735,6 @@ char *cmd;	/*  Incoming command line to execute  */
 	char swchar;		/* switch character to use */
 	union REGS regs;	/* parameters for dos call */
 	char comline[NSTRING];	/* constructed command line */
-	char *getenv();
 
 	/*  detect current switch character and set us up to use it */
 	regs.h.ah = 0x37;	/*  get setting data  */
@@ -776,7 +771,7 @@ char *cmd;	/*  Incoming command line to execute  */
 			with arguments
 */
 
-#if	LATTICE | AZTEC | MWC
+#if	LATTICE | MWC
 #define	CFLAG	1
 #endif
 
@@ -786,6 +781,7 @@ char *cmd;	/*  Incoming command line to execute  */
 
 {
 	char *sp;		/* temporary string pointer */
+	int rv;			/* numeric return value from subprocess */
 	char f1[38];		/* FCB1 area (not initialized */
 	char f2[38];		/* FCB2 area (not initialized */
 	char prog[NSTRING];	/* program filespec */
@@ -841,14 +837,14 @@ char *cmd;	/*  Incoming command line to execute  */
 	/* and make the call */
 	regs.h.ah = 0x4b;	/* EXEC Load or Execute a Program */
 	regs.h.al = 0x00;	/* load end execute function subcode */
-#if	AZTEC | MWC
+#if	MWC
 	regs.x.ds = ((unsigned long)(prog) >> 16);	/* program name ptr */
 	regs.x.dx = (unsigned int)(prog);
 	regs.x.es = regs.x.ds;
 	/*regs.x.es = ((unsigned long)(&pblock) >> 16);	* set up param block ptr */
 	regs.x.bx = (unsigned int)(&pblock);
 #endif
-#if	LATTICE | MSC | TURBO | IC | DTL | ZTC
+#if	LATTICE | MSC | TURBO | IC | ZTC
 	segreg.ds = ((unsigned long)(prog) >> 16);	/* program name ptr */
 	regs.x.dx = (unsigned int)(prog);
 	segreg.es = ((unsigned long)(&pblock) >> 16);	/* set up param block ptr */
@@ -858,40 +854,33 @@ char *cmd;	/*  Incoming command line to execute  */
 	if ((intdosx(&regs, &regs, &segreg) & CFLAG) == 0) {
 		regs.h.ah = 0x4d;	/* get child process return code */
 		intdos(&regs, &regs);	/* go do it */
-		rval = regs.x.ax;	/* save child's return code */
+		rv = regs.x.ax;		/* save child's return code */
 	} else
-		rval = -_oserr;		/* failed child call */
-#endif
-#if	AZTEC
-	if ((sysint(0x21, &regs, &regs) & CFLAG) == 0) {
-		regs.h.ah = 0x4d;	/* get child process return code */
-		sysint(0x21, &regs, &regs);	/* go do it */
-		rval = regs.x.ax;	/* save child's return code */
-	} else
-		rval = -errno;		/* failed child call */
+		rv = -_oserr;		/* failed child call */
 #endif
 #if	MWC
 	intcall(&regs, &regs, DOSINT);
 	if ((regs.x.flags & CFLAG) == 0) {
 		regs.h.ah = 0x4d;	/* get child process return code */
 		intcall(&regs, &regs, DOSINT);	/* go do it */
-		rval = regs.x.ax;	/* save child's return code */
+		rv = regs.x.ax;		/* save child's return code */
 	} else
-		rval = -errno;		/* failed child call */
+		rv = -errno;		/* failed child call */
 #endif
-#if	TURBO | IC | MSC | DTL | ZTC
+#if	TURBO | IC | MSC | ZTC
 	intdosx(&regs, &regs, &segreg);
 	if (regs.x.cflag == 0) {
 		regs.h.ah = 0x4d;	/* get child process return code */
 		intdos(&regs, &regs);	/* go do it */
-		rval = regs.x.ax;	/* save child's return code */
+		rv = regs.x.ax;		/* save child's return code */
 	} else
 #if	IC
-		rval = -1;
+		rv = -1;
 #else /* IC */
-		rval = -_doserrno;	/* failed child call */
+		rv = -_doserrno;	/* failed child call */
 #endif /* IC */
 #endif
+	strcpy(rval, int_asc(rv));
 	return((rval < 0) ? FALSE : TRUE);
 }
 

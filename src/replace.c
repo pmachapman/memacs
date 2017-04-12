@@ -11,26 +11,27 @@
 #include "edef.h"
 #include "elang.h"
 
-static int	replen;			/* length of replacement string */
+static int	replen;		/* length of replacement string */
+static char	*oldpatmatch = NULL;	/* allocated memory for un-do.*/
 
 /*
  * sreplace -- Search and replace.
  */
 int PASCAL NEAR sreplace(f, n)
-int f;		/* default flag */
-int n;		/* # of repetitions wanted */
+int f;					/* default flag */
+int n;					/* # of repetitions wanted */
 {
-	return (replaces(FALSE, f, n));
+	return(replaces(FALSE, f, n));
 }
 
 /*
  * qreplace -- search and replace with query.
  */
 int PASCAL NEAR qreplace(f, n)
-int f;		/* default flag */
-int n;		/* # of repetitions wanted */
+int f;					/* default flag */
+int n;					/* # of repetitions wanted */
 {
-	return (replaces(TRUE, f, n));
+	return(replaces(TRUE, f, n));
 }
 
 /*
@@ -38,52 +39,51 @@ int n;		/* # of repetitions wanted */
  *	string.  Query might be enabled (according to kind).
  */
 int PASCAL NEAR	replaces(kind, f, n)
-int	kind;	/* Query enabled flag */
-int	f;	/* default flag */
-int	n;	/* # of repetitions wanted */
+int	kind;				/* Query enabled flag */
+int	f;					/* default flag */
+int	n;					/* # of repetitions wanted */
 {
 	register int status;	/* success flag on pattern inputs */
 	register int nummatch;	/* number of found matches */
-	int numsub;		/* number of substitutions */
-	int nlflag;		/* last char of search string a <NL>? */
-	int nlrepl;		/* was a replace done on the last line? */
-	char c;			/* input char for query */
+	long numsub;			/* number of substitutions */
+	int nlflag;			/* last char of search string a <NL>? */
+	int nlrepl;			/* was a replace done on the last line? */
+	char c;				/* input char for query */
 	LINE *origline;		/* original "." position */
 	int origoff;		/* and offset (for . query option) */
 	LINE *lastline;		/* position of last replace and */
 	int lastoff;		/* offset (for 'u' query option) */
 	int oldmatchlen;	/* Closure may alter the match length.*/
-	static char *oldpatmatch = NULL;	/* allocated memory for un-do.*/
 
 	/*
 	 * Don't allow this command if we are
 	 * in read only mode.
 	 */
 	if (curbp->b_mode & MDVIEW)
-		return(rdonly());
+		return (rdonly());
 
 	/* Check for negative repetitions.
 	 */
 	if (f && n < 0)
-		return(FALSE);
+		return (FALSE);
 
 	/* Ask the user for the text of a pattern.
 	 */
-	if ((status = readpattern(kind? TEXT85: TEXT84, &pat[0], TRUE)) != TRUE)
+	if ((status = readpattern(kind ? TEXT85 : TEXT84, (char *) &pat[0], TRUE)) != TRUE)
 /*				"Replace" */
 /*						"Query replace" */
-		return(status);
+		return (status);
 
 	/* Ask for the replacement string, and get its length.
 	 */
-	if ((status = readpattern(TEXT86, &rpat[0], FALSE)) == ABORT)
+	if ((status = readpattern(TEXT86, (char *) &rpat[0], FALSE)) == ABORT)
 /*				"with" */
-		return(status);
+		return (status);
 
 	/* Set up flags so we can make sure not to do a recursive
 	 * replace on the last line.
 	 */
-	nlflag = (pat[matchlen - 1] == '\r');
+	nlflag = (pat[strlen(pat) - 1] == '\r');
 	nlrepl = FALSE;
 
 	/* Save original . position, reset the number of matches and
@@ -91,13 +91,18 @@ int	n;	/* # of repetitions wanted */
 	 */
 	origline = curwp->w_dotp;
 	origoff = curwp->w_doto;
-	numsub = 0;
+	numsub = 0L;
 	nummatch = 0;
-	lastline = (LINE *)NULL;
-	mmove_flag = FALSE; 	/* disable mouse move events		  */
+	lastline = (LINE *) NULL;
+	mmove_flag = FALSE;	/* disable mouse move events		  */
 
-	while ( (f == FALSE || n > nummatch) &&
-		(nlflag == FALSE || nlrepl == FALSE) ) {
+	while ((f == FALSE || n > nummatch) &&
+		(nlflag == FALSE || nlrepl == FALSE))
+	{
+		/* let the undo checkpoint out position each q-replacement */
+		if (kind)
+			undo_insert(OP_CMND, 1, obj);
+
 		/* Search for the pattern.
 		 * If we search with a regular expression,
 		 * matchlen is reset to the true length of
@@ -105,15 +110,18 @@ int	n;	/* # of repetitions wanted */
 		 */
 #if	MAGIC
 		if (magical && (curwp->w_bufp->b_mode & MDMAGIC)) {
-			if (!mcscanner(FORWARD, PTBEG, 1))
+			if (!mcscanner(&mcpat[0], FORWARD, PTBEG, 1))
 				break;
 		}
 		else
+			if (!mcscanner(&mcdeltapat[0], FORWARD, PTBEG, 1))
+				break;	/* all done */
+#else
+		if (!scanner(FORWARD, PTBEG, 1))
+			break;	/* all done */
 #endif
-			if (!scanner(FORWARD, PTBEG, 1))
-				break;		/* all done */
 
-		++nummatch;	/* Increment # of matches */
+		++nummatch;		/* Increment # of matches */
 
 		/* Check if we are on the last line.
 		 */
@@ -124,7 +132,7 @@ int	n;	/* # of repetitions wanted */
 		if (kind) {
 			/* Get the query.
 			 */
-pprompt:		mlrquery();
+pprompt:	mlrquery();
 qprompt:
 			/* Show the proposed place to change, and
 			 * update the position on the modeline if needed.
@@ -132,8 +140,8 @@ qprompt:
 			if (posflag)
 				upmode();
 			update(TRUE);
-			c = tgetc();			/* and input */
-			mlerase();			/* and clear it */
+			c = tgetc();	/* and input */
+			mlerase();	/* and clear it */
 
 			/* And respond appropriately.
 			 */
@@ -142,78 +150,80 @@ qprompt:
 				case 'o':	/* oui, substitute */
 				case 'O':
 #endif
-				case 'y':	/* yes, substitute */
-				case 'Y':
-				case ' ':
-					break;
+			case 'y':	/* yes, substitute */
+			case 'Y':
+			case 'l':	/* last substitute */
+			case 'L':
+			case ' ':
+				break;
 
-				case 'n':	/* no, onward */
-				case 'N':
-					forwchar(FALSE, 1);
-					continue;
+			case 'n':	/* no, onward */
+			case 'N':
+				forwchar(FALSE, 1);
+				continue;
 
-				case '!':	/* yes/stop asking */
-					kind = FALSE;
-					break;
+			case '!':	/* yes/stop asking */
+				kind = FALSE;
+				break;
 
-				case 'u':	/* undo last and re-prompt */
-				case 'U':
-					/* Restore old position.
+			case 'u':	/* undo last and re-prompt */
+			case 'U':
+				/* Restore old position.
+				 */
+				if (lastline == (LINE *) NULL) {
+					/* There is nothing to undo.
 					 */
-					if (lastline == (LINE *)NULL) {
-						/* There is nothing to undo.
-						 */
-						TTbeep();
-						goto pprompt;
-					}
-					curwp->w_dotp = lastline;
-					curwp->w_doto = lastoff;
-					lastline = NULL;
-					lastoff = 0;
-
-					/* Delete the new string,
-					 * restore the old match.
-					 */
-					backchar(FALSE, replen);
-					status = delins(replen, oldpatmatch, FALSE);
-					if (status != TRUE) {
-						mmove_flag = TRUE;
-						return(status);
-					}
-
-					/* Record one less substitution,
-					 * backup, save our place, and
-					 * reprompt.
-					 */
-					--numsub;
-					backchar(FALSE, oldmatchlen);
-					matchlen = oldmatchlen;
-					matchline = curwp->w_dotp;
-					matchoff  = curwp->w_doto;
-					continue;
-
-				case '.':	/* abort! and return */
-					/* restore old position */
-					curwp->w_dotp = origline;
-					curwp->w_doto = origoff;
-					curwp->w_flag |= WFMOVE;
-
-				case BELL:	/* abort! and stay */
-					mlwrite(TEXT89);
-/*						"Aborted!" */
-					mmove_flag = TRUE;
-					return(FALSE);
-
-				default:	/* bitch and beep */
 					TTbeep();
+					goto pprompt;
+				}
+				curwp->w_dotp = lastline;
+				curwp->w_doto = lastoff;
+				lastline = NULL;
+				lastoff = 0;
 
-				case '?':	/* help me */
-					mlwrite(TEXT90);
+				/* Delete the new string,
+				 * restore the old match.
+				 */
+				backchar(FALSE, replen);
+				status = delins(replen, oldpatmatch, FALSE);
+				if (status != TRUE) {
+					mmove_flag = TRUE;
+					return (status);
+				}
+
+				/* Record one less substitution,
+				 * backup, save our place, and
+				 * reprompt.
+				 */
+				--numsub;
+				backchar(FALSE, oldmatchlen);
+				matchlen = oldmatchlen;
+				matchline = curwp->w_dotp;
+				matchoff = curwp->w_doto;
+				continue;
+
+			case '.':	/* abort! and return */
+				/* restore old position */
+				curwp->w_dotp = origline;
+				curwp->w_doto = origoff;
+				curwp->w_flag |= WFMOVE;
+
+			case BELL:	/* abort! and stay */
+				mlwrite(TEXT89);
+/*						"Aborted!" */
+				mmove_flag = TRUE;
+				return (FALSE);
+
+			default:	/* bitch and beep */
+				TTbeep();
+
+			case '?':	/* help me */
+				mlwrite(TEXT90);
 /*"(Y)es, (N)o, (!)Do rest, (U)ndo last, (^G)Abort, (.)Abort back, (?)Help: "*/
-					goto qprompt;
+				goto qprompt;
 
-			}	/* end of switch */
-		}	/* end of "if kind" */
+			}		/* end of switch */
+		}		/* end of "if kind" */
 
 		/* if this is the point origin, flag so we a can reset it */
 		if (curwp->w_dotp == origline) {
@@ -225,9 +235,9 @@ qprompt:
 		 * replacement.
 		 */
 #if	MAGIC
-		status = delins(matchlen, &rpat[0], rmagical);
+		status = delins(matchlen, (char *)&rpat[0], rmagical);
 #else
-		status = delins(matchlen, &rpat[0], FALSE);
+		status = delins(matchlen, (char *)&rpat[0], FALSE);
 #endif
 		if (origline == NULL) {
 			origline = lforw(lastline);
@@ -236,10 +246,10 @@ qprompt:
 
 		if (status != TRUE) {
 			mmove_flag = TRUE;
-			return(status);
+			return (status);
 		}
 
-		numsub++;	/* increment # of substitutions */
+		numsub++;		/* increment # of substitutions */
 
 		/* Save our position, the match length, and the string
 		 * matched if we are query-replacing, as we may undo
@@ -248,38 +258,25 @@ qprompt:
 		 * (possible in MAGIC mode), because we'll infinite loop.
 		 */
 		if (kind) {
+			if (c == 'l' || c == 'L')
+				break;
 			lastline = curwp->w_dotp;
 			lastoff = curwp->w_doto;
 			oldmatchlen = matchlen;	/* Save the length for un-do.*/
 
-#if	(TURBO || ZTC) && (DOS16M == 0)
-			/* For compilers with reallocs that handle
-			 * NULL pointers.
-			 */
-			if ((oldpatmatch = realloc(oldpatmatch, matchlen + 1)) == NULL) {
+			if ((oldpatmatch = reroom(oldpatmatch, matchlen + 1)) == NULL) {
 				mlabort(TEXT94);
 /*					"%%Out of memory" */
 				mmove_flag = TRUE;
 				return(ABORT);
 			}
-#else
-			if (oldpatmatch != NULL)
-				free(oldpatmatch);
-
-			if ((oldpatmatch = malloc(matchlen + 1)) == NULL) {
-				mlabort(TEXT94);
-/*					"%%Out of memory" */
-				mmove_flag = TRUE;
-				return(ABORT);
-			}
-#endif
 			strcpy(oldpatmatch, patmatch);
 		}
 		else if (matchlen == 0) {
 			mlwrite(TEXT91);
 /*				"Empty string replaced, stopping." */
 			mmove_flag = TRUE;
-			return(FALSE);
+			return (FALSE);
 		}
 	}
 
@@ -288,7 +285,7 @@ qprompt:
 	mlwrite(TEXT92, numsub);
 /*		"%d substitutions" */
 	mmove_flag = TRUE;
-	return(TRUE);
+	return (TRUE);
 }
 
 /*
@@ -304,7 +301,7 @@ VOID PASCAL NEAR mlrquery()
 	mlwrite(TEXT87);
 /*		"Replace '" */
 
-	tcol = echostring(patmatch, strlen(TEXT87), NPAT/2);
+	tcol = echostring(patmatch, strlen(TEXT87), NPAT / 2);
 
 	mlputs(TEXT88);
 /*		"' with '" */
@@ -327,7 +324,7 @@ VOID PASCAL NEAR mlrquery()
 	}
 	else
 #endif
-		echostring(rpat, tcol, NPAT - 8);
+		echostring((char *) rpat, tcol, NPAT - 8);
 
 	mlputs("'? ");
 }
@@ -380,7 +377,7 @@ int	use_rmc;
 
 	return (status);
 }
-
+#if MAGIC
 /*
  * rmcstr -- Set up the replacement 'magic' array.  Note that if there
  *	are no meta-characters encountered in the replacement string,
@@ -395,23 +392,43 @@ int PASCAL NEAR rmcstr()
 	int	status = TRUE;
 	int	mj;
 
-	patptr = (char *)&rpat[0];
+	patptr = (char *) &rpat[0];
 	rmcptr = &rmcpat[0];
 	mj = 0;
 	rmagical = FALSE;
 
 	while (*patptr && status == TRUE) {
 		switch (*patptr) {
-			case MC_DITTO:
+		case MC_DITTO:
 
-				/* If there were non-magical characters in
-				 * the string before reaching this character
-				 * plunk it in the replacement array before
-				 * processing the current meta-character.
-				 */
+			/* If there were non-magical characters in
+			 * the string before reaching this character
+			 * plunk it in the replacement array before
+			 * processing the current meta-character.
+			 */
+			if (mj != 0) {
+				rmcptr->mc_type = LITSTRING;
+				if ((rmcptr->u.rstr = room(mj + 1)) == NULL) {
+					mlabort(TEXT94);
+/*							"%%Out of memory" */
+					status = FALSE;
+					break;
+				}
+				bytecopy(rmcptr->u.rstr, patptr - mj, mj);
+				rmcptr++;
+				mj = 0;
+			}
+			rmcptr->mc_type = DITTO;
+			rmcptr++;
+			rmagical = TRUE;
+			break;
+
+		case MC_ESC:
+			pchr = *(patptr + 1);	/* peek at next char.*/
+			if (pchr <= '9' && pchr >= '1') {
 				if (mj != 0) {
 					rmcptr->mc_type = LITSTRING;
-					if ((rmcptr->u.rstr = malloc(mj + 1)) == NULL) {
+					if ((rmcptr->u.rstr = room(mj + 1)) == NULL) {
 						mlabort(TEXT94);
 /*							"%%Out of memory" */
 						status = FALSE;
@@ -421,72 +438,52 @@ int PASCAL NEAR rmcstr()
 					rmcptr++;
 					mj = 0;
 				}
-				rmcptr->mc_type = DITTO;
-				rmcptr++;
-				rmagical = TRUE;
-				break;
+				rmcptr->mc_type = GROUP;
+				rmcptr->u.group_no = pchr - '0';
+				patptr++;
+			}
+			else
+			{
+				rmcptr->mc_type = LITSTRING;
 
-			case MC_ESC:
-				pchr = *(patptr + 1);	/* peek at next char.*/
-				if (pchr <= '9' && pchr >= '1') {
-					if (mj != 0) {
-						rmcptr->mc_type = LITSTRING;
-						if ((rmcptr->u.rstr = malloc(mj + 1)) == NULL) {
-							mlabort(TEXT94);
-/*							"%%Out of memory" */
-							status = FALSE;
-							break;
-						}
-						bytecopy(rmcptr->u.rstr, patptr - mj, mj);
-						rmcptr++;
-						mj = 0;
-					}
-					rmcptr->mc_type = GROUP;
-					rmcptr->u.group_no = pchr - '0';
+				/* We room mj plus two here, instead
+				 * of one, because we have to count the
+				 * current character.
+				 */
+				if ((rmcptr->u.rstr = room(mj + 2)) == NULL) {
+					mlabort(TEXT94);
+/*						"%%Out of memory" */
+					status = FALSE;
+					break;
+				}
+
+				bytecopy(rmcptr->u.rstr, patptr - mj, mj + 1);
+
+				/* If MC_ESC is not the last character
+				 * in the string, find out what it is
+				 * escaping, and overwrite the last
+				 * character with it.
+				 */
+				if (pchr != '\0') {
+					*((rmcptr->u.rstr) + mj) = pchr;
 					patptr++;
 				}
-				else
-				{
-					rmcptr->mc_type = LITSTRING;
+				mj = 0;
+			}
 
-					/* We malloc mj plus two here, instead
-					 * of one, because we have to count the
-					 * current character.
-					 */
-					if ((rmcptr->u.rstr = malloc(mj + 2)) == NULL) {
-						mlabort(TEXT94);
-/*						"%%Out of memory" */
-						status = FALSE;
-						break;
-					}
+			rmcptr++;
+			rmagical = TRUE;
+			break;
 
-					bytecopy(rmcptr->u.rstr, patptr - mj, mj + 1);
-
-					/* If MC_ESC is not the last character
-					 * in the string, find out what it is
-					 * escaping, and overwrite the last
-					 * character with it.
-					 */
-					if (pchr != '\0') {
-						*((rmcptr->u.rstr) + mj) = pchr;
-						patptr++;
-					}
-					mj = 0;
-				}
-
-				rmcptr++;
-				rmagical = TRUE;
-				break;
-
-			default:
-				mj++;
+		default:
+			mj++;
 		}
 		patptr++;
 	}
 
 	if (rmagical && mj > 0) {
 		rmcptr->mc_type = LITSTRING;
-		if ((rmcptr->u.rstr = malloc(mj + 1)) == NULL) {
+		if ((rmcptr->u.rstr = room(mj + 1)) == NULL) {
 			mlabort(TEXT94);
 /*				"%%Out of memory" */
 			status = FALSE;
@@ -496,6 +493,9 @@ int PASCAL NEAR rmcstr()
 	}
 
 	rmcptr->mc_type = MCNIL;
+#if DEBUG_SEARCH
+	rmc_list(0,0);
+#endif
 	return (status);
 }
 
@@ -515,4 +515,9 @@ VOID PASCAL NEAR rmcclear()
 	}
 
 	rmcpat[0].mc_type = MCNIL;
+	rmagical = FALSE;
+	if (oldpatmatch != NULL)
+		free(oldpatmatch);
+	oldpatmatch = NULL;
 }
+#endif

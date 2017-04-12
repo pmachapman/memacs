@@ -1,7 +1,7 @@
 /*	OS2.C:		Operating specific I/O and Spawning functions
 			for the OS/2 operating system
 			for MicroEMACS 3.9
-			(C)Copyright 1993 by Daniel M. Lawrence
+			(C)Copyright 1995 by Daniel M. Lawrence
 
 Note:  don't try to compile this on non OS/2 systems.... the OS/2
 	includes MUST come before ours.....
@@ -122,13 +122,12 @@ execprg(f, n)
  */
 pipecmd(f, n)
 {
-	register WINDOW *wp;	/* pointer to new window */
+	register EWINDOW *wp;	/* pointer to new window */
 	register BUFFER *bp;	/* pointer to buffer to zot */
 	register char *tmp;	/* ptr to TMP DOS environment variable */
 	char line[NLINE];	/* command line send to shell */
 	static char bname[] = "command";
 	static char filnam[NSTRING];
-	char *getenv();
 
 	/* don't allow this command if restricted */
 	if (restflag)

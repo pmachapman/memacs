@@ -34,11 +34,10 @@ store-procedure	init-help
 	set %helpfile 1			;mark which help file we are in
 	delete-mode "view"		;don't lock the help file
 	sethscreen
-	set %helpscreen "Main Menu"	;start at the main menu
-	gethscreen
+	gethscreen "Main Menu"		;start at the main menu
 !endm
 
-store-procedure gethscreen	;switch the current help screen
+store-procedure gethscreen %helpscreen	;switch the current help screen
 
 *gethbegin
 
@@ -268,14 +267,12 @@ store-procedure execcmd		;execute the current command
 	!endif
 
 	!if &seq %cmd &bind "FN6"
-		set %helpscreen "Index"
-		gethscreen
+		gethscreen "Index"
 		!return
 	!endif
 
 	!if &seq %cmd "beginning-of-file"
-		set %helpscreen "Main Menu"
-		gethscreen
+		gethscreen "Main Menu"
 		!return
 	!endif
 
@@ -377,8 +374,7 @@ store-procedure select-this	;select the currently highlighted selection
 	copy-region
 	set %selection &trim $kill
 ;	print &cat &cat "[selecting :" %selection ":]"
-	set %helpscreen %selection
-	gethscreen
+	gethscreen %selection
 !endm
 
 store-procedure select-mouse
@@ -448,14 +444,12 @@ store-procedure select-mouse
 		!endif
 
 		!if &seq %cmd "F6"
-			set %helpscreen "Index"
-			gethscreen
+			gethscreen "Index"
 			!return
 		!endif
 
 		!if &seq %cmd "HOME"
-			set %helpscreen "Main Menu"
-			gethscreen
+			gethscreen "Main Menu"
 			!return
 		!endif
 	!endif
@@ -480,8 +474,7 @@ store-procedure next-screen
 	search-forward "]"
 	backward-character
 	copy-region
-	set %helpscreen $kill
-	gethscreen
+	gethscreen $kill
 
 !endm
 
@@ -493,8 +486,7 @@ store-procedure next-hscreen
 	search-forward "]"
 	backward-character
 	copy-region
-	set %helpscreen $kill
-	gethscreen
+	gethscreen $kill
 
 !endm
 
@@ -506,8 +498,7 @@ store-procedure previous-hscreen
 	search-forward "]"
 	backward-character
 	copy-region
-	set %helpscreen $kill
-	gethscreen
+	gethscreen $kill
 
 !endm
 

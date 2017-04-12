@@ -1,5 +1,5 @@
 /*	EBIND:		Initial default key to function bindings for
-			MicroEMACS 3.12
+			MicroEMACS 4.00
 */
 
 /*
@@ -52,6 +52,7 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{CTRL|'[',		BINDFNC,	meta},
 	{CTRL|'\\',		BINDFNC,	forwsearch},
 	{CTRL|'^',		BINDFNC,	quote},
+	{CTRL|'_',		BINDFNC,	undo},
 	{CTLX|CTRL|'A',		BINDFNC,	fileapp},
 	{CTLX|CTRL|'B', 	BINDFNC,	listbuffers},
 	{CTLX|CTRL|'C', 	BINDFNC,	quit},
@@ -92,14 +93,11 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{CTLX|'A',		BINDFNC,	setvar},
 	{CTLX|'B',		BINDFNC,	usebuffer},
 	{CTLX|'C',		BINDFNC,	spawncli},
-#if	BSD || VMS || SUN || HPUX8 || HPUX9 || AVIION
+#if	BSD || FREEBSD || VMS || SUN || HPUX8 || HPUX9 || AVIION
 	{CTLX|'D',		BINDFNC,	bktoshell},
 #endif
 	{CTLX|'E',		BINDFNC,	ctlxe},
-	{CTLX|'F',		BINDFNC,	setfillcol},
-#if	DEBUGM
 	{CTLX|'G',		BINDFNC,	dispvar},
-#endif
 	{CTLX|'K',		BINDFNC,	killbuffer},
 	{CTLX|'M',		BINDFNC,	setmod},
 	{CTLX|'N',		BINDFNC,	filename},
@@ -109,6 +107,7 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{CTLX|'R',		BINDFNC,	risearch},
 	{CTLX|'S',		BINDFNC,	fisearch},
 #endif
+	{CTLX|'U',		BINDFNC,	undo_list},
 	{CTLX|'W',		BINDFNC,	resize},
 	{CTLX|'X',		BINDFNC,	nextbuffer},
 	{CTLX|'Y',		BINDFNC,	cycle_ring},
@@ -125,6 +124,7 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{META|CTRL|'R', 	BINDFNC,	qreplace},
 	{META|CTRL|'S', 	BINDFNC,	execfile},
 	{META|CTRL|'V', 	BINDFNC,	nextdown},
+	{META|CTRL|'U', 	BINDFNC,	undo_delete},
 	{META|CTRL|'W', 	BINDFNC,	killpara},
 	{META|CTRL|'X', 	BINDFNC,	execcmd},
 	{META|CTRL|'Y',		BINDFNC,	clear_ring},
@@ -155,7 +155,7 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{META|'P',		BINDFNC,	gotobop},
 	{META|'Q',		BINDFNC,	fillpara},
 	{META|'R',		BINDFNC,	sreplace},
-#if	BSD || HPUX8 || HPUX9 || VMS || SUN || AVIION
+#if	BSD || FREEBSD || HPUX8 || HPUX9 || VMS || SUN || AVIION
 	{META|'S',		BINDFNC,	bktoshell},
 #endif
 	{META|'U',		BINDFNC,	upperword},
@@ -219,6 +219,7 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{SPEC|'i',		BINDFNC,	forwpage},	/* grey PgDn */
 	{SPEC|'j',		BINDFNC,	insspace},	/* grey Ins */
 	{SPEC|'k',		BINDFNC,	forwdel},	/* grey Del */
+	{SPEC|':',		BINDFNC,	execcmd},	/* pause */
 
 	{SPEC|CTRL|'c',		BINDFNC,	gotobop},	/* ctrl grey PgUp */
 	{SPEC|CTRL|'d',		BINDFNC,	backword},	/* ctrl grey left */
@@ -226,17 +227,6 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{SPEC|CTRL|'i',		BINDFNC,	gotoeop},	/* ctrl grey PgDn */
 
 #endif
-
-	{SPEC|SHFT|'1', 	BINDFNC,	cbuf1},
-	{SPEC|SHFT|'2', 	BINDFNC,	cbuf2},
-	{SPEC|SHFT|'3', 	BINDFNC,	cbuf3},
-	{SPEC|SHFT|'4', 	BINDFNC,	cbuf4},
-	{SPEC|SHFT|'5', 	BINDFNC,	cbuf5},
-	{SPEC|SHFT|'6', 	BINDFNC,	cbuf6},
-	{SPEC|SHFT|'7', 	BINDFNC,	cbuf7},
-	{SPEC|SHFT|'8', 	BINDFNC,	cbuf8},
-	{SPEC|SHFT|'9', 	BINDFNC,	cbuf9},
-	{SPEC|SHFT|'0', 	BINDFNC,	cbuf10},
 
 #if	HP150
 	{SPEC|32,		BINDFNC,	backline},
@@ -267,14 +257,6 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{SPEC|0x74,		BINDFNC,	forwword},
 	{SPEC|0x49,		BINDFNC,	backpage},
 	{SPEC|0x51,		BINDFNC,	forwpage},
-	{SPEC|84,		BINDFNC,	cbuf1},
-	{SPEC|85,		BINDFNC,	cbuf2},
-	{SPEC|86,		BINDFNC,	cbuf3},
-	{SPEC|87,		BINDFNC,	cbuf4},
-	{SPEC|88,		BINDFNC,	cbuf5},
-	{SPEC|89,		BINDFNC,	cbuf6},
-	{SPEC|90,		BINDFNC,	cbuf7},
-	{SPEC|91,		BINDFNC,	cbuf8},
 #endif
 
 #if	AMIGA
@@ -287,16 +269,6 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{SPEC|'S',		BINDFNC,	forwpage},
 	{SPEC|'a',		BINDFNC,	backword},
 	{SPEC|'`',		BINDFNC,	forwword},
-	{SPEC|'P',		BINDFNC,	cbuf1},
-	{SPEC|'Q',		BINDFNC,	cbuf2},
-	{SPEC|'R',		BINDFNC,	cbuf3},
-	{SPEC|'S',		BINDFNC,	cbuf4},
-	{SPEC|'T',		BINDFNC,	cbuf5},
-	{SPEC|'U',		BINDFNC,	cbuf6},
-	{SPEC|'V',		BINDFNC,	cbuf7},
-	{SPEC|'W',		BINDFNC,	cbuf8},
-	{SPEC|'X',		BINDFNC,	cbuf9},
-	{SPEC|'Y',		BINDFNC,	cbuf10},
 	{127,			BINDFNC,	forwdel},
 #endif
 

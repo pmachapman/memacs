@@ -6,6 +6,7 @@
 ! to
 !	sys$library:vaxcrtl/lib
 !
+abbrev.obj,-
 basic.obj,-
 bind.obj,-
 buffer.obj,-
@@ -29,6 +30,7 @@ screen.obj,-
 search.obj,-
 smg.obj,-
 tags.obj,-
+undo.obj,-
 vms.obj,-
 window.obj,-
 word.obj,-

@@ -181,7 +181,8 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
     Win31API = ((w & 0xFF) > 3) || ((w >> 8) >= 10);
 #endif
 
-    GetProfileString (ProgName, "HelpFile", "", text, TXTSIZ);
+    GetPrivateProfileString (ProgName, "HelpFile", "", text, TXTSIZ, IniFile);
+
     if (text[0] != '\0') MainHelpFile = copystr (text);
     else MainHelpFile = NULL;   /* default supplied below... */
     MainHelpUsed = FALSE;
@@ -206,11 +207,12 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 			       MicroEMACS executable directory */
     }
 
-    TimeSlice = GetProfileInt (ProgName, "TimeSlice", 100);
+    TimeSlice = GetPrivateProfileInt (ProgName, "TimeSlice", 100, IniFile);
 
-    Colors = GetProfileInt (ProgName, "Colors", 0);
+    Colors = GetPrivateProfileInt (ProgName, "Colors", 0, IniFile);
 
-    GetProfileString (ProgName, "InitialSize", "", text, TXTSIZ);
+    GetPrivateProfileString (ProgName, "InitialSize", "", text,
+				TXTSIZ, IniFile);
     strlwr (text);
     if (strstr (text, "optimize")) {
 	InitPos.x = InitPos.y = 0;
@@ -218,6 +220,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
     else {
 	InitPos.x = InitPos.y = CW_USEDEFAULT;
     }
+
     if (nCmdShow == SW_SHOWNORMAL) {
 	if (strstr (text, "maximize")) {
 	    nCmdShow = SW_SHOWMAXIMIZED;
@@ -226,6 +229,16 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 	    nCmdShow = SW_SHOWMINNOACTIVE;
 	}
     }
+
+    GetPrivateProfileString (ProgName, "CaretShape", "", text,
+				TXTSIZ, IniFile);
+    strlwr (text);
+    if (strstr(text, "horizontal"))
+    	caret_shape = 0;
+    if (strstr(text, "vertical"))
+    	caret_shape = 1;
+    if (strstr(text, "fullcell"))
+    	caret_shape = 2;
 
     /*-Register the broadcast message */
     strcpy (text, ProgName);
@@ -263,7 +276,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 
     /*-Create the frame window */
     hFrameWnd = CreateWindow (FrameClassName,       /* class */
-			      ProgName,             /* title */
+			      PROGNAME " " VERSION, /* title */
 			      WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 			      InitPos.x,            /* positions */
 			      InitPos.y,
@@ -332,11 +345,11 @@ ParsingDone:
 
 static void PASCAL  SetFrameCaption (void)
 {
-    char    text[sizeof(PROGNAME)+19];
+    char    text[sizeof(PROGNAME) + sizeof(VERSION)+20];
     char    *t;
     int     Id;
 
-    strcpy (text, ProgName);
+    strcpy (text, PROGNAME " " VERSION);
     Id = GetWindowWord (hFrameWnd, GWW_FRMID);
     if (Id) {
 	for (t = text; *t != '\0'; t++) ;   /* look for the end of text */
@@ -410,7 +423,6 @@ LONG EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, UINT wParam,
 {
     switch (wMsg) {
 
-#if !WIN30SDK
     case WM_CREATE:
         if (Win31API) DragAcceptFiles (hWnd, TRUE);
         goto DefaultProc;
@@ -418,7 +430,6 @@ LONG EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, UINT wParam,
     case WM_DROPFILES:
 	DropMessage (hWnd, (HDROP)wParam);
 	break;
-#endif
 
     case WM_SETCURSOR:
 	if (UpdateCursor (hWnd, wParam, lParam)) return TRUE;
@@ -454,9 +465,7 @@ void FAR PASCAL FrameInit (CREATESTRUCT *cs)
     HMENU   hMenu;
     UINT    FrameId;
 
-#if !WIN30SDK
     if (Win31API) DragAcceptFiles (hFrameWnd, TRUE);
-#endif
 
     /*-advertise our birth to other Emacs instances and set the frame's
        caption with an Id if necessary */
@@ -546,9 +555,7 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, UINT wParam,
     switch (wMsg) {
 
     case WM_CREATE:
-#if !WIN30SDK
         if (Win31API) DragAcceptFiles (hWnd, TRUE);
-#endif
         if (!hscrollbar) ShowScrollBar (hWnd, SB_HORZ, FALSE);
         if (!vscrollbar) ShowScrollBar (hWnd, SB_VERT, FALSE);
 	{   /*-init WindowWords for ScrReSize function */
@@ -615,11 +622,9 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, UINT wParam,
 	if (EatKey (wMsg, wParam, lParam)) break;
         goto DefaultProc;
 
-#if !WIN30SDK
     case WM_DROPFILES:
         DropMessage (hWnd, (HDROP)wParam);
         break;
-#endif
 
     case WM_MOUSEMOVE:
     case WM_LBUTTONDOWN:
@@ -719,11 +724,9 @@ LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, UINT wParam,
 {
     switch (wMsg) {
         
-#if !WIN30SDK
     case WM_DROPFILES:
 	DropMessage (hWnd, (HDROP)wParam);
 	break;
-#endif
 
     case WM_INITMENUPOPUP:
 	InitMenuPopup ((HMENU)wParam, lParam);
@@ -761,14 +764,10 @@ LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, UINT wParam,
 	    {
 	        int     IconHeight;
 	        
-#if WIN30SDK
-                {
-#else
 	        if (Win31API) {
 	            IconHeight = GetSystemMetrics (SM_CYICONSPACING);
 	        }
 	        else {
-#endif
 	            IconHeight = GetSystemMetrics (SM_CYICON) +
 			         GetSystemMetrics (SM_CYCAPTION) +
 	                         GetSystemMetrics (SM_CYBORDER);

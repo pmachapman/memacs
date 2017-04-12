@@ -1,6 +1,6 @@
 /***
 	MPE driver/Microemacs 3.10b/3.10k,
-	Copyright 1993 D. Lawrence, C. Smith
+	Copyright 1995 D. Lawrence, C. Smith
  ***/
 
 /** Include files **/
@@ -33,14 +33,6 @@ int scnothing()
 #define CCE		2		/* Command successful		*/
 #define TIMEOUT		255		/* No character available	*/
 
-/** Type definitions **/
-struct keyent {				/* Key mapping entry		*/
-	struct keyent * samlvl;		/* Character on same level	*/
-	struct keyent * nxtlvl;		/* Character on next level	*/
-	unsigned char ch;		/* Character			*/
-	int code;			/* Resulting keycode		*/
-};
-
 /** Intrinsics **/
 #pragma intrinsic FCLOSE		/* File close intrinsic		*/
 #pragma intrinsic FREAD			/* File read intrinsic		*/
@@ -67,10 +59,6 @@ static int * inbuft =			/* Tail of input buffer		*/
 static unsigned char outbuf[NOUTCHAR];	/* Output buffer		*/
 static unsigned char * outbuft = 	/* Output buffer tail		*/
 	outbuf;
-static unsigned char keyseq[256];	/* Prefix escape sequence table	*/
-static struct keyent keymap[NKEYENT];	/* Key map			*/
-static struct keyent * nxtkey =		/* Next free key entry		*/
-	keymap;
 
 /** Terminal definition block **/
 int scopen(), scclose(), ttgetc(), ttputc(), ttflush();
@@ -283,83 +271,6 @@ char * seq;				/* Character sequence		*/
 		ttputc('\0');
 }
 
-/** Add character sequence to keycode entry **/
-void addkey(seq, fn)
-unsigned char * seq;			/* Character sequence		*/
-int fn;					/* Resulting keycode		*/
-{
-	int first;
-	struct keyent * cur, * nxtcur;
-
-	/* Skip on null sequences */
-	if (!seq)
-		return;
-
-	/* Skip single character sequences */
-	if (strlen(seq) < 2)
-		return;
-
-	/* If no keys defined, go directly to insert mode */
-	first = 1;
-	if (nxtkey != keymap) {
-		
-		/* Start at top of key map */
-		cur = keymap;
-		
-		/* Loop until matches exhast */
-		while (*seq) {
-			
-			/* Do we match current character */
-			if (*seq == cur->ch) {
-				
-				/* Advance to next level */
-				seq++;
-				cur = cur->nxtlvl;
-				first = 0;
-			} else {
-				
-				/* Try next character on same level */
-				nxtcur = cur->samlvl;
-				
-				/* Stop if no more */
-				if (nxtcur)
-					cur = nxtcur;
-				else
-					break;
-			}
-		}
-	}
-	
-	/* Check for room in keymap */
-	if (strlen(seq) > NKEYENT - (nxtkey - keymap))
-		return;
-		
-	/* If first character in sequence is inserted, add to prefix table */
-	if (first)
-		keyseq[*seq] = 1;
-		
-	/* If characters are left over, insert them into list */
-	for (first = 1; *seq; first = 0) {
-		
-		/* Make new entry */
-		nxtkey->ch = *seq++;
-		nxtkey->code = fn;
-		
-		/* If root, nothing to do */
-		if (nxtkey != keymap) {
-			
-			/* Set first to samlvl, others to nxtlvl */
-			if (first)
-				cur->samlvl = nxtkey;
-			else
-				cur->nxtlvl = nxtkey;
-		}
-
-		/* Advance to next key */
-		cur = nxtkey++;
-	}
-}
-
 /** Grab input characters, with wait **/
 unsigned char grabwait()
 {
@@ -423,52 +334,18 @@ int ch;					/* Character to add		*/
 	*inbuft++ = ch;
 }
 
-/** Cook input characters **/
-void cook()
+/*
+ * qrep - replace a key sequence with a single character in the input buffer.
+ */
+#if PROTO
+VOID qrep(int ch)
+#else
+VOID qrep( ch)
+int ch;
+#endif
 {
-	unsigned char ch;
-	struct keyent * cur;
-	
-	/* Get first character untimed */
-	ch = grabwait();
+	inbuft = inbuf;
 	qin(ch);
-	
-	/* Skip if the key isn't a special leading escape sequence */
-	if (keyseq[ch] == 0)
-		return;
-
-	/* Start at root of keymap */
-	cur = keymap;
-
-	/* Loop until keymap exhasts */
-	while (cur) {
-
-		/* Did we find a matching character */
-		if (cur->ch == ch) {
-
-			/* Is this the end */
-			if (cur->nxtlvl == NULL) {
-
-				/* Replace all character with new sequence */
-				inbuft = inbuf;
-				qin(cur->code);
-				return;
-			} else {
-				/* Advance to next level */
-				cur = cur->nxtlvl;
-			
-				/* Get next character, timed */
-				ch = grabnowait();
-				if (ch == TIMEOUT)
-					return;
-
-				/* Queue character */
-				qin(ch);
-			}
-		} else
-			/* Try next character on same level */
-			cur = cur->samlvl;
-	}
 }
 
 /** Return cooked characters **/
@@ -739,8 +616,6 @@ int n;					/* Argument count		*/
 {
 	char * sh;
 
-	char * getenv();
-
 	/* Don't allow this command if restricted */
 	if (restflag)
 		return resterr();
@@ -795,7 +670,7 @@ int n;					/* Argument count		*/
 	char line[NLINE];
 	int s;
 	BUFFER * bp;
-	WINDOW * wp;
+	EWINDOW * wp;
 	static char filnam[] = "command";
 
 	/* Don't allow this command if restricted */

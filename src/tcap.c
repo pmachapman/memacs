@@ -1,5 +1,5 @@
-/*	tcap:	Unix V5, SUN OS, SCO XENIX, V7 and BS4.2 Termcap video driver
-		for MicroEMACS 3.12
+/*	tcap:	Unix V5, SUN OS, SCO XENIX, and BS4.2 Termcap video driver
+		for MicroEMACS 4.00
 
          12-10-88 - Modifications made by Guy Turcotte to accomodate
                     SunOS V4.0 and Xenix V2.2.1 :
@@ -42,11 +42,11 @@
                     #if directive preceeding the get1key definition has been
                     modified from:
  
-                     #if (V7 == 0) && (BSD == 0)
+                     #if BSD == 0
  
                     to:
  
-                     #if (V7 == 0) && (BSD == 0) && (USG == 0)
+                     #if (BSD == 0) && (USG == 0)
                      
                   o The following lines define the new termcap entry for
                     the ansi kind of terminal: it permits the use of functions
@@ -83,7 +83,7 @@
 #if	USG | AUX | HPUX8 | HPUX9 | SMOS
 #include	<time.h>
 #endif
-#if	BSD | V7
+#if	BSD
 #include	<sys/types.h>
 #include	<sys/time.h>
 #endif
@@ -269,7 +269,6 @@ tcapopen()
 	char tcbuf[1024];
 	char *tv_stype;
 	char err_str[72];
-	char *getenv();
 	char *tgetstr();
 
 	strcpy(os, "UNIX");
@@ -440,7 +439,7 @@ int PASCAL NEAR get1key()
 	register int c;
 	register int index;	/* index into termcap binding table */
 	char *sp;
-#if	BSD | V7 | HPUX8 | HPUX9
+#if	BSD | HPUX8 | HPUX9
 	int fdset;
 	struct timeval timeout;
 #endif
@@ -454,7 +453,7 @@ int PASCAL NEAR get1key()
 
 	/* process a possible escape sequence */
 	/* set up to check the keyboard for input */
-#if	BSD | V7 | HPUX8 | HPUX9
+#if	BSD | HPUX8 | HPUX9
 	fdset = 1;
 	timeout.tv_sec = 0;
 	timeout.tv_usec = 35000L;

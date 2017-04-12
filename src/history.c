@@ -1,15 +1,15 @@
 /*
  *	HISTORY.C:	Revision History for
  *
- *	MicroEMACS 3.12
+ *	MicroEMACS 4.00
  *		written by Daniel M. Lawrence
  *		based on code by Dave G. Conroy.
  *
- *	(C)Copyright 1988, 1989, 1990, 1991, 1992, 1993 by Daniel M. Lawrence
- *	MicroEMACS 3.12 can be copied and distributed freely for any
+ *	(C)Copyright 1995 by Daniel M. Lawrence
+ *	MicroEMACS 4.00 can be copied and distributed freely for any
  *	non-commercial purposes. Commercial users may use MicroEMACS
- *	3.12 inhouse. Shareware distributors may redistribute
- *	MicroEMACS 3.12 for media costs only. MicroEMACS 3.12 can only
+ *	4.00 inhouse. Shareware distributors may redistribute
+ *	MicroEMACS 4.00 for media costs only. MicroEMACS 4.00 can only
  *	be incorporated into commercial software or resold with the
  *	permission of the current author.
  *
@@ -347,7 +347,7 @@
  *	22-jul-86
  *	- fixed replaces() so that it will return FALSE properly on the
  *	  input of the replacement string.
- *	- added a definition for FAILED as a return type.....
+ *	- added a definition for FAILD as a return type.....
  *	- changed version number to 3.7b
  *	23-jul-86
  *	- fixed o -> 0 problem in TERMIO.C
@@ -632,7 +632,7 @@
  *	  the high order bit
  *	30-mar-87
  *	- changed list-buffers (^X^B) so that with any argument, it will
- *	  also list the normally invisable buffers
+ *	  also list the normally invisible buffers
  *	- added store-procedure and execute-procedure/run (M-^E)
  *	  commands to store and execute named procedures.
  *	31-mar-87
@@ -933,10 +933,10 @@
  *	  pattern search.  This effects all the but MAGIC search commands.
  *	22-dec-87
  *	- narrow-to-region (^X-<) and widen-from-region (^X->) allow you
- *	  to make all but a region invisable, thus all global commands
+ *	  to make all but a region invisible, thus all global commands
  *	  can act on a single region.
  *	- a numeric argument on the select-buffer (^X-b) command makes
- *	  that buffer become "invisable"
+ *	  that buffer become "invisible"
  *	- M-FNC becomes $cmdhook
  *	  M-FNW becomes $wraphook
  *	23-dec-87
@@ -1096,7 +1096,7 @@
  *	- fixed bug in narrow() ... it works everywhere now.
  *	[BBS release of 3.9n]
  *	3-june-88
- *	- removed restriction against deleting invisable buffers
+ *	- removed restriction against deleting invisible buffers
  *	- a lot of little fixes suggested by Dave Tweten
  *	10-jun-88
  *	- added "safe save"ing as coded by Suresh Konda.
@@ -2188,6 +2188,350 @@
  *	- various last minute updates to help system and command files.
  *	22 Apr 93
  *	[RELEASED version 3.12 for general distribution]
+ *	29 Aug 93 John M. Gamble
+ *	- Added metacharacters beginning of word \< and end of word \> to
+ *	  MAGIC mode search.
+ *	- Added a (l)ast command to query-replace-string.
+ *	12 Sep 93 John M. Gamble
+ *	- Made the change in VMS.C that i had posted some months earlier:
+ *	  ffgetline() was returning too large a value for nbytes (which is
+ *	  used to allocate the LINE buffer) causing out-of-memory errors,
+ *	  due to the fact that it was returning rab.rab$w_usz instead of
+ *	  rab.rab$w_rsz.
+ *	15 Sep 93 Daniel Lawrence
+ *	- changed line counts (nline) in file.c in readin(), writeout(),
+ *	  and ifile() to longs
+ *	16 Sep 93
+ *	- on a failure to file lock, instead of aborting a file read, emacs
+ *	  now reads it and places it in VIEW mode
+ *	[version 3.12a handed out locally]
+ *	05 Nov 93
+ *	- added Bill Irwin's linked list functions to begin implimenting
+ *	  inline abbreviations.
+ *	08 Nov 93
+ *	- as warned for 2 full versions, I yanked the numbered macro code.
+ *	  saved 4.7K in the run image. I must now go re-work the various
+ *	  macro pages to not use them.
+ *	- added the add-abbrev and describe-abbrevs commands
+ *	- eliminated extra line in an apropos command if there are no
+ *	  matching macro names to list
+ *	- added ABBREV mode to indicate that symbol abbreviations should
+ *	  be expanded within a buffer as they are typed
+ *	- added &abbrev <sym> to return the current definition of a symbol
+ *	- added three new environment variables:
+ *		$abbell	- ring bell on expansion?
+ *		$abcap	- match capitolization on expansion? (not operational)
+ *		$abquick  Aggressive expansion?
+ *	- non-aggressive expansion is active.
+ *	09 Nov 93
+ *	[changed version number to 3.12b]
+ *	- Word wrapping is now honored when expanding an abbreviation.
+ *	- repaired a bug in ab_delete. Abbreviations work!
+ *	- added quick completion. $abquick will cause aggressive completion.
+ *	13 Nov 93
+ *	- added code to unbind keys bound to a buffer about to be deleted.
+ *	  This is needed to simplify page macro re-coding since the elimination
+ *	  of numbered macroes.
+ *	19 Nov 93 John Gamble
+ *	- Moved the cursor positioning call out of echochar().  echostring()
+ *	  and isearch() now place the cursor themselves.  This has no effect
+ *	  on isearch, but echostring now only places the cursor once, instead
+ *	  of for every single character in the string.  Makes life easier if
+ *	  you have a terminal on a relatively slow serial line.
+ *	1 Jan 94 John Gamble
+ *	- 'last' command in replaces() was checked even if we weren't in
+ *	  query-replace.  Fixed.
+ *	5 Feb 94 John Gamble
+ *	- Setting a new search pattern via isearch() did not reset the
+ *	  equivalent MAGIC mode pattern.  Performing a search after that
+ *	  meant that you would still be searching with the old, invalid
+ *	  pattern.  Fixed this by clearing the MAGIC mode pattern on entry -
+ *	  the search routines will re-create it as needed.
+ *	- Deleted code that detected if the point was in a word.  Written for
+ *	  MAGIC mode \> and \<, but Dan simultaneously wrote an identical
+ *	  function for ABBREV mode.  I use his instead now.
+ *	- Deleted function declaration for getenv() in bind.c, dolock.c,
+ *	  eval.c, and input.c; and the os-code files ansi.c, fmrdos.c,
+ *	  mpe.c, msdos.c, necdos.c, nt.c, os2.c, tcap.c, tos.c, unix.c,
+ *	  vt52.c, and wmcs.c.  Declared it instead in eproto.h, where it
+ *	  belongs - the compiler should complain a little less now.
+ *	- Prototyped functions clist_buffer(), clist_command(), and
+ *	  clist_file() in input.c.  Prototyped reform() in word.c.
+ *	  Prototyped function unlist_screen() in screen.c.  Declared as
+ *	  VOID unbind_buf() in bind.c
+ *	[Changed version to 3.12c on Feb 5, 1994]
+ *	10 Apr 94 John Gamble
+ *	- First step towards using Boyer-Moore searches in MAGIC mode
+ *	  searches.  MC struct contains a string field now, and the
+ *	  mcstr() routines can now collect characters as a string,
+ *	  instead of one character at a time.  Many changes to handle
+ *	  string allocation/deallocation.
+ *	17 Apr 94 John Gamble
+ *	- Merged in Pascal Mehuet's AIX and AIX windows changes.
+ *	1-jun-94 Daniel Lawrence
+ *	- started work on XVT windowing driver. added XVT.c.
+ *	6 Jun 94
+ *	- had to rename our WINDOW struct to EWINDOW to keep it from
+ *	  conflicting with XVT. What a pain.......
+ *	  This changed the version number to 3.12d
+ *	20 jul 94
+ *	- XVT driver is functional.
+ *	25 jul 94
+ *	- added $exithook to execute on exit.
+ *	- added new bit in $gflags (4) that tells of pending exit and
+ *	  allows it to be supressed.
+ *	27 jul 94
+ *	- made changes (of WINDOW to EWINDOW) and tested the Microsoft
+ *	  windows executable.
+ *	[Changed version number to 3.12e locally]
+ *	1 aug 94  bug fixes by Bruce Momjian
+ *	- conditionals in ifile() in file.c to prevent eroneous reassignments
+ *	  of the marks when inserting a file.
+ *	- DRIVESEPCHAR for UNIX and other systems is now null to prevent
+ *	  problems with colons in file names (stupid character to use!)
+ *	- in unix.c in getffile(), only allow a backslash as a path seperator.
+ *	- rename crypt() to ecrypt() [emacs crypt] to prevent conflicts
+ *	  with HPUX;s crypt function.
+ *	1 aug 94 Erkki Ruohtula
+ *	- in readin() in file.c if we can access the file and find it read
+ *	  only, place the buffer in VIEW mode.
+ *	1 aug 94 Daniel Lawrence
+ *	- dropped support for Datalight C. It's become Semantic C and has
+ *	  not existed for 6 years now.
+ *	- dropped support for UNIX version 7.
+ *	- dropped support for AZTEC C..... (sorry, it's really dead Jim)
+ *	2 aug 94
+ *	- removed the set-fill-column command. This is not really needed
+ *	  with set $fillcol availible. Fixed wpage.cmd not to use the old
+ *	  form anymore.
+ *	- ~e in strings now expands to the escape character.
+ *	- a couple of lines in eval.c fixed problems with user variables
+ *	  with names larger than the max were corrupting the user
+ *	  variable list.
+ *	- changed user variables names to be up to 16 characters long.
+ *	- We have been prescanning !while loops in procedures which
+ *	  should just be stored! fixing this perceptibly (about 30%) sped
+ *	  up the standard startup and the help system!
+ *	- added local (unbound) and global (unbound) commands to declare
+ *	  local and global user variables......
+ *	[changed version number to 3.12f]
+ *	- added data structure, elements and code to implement global
+ *	  and local user variables. UTABLE is a user data table, uv_head
+ *	  points to the head of a linked list of tables, of which uv_global
+ *	  points to the last, which is the global user variable table.
+ *	- fixed minor bug in pop() in display.c that made pop up list of
+ *	  exact screen sizes need an extra key to escape from when at the end.
+ *	5 aug 94
+ *	- finished local/global commands. Debugged. Local variables work and
+ *	  are now displayed properly from the describe-variables command.
+ *	- Eliminated the DEBUGM symbol. I want this facility online for ALL
+ *	  versions from now on, its not very large.
+ *	10 aug 94
+ *	- parameters to procedures are in and working! They appear in the
+ *	  describe-variables list as well.
+ *	22 aug 94 John Gamble
+ *	- Some modifications to estruct.h to handle forthcoming search
+ *	  changes: addition of the JMPTABLE type, new DELTA structure.
+ *	- Check for reasonable value of $hardtab in svar() in eval.c.
+ *	- Changed dolock.c to look at the evironment variable LOGNAME
+ *	  instead of USER when setting the lock file information, when
+ *	  compiling under HPUX8 and HPUX9.
+ *	- Put in Bruce Momjian's fix which put the null terminator
+ *	  of the directory string past the slash instead of on it (bug).
+ *	  This is in line 155 of dolock.c
+ *	- $modeflag was being ignored in scroll and pop row calculations.
+ *	  Put in the fix in basic.c and display.c
+ *	- Fixed a tab-is-eight-characters legacy in lowrite() in line.c
+ *	- Oops.  It was still called NSEARCH in mewin.def instead of SEARCH.
+ *	- Moved liteq() and litmake() declaractions to eproto.h from search.c.
+ *	- Put in some ifdef'ed code for MAGIC mode jump tables... don't use
+ *	  yet!
+ *	- Added $newscreen variable to variable list.  Default FALSE, so it
+ *	  shouldn't affect any screen macroes found in the command files.
+ *	26 Oct 1994 John Gamble
+ *	- Added a setjtable() call to isearch when exiting
+ *	  isearch with a regular command.
+ *	3 Dec 1994 Daniel Lawrence
+ *	- Added $undoflag variable to enable/disable undo command processing
+ *	  (I'm expecting a lot of overhead for these!)
+ *	5 Dec 94
+ *	- added structurs for OBJECT to be undone (OBJECT) and UNDO_OBJs.
+ *	- added UNDO_OBJ pointer to buffer structure
+ *	- wrote code to insert into the undo list (undo_insert()) to new
+ *	  source file undo.c
+ *	- added first calls to undo_insert in insert/del character functions
+ *	  in line.c and in execkey() in random.c
+ *	7 Feb 95
+ *	- added flag to suspend undo info collection while undoing....
+ *	8 Feb 95
+ *	- the rest of the basic undo facility is in and working!
+ *	  undo (^_)		undo most recent change
+ *	  delete_undos (M-^U)	clear the undo stack
+ *	  list_undos (^XU)	pop-up a buffer of undos
+ *	- Updated all the source copyright dates... how tedious
+ *	- toggling $undoflag clears all the buffers undo stack
+ *	- clear a buffer (via bclear() in buffer.c) clears all undo
+ *	  information for that buffer
+ *	13 Feb 95
+ *	- added new OP_ISTR and OP_DSTR operations within the UNDO code
+ *	  to optimize the entry of strings of characters.
+ *	- added a new OP_REPC operation to handle case changing and all
+ *	  other commands that change buffer text in place.
+ *	- a thourough scan of all invocations of lputc() pointed out several
+ *	  places to use the OP_REPC, including transpose-characters (^T).
+ *	- made query-replace-string (M-^R) drop an OP_CMND undo operator
+ *	  on the undo stack to seperate its replacements.
+ *	- added $dispundo to control display of undo stack level on
+ *	  the current windows modeline.
+ *	16 Feb 95
+ *	- added getoldb() to get a pointer to the most ancient visited
+ *	  buffer..... to pick to dump undo information from.
+ *	- replaced all calls to malloc() with room() to prepare to release
+ *	  undo information memory on malloc failure.
+ *	17 Feb 95
+ *	- retested current code under the Instant-C interpreter in order
+ *	  to examine memory utilization of undoes. Fixed lots of little
+ *	  signed/unsigned cahr and sign extension problems.
+ *	25 Feb 95 John Gamble
+ *	- "sys$sysdevice:[vmstools]" removed from *pathname in epath.h.
+ *	- Pascal Mehuet's AIX windows changes work for HPUX9 too.
+ *	  Changes in display.c, edef.h, main.c, and unix.c.
+ *	- Hitting a space for a completion list when no prior characters
+ *	  had been typed gave unpredictable results, now check for this.
+ *	- The function _strrev() exists for MSC, #define it to strrev()
+ *	  and add MSC to the list.
+ *	- Non-magical searches use the DELTA structure now.
+ * 	17 Mar 95 John Gamble
+ *	- Boyer Moore search in MAGIC mode is complete.
+ *	- $hardtab = 0 shows ^Is in a text buffer
+ *	22 Mar 95 Daniel Lawrence
+ *	- added OP_CPOS to allow a specific placement of the cursor after
+ *	  an undo. Added this entry to commands that delete backwards and
+ *	  would have left the cursor in the wrong place.
+ *	[March 22, 1995 - released version 4.0 BETA for beta testing]
+ *	29 Mar 95
+ *	- at John Gamble's suggestion, we have eliminated the need of the
+ *	  makelit() function, making uEMACS 682 bytes smaller under MSDOS!
+ *	- made the ldelete() function flag the position of saved text at
+ *	  the front of the string when deleteing backwards. This fixes some
+ *	  problems with undos of backward deleted text.
+ *	- made the delete-previous-word (M-^H) command push a OP_CPOS
+ *	  on the stack so an undo of it works properly.
+ *	- rewrote the macroes in epage.cmd not to use numbered macroes.
+ *	4 apr 95
+ *	- increased the buffer name max size to 128.... to match the user
+ *	  variables and everything else in the expresion evaluator.
+ *	- a missing long cast in abbrev.c in ab_expand() cause problems
+ *	  in 23 bit environments. All fixed.
+ *	- replaced all calls to realloc() to reroom() to allow the old
+ *	  undo info to be reclaimed on failure.
+ *	- some fixes in main.c dealing with REP and OVER modes allowing
+ *	  inserts of characters with repeat counts in these mores to work,
+ *	  as given to me by John Gamble.
+ *	- a laborious hour long process to fix the indentation of braces
+ *	  in main.c. Clearly anyone who prefers their own style should
+ *	  keep their hands off my code. This screws with my mind and with
+ *	  our every attempt to provide diffs.
+ *	6 apr 95
+ *	- fixed the OVER and REP mode code to store a cursor position
+ *	  undo entry to get the cursor position correct on undos.
+ *	- dumped the DOS16M symbol now that the reroom() routine
+ *	  replaces realloc() and it checks for a null pointer, making
+ *	  sure there are no attempts to realloc() a null pointer.
+ *	[April 10, 1995 - released version 4.0 BETA 2 for beta testing]
+ *	6 may 95 John Gamble
+ *	- Cleaned up code dealing with MAGIC (the compile option) == 0.
+ *	  Affects tag.c, eval.c, search.c and replace.c.
+ *	- linstr() checks for empty strings now.  This prevents adding
+ *	  an uneeded UNDO object.
+ *	- getctext() was using a local array as a return value.  This
+ *	  is a no-no.  It now takes an array as an argument, and returns
+ *	  that.
+ *	- $disphigh was not being checked for most column calculator
+ *	  functions.  The cursor was getting misplaced as a result.
+ *	  Added checks in mouse.c and random.c.  Removed some duplicate
+ *	  code in display.c as a result (updpos() now just calls getccol()).
+ *	- Search now highlights the match on the screen.  Uses mark # 10,
+ *	  which means it is on by default.  Change $hilight to prevent this,
+ *	  or compile with a different mark number.
+ *	- WIN3.0 support dropped.  Affects files mswin.h, mswemacs.c,
+ *	  mswfont.c, mswdrv.c, mswinput.c.
+ *	- Title and version now on the Windows title bar.  Change in mswsys.c.
+ *	  No longer put title and version on modeline for Windows version.
+ *	- Magenta and Lmagenta had identical values in the palette array.
+ *	  Changed Lmagenta.  Also, Yellow and Lyellow were nearly
+ *	  indistinguishable.  Altered both values in mswdisp.c.
+ *	- changed a "select-buffer "Function Keys"" line in emacs.rc to
+ *	  "1 select-buffer "Function Keys""  to ensure the buffer is
+ *	  always invisible in Windows.
+ *	- New mdi.cmd takes advantage of $newscreen - no more "Relay Screen"
+ *	  flashing for reading files (screen rebuild still uses it though).
+ *	27 may 1995 John Gamble
+ *	- The function scanner() goes away - mcscanner can handle jump
+ *	  tables, and uses the special MC structs mcdeltapat and tapatledcm
+ *	  for that purpose.  (scanner() actually sticks around for those
+ *	  who compile MicroEMACS without a magic mode, there's a #define).
+ *	- Variable numsubs in replaces() is type long now.  TEXT92 in all
+ *	  language files has the %d changed to %D.
+ *	- MS-Windows version now reads and writes to EMACS.INI, not WIN.INI.
+ *	- EMACS.INI also has a new entry CaretShape, which may be set
+ *	  to values "horizontal", "vertical", or "fullcell".  This had
+ *	  been a compile option in mswin.h, now it is a settable ini value.
+ *	- Making a buffer INVISIBLE was also marking it as changed if you
+ *	  did it by setting $cbflags.  Bug in eval.c is now fixed.
+ *	- New compile const HANDLE_WINCH for telling which machines
+ *	  handle the windows-changed signal.
+ *	- Put in Eric Picheral's suggested changes:
+ *	  o GNU has a getkey/setkey combo... change ours to [gs]et_key().
+ *	  o wordcount() was checking hard-coded letter values, now it
+ *	    uses is_letter().
+ *	  o Added USG and the HPUXes to the NFILEN condtion in estruct.h.
+ *	  o Put an unsigned char cast in lgetc() macro for some Unixes.
+ *	  o variable uv_head was misspelled ut_head in main.c.
+ *	  o Added WINDOW_MSWIN and AIX to list to include frenchis.h over
+ *	    french.h in elang.h.
+ *	  o New french.h and frenchis.h files.
+ *	31 May 95 Daniel Lawrence
+ *	- re-ported current version to Windows NT. Fixed makefile to work with
+ *	  visual C++ 2.0. Set PAUSE key to generate FN: and bound it to
+ *	  execute-command-line. Set to ignore scroll lock key.
+ *	- got rid of a lot of unreferenced local variables
+ *	9 June 95
+ *	- modified &cat to never overwrite its buffer
+ *	15 June 95
+ *	- added $popwait, which when false suppresses the user input during
+ *	  a pop-up buffer (for macroes!)
+ *	17 June 95
+ *	- bumped the maximum number of rows under windows up to 128 from 50.
+ *	- get the true length of the pattern rather than using matchlen
+ *	  while in MAGIC mode, as submitted by Frank Kaefer.
+ *	18 June 95 John Gamble
+ *	- New functions &mkcol and &mkline respectively return the column
+ *	  number and line number of mark n, if n is valid and exists.
+ *	  They return -1 and 0 otherwise.
+ *	- Bruce Momjian's mark fix for including text wasn't completely
+ *	  implemented, added the second portion that he posted.
+ *	10 Sept 95 John Gamble
+ *	- added add-keymap and list-keymappings to commands.  Code
+ *	  that formerly was duplicated in ansi.c, mpe.c, unix.c, smg.c,
+ *	  vms.c gets consolidated into keyboard.c.  Command add-keymap
+ *	  exists to replace the set $palette "KEYMAP ..." strangeness,
+ *	  list-keymappings displays what's been mapped in a popped buffer.
+ *	18 Nov 95 Daniel Lawrence
+ *	- moved the prototyping for the new keymapping functions from
+ *	  eproto.h backtokeybaoard.c. The needed structures for their
+ *	  declarations were not even defined for non-unix environments.
+ *	- bug in file.c in the unix code caused the wrong buffer to be
+ *	  marked as read-only when there was no file access. Fixed it.
+ *	- in undo() it was possible to execute undo_op() even when the
+ *	  endo stack was empty. This caused a zero pointer reference.
+ *	  This is now fixed.
+ *	29 Dec 95
+ *	- added 2 calls to movecursor (in echostring() and mlprompt())
+ *	  to make sure the physical cursor is updated to the logical cursor.
+ *	  This had been a problem in the Windows NT driver.......
+ *	- some lowercase "void" function declarations in eval.c, screen.c
+ *	  and undo.c has to be made "VOID". The SUN showed is this.
  */
 
 history()

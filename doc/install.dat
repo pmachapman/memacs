@@ -1,6 +1,6 @@
 @DefineProject
 	@Name 		= "MicroEMACS"
-	@Version	= "3.12"
+	@Version	= "4.0"
 	@Subdir 	= "\\bin\\"
 	@OutDrive 	= C
 	@Requires	@HardDisk
@@ -20,7 +20,7 @@
 	04/22/93
 	Installation Program
 
-  Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993 by Daniel M. Lawrence
+  Copyright (c) 1988 - 1995 by Daniel M. Lawrence
   @Name @Version can be copied and distributed freely for any
   non-commercial purposes. Commercial users may use @Name @Version
   inhouse. Shareware distributors may redistribute @Name @Version

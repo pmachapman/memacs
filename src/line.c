@@ -35,7 +35,7 @@ register int used;
 {
 	register LINE	*lp;
 
-	if ((lp = (LINE *)malloc(sizeof(LINE)+used)) == NULL) {
+	if ((lp = (LINE *)room(sizeof(LINE)+used)) == NULL) {
 		mlabort(TEXT94);
 /*                      "%%Out of memory" */
 		return(NULL);
@@ -65,7 +65,7 @@ register LINE	*lp;
 {
 	register BUFFER *bp;
 	SCREEN *scrp;		/* screen to fix pointers in */
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	register int cmark;		/* current mark */
 
 	/* in all screens.... */
@@ -132,7 +132,7 @@ register LINE	*lp;
 PASCAL NEAR lchange(flag)
 register int	flag;
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	SCREEN *scrp;		/* screen to fix pointers in */
 
 	if (curbp->b_nwnd != 1) 		/* Ensure hard. 	*/
@@ -174,14 +174,25 @@ int f, n;	/* default flag and numeric argument */
  * linstr -- Insert a string at the current point
  */
 
-int PASCAL NEAR linstr(instr)
-char	*instr;
+#if PROTO
+int PASCAL NEAR linstr(char *instr)
+#else
+int PASCAL NEAR linstr( instr)
+char *instr;
+#endif
 {
 	register int status;
+	register int saved_undo;	/* saved undo flag */
 
 	status = TRUE;
-	if (instr != NULL)
-		while (*instr) {
+	if (instr != NULL && *instr != '\0') {
+		/* record the insertion for the undo stack.... */
+		undo_insert(OP_ISTR, (long)strlen(instr), obj);
+
+		/* insert the string one character at a time */
+		saved_undo = undoing;
+		undoing = TRUE;
+		do {
 			status = ((*instr == '\r') ? lnewline(): linsert(1, *instr));
 
 			/* Insertion error? */
@@ -191,7 +202,10 @@ char	*instr;
 				break;
 			}
 			instr++;
-		}
+		} while (*instr);
+		undoing = saved_undo;
+	}
+
 	return(status);
 }
 
@@ -222,7 +236,7 @@ char	c;
 	register LINE	*lp3;
 	register int	doto;
 	register int	i;
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	SCREEN *scrp;		/* screen to fix pointers in */
 	int cmark;		/* current mark */
 
@@ -236,6 +250,10 @@ char	c;
 	/* Negative numbers of inserted characters are right out! */
 	if (n < 1)
 		return(FALSE);
+
+	/* remember we did this! */
+	obj.obj_char = c;
+	undo_insert(OP_INSC, (long)n, obj);
 
 	/* mark the current window's buffer as changed */
 	lchange(WFEDIT);
@@ -332,8 +350,8 @@ char c;		/* character to overwrite on current position */
 
 {
 	if (curwp->w_doto < curwp->w_dotp->l_used &&
-		(lgetc(curwp->w_dotp, curwp->w_doto) != '\t' ||
-		 (curwp->w_doto) % 8 == 7))
+		((lgetc(curwp->w_dotp, curwp->w_doto) != '\t' || tabsize == 0) ||
+		 (curwp->w_doto) % tabsize == tabsize -1))
 			ldelete(1L, FALSE);
 	return(linsert(1, c));
 }
@@ -379,12 +397,17 @@ int PASCAL NEAR lnewline()
 	register LINE	*lp1;
 	register LINE	*lp2;
 	register int	doto;
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	SCREEN *scrp;		/* screen to fix pointers in */
 	int cmark;		/* current mark */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
 		return(rdonly());	/* we are in read only mode	*/
+
+	/* remember we did this! */
+	obj.obj_char = 13;
+	undo_insert(OP_INSC, 1L, obj);
+
 	lchange(WFHARD);
 	lp1  = curwp->w_dotp;			/* Get the address and	*/
 	doto = curwp->w_doto;			/* offset of "."	*/
@@ -458,7 +481,7 @@ int kflag;	/* put killed text in kill buffer flag */
 	register LINE	*dotp;
 	register int	doto;
 	register int	chunk;
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	int cmark;		/* current mark */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
@@ -517,6 +540,12 @@ int kflag;	/* put killed text in kill buffer flag */
 			}
 #endif
 
+			/* save deleted characters for an undo... */
+			if (undoflag == TRUE) {
+				obj.obj_sptr = cp1;
+				undo_insert(OP_DSTR, (long)chunk, obj);
+			}
+	
 			/* save the text to the kill buffer */
 			if (kflag != FALSE) {
 				while (cp1 != cp2) {
@@ -611,6 +640,14 @@ int kflag;	/* put killed text in kill buffer flag */
 			}
 #endif
 	
+			/* save deleted characters for an undo... */
+			if (undoflag == TRUE) {
+				curwp->w_doto -= chunk;
+				obj.obj_sptr = cp2;
+				undo_insert(OP_DSTR, (long)chunk, obj);
+				curwp->w_doto += chunk;
+			}
+
 			/* save the text to the kill buffer */
 			if (kflag != FALSE) {
 				while (cp1 > cp2) {
@@ -661,14 +698,18 @@ int kflag;	/* put killed text in kill buffer flag */
 		the current line
 */
 
-char *PASCAL NEAR getctext()
+#if PROTO
+char *PASCAL NEAR getctext(char *rline)
+#else
+char *PASCAL NEAR getctext( rline)
+char *rline;
+#endif
 
 {
 	register LINE *lp;	/* line to copy */
 	register int size;	/* length of line to return */
 	register char *sp;	/* string pointer into line */
 	register char *dp;	/* string pointer into returned line */
-	char rline[NSTRING];	/* line to return */
 
 	/* find the contents of the current line and its length */
 	lp = curwp->w_dotp;
@@ -723,12 +764,17 @@ int PASCAL NEAR ldelnewline()
 	register LINE	*lp1;
 	register LINE	*lp2;
 	register LINE	*lp3;
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	SCREEN *scrp;		/* screen to fix pointers in */
 	int cmark;		/* current mark */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
 		return(rdonly());	/* we are in read only mode	*/
+
+	/* remember we did this! */
+	obj.obj_char = 13;
+	undo_insert(OP_DELC, 1L, obj);
+
 	lp1 = curwp->w_dotp;
 	lp2 = lp1->l_fp;
 	if (lp2 == curbp->b_linep) {		/* At the buffer end.	*/
@@ -931,13 +977,13 @@ char c;		/* character to insert in the kill buffer */
 #endif
 
 {
-	KILL *nchunk;	/* ptr to newly malloced chunk */
+	KILL *nchunk;	/* ptr to newly roomed chunk */
 
 	if (direct == FORWARD) {
 
 		/* check to see if we need a new chunk */
 		if (kused[kill_index] >= KBLOCK) {
-			if ((nchunk = (KILL *)malloc(sizeof(KILL))) == NULL) {
+			if ((nchunk = (KILL *)room(sizeof(KILL))) == NULL) {
 				mlwrite(TEXT94);
 /*					"%%Out of memory" */
 				return(FALSE);
@@ -967,7 +1013,7 @@ char c;		/* character to insert in the kill buffer */
 		/* REVERSE */
 		/* check to see if we need a new chunk */
 		if (kskip[kill_index] == 0) {
-			if ((nchunk = (KILL *)malloc(sizeof(KILL))) == NULL) {
+			if ((nchunk = (KILL *)room(sizeof(KILL))) == NULL) {
 				mlwrite(TEXT94);
 /*					"%%Out of memory" */
 				return(FALSE);

@@ -1,0 +1,56 @@
+/* emacs.url:	Universal Resource Language File for
+		MicroEMACS version 3.12
+		(C)Copyright 1994 by Daniel M. Lawrence
+*/
+
+#define PROJECT uemacs
+#define APPNAME uemacs
+#define QAPPNAME "MicroEMACS"
+
+#include "uemacs.h"
+
+#define NO_STD_ABOUT_BOX	1
+
+/********************************/
+/*	d1 - ABOUT box		*/
+/********************************/
+DIALOG 9050,   106, 60, 300, 60   "" MODAL
+	BUTTON 1,   224, 35, 70, 20   "Help" DEFAULT
+	BUTTON 2,   224, 5, 70, 20   "Cancel"
+	TEXT 4,   20, 5, 190, 16   "A Programmer's editor"
+	TEXT 5,   20, 21, 190, 16   "Version 3.12"
+	TEXT 6,   20, 37, 190, 16   "by Daniel Lawrence"
+
+#define NO_STD_FILE_MENU	1
+
+/********************************/
+/*	d1 - File Menu		*/
+/********************************/
+
+#include "url.h"
+
+menubar	MAIN_MENUBAR
+menu MAIN_MENUBAR
+	submenu M_FILE "~File"
+
+menubar BUF_MENUBAR
+menu BUF_MENUBAR
+	submenu M_FILE "~File"
+	DEFAULT_EDIT_MENU
+	DEFAULT_FONT_MENU
+
+MENU M_FILE "~File"
+	ITEM M_FILE_NEW "~New" DISABLED
+	ITEM M_FILE_OPEN "~Open..." DISABLED
+	SEPARATOR
+	ITEM M_FILE_SAVE "~Save" DISABLED
+	ITEM M_FILE_SAVEAS "Save ~As..."
+	ITEM M_FILE_QUIT "E~xit"
+	ITEM M_FILE_ABOUT "A~bout..."
+
+DIALOG ABANDON_MENU 50 50 300 100 "Abandon?" MODAL
+
+	TEXT AM_NAME 20 20 260 20 "Abandon Changes?"
+	BUTTON AM_SAVE    20 50 50 20 "SAVE" DEFAULT
+	BUTTON AM_CANCEL  100 50 50 20 "Cancel"
+	BUTTON AM_ABANDON 180 50 50 20 "Abandon"

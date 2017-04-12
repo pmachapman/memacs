@@ -1,6 +1,6 @@
 /*	basic.c:	Basic movement functions for
  *			MicroEMACS
- *			(C)Copyright 1993 by Daniel Lawrence
+ *			(C)Copyright 1995 by Daniel Lawrence
  *
  * The routines in this file move the cursor around on the screen. They
  * compute a new value for the cursor, then adjust ".". The display code
@@ -414,7 +414,7 @@ register LINE   *dlp;
         while (dbo != lused(dlp)) {
                 c = lgetc(dlp, dbo);
                 newcol = col;
-                if (c == '\t')
+                if (c == '\t' && tabsize > 0)
 			newcol += -(newcol % tabsize) + (tabsize - 1);
                 else if (c<0x20 || c==0x7F)
                         ++newcol;
@@ -440,8 +440,12 @@ int f,n;	/* prefix flag and argument */
 {
         register LINE   *lp;
 
+	/*
+	 * Calculate the lines to scroll, taking into account
+	 * the $overlap count and whether the modeline is on or not.
+	 */
         if (f == FALSE) {
-                n = curwp->w_ntrows - overlap;        /* Default scroll.      */
+                n = curwp->w_ntrows - overlap + !modeflag;        /* Default scroll.      */
                 if (n <= 0)                     /* Forget the overlap   */
                         n = 1;                  /* if tiny window.      */
         } else if (n < 0)
@@ -470,8 +474,12 @@ register int n;
 {
         register LINE   *lp;
 
+	/*
+	 * Calculate the lines to scroll, taking into account
+	 * the $overlap count and whether the modeline is on or not.
+	 */
         if (f == FALSE) {
-                n = curwp->w_ntrows - overlap;        /* Default scroll.      */
+                n = curwp->w_ntrows - overlap + !modeflag;        /* Default scroll.      */
                 if (n <= 0)                     /* Don't blow up if the */
                         n = 1;                  /* window is tiny.      */
         } else if (n < 0)

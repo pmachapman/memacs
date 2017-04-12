@@ -11,14 +11,18 @@
 #include "edef.h"
 #include "elang.h"
 
-static int	patlenadd;
-static int	lastchfjump, lastchbjump;
-static int	deltaf[HICHAR], deltab[HICHAR];
+#define SEARCH_HIGHLIGHT	10	/* mark # used to highlight */
+#define MAGIC_JUMP_TABLES	1	/* Jump tables in MAGIC mode */
 
-#if	MAGIC
+#if MAGIC
 static int	group_count;
 static int	group_len[MAXGROUPS];
 static REGION	group_reg[MAXGROUPS];
+
+#endif
+
+#if     WINDOW_MSWIN
+static int  o = 0;	/* For longop() calls.*/
 #endif
 
 /*
@@ -26,8 +30,13 @@ static REGION	group_reg[MAXGROUPS];
  *	search for the string.  If found, reset the "." to be just after
  *	the match string, and (perhaps) repaint the display.
  */
-int PASCAL NEAR forwsearch(f, n)
-int f, n;	/* default flag / numeric argument */
+#if PROTO
+int PASCAL NEAR forwsearch(int f, int n)
+#else
+int PASCAL NEAR forwsearch( f, n)
+int f;
+int n;
+#endif
 {
 	register int	status;
 
@@ -42,7 +51,7 @@ int f, n;	/* default flag / numeric argument */
 	 * pattern for up to n times, as long as the pattern is there
 	 * to be found.
 	 */
-	if ((status = readpattern(TEXT78, &pat[0], TRUE)) == TRUE)
+	if ((status = readpattern(TEXT78, (char *)&pat[0], TRUE)) == TRUE)
 		status = forwhunt(f, n);
 /*				"Search" */
 
@@ -54,8 +63,13 @@ int f, n;	/* default flag / numeric argument */
  *	If found, reset the "." to be just after the match string,
  *	and (perhaps) repaint the display.
  */
-int PASCAL NEAR forwhunt(f, n)
-int f, n;	/* default flag / numeric argument */
+#if PROTO
+int PASCAL NEAR forwhunt(int f, int n)
+#else
+int PASCAL NEAR forwhunt( f, n)
+int f;
+int n;
+#endif
 {
 	register int	spoint = PTEND;
 	register int	status;
@@ -72,7 +86,7 @@ int f, n;	/* default flag / numeric argument */
 		return FALSE;
 	}
 
-#if	MAGIC
+#if MAGIC
 	if ((curwp->w_bufp->b_mode & MDMAGIC) && mcpat[0].mc_type == MCNIL) {
 		if (!mcstr())
 			return FALSE;
@@ -90,12 +104,19 @@ int f, n;	/* default flag / numeric argument */
 			n = (n > 2)? (n + 1): 2;
 	}
 
-#if	MAGIC
+#if MAGIC
+#if 0
 	if (magical && (curwp->w_bufp->b_mode & MDMAGIC))
-		status = mcscanner(FORWARD, spoint, n);
+		status = mcscanner(&mcpat[0], FORWARD, spoint, n);
 	else
+		status = mcscanner(&mcdeltapat[0], FORWARD, spoint, n);
+#else
+	status = mcscanner((magical && (curwp->w_bufp->b_mode & MDMAGIC))?
+				&mcpat[0]: &mcdeltapat[0], FORWARD, spoint, n);
 #endif
-		status = scanner(FORWARD, spoint, n);
+#else
+	status = scanner(FORWARD, spoint, n);
+#endif
 
 	/* Complain if not there.
 	 */
@@ -113,8 +134,13 @@ int f, n;	/* default flag / numeric argument */
  *	If found "." is left pointing at the first character of the pattern
  *	(the last character that was matched).
  */
-int PASCAL NEAR backsearch(f, n)
-int f, n;	/* default flag / numeric argument */
+#if PROTO
+int PASCAL NEAR backsearch(int f, int n)
+#else
+int PASCAL NEAR backsearch( f, n)
+int f;
+int n;
+#endif
 {
 	register int	status;
 
@@ -129,7 +155,7 @@ int f, n;	/* default flag / numeric argument */
 	 * pattern for up to n times, as long as the pattern is there
 	 * to be found.
 	 */
-	if ((status = readpattern(TEXT81, &pat[0], TRUE)) == TRUE)
+	if ((status = readpattern(TEXT81, (char *)&pat[0], TRUE)) == TRUE)
 		status = backhunt(f, n);
 /*				"Reverse search" */
 
@@ -142,8 +168,13 @@ int f, n;	/* default flag / numeric argument */
  *	If found "." is left pointing at the first character of the pattern
  *	(the last character that was matched).
  */
-int PASCAL NEAR backhunt(f, n)
-int f, n;	/* default flag / numeric argument */
+#if PROTO
+int PASCAL NEAR backhunt(int f, int n)
+#else
+int PASCAL NEAR backhunt( f, n)
+int f;
+int n;
+#endif
 {
 	register int	spoint = PTBEG;
 	register int	status;
@@ -160,7 +191,7 @@ int f, n;	/* default flag / numeric argument */
 		return FALSE;
 	}
 
-#if	MAGIC
+#if MAGIC
 	if ((curwp->w_bufp->b_mode & MDMAGIC) && tapcm[0].mc_type == MCNIL) {
 		if (!mcstr())
 			return FALSE;
@@ -178,12 +209,19 @@ int f, n;	/* default flag / numeric argument */
 			n = (n > 2)? (n + 1): 2;
 	}
 
-#if	MAGIC
+#if MAGIC
+#if 0
 	if (magical && (curwp->w_bufp->b_mode & MDMAGIC))
-		status = mcscanner(REVERSE, spoint, n);
+		status = mcscanner(&tapcm[0], REVERSE, spoint, n);
 	else
+		status = mcscanner(&tapatledcm[0], REVERSE, spoint, n);
+#else
+	status = mcscanner((magical && (curwp->w_bufp->b_mode & MDMAGIC))?
+				&tapcm[0]: &tapatledcm[0], REVERSE, spoint, n);
 #endif
-		status = scanner(REVERSE, spoint, n);
+#else
+	status = scanner(REVERSE, spoint, n);
+#endif
 
 	/* Complain if not there.
 	 */
@@ -195,31 +233,43 @@ int f, n;	/* default flag / numeric argument */
 	return (status);
 }
 
-#if	MAGIC
+#if MAGIC
 /*
  * mcscanner -- Search for a meta-pattern in either direction.  If found,
  *	reset the "." to be at the start or just after the match string,
  *	and (perhaps) repaint the display.
  */
-int PASCAL NEAR mcscanner(direct, beg_or_end, repeats)
-int	direct;		/* which way to go.*/
-int	beg_or_end;	/* put point at beginning or end of pattern.*/
-int	repeats;	/* search repetitions.*/
+#if PROTO
+int PASCAL NEAR mcscanner(MC *mcpatrn, int direct, int beg_or_end, int repeats)
+#else
+int PASCAL NEAR mcscanner( mcpatrn, direct, beg_or_end, repeats)
+MC *mcpatrn;
+int direct;
+int beg_or_end;
+int repeats;
+#endif
 {
-	MC	*mcpatrn;	/* pointer into pattern */
 	LINE	*curline;	/* current line during scan */
 	int	curoff;		/* position within current line */
+	DELTA	*tbl;		/* structure with jump info */
+	int	patlenadd;
+	int	jump;
 
 	/* If we are going in reverse, then the 'end' is actually
 	 * the beginning of the pattern.  Toggle it.
 	 */
 	beg_or_end ^= direct;
 
-	/* Another directional problem: if we are searching forwards,
-	 * use the pattern in mcpat[].  Otherwise, use the reversed
-	 * pattern in tapcm[].
-	 */
-	mcpatrn = (direct == FORWARD)? &mcpat[0]: &tapcm[0];
+#if MAGIC_JUMP_TABLES
+	if (mcpatrn->mc_type == JMPTABLE) {
+		tbl = mcpatrn->u.jmptable;
+		jump = tbl->jump;
+		patlenadd = tbl->patlen;
+		mcpatrn++;
+	}
+	else
+		tbl = NULL;
+#endif
 
 	/* Setup local scan pointers to global ".".
 	 */
@@ -237,14 +287,40 @@ int	repeats;	/* search repetitions.*/
 		matchoff = curoff;
 		matchlen = 0;
 
+#if MAGIC_JUMP_TABLES
+		/*
+		 * If the first thing to look for is a constant string
+		 * that has been made into a jump table, use the fast
+		 * scan routines.  If that fails, then we have nothing
+		 * to match and return immediately.
+		 */
+		if (tbl != NULL) {
+			if (!fbound(tbl, patlenadd, &curline, &curoff, direct)) {
+				do
+				{
+					if (direct == FORWARD)
+						movelocalpoint(-patlenadd, &curoff, &curline);
+					else
+						movelocalpoint(patlenadd + 1, &curoff, &curline);
+
+					matchline = curline;
+					matchoff = curoff;
+
+					if ((matchlen = liteq(&curline, &curoff, direct, tbl->patrn)) > 0)
+						break;
+				} while (!fbound(tbl, jump, &curline, &curoff, direct));
+			}
+
+			if (matchlen == 0)
+				return FALSE;
+		}
+#endif
+
 #if     WINDOW_MSWIN
-		{
-		    static int  o = 0;
-		    if (--o < 0) {
+		/* to lower overhead, only 1/100 calls to longop */
+		if (--o < 0) {
 			longop(TRUE);
-			o = 100;   /* to lower overhead, only 1/100
-				       calls to longop */
-		    }
+			o = 100;
 		}
 #endif
 		if (amatch(mcpatrn, direct, &curline, &curoff)) {
@@ -252,6 +328,11 @@ int	repeats;	/* search repetitions.*/
 			 * Flag that we have moved,
 			 * reset the global "." pointers.
 			 */
+			curwp->w_markp[SEARCH_HIGHLIGHT] = matchline;
+			curwp->w_marko[SEARCH_HIGHLIGHT] = matchoff;
+			curwp->w_markp[SEARCH_HIGHLIGHT+1] = curline;
+			curwp->w_marko[SEARCH_HIGHLIGHT+1] = curoff;
+
 			curwp->w_flag |= WFMOVE;
 			if (beg_or_end == PTEND)	/* at end of string */
 			{
@@ -291,15 +372,20 @@ int	repeats;	/* search repetitions.*/
 }
 
 /*
- * amatch -- Search for a meta-pattern in either direction.  Based on the
- *	recursive routine amatch() (for "anchored match") in
- *	Kernighan & Plauger's "Software Tools".
+ * amatch -- Search for a meta-pattern in either direction.  Update
+ *	the passed-in LINE and offset values if successful.
+ *	Based on the recursive routine amatch() (for "anchored match")
+ *	in Kernighan & Plauger's "Software Tools".
  */
-int PASCAL NEAR	amatch(mcptr, direct, pcwline, pcwoff)
-register MC	*mcptr;		/* pattern to scan for */
-int		direct;		/* which way to go.*/
-LINE		**pcwline;	/* current line during scan */
-int		*pcwoff;	/* position within current line */
+#if PROTO
+int PASCAL NEAR	amatch(MC *mcptr, int direct, LINE **pcwline, int *pcwoff)
+#else
+int PASCAL NEAR	amatch( mcptr, direct, pcwline, pcwoff)
+MC *mcptr;
+int direct;
+LINE **pcwline;
+int *pcwoff;
+#endif
 {
 	LINE	*curline;	/* current line during scan */
 	int	curoff;		/* position within current line */
@@ -325,10 +411,14 @@ int		*pcwoff;	/* position within current line */
 		 * by a closure?
 		 */
 		if (cl_type = (mcptr->mc_type & ALLCLOS)) {
+
+			/* Minimum number of characters that may
+			 * match is 0 or 1.
+			 */
+			cl_min = (cl_type == CLOSURE_1);
+
 			if (cl_type == ZEROONE)
 			{
-				cl_min = 0;
-
 				if (mceq(nextch(&curline, &curoff, direct), mcptr))
 				{
 					nextch(&curline, &curoff, direct);
@@ -337,17 +427,11 @@ int		*pcwoff;	/* position within current line */
 			}
 			else
 			{
-				/* Minimum number of characters that may
-				 * match is 0 or 1.
-				 */
-				cl_min = (cl_type == CLOSURE_1);
-
 				/* Match as many characters as possible
 				 * against the current meta-character.
 				 */
-				while (mceq(nextch(&curline, &curoff, direct), mcptr)) {
+				while (mceq(nextch(&curline, &curoff, direct), mcptr))
 					cl_matchlen++;
-				}
 			}
 
 			/* We are now at the character that made us
@@ -388,6 +472,27 @@ int		*pcwoff;	/* position within current line */
 			if (curoff != lused(curline))
 				return FALSE;
 		}
+		else if (mcptr->mc_type == BOWRD) {
+			if (!isinword(lgetc(curline, curoff)))
+				return FALSE;
+
+			if (curoff != 0 &&
+			     isinword(lgetc(curline, curoff - 1)))
+				return FALSE;
+		}
+		else if (mcptr->mc_type == EOWRD) {
+			if (isinword(lgetc(curline, curoff)))
+				return FALSE;
+
+			if (curoff == 0 ||
+			     !isinword(lgetc(curline, curoff - 1)))
+				return FALSE;
+		}
+		else if (mcptr->mc_type == LITSTRING) {
+			if ((pre_matchlen = liteq(&curline, &curoff, direct, mcptr->u.lstring)) == 0)
+				return FALSE;
+			matchlen += pre_matchlen;
+		}
 		else
 		{
 			/* A character to compare against
@@ -411,7 +516,7 @@ success:
 	*pcwoff  = curoff;
 	return (TRUE);
 }
-#endif
+#else
 
 /*
  * scanner -- Search for a pattern in either direction.  If found,
@@ -420,19 +525,21 @@ success:
  *	Fast version using simplified version of Boyer and Moore
  *	Software-Practice and Experience, vol 10, 501-506 (1980)
  */
-int PASCAL NEAR scanner(direct, beg_or_end, repeats)
-int	direct;		/* which way to go.*/
-int	beg_or_end;	/* put point at beginning or end of pattern.*/
-int	repeats;	/* search repetitions.*/
+#if PROTO
+int PASCAL NEAR scanner(int direct, int beg_or_end, int repeats)
+#else
+int PASCAL NEAR scanner( direct, beg_or_end, repeats)
+int direct;
+int beg_or_end;
+int repeats;
+#endif
 {
-	register int	c;		/* character at current position */
-	register char	*patptr;	/* pointer into pattern */
+	DELTA	*tbl;			/* structure holding the jump info */
 	char	*patrn;			/* string to scan for */
 	LINE	*curline;		/* current line during scan */
 	int	curoff;			/* position within current line */
-	LINE	*scanline;		/* current line during scanning */
-	int	scanoff;		/* position in scanned line */
 	int	jump;			/* next offset */
+	int	patlenadd;
 
 	/* If we are going in reverse, then the 'end' is actually
 	 * the beginning of the pattern.  Toggle it.
@@ -440,18 +547,22 @@ int	repeats;	/* search repetitions.*/
 	beg_or_end ^= direct;
 
 	/* Another directional problem: if we are searching
-	 * forwards, use the pattern in pat[], and the jump
-	 * size in lastchfjump.  Otherwise, use the reversed
-	 * pattern in tap[], and the jump size of lastchbjump.
+	 * forwards, use the pattern and the jump size in
+	 * deltapat.  Otherwise, use the reversed pattern
+	 * pattern and the jump size in tapatled.
 	 */
 	if (direct == FORWARD) {
-		patrn = (char *)&pat[0];
-		jump = lastchfjump;
+		tbl = &deltapat;
+		patrn = deltapat.patrn;
+		patlenadd = deltapat.patlen;
+		jump = deltapat.jump;
 	}
 	else
 	{
-		patrn = (char *)&tap[0];
-		jump = lastchbjump;
+		tbl = &tapatled;
+		patrn = tapatled.patrn;
+		patlenadd = tapatled.patlen;
+		jump = tapatled.jump;
 	}
 
 	/* Set up local pointers to global ".".
@@ -464,33 +575,38 @@ int	repeats;	/* search repetitions.*/
 	 * by the pattern length, i.e. the last character of the
 	 * potential match.
 	 */
-	if (!fbound(patlenadd, &curline, &curoff, direct)) {
+	if (!fbound(tbl, patlenadd, &curline, &curoff, direct)) {
 		do
 		{
 			/* Set up the scanning pointers, and save
 			 * the current position in case we match
 			 * the search string at this point.
 			 */
-			scanline = matchline = curline;
-			scanoff  = matchoff  = curoff;
+			if (direct == FORWARD)
+				movelocalpoint(-patlenadd, &curoff, &curline);
+			else
+				movelocalpoint(patlenadd + 1, &curoff, &curline);
 
-			patptr = patrn;
+			matchline = curline;
+			matchoff  = curoff;
 
-			/* Scan through the pattern for a match.
-			 */
-			while ((c = (unsigned char)(*patptr++)) != '\0')
-				if (!eq(c, nextch(&scanline, &scanoff, direct)))
-					goto fail;
+			if (liteq(&curline, &curoff, direct, patrn) == 0)
+				goto fail;
 
 			/* A SUCCESSFULL MATCH!!!
 			 * Flag that we have moved and reset the
 			 * global "." pointers.
 			 */
+			curwp->w_markp[SEARCH_HIGHLIGHT] = matchline;
+			curwp->w_marko[SEARCH_HIGHLIGHT] = matchoff;
+			curwp->w_markp[SEARCH_HIGHLIGHT+1] = curline;
+			curwp->w_marko[SEARCH_HIGHLIGHT+1] = curoff;
+
 			curwp->w_flag |= WFMOVE;
 			if (beg_or_end == PTEND)	/* at end of string */
 			{
-				curwp->w_dotp = scanline;
-				curwp->w_doto = scanoff;
+				curwp->w_dotp = curline;
+				curwp->w_doto = curoff;
 			}
 			else		/* at beginning of string */
 			{
@@ -502,10 +618,11 @@ int	repeats;	/* search repetitions.*/
 			 * pointers to the start of the string, for savematch().
 			 */
 			if (direct == REVERSE) {
-				matchline = scanline;
-				matchoff = scanoff;
+				matchline = curline;
+				matchoff = curoff;
 			}
 
+			matchlen = patlenadd + 1;
 			if (savematch() == ABORT)
 				return ABORT;
 
@@ -514,18 +631,14 @@ int	repeats;	/* search repetitions.*/
 			 */
 			if (--repeats <= 0)
 				return (TRUE);
-			else
-			{
-				curline = scanline;
-				curoff = scanoff;
-			}
 
 fail:;			/* continue to search */
-		} while (!fbound(jump, &curline, &curoff, direct));
+		} while (!fbound(tbl, jump, &curline, &curoff, direct));
 	}
 
 	return FALSE;	/* We could not find a match */
 }
+#endif
 
 /*
  * fbound -- Return information depending on whether we have hit a boundry
@@ -533,101 +646,156 @@ fail:;			/* continue to search */
  *	of the search string has been found.  See boundry() for search
  *	restrictions.
  */
-int PASCAL NEAR	fbound(jump, pcurline, pcuroff, dir)
-LINE	**pcurline;
-int	*pcuroff, dir, jump;
+#if PROTO
+int PASCAL NEAR	fbound(DELTA *tbl, int jump, LINE **pcurline, int *pcuroff, int dir)
+#else
+int PASCAL NEAR	fbound( tbl, jump, pcurline, pcuroff, dir)
+DELTA *tbl;
+int jump;
+LINE **pcurline;
+int *pcuroff;
+int dir;
+#endif
 {
-	register int	spare, curoff;
-	register LINE	*curline;
+	int	curoff;
+	LINE	*curline;
 
 	curline = *pcurline;
 	curoff = *pcuroff;
 
 	if (dir == FORWARD) {
 		while (jump != 0) {
-#if	WINDOW_MSWIN
-			{
-				static int	o = 0;
-				if (--o < 0) {
-					longop(TRUE);
-					o = 100;   /* to lower overhead, only 1/100
-						    calls to longop */
-				}
+#if WINDOW_MSWIN
+			/* to lower overhead, only 1/100 calls to longop */
+			if (--o < 0) {
+				longop(TRUE);
+				o = 100;
 			}
 #endif
-			curoff += jump;
-			spare = curoff - lused(curline);
-
-			if (curline == curbp->b_linep)
+			if (movelocalpoint(jump, &curoff, &curline))
 				return (TRUE);	/* hit end of buffer */
 
-			while (spare > 0) {
-				curline = lforw(curline);/* skip to next line */
-				curoff = spare - 1;
-				spare = curoff - lused(curline);
-				if (curline == curbp->b_linep)
-					return (TRUE);	/* hit end of buffer */
-			}
-
-			if (spare == 0)
-				jump = deltaf[(int) '\r'];
+			if (curoff == lused(curline))
+				jump = tbl->delta[(int) '\r'];
 			else
-				jump = deltaf[(int) lgetc(curline, curoff)];
-		}
-
-		/* The last character matches, so back up to start
-		 * of possible match.
-		 */
-		curoff -= patlenadd;
-
-		while (curoff < 0) {
-			curline = lback(curline);	/* skip back a line */
-			curoff += lused(curline) + 1;
+				jump = tbl->delta[(int) lgetc(curline, curoff)];
 		}
 	}
 	else			/* Reverse.*/
 	{
 		jump++;		/* allow for offset in reverse */
 		while (jump != 0) {
-#if	WINDOW_MSWIN
-			{
-				static int	o = 0;
-				if (--o < 0) {
-					longop(TRUE);
-					o = 100;   /* to lower overhead, only 1/100
-						    calls to longop */
-				}
+#if WINDOW_MSWIN
+			/* to lower overhead, only 1/100 calls to longop */
+			if (--o < 0) {
+				longop(TRUE);
+				o = 100;
 			}
 #endif
-			curoff -= jump;
-			while (curoff < 0) {
-				curline = lback(curline);	/* skip back a line */
-				curoff += lused(curline) + 1;
-				if (curline == curbp->b_linep)
-					return (TRUE);	/* hit end of buffer */
-			}
+			if (movelocalpoint(-jump, &curoff, &curline))
+				return (TRUE);	/* hit end of buffer */
 
 			if (curoff == lused(curline))
-				jump = deltab[(int) '\r'];
+				jump = tbl->delta[(int) '\r'];
 			else
-				jump = deltab[(int) lgetc(curline, curoff)];
-		}
-
-		/* The last character matches, so back up to start
-		 * of possible match.
-		 */
-		curoff += patlenadd + 1;
-		spare = curoff - lused(curline);
-		while (spare > 0) {
-			curline = lforw(curline);	/* skip back a line */
-			curoff = spare - 1;
-			spare = curoff - lused(curline);
+				jump = tbl->delta[(int) lgetc(curline, curoff)];
 		}
 	}
 
 	*pcurline = curline;
 	*pcuroff = curoff;
 	return FALSE;
+}
+
+/*
+ * movelocalpoint -- Take the passed-in offset and LINE pointers, and
+ *	adjust them by n characters.  If boundry is hit, leave the pointers
+ *	alone and return TRUE.  Otherwise all went well, and return FALSE.
+ */
+#if PROTO
+int PASCAL NEAR movelocalpoint(int n, int *pcuroff, LINE **pcurline)
+#else
+int PASCAL NEAR movelocalpoint( n, pcuroff, pcurline)
+int n;
+int *pcuroff;
+LINE **pcurline;
+#endif
+{
+	register int spare;
+	register int curoff;
+	register LINE *curline;
+
+	curline = *pcurline;
+	curoff = *pcuroff + n;
+
+	if (n > 0) {
+		if (curline == curbp->b_linep)
+			return TRUE;		/* hit end of buffer */
+
+		while ((spare = curoff - lused(curline)) > 0) {
+			curline = lforw(curline);/* skip to next line */
+			curoff = spare - 1;
+			if (curline == curbp->b_linep)
+				return (TRUE);	/* hit end of buffer */
+		}
+	}
+	else {
+		while (curoff < 0) {
+			curline = lback(curline);	/* skip back a line */
+			curoff += lused(curline) + 1;
+			if (curline == curbp->b_linep)
+				return (TRUE);	/* hit end of buffer */
+		}
+	}
+	*pcurline = curline;
+	*pcuroff = curoff;
+	return FALSE;
+}
+
+/*
+ * make_delta -- Create the delta tables.
+ */
+#if PROTO
+VOID make_delta(char *pstring, DELTA *tbl)
+#else
+VOID make_delta( pstring, tbl)
+char *pstring;
+DELTA *tbl;
+#endif
+{
+	int	j, jump_by, ch;
+
+	strcpy(tbl->patrn, pstring);
+
+	jump_by = strlen(pstring);
+
+	for (j = 0; j < HICHAR; j++)
+		tbl->delta[j] = jump_by;
+
+	jump_by -= 1;
+
+	/* Now put in the characters contained
+	 * in the pattern, duplicating the CASE.
+	 */
+	for (j = 0; j < jump_by; j++) {
+		ch = *pstring++;
+		if (is_letter(ch))
+			tbl->delta[(unsigned char) chcase(ch)] = jump_by - j;
+		tbl->delta[ch] = jump_by - j;
+	}
+
+	/* The last character (left over from the loop above) will
+	 * have the pattern length, unless there are duplicates of
+	 * it.  Get the number to jump from the delta array, and
+	 * overwrite with zeroes in delta duplicating the CASE.
+	 */
+	ch = *pstring;
+	tbl->patlen = jump_by;
+	tbl->jump = jump_by + tbl->delta[ch];
+
+	if (is_letter(ch))
+		tbl->delta[(unsigned char) chcase(ch)] = 0;
+	tbl->delta[ch] = 0;
 }
 
 /*
@@ -639,49 +807,8 @@ int	*pcuroff, dir, jump;
  */
 VOID PASCAL NEAR setjtable()
 {
-	int	i;
-
-	strcpy(tap, pat);
-	patlenadd = (matchlen = strlen(strrev(tap))) - 1;
-
-	for (i = 0; i < HICHAR; i++) {
-		deltaf[i] = matchlen;
-		deltab[i] = matchlen;
-	}
-
-	/* Now put in the characters contained
-	 * in the pattern, duplicating the CASE.
-	 */
-	for (i = 0; i < patlenadd; i++) {
-		if (isletter(pat[i]))
-			deltaf[(unsigned char) chcase(pat[i])]
-			 = patlenadd - i;
-		deltaf[pat[i]] = patlenadd - i;
-  
-		if (isletter(tap[i]))
-			deltab[chcase(tap[i])]
-			 = patlenadd - i;
-		deltab[tap[i]] = patlenadd - i;
-	}
-
-	/* The last character will have the pattern length
-	 * unless there are duplicates of it.  Get the number to
-	 * jump from the arrays delta, and overwrite with zeroes
-	 * in delta duplicating the CASE.
-	 *
-	 * The last character is, of course, the first character
-	 * of the reversed string.
-	 */
-	lastchfjump = patlenadd + deltaf[tap[0]];
-	lastchbjump = patlenadd + deltab[pat[0]];
-  
-	if (isletter(tap[0]))
-		deltaf[(unsigned char) chcase(tap[0])] = 0;
-	deltaf[tap[0]] = 0;
-  
-	if (isletter(pat[0]))
-		deltab[(unsigned char) chcase(pat[0])] = 0;
-	deltab[pat[0]] = 0;
+	make_delta(pat, &deltapat);
+	make_delta(strrev(strcpy((char *)tap, (char *)pat)), &tapatled);
 }
 
 /*
@@ -714,12 +841,16 @@ register unsigned char pc;
  *	an error.  Display the old pattern, in the style of Jeff Lomicka.
  *	There is some do-it-yourself control expansion.  Change to using
  *	<META> to delimit the end-of-pattern to allow <NL>s in the search
- *	string. 
+ *	string.
  */
-int PASCAL NEAR readpattern(prompt, apat, srch)
-char	*prompt;
-char	apat[];
-int	srch;
+#if PROTO
+int PASCAL NEAR readpattern(char *prompt, char apat[], int srch)
+#else
+int PASCAL NEAR readpattern( prompt, apat, srch)
+char *prompt;
+char apat[];
+int srch;
+#endif
 {
 	register int	status;
 	char		tpat[NPAT+20];
@@ -741,7 +872,7 @@ int	srch;
 	else if (status == FALSE && apat[0] != 0)	/* Old one */
 		status = TRUE;
 
-#if	MAGIC
+#if MAGIC
 	/* Only make the meta-pattern if in magic mode, since the
 	 * pattern in question might have an invalid meta combination.
 	 */
@@ -764,32 +895,17 @@ int PASCAL NEAR savematch()
 	register int	j;
 	REGION		tmpreg;
 
-#if	(TURBO || ZTC) && (DOS16M == 0)
-	/* For those compilers whose reallocs() allow allocing memory
-	 * even when the pointer passed in is NULL.
-	 */
-	if ((patmatch = realloc(patmatch, matchlen + 1)) == NULL) {
+	if ((patmatch = reroom(patmatch, matchlen + 1)) == NULL) {
 		mlabort(TEXT94);
 /*			"%%Out of memory" */
 		return ABORT;
 	}
-#else
-
-	if (patmatch != NULL)
-		free(patmatch);
-
-	if ((patmatch = malloc(matchlen + 1)) == NULL) {
-		mlabort(TEXT94);
-/*			"%%Out of memory" */
-		return ABORT;
-	}
-#endif
 
 	tmpreg.r_offset = matchoff;
 	tmpreg.r_linep = matchline;
 	tmpreg.r_size = matchlen;
 
-#if	MAGIC == 0
+#if MAGIC == 0
 	regtostr(patmatch, &tmpreg);
 #else
 	/*
@@ -801,25 +917,11 @@ int PASCAL NEAR savematch()
 	{
 		group_reg[j].r_size += group_len[j];
 
-#if	(TURBO || ZTC) && (DOS16M == 0)
-		/* For those compilers whose reallocs() allow allocating
-		 * memory even when the pointer passed in is NULL.
-		 */
-		if ((grpmatch[j] = realloc(grpmatch[j], group_reg[j].r_size + 1)) == NULL) {
+		if ((grpmatch[j] = reroom(grpmatch[j], group_reg[j].r_size + 1)) == NULL) {
 			mlabort(TEXT94);
 /*			"%%Out of memory" */
 			return ABORT;
 		}
-#else
-		if (grpmatch[j] != NULL)
-			free(grpmatch[j]);
-
-		if ((grpmatch[j] = malloc(group_reg[j].r_size + 1)) == NULL) {
-			mlabort(TEXT94);
-/*			"%%Out of memory" */
-			return ABORT;
-		}
-#endif
 		regtostr(grpmatch[j], &group_reg[j]);
 	}
 #endif
@@ -833,9 +935,14 @@ int PASCAL NEAR savematch()
  *	in future, a' la VMS EDT.  At the moment, just return (TRUE) or
  *	FALSE depending on if a boundry is hit (ouch).
  */
-int PASCAL NEAR boundry(curline, curoff, dir)
-LINE	*curline;
-int	curoff, dir;
+#if PROTO
+int PASCAL NEAR boundry(LINE *curline, int curoff, int dir)
+#else
+int PASCAL NEAR boundry( curline, curoff, dir)
+LINE *curline;
+int curoff;
+int dir;
+#endif
 {
 	register int	border;
 
@@ -859,10 +966,14 @@ int	curoff, dir;
  *	the current character and move, reverse searches move and
  *	look at the character.
  */
-int PASCAL NEAR nextch(pcurline, pcuroff, dir)
-LINE	**pcurline;
-int	*pcuroff;
-int	dir;
+#if PROTO
+int PASCAL NEAR nextch(LINE **pcurline, int *pcuroff, int dir)
+#else
+int PASCAL NEAR nextch( pcurline, pcuroff, dir)
+LINE **pcurline;
+int *pcuroff;
+int dir;
+#endif
 {
 	register LINE	*curline;
 	register int	curoff;
@@ -897,7 +1008,37 @@ int	dir;
 	return (c);
 }
 
-#if	MAGIC
+/*
+ * liteq -- compare the string versus the current characters in the line.
+ *	Returns 0 (no match) or the number of characters matched.
+ */
+#if PROTO
+int PASCAL NEAR liteq(LINE **curline, int *curpos, int direct, char *lstring)
+#else
+int PASCAL NEAR liteq( curline, curpos, direct, lstring)
+LINE **curline;
+int *curpos;
+int direct;
+char *lstring;
+#endif
+{
+	LINE	*scanline = *curline;
+	int	scanpos = *curpos;
+	register int	c;
+	register int	count = 0;
+
+	while ((c = (unsigned char)(*lstring++)) != '\0') {
+		if (!eq(c, nextch(&scanline, &scanpos, direct)))
+			return 0;
+		count++;
+	}
+
+	*curline = scanline;
+	*curpos = scanpos;
+	return count;
+}
+
+#if MAGIC
 /*
  * mcstr -- Set up the 'magic' array.  The closure symbol is taken as
  *	a literal character when (1) it is the first character in the
@@ -914,6 +1055,7 @@ int	dir;
 int PASCAL NEAR mcstr()
 {
 	MC	*mcptr, *rtpcm;
+	DELTA	*tbl;
 	char	*patptr;
 	int	pchr;
 	int	status = TRUE;
@@ -1030,13 +1172,23 @@ int PASCAL NEAR mcstr()
 						break;
 					}
 				}
+				else if (pchr == MC_BOWRD) {
+					mcptr->mc_type = BOWRD;
+					does_closure = FALSE;
+					break;
+				}
+				else if (pchr == MC_EOWRD) {
+					mcptr->mc_type = EOWRD;
+					does_closure = FALSE;
+					break;
+				}
 				else if (pchr == '\0') {
 					pchr = '\\';
 					--patptr;
 				}
 			default:
-litcase:			mcptr->mc_type = LITCHAR;
-				mcptr->u.lchar = pchr;
+litcase:
+				status = litmake(&patptr, mcptr);
 				does_closure = TRUE;
 				break;
 		}		/* End of switch.*/
@@ -1045,19 +1197,18 @@ litcase:			mcptr->mc_type = LITCHAR;
 		mj++;
 	}		/* End of while.*/
 
+
 	/* Close off the meta-string, then set up the reverse array,
 	 * if the status is good.
 	 *
-	 * If the status is not good, nil out the meta-pattern.
-	 * Even if the status is bad from the cclmake() routine,
-	 * the bitmap for that member is guaranteed to be freed.
-	 * So we stomp a MCNIL value there, and call mcclear()
-	 * to free any other bitmaps.
+	 * If the status is not good, free up any bitmaps or strings,
+	 * and make mcpat[0].mc_type MCNIL.
 	 *
 	 * Please note the structure assignment - your compiler may
 	 * not like that.
 	 */
 	mcptr->mc_type = MCNIL;
+
 	if (stacklevel) {
 		status = FALSE;
 		mlwrite(TEXT222);
@@ -1067,21 +1218,56 @@ litcase:			mcptr->mc_type = LITCHAR;
 	if (status) {
 		rtpcm = &tapcm[0];
 		while (--mj >= 0) {
-#if	LATTICE
-			movmem(--mcptr, rtpcm, sizeof (MC));
-#else
 			*rtpcm = *--mcptr;
-#endif
+
+			if (rtpcm->mc_type == LITSTRING) {
+			   	if ((rtpcm->u.lstring = copystr(mcptr->u.lstring)) == NULL) {
+			      		status = FALSE;
+			      		break;
+			   	}
+			   	strrev(rtpcm->u.lstring);
+			}
+
 			rtpcm++;
 		}
 		rtpcm->mc_type = MCNIL;
 	}
-	else
-	{
-		(--mcptr)->mc_type = MCNIL;
-		mcclear();
-	}
 
+	if (status) {
+#if MAGIC_JUMP_TABLES
+		/*
+		 * Now see if we can use the fast jump tables instead
+		 * of a brute-force string search, if the first or
+		 * last meta-character types are strings.
+		 */
+		if (mcpat[0].mc_type == LITSTRING)
+		{
+			if ((tbl = (DELTA *) room(sizeof(DELTA))) != NULL)
+			{
+				make_delta(mcpat[0].u.lstring, tbl);
+				free(mcpat[0].u.lstring);
+				mcpat[0].u.jmptable = tbl;
+				mcpat[0].mc_type = JMPTABLE;
+			}
+		}
+		if (tapcm[0].mc_type == LITSTRING)
+		{
+			if ((tbl = (DELTA *) room(sizeof(DELTA))) != NULL)
+			{
+				make_delta(tapcm[0].u.lstring, tbl);
+				free(tapcm[0].u.lstring);
+				tapcm[0].u.jmptable = tbl;
+				tapcm[0].mc_type = JMPTABLE;
+			}
+		}
+#endif
+	}
+	else
+		mcclear();
+
+#if DEBUG_SEARCH
+	mc_list(0,0);
+#endif
 	return (status);
 }
 
@@ -1093,11 +1279,32 @@ VOID PASCAL NEAR mcclear()
 	register MC	*mcptr;
 	register int	j;
 
+	/*
+	 * Free up any memory allocated for the meta-characters:
+	 * bitmaps, strings, or the DELTA jmptables.
+	 */
 	mcptr = &mcpat[0];
-
 	while (mcptr->mc_type != MCNIL) {
 		if ((mcptr->mc_type == CCL) || (mcptr->mc_type == NCCL))
 			free(mcptr->u.cclmap);
+		else if (mcptr->mc_type == LITSTRING)
+			free(mcptr->u.lstring);
+		else if (mcptr->mc_type == JMPTABLE)
+			free(mcptr->u.jmptable);
+		mcptr++;
+	}
+
+	/*
+	 * Do the same for the reverse pattern, with the exception of
+	 * of the bitmaps.  The reverse pattern simply 'borrowed'
+	 * the forward pattern's bitmaps, which by now have been freed.
+	 */
+	mcptr = &tapcm[0];
+	while (mcptr->mc_type != MCNIL) {
+		if (mcptr->mc_type == LITSTRING)
+			free(mcptr->u.lstring);
+		else if (mcptr->mc_type == JMPTABLE)
+			free(mcptr->u.jmptable);
 		mcptr++;
 	}
 	mcpat[0].mc_type = tapcm[0].mc_type = MCNIL;
@@ -1121,9 +1328,13 @@ VOID PASCAL NEAR mcclear()
  *	Software Tools, this is the function omatch(), but i felt there were
  *	too many functions with the 'match' name already.
  */
-int PASCAL NEAR	mceq(bc, mt)
+#if PROTO
+int PASCAL NEAR	mceq(unsigned char bc, MC *mt)
+#else
+int PASCAL NEAR	mceq( bc, mt)
 unsigned char bc;
-MC	*mt;
+MC *mt;
+#endif
 {
 	register int result;
 
@@ -1139,7 +1350,7 @@ MC	*mt;
 		case CCL:
 			if (!(result = biteq(bc, mt->u.cclmap))) {
 				if ((curwp->w_bufp->b_mode & MDEXACT) == 0 &&
-				    (isletter(bc)))
+				    (is_letter(bc)))
 					result = biteq(chcase(bc), mt->u.cclmap);
 			}
 			break;
@@ -1148,7 +1359,7 @@ MC	*mt;
 			result = !biteq(bc, mt->u.cclmap);
 
 			if ((curwp->w_bufp->b_mode & MDEXACT) == 0 &&
-			    (isletter(bc)))
+			    (is_letter(bc)))
 				result &= !biteq(chcase(bc), mt->u.cclmap);
 
 			break;
@@ -1168,17 +1379,22 @@ MC	*mt;
  *	ppatptr is left pointing to the end-of-character-class character,
  *	so that a loop may automatically increment with safety.
  */
-int PASCAL NEAR	cclmake(ppatptr, mcptr)
-char	**ppatptr;
-MC	*mcptr;
+#if PROTO
+int PASCAL NEAR	cclmake(char **ppatptr, MC *mcptr)
+#else
+int PASCAL NEAR	cclmake( ppatptr, mcptr)
+char **ppatptr;
+MC *mcptr;
+#endif
 {
 	EBITMAP		bmap;
 	register char	*patptr;
 	register int	pchr, ochr;
 
-	if ((bmap = (EBITMAP) malloc(BMAPSIZE)) == NULL) {
+	if ((bmap = (EBITMAP) room(BMAPSIZE)) == NULL) {
 		mlabort(TEXT94);
 /*			"%%Out of memory" */
+		mcptr->mc_type = MCNIL;
 		return FALSE;
 	}
 
@@ -1253,11 +1469,116 @@ MC	*mcptr;
 }
 
 /*
+ * litmake -- create the literal string from the collection of characters.
+ *	If there is only one character in the collection, then no memory
+ *	needs to be allocated.
+ *
+ *	Please Note:  If new meta-characters are added (see estruct.h) then
+ *	you will also need to update this function!
+ */
+#if PROTO
+int PASCAL NEAR	litmake(char **ppatptr, MC *mcptr)
+#else
+int PASCAL NEAR	litmake( ppatptr, mcptr)
+char **ppatptr;
+MC *mcptr;
+#endif
+{
+	char	collect[NPAT + 1];
+	int	collect_len;
+	register int	pchr;
+	register char	*patptr;
+
+	/*
+	 * The reason this function was called was because a literal
+	 * character was encountered, so collect it immediately.
+	 */
+	collect[0] = *(patptr = *ppatptr);
+	collect_len = 1;
+
+	/*
+	 * Now loop through the pattern, collecting characters until
+	 * we run into a meta-character.
+	 */
+	while (pchr = *++patptr)
+	{
+		/*
+		 * If the current character is a closure character,
+		 * then the previous character cannot be part of the
+		 * collected string (it will be modified by closure).
+		 * Back up one, if it is not solo.
+		 */
+		if (pchr == MC_CLOSURE || pchr == MC_CLOSURE_1 ||
+		    pchr == MC_ZEROONE)
+		{
+			if (collect_len > 1) {
+				collect_len--;
+				patptr--;
+			}
+			break;
+		}
+
+		/*
+		 * The single-character meta-characters...
+		 */
+		if (pchr == MC_ANY || pchr == MC_CCL ||
+                    pchr == MC_BOL || pchr == MC_EOL)
+                	break;
+
+		/*
+		 * See if an escaped character is part of a meta-character
+		 * or not.  If not, then advance the pointer to collect the
+		 * next character, if there is a next character.
+		 */
+		if (pchr == MC_ESC) {
+			pchr = *(patptr + 1);
+
+			if (pchr == MC_GRPBEG || pchr == MC_GRPEND ||
+			    pchr == MC_BOWRD || pchr == MC_EOWRD)
+				break;
+
+			if (pchr != '\0')
+				patptr++;
+			magical = TRUE;
+		}
+
+		collect[collect_len++] = *patptr;
+	}
+
+	/*
+	 * Finished collecting characters, so either make a string out
+	 * of them, or a simple character.
+	 */
+	if (collect_len == 1) {
+		mcptr->u.lchar = collect[0];
+		mcptr->mc_type = LITCHAR;
+	}
+	else
+	{
+		collect[collect_len] = '\0';
+		if ((mcptr->u.lstring = copystr(collect)) == NULL)
+			mcptr->mc_type = MCNIL;
+		else
+			mcptr->mc_type = LITSTRING;
+	}
+	/*
+	 * Back up one so that the calling function will
+	 * increment onto the character we halted on.
+	 */
+	*ppatptr = patptr -1;
+	return (mcptr->mc_type != MCNIL);
+}
+
+/*
  * biteq -- is the character in the bitmap?
  */
-int PASCAL NEAR	biteq(bc, cclmap)
-int	bc;
-EBITMAP	cclmap;
+#if PROTO
+int PASCAL NEAR	biteq(int bc, EBITMAP cclmap)
+#else
+int PASCAL NEAR	biteq( bc, cclmap)
+int bc;
+EBITMAP cclmap;
+#endif
 {
 	if ((unsigned)bc >= HICHAR)
 		return FALSE;
@@ -1268,11 +1589,275 @@ EBITMAP	cclmap;
 /*
  * setbit -- Set a bit (ON only) in the bitmap.
  */
-VOID PASCAL NEAR setbit(bc, cclmap)
-int	bc;
-EBITMAP	cclmap;
+#if PROTO
+VOID PASCAL NEAR setbit(int bc, EBITMAP cclmap)
+#else
+VOID PASCAL NEAR setbit( bc, cclmap)
+int bc;
+EBITMAP cclmap;
+#endif
 {
 	if ((unsigned)bc < HICHAR)
 		*(cclmap + (bc >> 3)) |= BIT(bc & 7);
+}
+#endif
+
+#if DEBUG_SEARCH
+
+#if PROTO
+int PASCAL NEAR mc_list(int f, int n)
+#else
+int PASCAL NEAR mc_list( f, n)
+int f;
+int n;
+#endif
+{
+	MC	*mcptr;
+	BUFFER *patbuf; 	/* buffer containing pattern list */
+	char pline[NPAT*2]; 	/* text buffer to hold current line */
+	char cstr[2];		/* to turn single characters into strings.*/
+	int status;		/* return status from subcommands */
+	int j;
+
+	/* prepare and clear the buffer holding the meta-character list */
+	patbuf = bfind("[Debug Search Metacharacters]", TRUE, BFINVS);
+	if (patbuf == NULL) {
+		mlwrite(TEXT137);
+/*		"Cannot create buffer" */
+		return FALSE;
+	}
+
+	patbuf->b_mode |= MDVIEW;
+	if ((status = bclear(patbuf)) != TRUE) 	/* Blow old text away	*/
+		return(status);
+
+	/* add in the header text */
+	strcpy(pline, "         Pattern = \"");
+	strcat(pline, pat);
+	strcat(pline, "\"  (");
+	strcat(pline, int_asc(deltapat.jump));
+	strcat(pline, ", ");
+	strcat(pline, int_asc(deltapat.patlen));
+	strcat(pline, ")");
+
+	/* scan through the regular expression pattern */
+	cstr[0] = cstr[1] = '\0';
+	mcptr = &mcpat[0];
+	for (j = 0; j < 2; j++)
+	{
+		if (addline(patbuf, " ") == FALSE
+		|| addline(patbuf, pline) == FALSE
+		|| addline(patbuf,  "-----------------------") == FALSE
+		|| addline(patbuf, "Closure         MC Type") == FALSE
+		|| addline(patbuf,  "-----------------------") == FALSE)
+			return(FALSE);
+
+		while (mcptr->mc_type != MCNIL) {
+
+			if ((mcptr->mc_type) & CLOSURE)
+				strcpy(pline, "Zero to many    ");
+			else if ((mcptr->mc_type) & CLOSURE_1)
+				strcpy(pline, "One to many     ");
+			else if ((mcptr->mc_type) & ZEROONE)
+				strcpy(pline, "Optional        ");
+			else
+				strcpy(pline, "                ");
+
+			/* next, the meta-character type */
+			mctype_cat(pline, (mcptr->mc_type) & MASKCLO);
+
+			/* and some additional information */
+			switch ((mcptr->mc_type) & MASKCLO) {
+				case JMPTABLE:
+					strcat(pline, "\"");
+					strcat(pline, mcptr->u.jmptable->patrn);
+					strcat(pline, "\"  (");
+					strcat(pline, int_asc(mcptr->u.jmptable->jump));
+					strcat(pline, ", ");
+					strcat(pline, int_asc(mcptr->u.jmptable->patlen));
+					strcat(pline, ")");
+					break;
+
+				case LITSTRING:
+					strcat(pline, "\"");
+					strcat(pline, mcptr->u.lstring);
+					strcat(pline, "\"");
+					break;
+
+				case LITCHAR:
+					cstr[0] =  mcptr->u.lchar;
+					strcat(pline, "\"");
+					strcat(pline, cstr);
+					strcat(pline, "\"");
+					break;
+
+				case GRPBEG:
+					cstr[0] = mcptr->u.group_no + '0';
+					strcat(pline, cstr);
+					break;
+
+				case GRPEND:
+					cstr[0] = mcptr->u.group_no + '0';
+					strcat(pline, cstr);
+					break;
+			}
+
+			/* terminate and add the built line into the buffer */
+			if (addline(patbuf, pline) == FALSE)
+				return(FALSE);
+
+			mcptr++;
+		}
+		/* add in the header text */
+		strcpy(pline, " Reverse Pattern = \"");
+		strcat(pline, tap);
+		strcat(pline, "\"  (");
+		strcat(pline, int_asc(tapatled.jump));
+		strcat(pline, ", ");
+		strcat(pline, int_asc(tapatled.patlen));
+		strcat(pline, ")");
+
+		mcptr = &tapcm[0];
+	}
+	return(wpopup(patbuf));
+}
+
+#if PROTO
+int PASCAL NEAR rmc_list(int f, int n)
+#else
+int PASCAL NEAR rmc_list( f, n)
+int f;
+int n;
+#endif
+{
+	RMC	*rmcptr;
+	BUFFER *patbuf; 	/* buffer containing pattern list */
+	char pline[NPAT+32]; 	/* text buffer to hold current line */
+	char cstr[2];		/* to turn single characters into strings.*/
+	int status;		/* return status from subcommands */
+
+	/* prepare and clear the buffer holding the meta-character list */
+	patbuf = bfind("[Debug Replace Metacharacters]", TRUE, BFINVS);
+	if (patbuf == NULL) {
+		mlwrite(TEXT137);
+/*		"Cannot create buffer" */
+		return FALSE;
+	}
+
+	patbuf->b_mode |= MDVIEW;
+	if ((status = bclear(patbuf)) != TRUE) 	/* Blow old text away	*/
+		return(status);
+
+	/* add in the header text */
+	strcpy(pline, "Replacement Pattern = \"");
+	strcat(pline, rpat);
+	strcat(pline, "\"");
+
+	/* scan through the regular expression pattern */
+	cstr[0] = cstr[1] = '\0';
+	rmcptr = &rmcpat[0];
+
+	if (addline(patbuf, " ") == FALSE
+	|| addline(patbuf, pline) == FALSE
+	|| addline(patbuf,  "-----------------------") == FALSE
+	|| addline(patbuf,  "RMC Type") == FALSE
+	|| addline(patbuf,  "-----------------------") == FALSE)
+		return(FALSE);
+
+	while (rmcptr->mc_type != MCNIL) {
+		mctype_cat(pline, rmcptr->mc_type);
+
+		/* and some additional information */
+		switch (rmcptr->mc_type) {
+			case LITSTRING:
+				strcat(pline, "\"");
+				strcat(pline, rmcptr->u.rstr);
+				strcat(pline, "\"");
+				break;
+
+			case GROUP:
+				cstr[0] = rmcptr->u.group_no + '0';
+				strcat(pline, cstr);
+				break;
+		}
+
+		/* terminate and add the built line into the buffer */
+		if (addline(patbuf, pline) == FALSE)
+			return(FALSE);
+
+		rmcptr++;
+	}
+	return(wpopup(patbuf));
+}
+
+#if PROTO
+VOID PASCAL NEAR mctype_cat(char pline[], int mc_type)
+#else
+VOID PASCAL NEAR mctype_cat( pline, mc_type)
+char pline[];
+int mc_type;
+#endif
+{
+	switch (mc_type) {
+		case JMPTABLE:
+			strcat(pline, "JMPTABLE   ");
+			break;
+
+		case LITSTRING:
+			strcat(pline, "LITSTRING  ");
+			break;
+
+		case LITCHAR:
+			strcat(pline, "LITCHAR    ");
+			break;
+
+		case ANY:
+			strcat(pline, "ANY        ");
+			break;
+
+		case CCL:
+			strcat(pline, "CCL        ");
+			break;
+
+		case NCCL:
+			strcat(pline, "NCCL       ");
+			break;
+
+		case BOL:
+			strcat(pline, "BOL        ");
+			break;
+
+		case EOL:
+			strcat(pline, "EOL        ");
+			break;
+
+		case BOWRD:
+			strcat(pline, "BOWORD     ");
+			break;
+
+		case EOWRD:
+			strcat(pline, "EOWORD     ");
+			break;
+
+		case GRPBEG:
+			strcat(pline, "GRPBEG     ");
+			break;
+
+		case GRPEND:
+			strcat(pline, "GRPEND     ");
+			break;
+
+		case GROUP:
+			strcat(pline, "GROUP      ");
+			break;
+
+		case DITTO:
+			strcat(pline, "DITTO      ");
+			break;
+
+		default:
+			strcat(pline, "Unknown type");
+			break;
+	}
 }
 #endif

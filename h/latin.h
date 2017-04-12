@@ -1,5 +1,5 @@
-/* LATIN.H: 	Latin language text strings for MicroEMACS 3.12
-		(C)Copyright 1993 by Daniel M. Lawrence
+/* LATIN.H: 	Latin language text strings for MicroEMACS 4.00
+		(C)Copyright 1995 by Daniel M. Lawrence
  		translated 1991 by Anthony Appleyard	*/
 
 #define TEXT1   "[incipio novum CLI]"
@@ -60,7 +60,7 @@
 #define TEXT56  "tabula variabilium"
 #define TEXT57  "non possum variabilium ostendere tabula"
 #define TEXT58  "[struo tabula variabilium]"
-#define TEXT59  "[columna impletionis est %d]"
+#define TEXT59  UNUSED
 #define TEXT60  "Linea %D/%D Col %d/%d Char %D/%D (%d%%) char = 0x%x"
 #define TEXT61  "%%argumentum negativum occisionus nefas est"
 #define TEXT62  "modus globalis "
@@ -83,8 +83,8 @@
 #define TEXT79  "non inveni"
 #define TEXT80  "Nullum exemplar definitum est"
 #define TEXT81  "petere retro "
-#define TEXT82  "respicio %d cum saltu %d"
-#define TEXT83  "ejus alius casus est %d" /* 'instance' vel ut A/a B/b etc? */
+#define TEXT82  UNUSED				/* "respicio %d cum saltu %d" */
+#define TEXT83  UNUSED				/* "ejus alius casus est %d" 'instance' vel ut A/a B/b etc? */
 #define TEXT84  "in loco hujus "
 #define TEXT85  "quaerens, in loco hujus "
 #define TEXT86  "ponere hoc "
@@ -93,7 +93,7 @@
 #define TEXT89  "interrupistis!"
 #define TEXT90  "Y=ita,N=non,!=fac rest.,U=solve prec.,^G=exire,.=exire retro,?=adjuv.: "
 #define TEXT91  "linum vacuum substitui, consisto igitur."
-#define TEXT92  "%d substitutiones"
+#define TEXT92  "%D substitutiones"
 #define TEXT93  "%%ERROR dum delebam"
 #define TEXT94  "%%memoria est plena"
 #define TEXT95  "%%mceq: quid est %d?"
@@ -242,6 +242,8 @@
 #define TEXT246 "%%Need function key number"
 #define TEXT247 "%%Function key number out of range"
 #define	TEXT248 "Enter Label String: "
+#define TEXT249 "Global variable to declare: "
+#define	TEXT250 "Local variable to declare: "
 
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrect menu]"

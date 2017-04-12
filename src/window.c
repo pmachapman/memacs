@@ -38,14 +38,13 @@ int f, n;	/* prefix flag and argument */
 {
     if (f == FALSE)
 	sgarbf = TRUE;
-    else
-	{
+    else {
 	curwp->w_force = 0;		/* Center dot. */
 	curwp->w_flag |= WFFORCE;
-	}
+    }
 
     return(TRUE);
-    }
+}
 
 /*
  * The command make the next window (next => down the screen) the current
@@ -60,7 +59,7 @@ PASCAL NEAR nextwind(f, n)
 int f, n;	/* default flag and numeric argument */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	register int nwindows;		/* total number of windows */
 
 	if (f) {
@@ -107,8 +106,8 @@ PASCAL NEAR prevwind(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW *wp1;
-	register WINDOW *wp2;
+	register EWINDOW *wp1;
+	register EWINDOW *wp2;
 
 	/* if we have an argument, we mean the nth window from the bottom */
 	if (f)
@@ -161,28 +160,24 @@ int f, n;	/* prefix flag and argument */
 
     lp = curwp->w_linep;
 
-    if (n < 0)
-	{
+    if (n < 0) {
 	while (n++ && lp!=curbp->b_linep)
 	    lp = lforw(lp);
-	}
-    else
-	{
+    } else {
 	while (n-- && lback(lp)!=curbp->b_linep)
 	    lp = lback(lp);
-	}
+    }
 
     curwp->w_linep = lp;
     curwp->w_flag |= WFHARD;		/* Mode line is OK. */
 
-    for (i = 0; i < curwp->w_ntrows; ++i)
-	{
+    for (i = 0; i < curwp->w_ntrows; ++i) {
 	if (lp == curwp->w_dotp)
 	    return(TRUE);
 	if (lp == curbp->b_linep)
 	    break;
 	lp = lforw(lp);
-	}
+    }
 
     lp = curwp->w_linep;
     i  = curwp->w_ntrows/2;
@@ -193,7 +188,7 @@ int f, n;	/* prefix flag and argument */
     curwp->w_dotp  = lp;
     curwp->w_doto  = 0;
     return(TRUE);
-    }
+}
 
 /*
  * This command makes the current window the only window on the screen. Bound
@@ -207,7 +202,7 @@ PASCAL NEAR onlywind(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	register LINE	*lp;
 	register int	i;
 	int cmark;		/* current mark */
@@ -263,8 +258,8 @@ PASCAL NEAR delwind(f,n)
 int f, n;	/* arguments are ignored for this command */
 
 {
-	register WINDOW *wp;	/* window to recieve deleted space */
-	register WINDOW *lwp;	/* ptr window before curwp */
+	register EWINDOW *wp;	/* window to recieve deleted space */
+	register EWINDOW *lwp;	/* ptr window before curwp */
 	register int target;	/* target line to search for */
 	int cmark;		/* current mark */
 
@@ -340,7 +335,7 @@ Split the current window.  A window smaller than 3 lines cannot be
 split.	(Two line windows can be split when mode lines are disabled) An
 argument of 1 forces the cursor into the upper window, an argument of
 two forces the cursor to the lower window.  The only other error that
-is possible is a "malloc" failure allocating the structure for the new
+is possible is a "room" failure allocating the structure for the new
 window.  Bound to "C-X 2". 
 
 */
@@ -350,13 +345,13 @@ PASCAL NEAR splitwind(f, n)
 int f, n;	/* default flag and numeric argument */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	register LINE	*lp;
 	register int	ntru;
 	register int	ntrl;
 	register int	ntrd;
-	register WINDOW *wp1;
-	register WINDOW *wp2;
+	register EWINDOW *wp1;
+	register EWINDOW *wp2;
 	int cmark;		/* current mark */
 
 	/* make sure we have enough space */
@@ -365,7 +360,7 @@ int f, n;	/* default flag and numeric argument */
 /*			"Cannot split a %d line window" */
 		return(FALSE);
 	}
-	if ((wp = (WINDOW *) malloc(sizeof(WINDOW))) == NULL) {
+	if ((wp = (EWINDOW *)room(sizeof(EWINDOW))) == NULL) {
 		mlabort(TEXT94);
 /*			"%%Out of memory" */
 		return(FALSE);
@@ -442,7 +437,7 @@ PASCAL NEAR enlargewind(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW *adjwp;
+	register EWINDOW *adjwp;
 	register LINE	*lp;
 	register int	i;
 
@@ -493,7 +488,7 @@ PASCAL NEAR shrinkwind(f, n)
 int f,n;	/* prefix flag and argument */
 
 {
-	register WINDOW *adjwp;
+	register EWINDOW *adjwp;
 	register LINE	*lp;
 	register int	i;
 
@@ -568,7 +563,7 @@ int PASCAL NEAR wpopup(popbuf)
 BUFFER *popbuf;
 #endif
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	register BUFFER *bp;
 	register int cmark;		/* current mark */
 
@@ -656,7 +651,7 @@ PASCAL NEAR restwnd(f, n)	/* restore the saved screen */
 int f, n;	/* prefix flag and argument */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 
 	/* find the window */
 	wp = wheadp;
@@ -681,9 +676,9 @@ int f;	/* default flag */
 int n;	/* numeric argument */
 
 {
-	WINDOW *wp;	/* current window being examined */
-	WINDOW *nextwp; /* next window to scan */
-	WINDOW *lastwp; /* last window scanned */
+	EWINDOW *wp;	/* current window being examined */
+	EWINDOW *nextwp; /* next window to scan */
+	EWINDOW *lastwp; /* last window scanned */
 	int lastline;	/* screen line of last line of current window */
 	int cmark;		/* current mark */
 
@@ -783,7 +778,7 @@ int f;	/* default flag */
 int n;	/* numeric argument */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 
 	/* if the command defaults, assume the largest */
 	if (f == FALSE)
@@ -825,8 +820,6 @@ int n;	/* numeric argument */
 #if	WINDOW_MSWIN
 	term.t_colorg = 0;  /* screen positions are not managed by EMACS */
 #else
-	register WINDOW *wp;
-
 	/* if the command defaults, assume zero */
 	if (f == FALSE)
 		n = 0;
@@ -854,8 +847,6 @@ int n;	/* numeric argument */
 #if	WINDOW_MSWIN
 	term.t_roworg = 0;  /* screen positions are not managed by EMACS */
 #else
-	register WINDOW *wp;
-
 	/* if the command defaults, assume zero */
 	if (f == FALSE)
 		n = 0;
@@ -896,7 +887,7 @@ int PASCAL NEAR getwpos()	/* get screen offset of current line in current window
 int PASCAL NEAR getcwnum()		/* get current window number */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	register int num;
 
 	num = 1;
@@ -912,7 +903,7 @@ int PASCAL NEAR getcwnum()		/* get current window number */
 int PASCAL NEAR gettwnum()		/* get total window count */
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	register int ctr;
 
 	ctr = 0;

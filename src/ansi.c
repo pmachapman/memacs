@@ -270,9 +270,8 @@ register int    n;
 
 PASCAL NEAR ansiopen()
 {
-#if     V7 | USG | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX
+#if     USG | AIX | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX
         register char *cp;
-        char *getenv();
 
         if ((cp = getenv("TERM")) == NULL) {
                 puts(TEXT4);
@@ -286,7 +285,7 @@ PASCAL NEAR ansiopen()
                 meexit(1);
         }
 #endif
-#if	MOUSE & ( V7 | USG | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX | VMS)
+#if	MOUSE & (USG | AIX | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX | VMS)
 /*
 	If this is an ansi terminal of at least DEC level
 	2 capability, some terminals of this level, such as the "Whack"
@@ -320,7 +319,7 @@ PASCAL NEAR ansiclose()
 	ansifcol(7);
 	ansibcol(0);
 #endif
-#if	MOUSE & ( V7 | USG | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX | VMS)
+#if	MOUSE & (USG | AIX | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX | VMS)
 	{
 		char *s;
 
@@ -353,7 +352,7 @@ PASCAL NEAR ansikclose()	/* close the keyboard (a noop here) */
 {
 }
 
-#if     V7 | USG | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX | VMS
+#if   USG | AIX | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX | VMS
 /***
  *  ttputs  -  Send a string to ttputc
  *
@@ -557,7 +556,7 @@ PASCAL NEAR ansigetc()
 	not allow function keys or mouse to operate properly.  This
 	makes VT100 users much happier.
 */
-	    ch = ttgetc_shortwait();
+	    ch = grabnowait();
 	    if( ch < 0) return( 27);	/* Wasn't a function key */
 	    if( ch == '[') docsi( ch);
 	    else if( ch == ':') dobbnmouse();

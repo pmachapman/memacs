@@ -19,7 +19,7 @@ HFILES=estruct.h $(HDIR)/edef.h $(HDIR)/efunc.h $(HDIR)/epath.h $(HDIR)/ebind.h 
 
 #list of object files
 
-F1=$(OBJD)/basic.o $(OBJD)/bind.o $(OBJD)/buffer.o
+F1=$(OBJD)/abbrev.o $(OBJD)/basic.o $(OBJD)/bind.o $(OBJD)/buffer.o
 F2=$(OBJD)/char.o $(OBJD)/crypt.o $(OBJD)/display.o $(OBJD)/dolock.o
 F3=$(OBJD)/eval.o $(OBJD)/exec.o $(OBJD)/file.o
 F4=$(OBJD)/fileio.o $(OBJD)/unix.o $(OBJD)/input.o
@@ -37,6 +37,8 @@ OFILES =	$(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8)
 bin/emacs.exe:	$(OFILES)
 		$(CC) $(CFLAGS) $(OFILES) -ltermcap -lc -o bin/emacs
 
+$(OBJD)/abbrev.o: $(SRCD)/abbrev.c $(HFILES)
+	$(CC) $(CFLAGS) -c -o $(OBJD)/abbrev.o $(SRCD)/abbrev.c
 $(OBJD)/basic.o: $(SRCD)/basic.c $(HFILES)
 	$(CC) $(CFLAGS) -c -o $(OBJD)/basic.o $(SRCD)/basic.c
 $(OBJD)/bind.o: $(SRCD)/bind.c $(HFILES)

@@ -28,14 +28,14 @@ HFILES = $(H1) $(H2) $(H3)
 
 #list of source files
 
-F1 = $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
+F1 = $(OBJD)\abbrev.obj $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
 F2 = $(OBJD)\char.obj $(OBJD)\crypt.obj $(OBJD)\display.obj
 F3 = $(OBJD)\eval.obj $(OBJD)\exec.obj $(OBJD)\file.obj $(OBJD)\tags.obj
 F4 = $(OBJD)\fileio.obj $(OBJD)\ibmpc.obj $(OBJD)\input.obj $(OBJD)\isearch.obj
 F5 = $(OBJD)\keyboard.obj $(OBJD)\line.obj $(OBJD)\lock.obj $(OBJD)\dolock.obj
 F6 = $(OBJD)\main.obj $(OBJD)\mouse.obj $(OBJD)\msdos.obj $(OBJD)\screen.obj
 F7 = $(OBJD)\random.obj $(OBJD)\region.obj $(OBJD)\search.obj $(OBJD)\replace.obj
-F8 = $(OBJD)\window.obj $(OBJD)\word.obj  $(OBJD)\execpr.obj
+F8 = $(OBJD)\undo.obj $(OBJD)\window.obj $(OBJD)\word.obj  $(OBJD)\execpr.obj
 
 # product list
 
@@ -49,6 +49,8 @@ bin\cmdfix.exe: $(OBJD)\cmdfix.obj
 
 # compilation rules
 
+$(OBJD)\abbrev.obj: $(SRCD)\abbrev.c $(HFILES)
+	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
 $(OBJD)\basic.obj: $(SRCD)\basic.c $(HFILES)
 	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
 $(OBJD)\bind.obj: $(SRCD)\bind.c $(HFILES)
@@ -106,6 +108,8 @@ $(OBJD)\screen.obj: $(SRCD)\screen.c $(HFILES)
 $(OBJD)\tags.obj: $(SRCD)\tags.c $(HFILES)
 	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
 $(OBJD)\window.obj: $(SRCD)\window.c $(HFILES)
+	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
+$(OBJD)\undo.obj: $(SRCD)\undo.c $(HFILES)
 	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c
 $(OBJD)\word.obj: $(SRCD)\word.c $(HFILES)
 	$(CC) $(CFLAGS) -o$(OBJD)\$&.obj $(SRCD)\$&.c

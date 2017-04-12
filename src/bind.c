@@ -25,12 +25,7 @@ int f,n;	/* prefix flag and argument */
 	bp = bfind("emacs.hlp", FALSE, BFINVS);
 
 	if (bp == NULL) {
-#if SHARED
-		strcpy(tname, pathname[1]);
-		fname = flook(tname, FALSE);
-#else	    
 		fname = flook(pathname[1], FALSE);
-#endif
 		if (fname == NULL) {
 			mlwrite(TEXT12);
 /*				"[Help file is not online]" */
@@ -336,6 +331,28 @@ int c;		/* command key to unbind */
 	return(TRUE);
 }
 
+/* unbind all the keys bound to a buffer (which we can then delete */
+
+VOID PASCAL NEAR unbind_buf(bp)
+
+BUFFER *bp;	/* buffer to unbind all keys connected to */
+
+{
+	register KEYTAB *ktp;	/* pointer into the command table */
+
+	/* search the table to see if the key exists */
+	ktp = &keytab[0];
+	while (ktp->k_type != BINDNUL) {
+		if (ktp->k_type == BINDBUF) {
+			if (ktp->k_ptr.buf == bp) {
+				unbindchar(ktp->k_code);
+				--ktp;
+			}
+		}
+		++ktp;
+	}
+}
+
 /* Describe bindings:
 
 	   bring up a fake buffer and list the key bindings
@@ -378,7 +395,8 @@ char *mstring;	/* match string if a partial list */
 	register BUFFER *bp;	/* buffer ptr for function scan */
 	int cpos;		/* current position to use in outseq */
 	char outseq[80];	/* output buffer for keystroke sequence */
-
+	int first_entry;	/* is this the first macro listing? */
+	
 	/* get a buffer for the binding list */
 	listbuf = bfind(TEXT21, TRUE, BFINVS);
 /*		   "Binding list" */
@@ -438,11 +456,8 @@ fail:		/* and on to the next name */
 		++nptr;
 	}
 
-	/* add a blank line between the key and macro lists */
-	if (addline(listbuf, "") != TRUE)
-		return(FALSE);
-
 	/* scan all buffers looking for macroes and their bindings */
+	first_entry = TRUE;
 	bp = bheadp;
 	while (bp) {
 
@@ -479,6 +494,13 @@ fail:		/* and on to the next name */
 				cpos = 0;	/* and clear the line */
 			}
 			++ktp;
+		}
+
+		/* add a blank line between the key and macro lists */
+		if (first_entry == TRUE) {
+			if (addline(listbuf, "") != TRUE)
+				return(FALSE);
+			first_entry = FALSE;
 		}
 
 		/* if no key was bound, we need to dump it anyway */
@@ -549,7 +571,7 @@ int mflag;	/* going for a meta sequence? */
 
 	/* or the normal way */
 	if (mflag)
-		c = getkey();
+		c = get_key();
 	else
 		c = getcmd();
 	return(c);
@@ -575,14 +597,7 @@ char *sfname;	/* name of startup file (null if default) */
 
 		fname = flook(name, TRUE);
 	} else
-#if SHARED
-	{
-		strcpy(tname, pathname[0]);
-		fname = flook(tname, TRUE);
-	}
-#else
 		fname = flook(pathname[0], TRUE);
-#endif
 
 	/* if it isn't around, don't sweat it */
 	if (fname == NULL)
@@ -619,7 +634,6 @@ int hflag;	/* Look in the HOME environment variable first? */
 	register char *sp;	/* pointer into path spec */
 	register int i; 	/* index */
 	static char fspec[NFILEN];	/* full path spec to search */
-	char *getenv();
 
 	/* if we have an absolute path.. check only there! */
 	sp = fname;
@@ -872,7 +886,7 @@ char *fname;	/* name to attempt to match */
 {
 	int nval;
 
-	if ((nval = binary(fname, namval, numfunc)) == -1)
+	if ((nval = binary(fname, namval, numfunc, NSTRING)) == -1)
 		return(NULL);
 	else
 		return(names[nval].n_func);
@@ -906,7 +920,7 @@ int index;	/* index of name to fetch out of the name table */
 
 unsigned int PASCAL NEAR stock(keyname)
 
-char *keyname;	/* name of key to translate to Command key form */
+unsigned char *keyname;	/* name of key to translate to Command key form */
 
 {
 	register unsigned int c;	/* key sequence to return */
@@ -998,8 +1012,10 @@ int f, n;	/* agruments to C function */
 {
 	register int status;	/* error return */
 
-	if (key->k_type == BINDFNC)
+	if (key->k_type == BINDFNC) {
+		undo_insert(OP_CMND, 1, obj);
 		return((*(key->k_ptr.fp))(f, n));
+	}
 	if (key->k_type == BINDBUF) {
 		while (n--) {
 			status = dobuf(key->k_ptr.buf);
@@ -1013,9 +1029,9 @@ int f, n;	/* agruments to C function */
 /* set a KEYTAB to the given name of the given type */
 
 #if	PROTO
-int setkey(KEYTAB *key, char *name)
+int set_key(KEYTAB *key, char *name)
 #else
-setkey(key, name)
+set_key(key, name)
 
 KEYTAB *key;		/* ptr to key to set */
 char *name;		/* name of function or buffer */

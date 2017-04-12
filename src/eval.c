@@ -10,23 +10,62 @@
 #include	"elang.h"
 #include	"evar.h"
 
-VOID PASCAL NEAR varinit()	/* initialize the user variable list */
+/* initialize the entries in one user variable table */
+
+VOID PASCAL NEAR uv_init(ut)
+
+UTABLE *ut;	/* user variable table to initialize */
 
 {
 	register int i;
 
-	for (i=0; i < MAXVARS; i++)
-		uv[i].u_name[0] = 0;
+	for (i=0; i < ut->size; i++) {
+		ut->uv[i].u_name[0] = 0;
+		ut->uv[i].u_value = (char *)NULL;
+	}
 }
 
-VOID PASCAL NEAR varclean()	/* initialize the user variable list */
+VOID PASCAL NEAR varinit()	/* initialize the global user variable table */
+
+{
+	/* allocate the global user variable table */
+	uv_global = uv_head =
+		(UTABLE *)room(sizeof(UTABLE) + MAXVARS * sizeof(UVAR));
+
+	/* and set up its fields */
+	uv_head->next = (UTABLE *)NULL;
+	uv_head->size = MAXVARS;
+	uv_head->bufp = (BUFFER *)NULL;
+	uv_init(uv_head);
+}
+
+VOID PASCAL NEAR uv_clean(ut)	/* discard the contents of a user variable table */
+
+UTABLE *ut;	/* ptr to table to clear */
 
 {
 	register int i;
 
-	for (i=0; i < MAXVARS; i++)
-		if (uv[i].u_name[0] != 0)
-			free(uv[i].u_value);
+	/* now clear the entries in this one */
+	for (i=0; i < ut->size; i++)
+		if (ut->uv[i].u_name[0] != 0)
+			free(ut->uv[i].u_value);
+}
+
+VOID PASCAL NEAR varclean(ut)	/* discard and clear all user variable tables */
+
+UTABLE *ut;	/* table to clear */
+
+{
+	/* first clean all the ones under this one */
+	if (ut->next != (UTABLE *)NULL)
+		varclean(ut->next);
+
+	/* clear the contents of this table */
+	uv_clean(ut);
+
+	/* and then deallocate the this table itself */
+	free(ut);
 }
 
 char *PASCAL NEAR gtfun(fname)	/* evaluate a function */
@@ -36,18 +75,15 @@ char *fname;		/* name of function to evaluate */
 {
 	register int fnum;		/* index to function to eval */
 	register int arg;		/* value of some arguments */
+	BUFFER *bp;			/* scratch buffer pointer */
 	char arg1[NSTRING];		/* value of first argument */
 	char arg2[NSTRING];		/* value of second argument */
 	char arg3[NSTRING];		/* value of third argument */
 	static char result[2 * NSTRING];	/* string result */
-#if	ENVFUNC
-	char *getenv(); 		/* get environment string */
-#endif
 
 	/* look the function up in the function table */
-	fname[3] = 0;	/* only first 3 chars significant */
 	mklower(fname); /* and let it be upper or lower case */
-	fnum = binary(fname, funval, NFUNCS);
+	fnum = binary(fname, funval, NFUNCS, MINFLEN);
 
 	/* return errorm on a bad reference */
 	if (fnum == -1) {
@@ -76,6 +112,7 @@ char *fname;		/* name of function to evaluate */
 
 	/* and now evaluate it! */
 	switch (fnum) {
+		case UFABBREV:	return(fixnull(ab_lookup(arg1)));
 		case UFABS:	return(int_asc(absv(asc_int(arg1))));
 		case UFADD:	return(int_asc(asc_int(arg1) + asc_int(arg2)));
 		case UFAND:	return(ltos(stol(arg1) && stol(arg2)));
@@ -85,8 +122,24 @@ char *fname;		/* name of function to evaluate */
 		case UFBNOT:	return(int_asc(~asc_int(arg1)));
 		case UFBOR:	return(int_asc(asc_int(arg1) | asc_int(arg2)));
 		case UFBXOR:	return(int_asc(asc_int(arg1) ^ asc_int(arg2)));
+		case UFCALL:	/* construct buffer name to execute */
+				result[0] = '[';
+				strcpy(&result[1], arg1);
+				strcat(result, "]");
+
+				/* find it, return ERROR if it does not exist */
+				bp = bfind(result, FALSE, 0);
+				if (bp == NULL)
+					return(errorm);
+
+				/* execute it and return whats in the $rval */
+				dobuf(bp);
+				return(fixnull(rval));
 		case UFCAT:	strcpy(result, arg1);
-				return(strcat(result, arg2));
+				strncat(result, arg2, NSTRING);
+				result[NSTRING - 1] = 0;
+				return(result);
+
 		case UFCHR:	result[0] = asc_int(arg1);
 				result[1] = 0;
 				return(result);
@@ -109,17 +162,18 @@ char *fname;		/* name of function to evaluate */
 				return(fixnull(flook(arg1, TRUE)));
 		case UFGREATER: return(ltos(asc_int(arg1) > asc_int(arg2)));
 		case UFGROUP:
-				if ((arg = asc_int(arg1)) < 0 || arg >= MAXGROUPS)
+				arg = asc_int(arg1);
+#if	MAGIC
+				if (arg < 0 || arg >= MAXGROUPS)
 					return(bytecopy(result, errorm, NSTRING * 2));
 				    
-#if	MAGIC
 				return(bytecopy(result, fixnull(grpmatch[arg]),
 					 NSTRING * 2));
 #else
 				if (arg == 0)
 					bytecopy(result, patmatch, NSTRING * 2);
 				else
-					result[0] = '\0';
+					return(bytecopy(result, errorm, NSTRING * 2));
 				return(result);
 #endif
 		case UFGTCMD:	return(cmdstr(getcmd(), result));
@@ -137,6 +191,20 @@ char *fname;		/* name of function to evaluate */
 					arg = strlen(arg1);
 				return(bytecopy(result, &arg1[arg-1],
 					asc_int(arg3)));
+		case UFMKCOL:	if ((arg = asc_int(arg1)) < 0 || arg >= NMARKS ||
+				    curwp->w_markp[arg] == NULL)
+				{
+					mlwrite(TEXT11, arg);
+					return (int_asc(-1));
+				}
+				return(int_asc(findcol(curwp->w_markp[arg], curwp->w_marko[arg])));
+		case UFMKLINE:	if ((arg = asc_int(arg1)) < 0 || arg >= NMARKS ||
+				    curwp->w_markp[arg] == NULL)
+				{
+					mlwrite(TEXT11, arg);
+					return (int_asc(0));
+				}
+				return(long_asc(getlinenum(curbp, curwp->w_markp[arg])));
 		case UFMOD:	if ((arg = asc_int(arg2)) != 0)
 					return(int_asc(asc_int(arg1) % arg));
 				else {
@@ -178,22 +246,37 @@ char *vname;		/* name of user variable to fetch */
 {
 	register int vnum;	/* ordinal number of user var */
 	register char *vptr;	/* temp pointer to function value */
+	register UTABLE *ut;	/* ptr to the current variable table */
 
 	/* limit comparisons to significant length */
 	if (strlen(vname) >= NVSIZE)	/* "%" counts, but is not passed */
-		vname[NVSIZE-1] = '\0';
+		vname[NVSIZE] = '\0';
+	
+	/* scan through each user variable table starting with the
+	   most local and going to the global table */
+	ut = uv_head;
+	while (ut) {
 
-	/* scan the list looking for the user var name */
-	for (vnum = 0; vnum < MAXVARS; vnum++) {
-		if (uv[vnum].u_name[0] == 0)
-			return(errorm);
-		if (strcmp(vname, uv[vnum].u_name) == 0) {
-			vptr = uv[vnum].u_value;
-			if (vptr)
-				return(vptr);
-			else
-				return(errorm);
+		/* scan this table looking for the user var name */
+		for (vnum = 0; vnum < ut->size; vnum++) {
+
+			/* out of entries? */
+			if (ut->uv[vnum].u_name[0] == 0)
+				goto next_ut;
+
+			/* is this the one? */
+			if (strcmp(vname, ut->uv[vnum].u_name) == 0) {
+
+				/* return its value..... */
+				vptr = ut->uv[vnum].u_value;
+				if (vptr)
+					return(vptr);
+				else
+					return(errorm);
+			}
 		}
+
+next_ut:	ut = ut->next;
 	}
 
 	/* return errorm if we run off the end */
@@ -216,11 +299,12 @@ int i;
 	return(envars[i]);
 }
 
-PASCAL NEAR binary(key, tval, tlength)
+PASCAL NEAR binary(key, tval, tlength, klength)
 
 char *key;		/* key string to look for */
 char *(PASCAL NEAR *tval)();	/* ptr to function to fetch table value with */
 int tlength;		/* length of table to search */
+int klength;		/* maximum length of string to compare */
 
 {
 	int l, u;	/* lower and upper limits of binary search */
@@ -236,7 +320,7 @@ int tlength;		/* length of table to search */
 		i = (l + u) >> 1;
 
 		/* do the comparison */
-		cresult = strcmp(key, (*tval)(i));
+		cresult = strncmp(key, (*tval)(i), klength);
 		if (cresult == 0)
 			return(i);
 		if (cresult < 0)
@@ -256,7 +340,7 @@ char *vname;		/* name of environment variable to retrieve */
 	static char result[2 * NSTRING];	/* string result */
 
 	/* scan the list, looking for the referenced name */
-	vnum = binary(vname, envval, NEVARS);
+	vnum = binary(vname, envval, NEVARS, NVSIZE);
 
 	/* return errorm on a bad reference */
 	if (vnum == -1)
@@ -264,6 +348,9 @@ char *vname;		/* name of environment variable to retrieve */
 
 	/* otherwise, fetch the appropriate value */
 	switch (vnum) {
+		case EVABBELL:	return(ltos(ab_bell));
+		case EVABCAP:	return(ltos(ab_cap));
+		case EVABQUICK:	return(ltos(ab_quick));
 		case EVACOUNT:	return(int_asc(gacount));
 		case EVASAVE:	return(int_asc(gasave));
 		case EVBUFHOOK: return(fixnull(getfname(&bufhook)));
@@ -287,7 +374,9 @@ char *vname;		/* name of environment variable to retrieve */
 		case EVDISCMD:	return(ltos(discmd));
 		case EVDISINP:	return(ltos(disinp));
 		case EVDISPHIGH:return(ltos(disphigh));
+		case EVDISPUNDO:return(ltos(dispundo));
 		case EVEXBHOOK: return(fixnull(getfname(&exbhook)));
+		case EVEXITHOOK:return(fixnull(getfname(&exithook)));
 		case EVFCOL:	return(int_asc(curwp->w_fcol));
 		case EVFILLCOL: return(int_asc(fillcol));
 		case EVFLICKER: return(ltos(flickcode));
@@ -304,13 +393,14 @@ char *vname;		/* name of environment variable to retrieve */
 		case EVLANG:	return(LANGUAGE);
 		case EVLASTKEY: return(int_asc(lastkey));
 		case EVLASTMESG:return(lastmesg);
-		case EVLINE:	return(getctext());
+		case EVLINE:	return(getctext(result));
 		case EVLTERM:	return(lterm);
 		case EVLWIDTH:	return(int_asc(lused(curwp->w_dotp)));
 		case EVMATCH:	return(fixnull(patmatch));
 		case EVMMOVE:	return(int_asc(mouse_move));
 		case EVMODEFLAG:return(ltos(modeflag));
 		case EVMSFLAG:	return(ltos(mouseflag));
+		case EVNEWSCRN:	return(ltos(newscreenflag));
 		case EVNUMWIND: return(int_asc(gettwnum()));
 		case EVORGCOL:	return(int_asc(term.t_colorg));
 		case EVORGROW:	return(int_asc(term.t_roworg));
@@ -326,13 +416,14 @@ char *vname;		/* name of environment variable to retrieve */
 				return(falsem);
 #endif
 		case EVPOPFLAG: return(ltos(popflag));
+		case EVPOPWAIT: return(ltos(popwait));
 		case EVPOSFLAG: return(ltos(posflag));
 		case EVPROGNAME:return(PROGNAME);
 		case EVRAM:	return(int_asc((int)(envram / 1024l)));
 		case EVREADHK:	return(fixnull(getfname(&readhook)));
 		case EVREGION:	return(getreg(result));
 		case EVREPLACE: return((char *)rpat);
-		case EVRVAL:	return(int_asc(rval));
+		case EVRVAL:	return(rval);
 		case EVSCRNAME: return(first_screen->s_screen_name);
 		case EVSEARCH:	return((char *)pat);
 		case EVSEARCHPNT:	return(int_asc(searchtype));
@@ -348,6 +439,7 @@ char *vname;		/* name of environment variable to retrieve */
 		case EVTIME:	return(timeset());
 		case EVTIMEFLAG: return(ltos(timeflag));
 		case EVTPAUSE:	return(int_asc(term.t_pause));
+		case EVUNDOFLAG: return(ltos(undoflag));
 		case EVVERSION: return(VERSION);
 		case EVVSCRLBAR: return(ltos(vscrollbar));
 		case EVWCHARS:	return(getwlist(result));
@@ -476,7 +568,7 @@ int n;		/* numeric arg (can overide prompted value) */
 	}
 
 	/* check the legality and find the var */
-	findvar(var, &vd, NVSIZE + 1);
+	findvar(var, &vd, NVSIZE + 1, VT_GLOBAL);
         
 	/* if its not legal....bitch */
 	if (vd.v_type == -1) {
@@ -498,7 +590,6 @@ int n;		/* numeric arg (can overide prompted value) */
 	/* and set the appropriate value */
 	status = svar(&vd, value);
 
-#if	DEBUGM
 	/* if $debug == TRUE, every assignment will echo a statment to
 	   that effect here. */
         
@@ -512,59 +603,198 @@ int n;		/* numeric arg (can overide prompted value) */
 		strcat(outline, value);
 		strcat(outline, ")))");
 
-		/* expand '%' to "%%" so mlwrite wont bitch */
-		makelit(outline);
+		/* write out the debug line */
+		mlforce(outline);
+		update(TRUE);
+
+		/* and get the keystroke to hold the output */
+		if (get_key() == abortc) {
+			mlforce(TEXT54);
+/*				"[Macro aborted]" */
+			status = FALSE;
+		}
+	}
+
+	/* and return it */
+	return(status);
+}
+
+int PASCAL NEAR global_var(f, n)	/* declare a global variable */
+
+int f;		/* default flag */
+int n;		/* numeric arg (ignored here) */
+
+{
+	register int status;	/* status return */
+	VDESC vd;		/* variable num/type */
+	char var[NVSIZE+1];	/* name of variable to fetch */
+
+	/* first get the variable to set.. */
+	if (clexec == FALSE) {
+		status = mlreply(TEXT249, &var[0], NVSIZE+1);
+/*				 "Global variable to declare: " */
+		if (status != TRUE)
+			return(status);
+	} else {	/* macro line argument */
+		/* grab token and skip it */
+		execstr = token(execstr, var, NVSIZE + 1);
+	}
+
+	/* check the legality and find the var */
+	findvar(var, &vd, NVSIZE + 1, VT_GLOBAL);
+        
+	/* if its not legal....bitch */
+	if (vd.v_type == -1) {
+		mlwrite(TEXT52, var);
+/*			"%%No such variable as '%s'" */
+		return(FALSE);
+	}
+
+	/* and set the appropriate value */
+	status = svar(&vd, "");
+
+	/* if $debug == TRUE, every assignment will echo a statment to
+	   that effect here. */
+        
+	if (macbug && (strcmp(var, "%track") != 0)) {
+		strcpy(outline, "(((Globally declare ");
+
+		strcat(outline, var);
+		strcat(outline, ")))");
 
 		/* write out the debug line */
 		mlforce(outline);
 		update(TRUE);
 
 		/* and get the keystroke to hold the output */
-		if (getkey() == abortc) {
+		if (get_key() == abortc) {
 			mlforce(TEXT54);
 /*				"[Macro aborted]" */
 			status = FALSE;
 		}
 	}
-#endif
 
 	/* and return it */
 	return(status);
 }
 
-PASCAL NEAR findvar(var, vd, size)	/* find a variables type and name */
+int PASCAL NEAR local_var(f, n)	/* declare a local variable */
+
+int f;		/* default flag */
+int n;		/* numeric arg (ignored here) */
+
+{
+	register int status;	/* status return */
+	VDESC vd;		/* variable num/type */
+	char var[NVSIZE+1];	/* name of variable to fetch */
+
+	/* first get the variable to set.. */
+	if (clexec == FALSE) {
+		status = mlreply(TEXT250, &var[0], NVSIZE+1);
+/*				 "Local variable to declare: " */
+		if (status != TRUE)
+			return(status);
+	} else {	/* macro line argument */
+		/* grab token and skip it */
+		execstr = token(execstr, var, NVSIZE + 1);
+	}
+
+	/* check the legality and find the var */
+	findvar(var, &vd, NVSIZE + 1, VT_LOCAL);
+        
+	/* if its not legal....bitch */
+	if (vd.v_type == -1) {
+		mlwrite(TEXT52, var);
+/*			"%%No such variable as '%s'" */
+		return(FALSE);
+	}
+
+	/* and set the appropriate value */
+	status = svar(&vd, "");
+
+	/* if $debug == TRUE, every assignment will echo a statment to
+	   that effect here. */
+        
+	if (macbug && (strcmp(var, "%track") != 0)) {
+		strcpy(outline, "(((Locally declare ");
+
+		strcat(outline, var);
+		strcat(outline, ")))");
+
+		/* write out the debug line */
+		mlforce(outline);
+		update(TRUE);
+
+		/* and get the keystroke to hold the output */
+		if (get_key() == abortc) {
+			mlforce(TEXT54);
+/*				"[Macro aborted]" */
+			status = FALSE;
+		}
+	}
+
+	/* and return it */
+	return(status);
+}
+
+/* find a variables type and name */
+
+VOID PASCAL NEAR findvar(var, vd, size, scope)
 
 char *var;	/* name of var to get */
 VDESC *vd;	/* structure to hold type and ptr */
 int size;	/* size of var array */
+int scope;	/* intended scope of any created user variables */
 
 {
 	register int vnum;	/* subscript in varable arrays */
 	register int vtype;	/* type to return */
+	register UTABLE *vut;	/* user var table to search */
 
 fvar:	vtype = -1;
+	vut = uv_head;
+
 	switch (var[0]) {
 
 		case '$': /* check for legal enviromnent var */
-			if ((vnum = binary(&var[1], envval, NEVARS)) != -1)
+			if ((vnum = binary(&var[1], envval, NEVARS, NVSIZE)) != -1)
 				vtype = TKENV;
 			break;
 
 		case '%': /* check for existing legal user variable */
-			for (vnum = 0; vnum < MAXVARS; vnum++)
-				if (strcmp(&var[1], uv[vnum].u_name) == 0) {
-					vtype = TKVAR;
+			while (vut) {
+				for (vnum = 0; vnum < vut->size; vnum++)
+					if (strcmp(&var[1],
+					    vut->uv[vnum].u_name) == 0) {
+						vtype = TKVAR;
+						goto retvar;
+					}
+				vut = vut->next;
+				if (scope == VT_LOCAL)
 					break;
-				}
-			if (vnum < MAXVARS)
+			}
+
+			/* if we should not define one.... */
+			if (scope == VT_NONE)
 				break;
 
-			/* create a new one??? */
-			for (vnum = 0; vnum < MAXVARS; vnum++)
-				if (uv[vnum].u_name[0] == 0) {
+			/* scope it as requested */
+			if (scope == VT_LOCAL)
+				vut = uv_head;
+			else
+				vut = uv_global;
+
+			/* no room left in requested user var table? */
+			if (vnum < vut->size)
+				break;
+
+			/* create a new variable */
+			for (vnum = 0; vnum < vut->size; vnum++)
+				if (vut->uv[vnum].u_name[0] == 0) {
 					vtype = TKVAR;
-					strcpy(uv[vnum].u_name, &var[1]);
-					uv[vnum].u_value = NULL;
+					memset((char *)&vut->uv[vnum].u_name[0], '\0', NVSIZE);
+					strncpy(vut->uv[vnum].u_name, &var[1], NVSIZE);
+					vut->uv[vnum].u_value = NULL;
 					break;
 				}
 			break;
@@ -580,8 +810,9 @@ fvar:	vtype = -1;
 	}
 
 	/* return the results */
-	vd->v_num = vnum;
+retvar:	vd->v_num = vnum;
 	vd->v_type = vtype;
+	vd->v_ut = vut;
 	return;
 }
 
@@ -593,6 +824,7 @@ char *value;	/* value to set to */
 {
 	register int vnum;	/* ordinal number of var refrenced */
 	register int vtype;	/* type of variable to set */
+	register UTABLE *vut;	/* user table pointer */
 	register int status;	/* status return */
 	register int c; 	/* translated character */
 	register char *sp;	/* scratch string pointer */
@@ -600,48 +832,58 @@ char *value;	/* value to set to */
 	/* simplify the vd structure (we are gonna look at it a lot) */
 	vnum = var->v_num;
 	vtype = var->v_type;
+	vut = var->v_ut;
 
 	/* and set the appropriate value */
 	status = TRUE;
 	switch (vtype) {
 	case TKVAR: /* set a user variable */
-		if (uv[vnum].u_value != NULL)
-			free(uv[vnum].u_value);
-		sp = malloc(strlen(value) + 1);
+		if (vut->uv[vnum].u_value != NULL)
+			free(vut->uv[vnum].u_value);
+		sp = room(strlen(value) + 1);
 		if (sp == NULL)
 			return(FALSE);
 		strcpy(sp, value);
-		uv[vnum].u_value = sp;
-#if	1
+		vut->uv[vnum].u_value = sp;
+
+		/* setting a variable to error stops macro execution */
 		if (strcmp(value, errorm) == 0)
 			status = FALSE;
-#endif
+
 		break;
 
 	case TKENV: /* set an environment variable */
 		status = TRUE;	/* by default */
 
 		switch (vnum) {
+		case EVABBELL:	ab_bell = stol(value);
+				break;
+		case EVABCAP:	ab_cap = stol(value);
+				break;
+		case EVABQUICK:	ab_quick = stol(value);
+				break;
 		case EVACOUNT:	gacount = asc_int(value);
 				break;
 		case EVASAVE:	gasave = asc_int(value);
 				break;
-		case EVBUFHOOK: setkey(&bufhook, value);
+		case EVBUFHOOK: set_key(&bufhook, value);
 				break;
-		case EVCBFLAGS: curbp->b_flag = (curbp->b_flag & ~(BFCHG|BFINVS))
-					| (asc_int(value) & (BFCHG|BFINVS));
-				lchange(WFMODE);
+		case EVCBFLAGS: c = asc_int(value);
+				curbp->b_flag = (curbp->b_flag & ~(BFCHG|BFINVS))
+					| (c & (BFCHG|BFINVS));
+				if ((c & BFCHG) == BFCHG)
+					lchange(WFMODE);
 				break;
 		case EVCBUFNAME:strcpy(curbp->b_bname, value);
 				curwp->w_flag |= WFMODE;
 				break;
 		case EVCFNAME:	strcpy(curbp->b_fname, value);
 #if	WINDOW_MSWIN
-						fullpathname (curbp->b_fname, NFILEN);
+				fullpathname(curbp->b_fname, NFILEN);
 #endif
 				curwp->w_flag |= WFMODE;
 				break;
-		case EVCMDHK:	setkey(&cmdhook, value);
+		case EVCMDHK:	set_key(&cmdhook, value);
 				break;
 		case EVCMODE:	curbp->b_mode = asc_int(value);
 				curwp->w_flag |= WFMODE;
@@ -687,7 +929,12 @@ char *value;	/* value to set to */
 				if (c != disphigh)
 					upwind();
 				break;
-		case EVEXBHOOK: setkey(&exbhook, value);
+		case EVDISPUNDO:
+				dispundo = stol(value);
+				break;
+		case EVEXBHOOK: set_key(&exbhook, value);
+				break;
+		case EVEXITHOOK:set_key(&exithook, value);
 				break;
 		case EVFCOL:	curwp->w_fcol = asc_int(value);
 				if (curwp->w_fcol < 0)
@@ -704,8 +951,11 @@ char *value;	/* value to set to */
 				break;
 		case EVGMODE:	gmode = asc_int(value);
 				break;
-		case EVHARDTAB: tabsize = asc_int(value);
-				upwind();
+		case EVHARDTAB: if ((c = asc_int(value)) >= 0)
+				{
+					tabsize = c;
+					upwind();
+				}
 				break;
 		case EVHILITE:	hilite = asc_int(value);
 				if (hilite > NMARKS)
@@ -745,6 +995,8 @@ char *value;	/* value to set to */
 				break;
 		case EVMSFLAG:	mouseflag = stol(value);
 				break;
+		case EVNEWSCRN:	newscreenflag = stol(value);
+				break;
 		case EVNUMWIND: break;
 		case EVORGCOL:	status = new_col_org(TRUE, asc_int(value));
 				break;
@@ -763,23 +1015,26 @@ char *value;	/* value to set to */
 		case EVPENDING: break;
 		case EVPOPFLAG: popflag = stol(value);
 				break;
+		case EVPOPWAIT: popwait = stol(value);
+				break;
 		case EVPOSFLAG: posflag = stol(value);
 				upmode();
 				break;
 		case EVPROGNAME:break;
 		case EVRAM:	break;
-		case EVREADHK:	setkey(&readhook, value);
+		case EVREADHK:	set_key(&readhook, value);
 				break;
 		case EVREGION:	break;
-		case EVREPLACE: strcpy(rpat, value);
+		case EVREPLACE: strcpy((char *)rpat, value);
 #if	MAGIC
 				rmcclear();
 #endif 
 				break;
-		case EVRVAL:	break;
+		case EVRVAL:	strcpy(rval, value);
+				break;
 		case EVSCRNAME: select_screen(lookup_screen(value), TRUE);
 				break;
-		case EVSEARCH:	strcpy(pat, value);
+		case EVSEARCH:	strcpy((char *)pat, value);
 				setjtable(); /* Set up fast search arrays  */
 #if	MAGIC
 				mcclear();
@@ -813,6 +1068,10 @@ char *value;	/* value to set to */
 				break;
 		case EVTPAUSE:	term.t_pause = asc_int(value);
 				break;
+		case EVUNDOFLAG:if (undoflag != stol(value))
+					undo_dump();
+				undoflag = stol(value);
+				break;
 		case EVVERSION: break;
 		case EVVSCRLBAR: vscrollbar = stol(value);
 				break;
@@ -820,9 +1079,9 @@ char *value;	/* value to set to */
 				break;
 		case EVWLINE:	status = resize(TRUE, asc_int(value));
 				break;
-		case EVWRAPHK:	setkey(&wraphook, value);
+		case EVWRAPHK:	set_key(&wraphook, value);
 				break;
-		case EVWRITEHK: setkey(&writehook, value);
+		case EVWRITEHK: set_key(&writehook, value);
 				break;
 		case EVXPOS:	xpos = asc_int(value);
 				break;
@@ -1296,7 +1555,6 @@ char *st;
 	return(TRUE);
 }
 
-#if	DEBUGM
 int PASCAL NEAR dispvar(f, n)		/* display a variable's value */
 
 int f;		/* default flag */
@@ -1319,7 +1577,7 @@ int n;		/* numeric arg (can overide prompted value) */
 	}
 
 	/* check the legality and find the var */
-	findvar(var, &vd, NVSIZE + 1);
+	findvar(var, &vd, NVSIZE + 1, VT_NONE);
         
 	/* if its not legal....bitch */
 	if (vd.v_type == -1) {
@@ -1334,9 +1592,6 @@ int n;		/* numeric arg (can overide prompted value) */
 
 	/* and lastly the current value */
 	strcat(outline, fixnull(getval(var)));
-
-	/* expand '%' to "%%" so mlwrite wont bitch */
-	makelit(outline);
 
 	/* write out the result */
 	mlforce(outline);
@@ -1357,6 +1612,8 @@ int f,n;	/* prefix flag and argument */
 {
 	register BUFFER *varbuf;/* buffer to put variable list into */
 	register int uindex;	/* index into uvar table */
+	UTABLE *ut;		/* user variable table pointer */
+	PARG *cur_arg;		/* ptr to buffers argument list */
 	char outseq[256];	/* output buffer for keystroke sequence */
 
 	/* and get a buffer for it */
@@ -1388,25 +1645,57 @@ int f,n;	/* prefix flag and argument */
 			return(FALSE);
 	}
 
-	if (addline(varbuf, "") != TRUE)
-		return(FALSE);
+	/* build all the user variable lists */
+	ut = uv_head;
+	while (ut) {
 
-	/* build the user variable list */
-	for (uindex = 0; uindex < MAXVARS; uindex++) {
-		if (uv[uindex].u_name[0] == 0)
-			break;
+		/* a blank line, please.... */
+		if (addline(varbuf, "") != TRUE)
+			return(FALSE);
 
-		/* add in the user variable name */
-		strcpy(outseq, "%");
-		strcat(outseq, uv[uindex].u_name);
-		pad(outseq, 14);
-	        
-		/* add in the value */
-		strcat(outseq, uv[uindex].u_value);
+		/* make a header for this list */
+		strcpy(outseq, "----- ");
+		if (ut->bufp == (BUFFER *)NULL)
+			strcat(outseq, "Global User Variables");
+		else {
+			strcat(outseq, "Defined in ");
+			strcat(outseq, ut->bufp->b_bname);
+			if (ut->bufp->b_numargs > 0) {
+				strcat(outseq, "(");
+				cur_arg = ut->bufp->b_args;
+				while (cur_arg) {
+					if (cur_arg != ut->bufp->b_args)
+						strcat(outseq, ", ");
+					strcat(outseq, cur_arg->name);
+					cur_arg = cur_arg->next;
+				}
+				strcat(outseq, ")");
+			}
+		}
+		strcat(outseq, " -----");
 
 		/* and add it as a line into the buffer */
 		if (addline(varbuf, outseq) != TRUE)
 			return(FALSE);
+
+		/* build this list */
+		for (uindex = 0; uindex < ut->size; uindex++) {
+			if (ut->uv[uindex].u_name[0] == 0)
+				break;
+	
+			/* add in the user variable name */
+			strcpy(outseq, "%");
+			strcat(outseq, ut->uv[uindex].u_name);
+			pad(outseq, 14);
+		        
+			/* add in the value */
+			strcat(outseq, ut->uv[uindex].u_value);
+	
+			/* and add it as a line into the buffer */
+			if (addline(varbuf, outseq) != TRUE)
+				return(FALSE);
+		}
+		ut = ut->next;
 	}
 
 	/* display the list */
@@ -1473,4 +1762,3 @@ int len;	/* wanted length of string */
 		s[len] = 0;
 	}
 }
-#endif

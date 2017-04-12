@@ -1,6 +1,6 @@
 /*	CHAR.C:	Character handling functions for
-		MicroEMACS 3.12
-		(C)Copyright 1993 by Daniel Lawrence
+		MicroEMACS 4.00
+		(C)Copyright 1995 by Daniel Lawrence
 
 		ALL THE CODE HERE IS FOR VARIOUS FORMS OF ASCII AND
 		WILL HAVE TO BE MODIFIED FOR EBCDIC
@@ -12,15 +12,15 @@
 #include	"edef.h"
 #include	"elang.h"
 
-/*	isletter()
+/*	is_letter()
 		Is the character a letter?  We presume a letter must
 	be either in the upper or lower case tables (even if it gets
 	translated to itself).
 */
 
-int PASCAL NEAR isletter(ch)
+int PASCAL NEAR is_letter(ch)
 
-register unsigned int ch;
+register char ch;
 
 {
 	return(is_upper(ch) || is_lower(ch));
@@ -32,9 +32,11 @@ register unsigned int ch;
 */
 
 int PASCAL NEAR is_lower(ch)
-register unsigned int	ch;
+
+register char ch;
+
 {
-	return(lowcase[ch] != 0);
+	return(lowcase[ch & 255] != 0);
 }
 
 /*	is_upper()
@@ -43,9 +45,11 @@ register unsigned int	ch;
 */
 
 int PASCAL NEAR is_upper(ch)
-register unsigned int	ch;
+
+register char ch;
+
 {
-	return(upcase[ch] != 0);
+	return(upcase[ch & 255] != 0);
 }
 
 /*	chcase()
@@ -60,11 +64,11 @@ register unsigned int	ch;
 {
 	/* translate lowercase */
 	if (is_lower(ch))
-		return(lowcase[ch]);
+		return(lowcase[ch & 255]);
 
 	/* translate uppercase */
 	if (is_upper(ch))
-		return(upcase[ch]);
+		return(upcase[ch & 255]);
 
 	/* let the rest pass */
 	return(ch);
@@ -79,7 +83,7 @@ unsigned char *cp;	/* ptr to character to uppercase */
 {
 	/* translate uppercase */
 	if (is_lower(*cp))
-		*cp = lowcase[*cp];
+		*cp = lowcase[*cp & 255];
 }
 
 /* change *cp to an lower case character */
@@ -91,7 +95,7 @@ unsigned char *cp;	/* ptr to character to lowercase */
 {
 	/* translate lowercase */
 	if (is_upper(*cp))
-		*cp = upcase[*cp];
+		*cp = upcase[*cp & 255];
 }
 
 #if	PROTO
@@ -103,7 +107,7 @@ unsigned char ch;	/* character to get uppercase euivalant of */
 #endif
 {
 	if (is_lower(ch))
-		return(lowcase[ch]);
+		return(lowcase[ch & 255]);
 	else
 		return(ch);
 }
@@ -117,7 +121,7 @@ unsigned char ch;	/* character to get lowercase equivalant of */
 #endif
 {
 	if (is_upper(ch))
-		return(upcase[ch]);
+		return(upcase[ch & 255]);
 	else
 		return(ch);
 }
@@ -138,14 +142,14 @@ VOID PASCAL NEAR initchars()	/* initialize the character upper/lower case tables
 		lowcase[index] = index ^ DIFCASE;
 		upcase[index ^ DIFCASE] = index;
 	}
-#if BSD || USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION
+#if BSD || FREEBSD || USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION
 	/* and for those international characters! */
 	for (index = (unsigned char)'\340';
 	     index <= (unsigned char)'\375'; index++) {
 		lowcase[index] = index ^ DIFCASE;
 		upcase[index ^ DIFCASE] = index;
 	}
-#endif /*  BSD || USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION */
+#endif /*  BSD || FREEBSD || USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION */
 
 #if	MSDOS
 	/* setup various extended IBM-PC characters */
@@ -272,7 +276,7 @@ char *val;	/* value to set it to */
 	return(upcase[*ch & 255] = *val & 255);
 }
 
-#if (ZTC | TURBO) == 0
+#if (ZTC | TURBO | MSC) == 0
 /*
  * strrev -- Reverse string in place.  Code here for those compilers
  *	that do not have the function in their own library.

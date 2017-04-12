@@ -1,8 +1,8 @@
-c:\sys\turbo\lib\c0l obj\basic obj\bind obj\buffer obj\char obj\crypt+
-obj\display obj\dolock obj\eval obj\exec obj\execpr obj\file obj\fileio+
-obj\ibmpc obj\input obj\isearch obj\keyboard obj\line obj\lock obj\main+
-obj\mouse obj\msdos obj\random obj\region obj\replace obj\screen obj\search+
-obj\tags obj\window obj\word
+c:\sys\turbo\lib\c0l obj\abbrev obj\basic obj\bind obj\buffer obj\char+
+obj\crypt obj\display obj\dolock obj\eval obj\exec obj\execpr obj\file+
+obj\fileio obj\ibmpc obj\input obj\isearch obj\keyboard obj\line obj\lock+
+obj\main obj\mouse obj\msdos obj\random obj\region obj\replace obj\screen+
+obj\search obj\tags obj\undo obj\window obj\word
 bin\emacs/m/linenumbers
 emacs.map
 c:\sys\turbo\lib\cl

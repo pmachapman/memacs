@@ -22,6 +22,7 @@ int f, n;	/* command arguments [passed through to command executed] */
 
 	/* if we are non-interactive.... force the command interactivly */
 	if (clexec == TRUE) {
+
 		/* grab token and advance past */
 		execstr = token(execstr, buffer, NPAT);
 
@@ -203,6 +204,7 @@ int size;		/* maximum size of token */
 				case 't':	c = 9;  break;
 				case 'b':	c = 8;  break;
 				case 'f':	c = 12; break;
+				case 'e':	c = 27;	break;
 				default:	c = *(src-1);
 			}
 			if (--size > 0) {
@@ -285,53 +287,6 @@ int terminator;		/* terminating char to be used on interactive fetch */
 	return(TRUE);
 }
 
-/*	storemac:	Set up a macro buffer and flag to store all
-			executed command lines there			*/
-
-PASCAL NEAR storemac(f, n)
-
-int f;		/* default flag */
-int n;		/* macro number to use */
-
-{
-	register struct BUFFER *bp;	/* pointer to macro buffer */
-	char bname[NBUFN];		/* name of buffer to use */
-
-	/* must have a numeric argument to this function */
-	if (f == FALSE) {
-		mlwrite(TEXT111);
-/*                      "No macro specified" */
-		return(FALSE);
-	}
-
-	/* range check the macro number */
-	if (n < 1 || n > 40) {
-		mlwrite(TEXT112);
-/*                      "Macro number out of range" */
-		return(FALSE);
-	}
-
-	/* construct the macro buffer name */
-	strcpy(bname, "[Macro xx]");
-	bname[7] = '0' + (n / 10);
-	bname[8] = '0' + (n % 10);
-
-	/* set up the new macro buffer */
-	if ((bp = bfind(bname, TRUE, BFINVS)) == NULL) {
-		mlwrite(TEXT113);
-/*                      "Can not create macro" */
-		return(FALSE);
-	}
-
-	/* and make sure it is empty */
-	bclear(bp);
-
-	/* and set the macro store pointers to it */
-	mstore = TRUE;
-	bstore = bp;
-	return(TRUE);
-}
-
 /*	storeproc:	Set up a procedure buffer and flag to store all
 			executed command lines there			*/
 
@@ -342,17 +297,16 @@ int n;		/* macro number to use */
 
 {
 	register struct BUFFER *bp;	/* pointer to macro buffer */
-	register int status;		/* return status */
+	PARG *last_arg;			/* last macro argument */
+	PARG *cur_arg;			/* current macro argument */
 	char bname[NBUFN];		/* name of buffer to use */
 
-	/* a numeric argument means its a numbered macro */
-	if (f == TRUE)
-		return(storemac(f, n));
+	/* this commands makes no sense interactively */
+	if (clexec == FALSE)
+		return(FALSE);
 
 	/* get the name of the procedure */
-        if ((status = mlreply(TEXT114, &bname[1], NBUFN-2)) != TRUE)
-/*                            "Procedure name: " */
-                return(status);
+	execstr = token(execstr, &bname[1], NBUFN-2);
 
 	/* construct the macro buffer name */
 	bname[0] = '[';
@@ -368,6 +322,37 @@ int n;		/* macro number to use */
 	/* and make sure it is empty */
 	bclear(bp);
 
+	/* retrieve and store any formal parameters */
+	last_arg = (PARG *)NULL;
+	bp->b_numargs = 0;
+	execstr = token(execstr, bname, NVSIZE);
+
+	while (*bname && *bname != ';') {
+
+		/* allocate an argument */
+		cur_arg = (PARG *)room(sizeof(PARG));
+		if (cur_arg == (PARG *)NULL) {
+			mlwrite(TEXT113);
+/*      	                "Can not create macro" */
+			return(FALSE);
+		}
+
+		/* and add it to the linked list of arguments for this buffer */
+		strcpy(cur_arg->name, bname);
+		cur_arg->next = (PARG *)NULL;
+		if (last_arg == (PARG *)NULL)
+			bp->b_args = cur_arg;
+		else
+			last_arg->next = cur_arg;
+
+		/* and let the buffer total these */
+		bp->b_numargs++;
+		last_arg = cur_arg;
+
+		/* on to the next parameter */
+		execstr = token(execstr, bname, NVSIZE);
+        }
+                
 	/* and set the macro store pointers to it */
 	mstore = TRUE;
 	bstore = bp;
@@ -439,7 +424,8 @@ int f, n;	/* default flag and numeric arg */
 	!if (cond)	conditional execution
 	!else
 	!endif
-	!return		Return (terminating current macro)
+	!return	<rval>	Return (terminating current macro/
+			        set $rval to and return <rval>)
 	!goto <label>	Jump to a label in the current macro
 	!force		Force macro to continue...even if command fails
 	!while (cond)	Execute a loop if the condition is true
@@ -464,34 +450,38 @@ BUFFER *bp;	/* buffer to execute */
 	int linlen;		/* length of line to execute */
 	int i;			/* index */
 	int force;		/* force TRUE result? */
-	WINDOW *wp;		/* ptr to windows to scan */
+	EWINDOW *wp;		/* ptr to windows to scan */
 	WHBLOCK *whlist;	/* ptr to !WHILE list */
 	WHBLOCK *scanner;	/* ptr during scan */
 	WHBLOCK *whtemp;	/* temporary ptr to a WHBLOCK */
 	char *einit;		/* initial value of eline */
 	char *eline;		/* text of line to execute */
 	char tkn[NSTRING];	/* buffer to evaluate an expresion in */
+	int num_locals;		/* number of local variables used in procedure */
+	UTABLE *ut;		/* new local user variable table */
 #if	LOGFLG
 	FILE *fp;		/* file handle for log file */
 #endif
-#if	DEBUGM
 	int skipflag;		/* are we skipping debugging a function? */
-#endif
+	PARG *cur_arg;		/* current argument being filled */
+	int cur_index;		/* index into current user table */
+	VDESC vd;		/* variable num/type */
+	char value[NSTRING];	/* evaluated argument */
 
 	/* clear IF level flags/while ptr */
 	execlevel = 0;
 	whlist = NULL;
 	scanner = NULL;
+	num_locals = 0;
 
 	/* flag we are executing the buffer */
 	bp->b_exec += 1;
 
-#if	DEBUGM
 	/* we are not skipping a function yet (for the debugger) */
 	skipflag = FALSE;
-#endif
 
-	/* scan the buffer to execute, building WHILE header blocks */
+	/* scan the buffer to execute, building WHILE header blocks
+	   and counting local variables */
 	hlp = bp->b_linep;
 	lp = lforw(hlp);
 	while (lp != hlp) {
@@ -501,16 +491,35 @@ BUFFER *bp;	/* buffer to execute */
 		i = lused(lp);
 
 		/* trim leading whitespace */
-		while (i-- > 0 && (*eline == ' ' || *eline == '\t'))
+		while (i > 0 && (*eline == ' ' || *eline == '\t')) {
+			i--;
 			++eline;
+		}
 
 		/* if theres nothing here, don't bother */
 		if (i <= 0)
 			goto nxtscan;
 
+		/* if we are already in a stored-procedure */
+		if (mstore) {
+			if (strncmp(eline, "!endm", 5) == 0)
+				mstore = FALSE;
+			goto nxtscan;
+		}
+
+		/* stored procedure? */
+		if (strncmp(eline, "store-procedure", 15) == 0) {
+			mstore = TRUE;
+			goto nxtscan;
+		}
+
+		/* local variable declaration? */
+		if (strncmp(eline, "local", 5) == 0)
+			++num_locals;
+
 		/* if is a while directive, make a block... */
 		if (eline[0] == '!' && eline[1] == 'w' && eline[2] == 'h') {
-			whtemp = (WHBLOCK *)malloc(sizeof(WHBLOCK));
+			whtemp = (WHBLOCK *)room(sizeof(WHBLOCK));
 			if (whtemp == NULL) {
 noram:				errormesg(TEXT119, bp, lp);
 /*                                        "%%Out of memory during while scan" */
@@ -530,7 +539,7 @@ failexit:			freewhile(scanner);
 /*                                        "%%!BREAK outside of any !WHILE loop" */
 				goto failexit;
 			}
-			whtemp = (WHBLOCK *)malloc(sizeof(WHBLOCK));
+			whtemp = (WHBLOCK *)room(sizeof(WHBLOCK));
 			if (whtemp == NULL)
 				goto noram;
 			whtemp->w_begin = lp;
@@ -572,6 +581,47 @@ nxtscan:	/* on to the next line */
 	/* let the first command inherit the flags from the last one..*/
 	thisflag = lastflag;
 
+	/* remember we need room for the procedure arguments
+	   among the locals */
+	if (bp->b_numargs == NOTPROC)
+		bp->b_numargs = 0;
+	num_locals += bp->b_numargs;
+
+	/* allocate a local user variable table */
+	ut = (UTABLE *)room(sizeof(UTABLE) + num_locals * sizeof(UVAR));
+	if (ut == (UTABLE *)NULL) {
+		errormesg("%%Out of memory allocating locals", bp, lp);
+		execlevel = 0;
+		freewhile(whlist);
+		bp->b_exec -= 1;
+		return(FALSE);
+	}
+	ut->next = uv_head;
+	ut->size = num_locals;
+	ut->bufp = bp;
+	uv_init(ut);
+	uv_head = ut;
+
+	/* and evaluate the arguments passed, placing them in
+	   the local variable table */
+	cur_index = 0;
+	cur_arg = bp->b_args;
+	while (cur_arg != (PARG *)NULL) {
+
+		/* ask for argument names */
+		if ((status = mlreply("Argument: ", value, NSTRING)) != TRUE)
+/*				      "Argument: " */
+			return(status);
+
+		/* and create and set these in the local user var table */
+		findvar(cur_arg->name, &vd, NVSIZE + 1, VT_LOCAL);
+		svar(&vd, value);
+
+		/* on to the next argument */
+		cur_arg = cur_arg->next;
+		cur_index++;
+	}
+
 	/* starting at the beginning of the buffer */
 	hlp = bp->b_linep;
 	lp = lforw(hlp);
@@ -579,12 +629,12 @@ nxtscan:	/* on to the next line */
 
 		/* allocate eline and copy macro line to it */
 		linlen = lused(lp);
-		if ((einit = eline = malloc(linlen+1)) == NULL) {
+		if ((einit = eline = room(linlen+1)) == NULL) {
 			errormesg(TEXT123, bp, lp);
 /*                              "%%Out of Memory during macro execution" */
 			freewhile(whlist);
 			bp->b_exec -= 1;
-			return(FALSE);
+			goto freeut;
 		}
 		bytecopy(eline, ltext(lp), linlen);
 		eline[linlen] = 0;	/* make sure it ends */
@@ -605,7 +655,6 @@ nxtscan:	/* on to the next line */
 		fclose(fp);
 #endif
 	
-#if	DEBUGM
 		/* only do this if we are debugging */
 		if (macbug && !mstore && (execlevel == 0))
 			if (debug(bp, eline, &skipflag) == FALSE) {
@@ -613,7 +662,6 @@ nxtscan:	/* on to the next line */
 /*                                      "[Macro aborted]" */
 				goto eabort;
 			}
-#endif
 
 		/* Parse directives here.... */
 		dirnum = -1;
@@ -767,7 +815,14 @@ nxtscan:	/* on to the next line */
 				goto onward;
 	
 			case DRETURN:	/* RETURN directive */
+				/* if we are executing.... */
 				if (execlevel == 0) {
+
+					/* check for a return value */
+					if (macarg(tkn) == TRUE)
+						strcpy(rval, tkn);
+
+					/* and free the line resources */
 					free(einit);
 					goto eexec;
 				}
@@ -845,22 +900,31 @@ nxtscan:	/* on to the next line */
 			freewhile(whlist);
 			bp->b_exec -= 1;
 			free(einit);
+
+			/* discard the local user variable table */
+			uv_head = ut->next;
+			uv_clean(ut);
+			free(ut);
+
 			return(status);
 		}
 
 onward:		/* on to the next line */
 		free(einit);
 		lp = lforw(lp);
-#if	DEBUGM
 		if (skipflag)
 			macbug = TRUE;
-#endif
 	}
 
 eexec:	/* exit the current function */
 	execlevel = 0;
 	freewhile(whlist);
 	bp->b_exec -= 1;
+
+	/* discard the local user variable table */
+	uv_head = ut->next;
+	uv_clean(ut);
+	free(ut);
         return(TRUE);
 
 eabort:	/* exit the current function with a failure */
@@ -868,6 +932,11 @@ eabort:	/* exit the current function with a failure */
 	freewhile(whlist);
 	bp->b_exec -= 1;
 	free(einit);
+
+	/* discard the local user variable table */
+freeut:	uv_head = ut->next;
+	uv_clean(ut);
+	free(ut);
         return(FALSE);
 }
 
@@ -897,7 +966,6 @@ LINE *lp;	/* line " */
 	mlforce(buf);
 }
 
-#if	DEBUGM
 /*		Interactive debugger
 
 		if $debug == TRUE, The interactive debugger is invoked
@@ -940,16 +1008,13 @@ dbuild:	/* Build the information line to be presented to the user */
 	strcat(outline, eline);
 	strcat(outline, ">>>");
 
-	/* expand the %'s so mlwrite() won't interpret them */
-	makelit(outline);
-
 	/* write out the debug line */
 dinput:	outline[term.t_ncol - 1] = 0;
 	mlforce(outline);
 	update(TRUE);
 
 	/* and get the keystroke */
-	c = getkey();
+	c = get_key();
 
 	/* ignore the mouse here */
 	if (c & MOUS)
@@ -1006,7 +1071,7 @@ dinput:	outline[term.t_ncol - 1] = 0;
 			strcat(temp, gtusr("track"));
 			strcat(temp, "]");
 			mlforce(temp);
-			c = getkey();
+			c = get_key();
 			goto dinput;
 
 		case 't': /* track expresion */
@@ -1033,41 +1098,13 @@ dinput:	outline[term.t_ncol - 1] = 0;
 	}
 	return(TRUE);
 }
-#endif
-
-VOID PASCAL NEAR makelit(s)		/* expand all "%" to "%%" */
-
-char *s;	/* string to expand */
-
-{
-	register char *sp;	/* temp for expanding string */
-	register char *ep;	/* ptr to end of string to expand */
-
-	sp = s;
-	while (*sp)
-	if (*sp++ == '%') {
-		/* advance to the end */
-		ep = --sp;
-		while (*ep++)
-			;
-		/* null terminate the string one out */
-		*(ep + 1) = 0;
-		/* copy backwards */
-		while(ep-- > sp)
-			*(ep + 1) = *ep;
-
-		/* and advance sp past the new % */
-		sp += 2;					
-	}
-}
 
 VOID PASCAL NEAR freewhile(wp)	/* free a list of while block pointers */
 
 WHBLOCK *wp;	/* head of structure to free */
 
 {
-	if (wp != NULL)
-	{
+	if (wp != NULL) {
 		freewhile(wp->w_next);
 		free((char *) wp);
 	}
@@ -1158,355 +1195,3 @@ char *fname;	/* file name to execute */
 		zotbuf(bp);
 	return(TRUE);
 }
-
-/*	cbuf:	Execute the contents of a numbered buffer	*/
-
-PASCAL NEAR cbuf(f, n, bufnum)
-
-int f, n;	/* default flag and numeric arg */
-int bufnum;	/* number of buffer to execute */
-
-{
-        register BUFFER *bp;		/* ptr to buffer to execute */
-        register int status;		/* status return */
-	static char bufname[] = "[Macro xx]";
-
-	/* make the buffer name */
-	bufname[7] = '0' + (bufnum / 10);
-	bufname[8] = '0' + (bufnum % 10);
-
-	/* find the pointer to that buffer */
-        if ((bp=bfind(bufname, FALSE, 0)) == NULL) {
-        	mlwrite(TEXT130);
-/*                      "Macro not defined" */
-                return(FALSE);
-        }
-
-	/* and now execute it as asked */
-	while (n-- > 0)
-		if ((status = dobuf(bp)) != TRUE)
-			return(status);
-	return(TRUE);
-}
-
-PASCAL NEAR cbuf1(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 1));
-}
-
-PASCAL NEAR cbuf2(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 2));
-}
-
-PASCAL NEAR cbuf3(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 3));
-}
-
-PASCAL NEAR cbuf4(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 4));
-}
-
-PASCAL NEAR cbuf5(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 5));
-}
-
-PASCAL NEAR cbuf6(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 6));
-}
-
-PASCAL NEAR cbuf7(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 7));
-}
-
-PASCAL NEAR cbuf8(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 8));
-}
-
-PASCAL NEAR cbuf9(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 9));
-}
-
-PASCAL NEAR cbuf10(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 10));
-}
-
-PASCAL NEAR cbuf11(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 11));
-}
-
-PASCAL NEAR cbuf12(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 12));
-}
-
-PASCAL NEAR cbuf13(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 13));
-}
-
-PASCAL NEAR cbuf14(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 14));
-}
-
-PASCAL NEAR cbuf15(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 15));
-}
-
-PASCAL NEAR cbuf16(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 16));
-}
-
-PASCAL NEAR cbuf17(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 17));
-}
-
-PASCAL NEAR cbuf18(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 18));
-}
-
-PASCAL NEAR cbuf19(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 19));
-}
-
-PASCAL NEAR cbuf20(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 20));
-}
-
-PASCAL NEAR cbuf21(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 21));
-}
-
-PASCAL NEAR cbuf22(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 22));
-}
-
-PASCAL NEAR cbuf23(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 23));
-}
-
-PASCAL NEAR cbuf24(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 24));
-}
-
-PASCAL NEAR cbuf25(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 25));
-}
-
-PASCAL NEAR cbuf26(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 26));
-}
-
-PASCAL NEAR cbuf27(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 27));
-}
-
-PASCAL NEAR cbuf28(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 28));
-}
-
-PASCAL NEAR cbuf29(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 29));
-}
-
-PASCAL NEAR cbuf30(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 30));
-}
-
-PASCAL NEAR cbuf31(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 31));
-}
-
-PASCAL NEAR cbuf32(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 32));
-}
-
-PASCAL NEAR cbuf33(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 33));
-}
-
-PASCAL NEAR cbuf34(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 34));
-}
-
-PASCAL NEAR cbuf35(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 35));
-}
-
-PASCAL NEAR cbuf36(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 36));
-}
-
-PASCAL NEAR cbuf37(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 37));
-}
-
-PASCAL NEAR cbuf38(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 38));
-}
-
-PASCAL NEAR cbuf39(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 39));
-}
-
-PASCAL NEAR cbuf40(f, n)
-
-int f, n;	/* flag and numeric argument */
-
-{
-	return(cbuf(f, n, 40));
-}
-
-

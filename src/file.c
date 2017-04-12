@@ -11,7 +11,7 @@
 #include	"eproto.h"
 #include	"edef.h"
 #include	"elang.h"
-#if	BSD | SUN | V7
+#if	BSD | FREEBSD | SUN | USG | AIX
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #endif
@@ -95,7 +95,6 @@ int f,n;	/* prefix flag and argument */
 
 {
 	char *fname;	/* file user wishes to find */	/* file name */
-	register int s;		/* status return */
 
 	if (restflag)		/* don't allow this command if restricted */
 		return(resterr());
@@ -150,12 +149,12 @@ PASCAL NEAR resetkey()	/* reset the encryption key if needed */
 
 		/* and set up the key to be used! */
 		/* de-encrypt it */
-		crypt((char *)NULL, 0);
-		crypt(curbp->b_key, strlen(curbp->b_key));
+		ecrypt((char *)NULL, 0);
+		ecrypt(curbp->b_key, strlen(curbp->b_key));
 
 		/* re-encrypt it...seeding it to start */
-		crypt((char *)NULL, 0);
-		crypt(curbp->b_key, strlen(curbp->b_key));
+		ecrypt((char *)NULL, 0);
+		ecrypt(curbp->b_key, strlen(curbp->b_key));
 	}
 
 	return(TRUE);
@@ -172,7 +171,7 @@ int lockfl;		/* check the file for locks? */
 	register LINE	*lp;
 	register int	i;
 	register int	s;
-	register int cmark;	/* current mark */
+	SCREEN		*sp;	/* screen pointer, if we need it */
 	char bname[NBUFN];	/* buffer name to put file */
 	char prompt[NSTRING];	/* string for collisions prompt */
 
@@ -227,6 +226,19 @@ int lockfl;		/* check the file for locks? */
 		return(FALSE);
 	}
 
+	/*
+	 * Check $newscreen, see if we make a
+	 * new screen for the new file.
+	 */
+	if (newscreenflag) {
+		sp = lookup_screen(bname);
+		if (sp == (SCREEN *)NULL) {
+			/* screen does not exist, create it */
+			sp = init_screen(bname, bp);
+		}
+		select_screen(sp, FALSE);
+	}
+
 	swbuffer(bp);			/* switch to the new buffer */
 	return(readin(fname, lockfl));	/* Read it in.		*/
 }
@@ -249,17 +261,18 @@ int	lockfl;		/* check for file locks? */
 	register LINE *lp1;
 	register LINE *lp2;
 	register int i;
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	register BUFFER *bp;
 	register int s;
-	register int nline;
+	register long nline;
 	register int cmark;	/* current mark */
 	int nbytes;
 	char mesg[NSTRING];
 
 #if	FILOCK
+	force_read = FALSE;
 	if (lockfl && lockchk(fname) == ABORT)
-		return(ABORT);
+		force_read = TRUE;
 #endif
 
 	bp = curbp;				/* Cheap.		*/
@@ -293,7 +306,7 @@ int	lockfl;		/* check for file locks? */
 	/* read the file in */
 	mlwrite(TEXT139);
 /*              "[Reading file]" */
-	nline = 0;
+	nline = 0L;
 	while ((s=ffgetline(&nbytes)) == FIOSUC) {
 		if ((lp1=lalloc(nbytes)) == NULL) {
 			s = FIOMEM;		/* Keep message on the	*/
@@ -309,6 +322,15 @@ int	lockfl;		/* check for file locks? */
 		++nline;
 	}
 	ffclose();				/* Ignore errors.	*/
+
+#if	BSD || FREEBSD || USG || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVION
+	/* if we don't have write priviledges, make this in VIEW mode */
+	if (s !=FIOERR && s != FIOFNF) {
+		if (access(fname, 2 /* W_OK*/) != 0)
+			curbp->b_mode |= MDVIEW;
+	}
+#endif
+
 	strcpy(mesg, "[");
 	if (s==FIOERR) {
 		strcat(mesg, TEXT141);
@@ -322,10 +344,10 @@ int	lockfl;		/* check for file locks? */
 	}
 	strcat(mesg, TEXT140);
 /*                   "Read " */
-	strcat(mesg, int_asc(nline));
+	strcat(mesg, long_asc(nline));
 	strcat(mesg, TEXT143);
 /*                   " line" */
-	if (nline > 1)
+	if (nline > 1L)
 		strcat(mesg, "s");
 	strcat(mesg, "]");
 	mlwrite(mesg);
@@ -344,6 +366,12 @@ out:
 			wp->w_flag |= WFMODE|WFHARD;
 		}
 	}
+#if	FILOCK
+	if (force_read == TRUE) {
+		curbp->b_mode |= MDVIEW;
+		upmode();
+	}
+#endif
 	if (s == FIOERR || s == FIOFNF) 	/* False if error.	*/
 		return(FALSE);
 	return(TRUE);
@@ -400,7 +428,7 @@ char *fname;
 	while (cp1!=&fname[0] && cp1[-1]!=':' && cp1[-1]!='\\'&&cp1[-1]!='/')
 		--cp1;
 #endif
-#if	V7 | USG | AUX | SMOS | HPUX8 | HPUX9 | BSD | SUN | XENIX | AVIION
+#if	USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | BSD | FREEBSD | SUN | XENIX | AVIION
 	while (cp1!=&fname[0] && cp1[-1]!='/')
 		--cp1;
 #endif
@@ -567,12 +595,12 @@ char *mode;	/* mode to open file (w = write a = append) */
 {
 	register LINE *lp;	/* line to scan while writing */
 	register char *sp;	/* temporary string pointer */
-	register int nline;	/* number of lines written */
+	register long nline;	/* number of lines written */
 	int status;		/* return status */
 	int sflag;		/* are we safe saving? */
 	char tname[NSTRING];	/* temporary file name */
 	char buf[NSTRING];	/* message buffer */
-#if	BSD | SUN | V7 | XENIX
+#if	BSD | FREEBSD | SUN | XENIX | USG | AIX
 	struct stat st;		/* we need info about the file permisions */
 #endif
 
@@ -629,7 +657,7 @@ char *mode;	/* mode to open file (w = write a = append) */
 	mlwrite(TEXT148);	/* tell us that we're writing */
 /*              "[Writing...]" */
 	lp = lforw(curbp->b_linep);	/* start at the first line.	*/
-	nline = 0;			/* track the Number of lines	*/
+	nline = 0L;			/* track the Number of lines	*/
 	while (lp != curbp->b_linep) {
 		if ((status = ffputline(&lp->l_text[0], lused(lp))) != FIOSUC)
 			break;
@@ -645,21 +673,21 @@ char *mode;	/* mode to open file (w = write a = append) */
 		/* report on success (or lack therof) */
 		strcpy(buf, TEXT149);
 /*                          "[Wrote " */
-		strcat(buf, int_asc(nline));
+		strcat(buf, long_asc(nline));
 		strcat(buf, TEXT143);
 /*                          " line" */
-		if (nline > 1)
+		if (nline > 1L)
 			strcat(buf, "s");
 
 		if (sflag) {
-#if	BSD | SUN | V7 | XENIX
+#if	BSD | FREEBSD | SUN | XENIX | USG | AIX
 			/* get the permisions on the original file */
 			stat(fn, &st);
 #endif
 			/* erase original file */
 			/* rename temporary file to original name */
 			if (unlink(fn) == 0 && rename(tname, fn) == 0) {
-#if	BSD | SUN | V7 | XENIX
+#if	BSD | FREEBSD | SUN | XENIX | USG | AIX
 				chown(fn, (int)st.st_uid, (int)st.st_gid);
 				chmod(fn, (int)st.st_mode);
 #else
@@ -728,7 +756,7 @@ char	fname[];
 	register int i;
 	register BUFFER *bp;
 	register int s;
-	register int nline;
+	register long nline;
 	int nbytes;
 	int cmark;	/* current mark */
 	char mesg[NSTRING];
@@ -755,11 +783,13 @@ char	fname[];
 	curwp->w_dotp = lback(curwp->w_dotp);
 	curwp->w_doto = 0;
 	for (cmark = 0; cmark < NMARKS; cmark++) {
-		curwp->w_markp[cmark] = curwp->w_dotp;
-		curwp->w_marko[cmark] = 0;
+		if (curwp->w_markp[cmark] == lforw(curwp->w_dotp)) {
+			curwp->w_markp[cmark] = curwp->w_dotp;
+			curwp->w_marko[cmark] = 0;
+		}
 	}
 
-	nline = 0;
+	nline = 0L;
 	while ((s=ffgetline(&nbytes)) == FIOSUC) {
 		if ((lp1=lalloc(nbytes)) == NULL) {
 			s = FIOMEM;		/* Keep message on the	*/
@@ -781,7 +811,10 @@ char	fname[];
 		++nline;
 	}
 	ffclose();				/* Ignore errors.	*/
-	curwp->w_markp[0] = lforw(curwp->w_markp[0]);
+	for (cmark = 0; cmark < NMARKS; cmark++)
+		if (curwp->w_markp[cmark] == lback(curwp->w_dotp))
+			curwp->w_markp[cmark] = lforw(curwp->w_markp[cmark]);
+
 	strcpy(mesg, "[");
 	if (s==FIOERR) {
 		strcat(mesg, TEXT141);
@@ -795,10 +828,10 @@ char	fname[];
 	}
 	strcat(mesg, TEXT154);
 /*                   "Inserted " */
-	strcat(mesg, int_asc(nline));
+	strcat(mesg, long_asc(nline));
 	strcat(mesg, TEXT143);
 /*                   " line" */
-	if (nline > 1)
+	if (nline > 1L)
 		strcat(mesg, "s");
 	strcat(mesg, "]");
 	mlwrite(mesg);

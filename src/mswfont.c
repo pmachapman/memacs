@@ -429,23 +429,25 @@ AcceptFont:
 	    else return FALSE;
 	case ID_SAVEFONT:
 	    if (NOTIFICATION_CODE == BN_CLICKED) {
-		/*-save the facename, bold status and size into WIN.INI,
+		/*-save the facename, bold status and size into EMACS.INI,
 		   then perform as the OK button */
 		char    NumText[17];
 		    
 		GetFontMetrics (hNewFont, &Metrics, FaceName);
-		WriteProfileString (ProgName, "FontName", FaceName);
-		WriteProfileString (ProgName, "CharSet",
-		                    itoa (Metrics.tmCharSet, NumText, 10));
-		WriteProfileString (ProgName, "FontHeight",
-		                    itoa (Metrics.tmHeight, NumText, 10));
-		WriteProfileString (ProgName, "FontWidth",
+
+		WritePrivateProfileString (ProgName, "FontName", FaceName, IniFile);
+		WritePrivateProfileString (ProgName, "CharSet",
+		                    itoa (Metrics.tmCharSet, NumText, 10), IniFile);
+		WritePrivateProfileString (ProgName, "FontHeight",
+		                    itoa (Metrics.tmHeight, NumText, 10), IniFile);
+		WritePrivateProfileString (ProgName, "FontWidth",
 		                    itoa (Metrics.tmAveCharWidth,
-                                          NumText, 10));
-		WriteProfileString (ProgName, "FontWeight",
-		                    itoa (Metrics.tmWeight, NumText, 10));
+                                          NumText, 10), IniFile);
+		WritePrivateProfileString (ProgName, "FontWeight",
+		                    itoa (Metrics.tmWeight, NumText, 10), IniFile);
             }
-	    else return FALSE;
+	    else
+		return FALSE;
 	    goto AcceptFont;
 	case ID_ANSI:
 	case ID_OEM:
@@ -577,7 +579,8 @@ void FAR PASCAL FontInit (void)
     LOGFONT lf;
     char    text[20];
 
-    if (GetProfileString (ProgName, "CharSet", "", text, 20)) {
+    if (GetPrivateProfileString (ProgName, "CharSet", "", text, 20, IniFile)) {
+
         if (isdigit(text[0])) { /* pure numeric value */
             lf.lfCharSet = atoi (text);
         }
@@ -587,11 +590,13 @@ void FAR PASCAL FontInit (void)
 	    }
 	    else lf.lfCharSet = ANSI_CHARSET;
 	}
-	lf.lfHeight = GetProfileInt (ProgName, "FontHeight", 0);
-	lf.lfWidth = GetProfileInt (ProgName, "FontWidth", 0);
+
+	lf.lfHeight = GetPrivateProfileInt (ProgName, "FontHeight", 0, IniFile);
+	lf.lfWidth = GetPrivateProfileInt (ProgName, "FontWidth", 0, IniFile);
+	lf.lfWeight = GetPrivateProfileInt (ProgName, "FontWeight", 400, IniFile);
+
 	lf.lfEscapement = 0;
 	lf.lfOrientation = 0;
-	lf.lfWeight = GetProfileInt (ProgName, "FontWeight", 400);
 	lf.lfItalic = 0;
 	lf.lfUnderline = 0;
 	lf.lfStrikeOut = 0;
@@ -599,8 +604,9 @@ void FAR PASCAL FontInit (void)
 	lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 	lf.lfQuality = DEFAULT_QUALITY;
 	lf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
-        GetProfileString (ProgName, "FontName", "",
-                          lf.lfFaceName, LF_FACESIZE);
+
+        GetPrivateProfileString (ProgName, "FontName", "",
+                          lf.lfFaceName, LF_FACESIZE, IniFile);
 
         hEmacsFont = CreateFontIndirect (&lf);
     }

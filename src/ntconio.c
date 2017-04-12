@@ -1,7 +1,7 @@
 /*      NTCONIO.C       Operating specific video & keyboard functions
  *                      for the Window NT operating system (console mode)
- *                      for MicroEMACS 3.12
- *                      (C)Copyright 1993 by Daniel M. Lawrence
+ *                      for MicroEMACS 4.00
+ *                      (C)Copyright 1995 by Daniel M. Lawrence
  *                      Windows NT version by Walter Warniaha
  *
  * The routines in this file provide video and keyboard support using the
@@ -9,7 +9,6 @@
  *
  */
 
-#define BUGGY_CODE 1
 #define termdef 1                       /* don't define "term" external */
 
 #undef  PASCAL
@@ -21,8 +20,8 @@
 #include        "edef.h"
 #include        "elang.h"
 
-#if     WINNTCON
-#define NROW    60              /* Screen size.                 */
+#if     NTCON
+#define NROW    80              /* Screen size.                 */
 #define NCOL    132             /* Edit if you want to.         */
 #define MARGIN  8               /* size of minimim margin and   */
 #define SCRSIZ  64              /* scroll size for extended lines */
@@ -224,7 +223,7 @@ PASCAL NEAR ntflush(void)
 	COORD coordUpdateBegin, coordBufferSize;
 
 	if (ntMin <= ntMax) {
-#if BUGGY_CODE
+
 		if (ntMin == ntMax) {
 
 			/* Fri Feb 14 1992 WaltW - Same fuckin' line bud. */
@@ -233,9 +232,7 @@ PASCAL NEAR ntflush(void)
 
 			coordUpdateBegin.X = 0; //ntColMin;
 			coordUpdateBegin.Y = ntMin;
-		} else
-#endif
-		{
+		} else {
 			srWriteRegion.Right = term.t_ncol - 1;
 			srWriteRegion.Left = 0;
 
@@ -393,17 +390,26 @@ static void near KeyboardEvent()
 			case 68:	/* F10 */
 				prefix = SPEC; c = '0'; break;
 
+			case 69:	/* PAUSE */
+				prefix = SPEC; c = ':'; break;
+
+			case 70:	/* SCROLL LOCK */
+				return;
+
 			case 71:	/* HOME */
 				prefix = SPEC; c = '<'; break;
-
-			case 75:	/* Cursor left */
-				prefix = SPEC; c = 'B'; break;
 
 			case 72:	/* Cursor Up */
 				prefix = SPEC; c = 'P'; break;
 
 			case 73:	/* Page Up */
 				prefix = SPEC; c = 'Z'; break;
+
+			case 75:	/* Cursor left */
+				prefix = SPEC; c = 'B'; break;
+
+			case 76:	/* keypad 5 */
+				prefix = SPEC; c = 'L'; break;
 
 			case 77:	/* Cursor Right */
 				prefix = SPEC; c = 'F'; break;
@@ -424,6 +430,9 @@ static void near KeyboardEvent()
 				prefix = SPEC; c = 'D'; break;
 
 			case 87:	/* F11 */
+				prefix = SPEC; c = '-'; break;
+
+			case 88:	/* F12 */
 				prefix = SPEC; c = '='; break;
 
 			default:
@@ -541,11 +550,18 @@ PASCAL NEAR ntputc(int c)
 {
 	WORD wScreenPos;
 
-	if (c == '\n' || c == '\r') 		/* returns and linefeeds */
+	if (c == '\n' || c == '\r') { 		/* returns and linefeeds */
+		ntrow++;
+		ntcol = 0;
 		return;
+	}
 
-	if (c == '\b')				/* backspace */
-		c = ' ', --ntcol;
+	if (c == '\b') {			/* backspace */
+		--ntcol;
+		ntputc(' ');
+		--ntcol;
+		return;
+	}
 
 	wScreenPos = (ntrow * term.t_ncol) + ntcol++;
 	ciScreenBuffer[wScreenPos].Char.AsciiChar = c;

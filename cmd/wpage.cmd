@@ -1,19 +1,17 @@
 ;	WPAGE.CMD:	Wordprocessing Macro Page
-;			for MicroEMACS 3.9d and above
+;			for MicroEMACS 3.13 and above
 ;			(C)opyright 1987 by Daniel M Lawrence
 
 ; set the clean procedure up
 store-procedure clean
-	delete-buffer "[Macro 10]"
-       	bind-to-key execute-macro-11 S-FN2
-	bind-to-key execute-macro-12 S-FN3
-	delete-buffer "[Macro 13]"
-	delete-buffer "[Macro 14]"
-	delete-buffer "[Macro 15]"
-	delete-buffer "[Macro 16]"
-	delete-buffer "[Macro 17]"
-	bind-to-key execute-macro-18 S-FN9
-	delete-buffer "[Macro 19]"
+	delete-buffer "[w-center]"
+	delete-buffer "[w-scheck]
+	delete-buffer "[w-indformat]"
+	delete-buffer "[w-notready]"
+	delete-buffer "[w-swapword]"
+	unbind-key S-FN3
+	unbind-key S-FN9
+
 	set $cmode %oldmode
 	set $gmode %oldgmode
 !endm
@@ -50,7 +48,7 @@ store-procedure clean
 
 ; Center the current line
 
-10	store-macro
+store-procedure w-center
 	end-of-line
 	set %rctmp $curcol
 	beginning-of-line
@@ -58,12 +56,9 @@ store-procedure clean
 	beginning-of-line
 !endm
 
-bind-to-key nop S-FN2
-bind-to-key fill-paragraph S-FN3
-
 ;	Spell check the current buffer
 
-13	store-macro
+store-procedure w-scheck
 	set %rctmp @"User dictionary(<ret> if none): "
 	!if &seq %rctmp "ERROR"
 		!return
@@ -87,7 +82,7 @@ bind-to-key fill-paragraph S-FN3
 
 ;	reformat indented paragraph
 
-14	store-macro
+store-procedure w-indformat
 	write-message "                    [Fixing paragraph]"
 
 	;remember where we are..and set up
@@ -118,10 +113,10 @@ bind-to-key fill-paragraph S-FN3
 	!endwhile
 
 	;re-format it
-	&sub $fillcol 8 set-fill-column
+	&sub $fillcol 8 set $fillcol
 	1 goto-line
 	fill-paragraph
-	&add $fillcol 8 set-fill-column
+	&add $fillcol 8 set $fillcol
 
 	;insert new indents
 	end-of-file
@@ -149,13 +144,13 @@ bind-to-key fill-paragraph S-FN3
 	write-message "                    [Fixed paragraph]"
 !endm
 
-15	store-macro
+store-procedure w-notready
 	write-message "[MicroSCRIBE not ready]"
 !endm
 
 ;	swap the word the cursor is on and it's predisesor
 
-16	store-macro
+store-procedure w-swapword
 	set %rctmp $search
 	forward-character
 	previous-word
@@ -177,18 +172,18 @@ bind-to-key fill-paragraph S-FN3
 	set $search %rctmp
 !endm
 
-17	store-macro
-	write-message "[MicroSCRIBE not ready]"
-!endm
-
+macro-to-key w-center S-FN1
+bind-to-key fill-paragraph S-FN3
+macro-to-key w-scheck S-FN4
+macro-to-key w-indformat S-FN5
+macro-to-key w-notready S-FN6
+macro-to-key w-swapword S-FN7
+macro-to-key w-notready S-FN8
 bind-to-key count-words S-FN9
+macro-to-key w-notready S-FN8
 
-19	store-macro
-	write-message "[MicroSCRIBE not ready]"
-!endm
-
-	set %oldmode $cmode
-	set %oldgmode $gmode
-	add-mode wrap
-	add-global-mode wrap
-	write-message "[Wordprocessing mode loaded]"
+set %oldmode $cmode
+set %oldgmode $gmode
+add-mode wrap
+add-global-mode wrap
+write-message "[Wordprocessing mode loaded]"

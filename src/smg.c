@@ -58,8 +58,8 @@
  *		2)	Change the parameter declaration "char ch" to "int ch"
  *			in smgqin since we queue key values (not characters)
  *		3) 	Change calls "smgqin(ch)" to "smgqin((unsigned char)ch)"
- *			in smggcook since we don't want sign extension
- *		4)	Remove call "smgqin(0)" in smggcook. Instead of queuing
+ *			in cook since we don't want sign extension
+ *		4)	Remove call "smgqin(0)" in cook. Instead of queuing
  *			a sequence of chars to represent the key value, just
  *			queue the final value instead - much cleaner.
  *		5)	Change the declaration from "char ch" to "int ch" in
@@ -409,16 +409,7 @@ extern NOSHARE TTCHAR orgchar;			/* Original characteristics */
 #define FAILURE( s) (!(s&1))
 #define SUCCESS( s) (s&1)
 
-/** Parameters **/
-#define NKEYENT		128		/* Number of keymap entries	*/
 
-/** Type definitions **/
-struct keyent {				/* Key mapping entry		*/
-	struct keyent * samlvl;		/* Character on same level	*/
-	struct keyent * nxtlvl;		/* Character on next level	*/
-	char ch;			/* Character			*/
-	int code;			/* Resulting keycode		*/
-};
 
 /** Values to manage the screen **/
 static int termtype;			/* Handle to pass to SMG	*/
@@ -439,9 +430,6 @@ static int wide_char;			/* Number of characters wide	*/
 static int inbuf[64];			/* Input buffer			*/
 static int * inbufh = inbuf;		/* Head of input buffer		*/
 static int * inbuft = inbuf;		/* Tail of input buffer		*/
-static char keyseq[256];		/* Prefix escape sequence table	*/
-static struct keyent keymap[NKEYENT];	/* Key map			*/
-static struct keyent * nxtkey = keymap;	/* Next free key entry		*/
 
 
 /* Forward references.          */
@@ -677,98 +665,19 @@ int smggetnum(int code)
 }
 
 /***
- *  smgaddkey  -  Add key to key map
- *
- *  smgaddkey adds a new escape sequence to the sequence table.
- *  I am not going to try to explain this table to you in detail.
- *  However, in short, it creates a tree which can easily be transversed
- *  to see if input is in a sequence which can be translated to a
- *  function key (arrows and find/select/do etc. are treated like
- *  function keys).  If the sequence is ambiguous or duplicated,
- *  it is silently ignored.
- *
- *  Nothing returned
- *
- *  code - SMG key code
- *  fn   - Resulting keycode
+ *  smgaddkey - translate the SMG code to the escape sequence, and
+ *  add it to the list of keys.
  ***/
-smgaddkey(int code, int fn)
+int smgaddkey(int code, int fn)
 {
-	char * seq;
-	int first;
-	struct keyent * cur, * nxtcur;
-	
-	/* Skip on NULL sequence */
-	seq = smggetstr(code);
-	if (seq == NULL)
-		return;
-	
-	/* If no keys defined, go directly to insert mode */
-	first = 1;
-	if (nxtkey != keymap) {
-		
-		/* Start at top of key map */
-		cur = keymap;
-		
-		/* Loop until matches exhast */
-		while (*seq) {
-			
-			/* Do we match current character */
-			if (*seq == cur->ch) {
-				
-				/* Advance to next level */
-				seq++;
-				cur = cur->nxtlvl;
-				first = 0;
-			} else {
-				
-				/* Try next character on same level */
-				nxtcur = cur->samlvl;
-				
-				/* Stop if no more */
-				if (nxtcur)
-					cur = nxtcur;
-				else
-					break;
-			}
-		}
-	}
-	
-	/* Check for room in keymap */
-	if (strlen(seq) > NKEYENT - (nxtkey - keymap))
-		return;
-		
-	/* If first character if sequence is inserted, add to prefix table */
-	if (first)
-		keyseq[(unsigned char) *seq] = 1;
-		
-	/* If characters are left over, insert them into list */
-	for (first = 1; *seq; first = 0) {
-		
-		/* Make new entry */
-		nxtkey->ch = *seq++;
-		nxtkey->code = fn;
-		
-		/* If root, nothing to do */
-		if (nxtkey != keymap) {
-			
-			/* Set first to samlvl, others to nxtlvl */
-			if (first)
-				cur->samlvl = nxtkey;
-			else
-				cur->nxtlvl = nxtkey;
-		}
-
-		/* Advance to next key */
-		cur = nxtkey++;
-	}
+	return (addkey(smggetstr(code), fn));
 }
 
 /***
  *  smgcap  -  Get capabilities from VMS's SMG library
  *
  *  smgcap retrives all the necessary capabilities from the SMG
- *  library to operate microEmacs.  If an insufficent number of
+ *  library to operate MicroEMACS.  If an insufficent number of
  *  capabilities are found for the particular terminal, an error
  *  status is returned.
  *
@@ -814,7 +723,7 @@ int smgcap()
 	wide_char = smggetnum(SMG$K_WIDE_SCREEN_COLUMNS);
 	set_cursor_abs = smggetstr(SMG$K_SET_CURSOR_ABS);
 
-	/* Disable resoultion if unreasonable */
+	/* Disable resolution if unreasonable */
 	if (narrow_char < 10 || wide_char < 10) {
 		width_wide = width_narrow = NULL;
 		strcpy(sres, "NORMAL");
@@ -957,9 +866,9 @@ char * string;				/* String to write		*/
 }
 
 /***
- *  smgqin  -  Queue character for input
+ *  qin  -  Queue character for input
  *
- *  smgqin queues the character into the input buffer for later
+ *  qin queues the character into the input buffer for later
  *  reading.  This routine will mostly be used by mouse support
  *  and other escape sequence processing.
  *
@@ -967,7 +876,7 @@ char * string;				/* String to write		*/
  *
  *  ch  - (Extended) character to add
  ***/
-smgqin(int ch)
+qin(int ch)
 {
 	/* Check for overflow */
 	if (inbuft == &inbuf[sizeof(inbuf)]) {
@@ -982,59 +891,10 @@ smgqin(int ch)
 }
 
 /***
- *  smggcook  -  Get characters from input device
- *
- *  smggcook "cooks" input from the input device and places them into
- *  the input queue.
- *
- *  Nothing returned.
- ***/
-smggcook()
-{
-	char ch;
-	struct keyent * cur;
-	
-	/* Get first character untimed */
-	ch = ttgetc();
-	smgqin((unsigned char)ch);
-	
-	/* Skip if the key isn't a special leading escape sequence */
-	if (keyseq[(unsigned char)ch] == 0)
-		return;
-
-	/* Start translating */
-	cur = keymap;
-	while (cur) {
-		if (cur->ch == ch) {
-			/* Is this the end */
-			if (cur->nxtlvl == NULL) {
-				/* Replace all character with new sequence */
-				inbuft = inbuf;
-				smgqin(cur->code);
-				return;
-			} else {
-				/* Advance to next level */
-				cur = cur->nxtlvl;
-			
-				/* Get next character, timed */
-				ch = ttgetc_shortwait();
-				if (ch < 0)
-					return;
-
-				/* Queue character */
-				smgqin((unsigned char)ch);
-			}
-		} else
-			/* Try next character on same level */
-			cur = cur->samlvl;
-	}
-}
-
-/***
  *  smggetc  -  Get a character
  *
  *  smggetc obtains input from the character input queue.  If the queue
- *  is empty, a call to smggcook() is called to fill the input queue.
+ *  is empty, a call to cook() is called to fill the input queue.
  *
  *  Returns:	character
  ***/
@@ -1054,7 +914,7 @@ int smggetc()
 		} else
 	
 			/* Fill input buffer */
-			smggcook();
+			cook();
 	}
 	
 	/* Return next character */

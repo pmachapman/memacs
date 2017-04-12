@@ -1,0 +1,10 @@
+c:\sys\turbo\lib\c0l obj\abbrev obj\basic obj\bind obj\buffer obj\char+
+obj\cryptundo obj\display obj\dolock obj\eval obj\exec obj\file+
+obj\fileioundo obj\ibmpc obj\input obj\isearch obj\keyboard obj\line+
+obj\lock obj\mainundo obj\mouse obj\msdos obj\random obj\region+
+obj\replace obj\undo obj\screen obj\search obj\tags obj\undo obj\window+
+obj\word
+bin\emacs/m/linenumbers
+emacs.map
+c:\sys\turbo\lib\cl
+

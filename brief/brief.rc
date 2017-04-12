@@ -1,0 +1,1016 @@
+;
+;   Brief Emulation using MicroEMACS 3.12 or higher
+;
+;   (C)opyright 1994 by Jim Kissel
+;
+;	Comments, suggestions and bugs to jlk@sni.co.uk
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   Section 1  User Variables for Brief Emulation
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;	Brief Variables for Key Bindings
+;
+set $discmd FALSE
+
+set %bf_end     4	 ; the end key   (see end of emacsrc for info on how to)
+set %bf_home 2108	 ; the home key  (determine these values)
+set %bf_bcnt    1	 ; number of strings used by bf_ckbkup
+set %bf_bklst1  " "	 ; insure that the first backup list string exists
+set %bf_btoggle TRUE ; if TRUE backup files else don't
+
+set $sscroll TRUE
+set $hardtab 4
+set $timeflag TRUE      ; time on status line Not Brief style ;-(
+set $posflag TRUE       ; nor is the position   ;-( but it will do for now
+set %bf_macro FALSE
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   Section 2  General Procedure for Brief Emulation
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;
+;    Remember the last key for HOME:HOME:HOME & END:END:END processing
+;
+store-procedure bf_home_end
+	!if &equ $lastkey %bf_end
+		set %brief_end &add %brief_end 1
+	!else
+		set %brief_end 1
+	!endif
+	!if &equ $lastkey %bf_home
+		set %brief_home &add %brief_home 1
+	!else
+		set %brief_home 1
+	!endif
+!endm
+set $cmdhook bf_home_end
+
+;
+;     Setup the correct modes for Brief
+;
+store-procedure brief_startup_mode
+	set $ssave FALSE
+	set $cmode 72	; EXACT + MAGIC or search/replace
+	set $gmode 72
+	set %bf_dot &sin $cfname "."
+	!if %bf_dot
+		set %bf_ftype &rig $cfname &sub &len $cfname %bf_dot
+		!if &or &seq "c" %bf_ftype &seq "h" %bf_ftype
+			add-mode "CMODE"
+		!endif
+	!endif
+!endm
+set $readhook brief_startup_mode
+
+;
+;     Parse the error file. Part of Ctrl-P Error processing
+;
+;     This code is OS and Compiler specific.  Currently the Brief Emulation
+;     supports the output from AT&T 5.4 and AIX compilers.  Post me other
+;     compiler error outputs for inclusion or write your one. 
+;     jlk@sni.co.uk
+;
+store-procedure bf_parse_error_file
+	;
+	; this parses AT&T compiler output
+	;
+	set %bf_start &add &sin $line "line" 4
+	set %bf_len &sub &sin $line ":" %bf_start
+	set %bf_lnum &mid $line %bf_start %bf_len
+	;
+	; you get >>> 211.16<<< under AIX. Parse it some more
+	;
+	set %bf_lnum &right %bf_lnum &sub &len %bf_lnum 1
+	set %bf_lnum &left %bf_lnum &sub &sin %bf_lnum "." 1
+	;
+	; end of AIX specific parse
+	;
+	unbind-key ^M
+	bind-to-key %bf_newline ^M
+	set %bf_start &sin $line "error"
+	set %bf_error &right $line &sub $lwidth &sub %bf_start 1
+	find-screen "MAIN"
+	goto-line %bf_lnum
+	write-message %bf_error
+!endm
+
+;
+;	Store the file name in the backup string array
+;	Part of Brief Backup
+;
+;	if there is room in the last backup string
+;		store the file name
+;	else
+;		create a new backup string and increment the count
+;
+store-procedure bf_backup_str
+	set %bf_ttmp &cat "%bf_bklst" %bf_bcnt
+	!if &gre &add &len %bf_file &len &ind %bf_ttmp 127
+		set %bf_bcnt &add %bf_bcnt 1
+		set %bf_ttmp &cat "%bf_bklst" %bf_bcnt
+		set &ind %bf_ttmp &cat " " %bf_file
+	!else
+;		set %bf_tttmp &cat &ind %bf_ttmp %bf_file
+;		set &ind %bf_ttmp %bf_tttmp
+		set &ind %bf_ttmp &cat &ind %bf_ttmp %bf_file
+	!endif
+!endm
+
+;
+;	Brief Check Backup
+;
+;	Check if the current files has been backed up
+;	if it has %bf_ret is set TRUE
+;	else set %bf_ret FALSE and call bf_backup_str 
+;		to add it to the list of already backed up files
+;
+store-procedure bf_ckbkup
+	set %bf_ret FALSE
+	set %bf_tmp %bf_bcnt
+	!while &not &equ %bf_tmp 0
+		;
+		;	look for the file name in the current backup string
+		;	if we find it set bf_ret TRUE and retur
+		;	else save the file name in the backup string array
+		;
+		set %bf_ttmp &cat "%bf_bklst" %bf_tmp
+		set %bf_file &fin $cfname
+		!if &not &equ &sin &ind %bf_ttmp %bf_file 0
+			set %bf_ret TRUE
+			!return
+		!else
+			bf_backup_str
+		!endif
+		set %bf_tmp &sub %bf_tmp 1
+	!endwhile
+!endm
+
+;
+;	Backup a file if $BBACKUP is set in the environment
+;	and we haven't already backed up this file
+;
+;	WARNINGS***WARNING***WARNING***WARNING***WARNING
+;
+;	If you are editing two files with the same filename 
+;	the last one written will be the only one in $BBACKUP
+;	This limitation will be repaired, once it is possible to
+;	determine the fully qualified path of each file, hopefully in
+;	MicroEMACS 3.13 
+;
+;	WARNINGS***WARNING***WARNING***WARNING***WARNING
+;
+store-procedure bf_bfile
+	set %bbdir &env BBACKUP
+	!if &not &equ &len %bbdir 0
+		bf_ckbkup
+		!if &ind %bf_ret TRUE
+			write-message "backup already done"
+		!else
+			write-message "Creating backup file..."
+			set %bf_cmd &cat &cat &cat "cp " %bf_file " " &env BBACKUP
+			shell-command %bf_cmd
+		!endif
+	!else
+		write-message "$BBACKUP not set"
+	!endif
+!endm
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   Section 3  KeyBindings a Specific Procedure for Brief Emulation
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;
+;     Alt-A Non-Inclusive Mark
+;
+;     Maped to Esc-A  M-A
+;
+unbind-key M-A
+bind-to-key set-mark M-A
+  
+;
+;     Ctrl-A not used by Brief 
+;
+;     just unbind
+;
+unbind-key ^A
+
+;
+;     Alt-B Buffer List   Differenct from Brief Buffer List
+;
+;     Maped to Esc-B  M-B
+;
+;     note: room for improvement in the style of Brief
+;
+unbind-key M-B
+bind-to-key list-buffers M-B
+
+;
+;     Ctrl-B      Line to Bottom (of screen)
+;
+store-procedure brief-line-to-bottom
+	&sub $wline $cwline move-window-up
+!endm
+unbind-key ^B
+macro-to-key brief-line-to-bottom ^B
+
+;
+;     Alt-C  Column Mark
+;
+;     Not implemented.  Columns not supported by MicroEmacs.
+;
+
+;
+;     Ctrl-C      Centre Line in Window
+;
+store-procedure brief-centre-line
+;	&sub &div $wline 2 $cwline move-window-up ;this should work but doesn't
+    set %briefctr &sub &div $wline 2 $cwline
+    !if &les %briefctr 0
+        &abs %briefctr move-window-down
+    !else
+        %briefctr move-window-up
+    !endif
+!endm
+unbind-key ^C
+macro-to-key brief-centre-line ^C
+
+;
+;     Alt-D Delete Line
+;
+;     Maped to Esc-D  M-D
+;
+store-procedure brief-delete-line
+	set %briefcol $curcol
+	beginning-of-line
+	!if &LEN $line
+		!force kill-to-end-of-line
+		!force kill-to-end-of-line
+	!else
+		!force kill-to-end-of-line
+	!endif
+    !if &GRE %briefcol $lwidth
+		end-of-line
+	!else
+		%briefcol forward-character
+	!endif
+!endm
+unbind-key M-D
+macro-to-key brief-delete-line M-D
+
+;
+;     Ctrl-D Scroll Buffer Down not implemented
+;
+;     Ctrl-D is the same as the End key on most Unix keyboards so.......
+;
+
+;
+;     Alt-E    Edit file
+;
+;     Maped to Esc-E  M-E
+;
+bind-to-key find-file M-E
+
+;
+;     Ctrl-E is not used by Brief
+;
+;     just unbind
+;
+unbind-key ^E
+
+;
+;     Alt-F Display File Name
+;
+;     just unbind. Well is on the status line ;-)
+;
+unbind-key M-F
+
+;
+;     Ctrl-F is not used by Brief
+;
+unbind-key ^F
+
+;
+;     Alt-G Go to Line
+;
+;     Maped to Esc-G M-G
+;     wow !!! a match !!!
+;
+
+;
+;     Alt-H Help!
+;
+;     Maped to Esc-H M-H
+;     For now we use the apropos command
+;
+bind-to-key apropos M-H
+
+;
+;     Ctrl-H is backspace in both Brief and MicroEmacs
+;
+
+;
+;     Alt-I Insert Mode Toggle
+;
+;     Maped to Esc-I  M-I. Toggle insert/overtype mode
+;     Note Brief changes global modes.  This may not suit everyone
+;
+;     cmode is also set so the current buffer over/insert mode is 
+;     also changed.  32 is the bitwise position of overwrite mode.
+;
+store-procedure brief-toggle-insert-mode
+	!if &ban $gmode 32
+		delete-global-mode over
+	!else
+		add-global-mode over
+	!endif
+	!if &ban $cmode 32
+		delete-mode over
+	!else
+		add-mode over
+	!endif
+!endm
+macro-to-key brief-toggle-insert-mode M-I
+
+;
+;     Ctrl-I  Tab same in Micro-Emacs!!!!
+;
+
+;
+;     Alt-J  Jump to Bookmark
+;
+;     Maped to Esc-J M-J
+;
+bind-to-key goto-mark M-J
+
+;
+;     Alt-K  Delete to End of Line
+;
+;     Maped to Esc-K M-K
+;
+unbind-key M-K
+bind-to-key kill-to-end-of-line M-K
+
+;
+;     Ctrl-K  Not used by Brief  (just unbind)
+;
+unbind-key ^K
+
+;
+;     Alt-L Line Mark  No equilvent in MicroEmacs
+;
+;     We could simulate by eol;set-mark;bol if required but this
+;     is different from Brief
+;
+unbind-key M-L
+
+;
+;     Ctrl-L Not used by Brief
+;
+unbind-key ^L
+
+;
+;     Alt-M  Mark
+;
+;     Maped to Esc-M  M-M
+;
+unbind-key M-M
+bind-to-key set-mark M-M
+
+;
+;     Ctrl-M is newline in Brief and MicroEmacs
+;
+
+;
+;     Alt-N Next Buffer
+;
+;     Maped to Esc-N M-N
+;
+store-procedure brief-next-buffer
+	!force next-buffer
+	!if $status
+		clear-message-line
+	!else
+		write-message "No other buffers."
+	!endif
+!endm
+unbind-key M-N
+macro-to-key brief-next-buffer M-N
+
+;
+;    Ctrl-N Next Error
+;
+;    Will add to the Ctrl-P processing next release
+;
+unbind-key ^N
+
+;
+;     Alt-O Change Output File
+;
+;     Maped to Esc-O  M-O
+;
+bind-to-key change-file-name M-O
+
+;
+;     Ctrl-O Not used by Brief
+;
+unbind-key ^O
+
+;
+;     Alt-O Print Block: Not supported by Micro-Emacs
+;
+;unbind-key M-P
+
+;
+;     Ctrl-P      Error Display
+;
+store-procedure bf_display_error
+	set %bf_dot &sin $cfname "."
+	!if %bf_dot
+		set %bf_ftype &rig $cfname &sub &len $cfname %bf_dot
+		!if &not &seq "c" %bf_ftype
+			write-message "No errors."
+			!return
+		!endif
+	!endif
+	set %bf_hfile $cfname
+	set %bf_tmp &left $cfname &sub &len $cfname 1
+	set %bf_filename &cat %bf_tmp "err"
+!force	find-file %bf_filename
+	!if &seq $status FALSE
+		find-file %bf_hfile
+		delete-buffer %bf_filename
+		write-message "No errors."
+	!else
+		add-mode "VIEW"
+		set %bf_newline &bind ^M
+		unbind-key ^M
+		macro-to-key bf_parse_error_file ^M
+	!endif
+!endm
+unbind-key ^P
+macro-to-key bf_display_error ^P
+
+;
+;     Alt-Q Quote
+;
+;     Maped to Esc-Q  M-Q
+;
+unbind-key M-Q
+bind-to-key quote-character M-Q
+
+;
+;     Ctrl-Q Not used by Brief
+;
+;unbind-key ^Q
+
+;
+;     Alt-R Read File
+;
+;     Maped to Esc-R M-R
+;
+unbind-key M-R
+bind-to-key insert-file M-R
+
+;
+;    Ctrl-R Repeat
+;
+unbind-key ^R
+bind-to-key universal-argument ^R
+
+;
+;    Alt-S Search Forward
+;
+;    Maped to Esc-S M-S
+;
+bind-to-key search-forward M-S
+
+;
+;    Ctrl-S not used by Brief
+;
+unbind-key ^S
+
+;
+;     Alt-T Translate Forward
+;
+;     Query-replace-string is a better match than replace-string
+;
+bind-to-key query-replace-string M-T
+
+;
+;    Ctrl-T      Line to Top (of screen)
+;
+store-procedure brief-line-to-top
+	&sub $cwline 1 move-window-down
+!endm
+unbind-key ^T
+macro-to-key brief-line-to-top ^T		; line to top (of window)
+
+;
+;     Alt-U Undo  Not currently supported by 3.12
+;
+;     But comming to a new version of MicroEMACS near you soon......
+;     Just needs some BETA testers.  Contact Jim Kissel jlk@sni.co.uk
+;
+unbind-key M-U
+;bind-to-key undo M-U
+
+;
+;     Ctrl-U Scroll buffer Up
+;
+;     ^U move-window-down in MicroEmacs is the same (similar?)
+;
+bind-to-key move-window-down ^U
+
+;
+;    Alt-V Display Version Id
+;
+;    Maped to Esc-V  M-V
+;    just for those who cannot read the status line
+;
+store-procedure brief-version
+	write-message &cat $progname &cat " " $version
+!endm
+unbind-key M-V
+macro-to-key brief-version M-V
+
+;
+;    Ctrl-V not used by Brief
+;
+unbind-key ^V
+
+;
+;    Alt-W Write
+;
+;    Maped to Esc-W  M-W
+;
+store-procedure brief_save_file
+	!if &SEQ $region "ERROR"
+		!if &BAN $cbflags 2
+			!if &seq %bf_btoggle TRUE
+				bf_bfile
+			!endif
+			save-file
+		!else
+			write-message "File has not been modified -- not written."
+		!endif
+	!else
+		save-file ; for now do a write block later
+	!endif
+;	clear-message-line
+!endm
+unbind-key M-W
+macro-to-key brief_save_file M-W
+
+;
+;    Ctrl-W Backup File Toggle
+;
+store-procedure bf_back_toggle
+	!if &seq %bf_btoggle TRUE
+		write-message "Backup files will not be created."
+		set %bf_btoggle FALSE
+	!else
+		write-message "Backup files will be created."
+		set %bf_btoggle TRUE
+	!endif
+!endm
+unbind-key ^W
+macro-to-key bf_back_toggle ^W
+
+;
+;    Alt-X  Exit
+;
+;    Maped to Esc-X  M-X
+;
+unbind-key M-X
+bind-to-key exit-emacs M-X
+
+;
+;    Ctrl-X Write Files and Exit
+;
+;    t.b.a
+;
+
+;
+;    Alt-Z Suspend Brief
+;
+;    Maped to Esc-Z  M-Z  MicroEmacs i-shell
+;
+unbind-key M-Z
+bind-to-key i-shell M-Z
+
+;
+;    Ctrl-Z Zoom Window
+;
+;    missing for now (will add later)
+;
+unbind-key ^Z
+
+;
+;    Alt-minus Previous Buffer
+;
+;    Keyboard - is mapped to M--  (Alt-minus) which conflicts wiht
+;    this command.  Not implimented at present.
+;
+
+;
+;    Ctrl-minus Delete Current Buffer
+;
+store-procedure brief_delete_current_buffer
+	set %brief_buf $cbufname
+	!force next-buffer
+	!if $status
+		delete-buffer %brief_buf
+	!else
+		write-message "Can't delete: no other buffers."
+	!endif
+!endm
+macro-to-key brief_delete_current_buffer ^_
+
+;
+;    Backspace  no change from MicroEmacs
+;
+
+;
+;    Ctrl-Backspace  Delete Previous Word
+;
+;    not implemented as my terminal emulator returns the same codes for
+;    CTRL-Backspace and the Del key
+;
+
+;
+;    Enter as per MicroEmacs
+;
+
+;
+;    Ctrl-Enter Open Line
+;
+store-procedure brief_open_line
+	end-of-line
+	newline
+!endm
+unbind-key ^J
+macro-to-key brief_open_line ^J
+
+;
+;    Esc Escape
+;
+;    We are using Esc for the Alt key. ;-(  can't map
+;
+
+;
+;    Tab  as per MicroEmacs
+;
+
+;
+;    Shift-Tab is Back-Tab!  Why do anything?
+;
+
+;
+;    Alt-1 to Alt-0  Drop Bookmark n
+;
+;    We either sacrifice Repeat 1 to 10 or we have only one mark?
+;
+
+;
+;    F1 Change Window
+;
+;    not quite brief style but it goes to previous/next window via cursor keys
+;
+store-procedure change-window
+*bwinretry
+	write-message "Point to destination (use cursor keys)"
+	set %briefchar &gtc
+	!if &seq %briefchar FNP		; the up arrow key
+		previous-window
+	!else
+		!if &seq %briefchar FNN	; the down arrow key
+			next-window
+		!else
+;			!if $seq %briefchar &chr 7	; abort !
+;				write-message "Command canceled"
+;				!goto bwinend
+;			!else
+;write-message &cat >>> &cat %briefchar <<<
+				!goto bwinretry
+;			!endif
+;will fix this when I know how to read a ^G
+		!endif
+	!endif
+*bwinend
+!endm
+unbind-key ^XO
+unbind-key ^XP
+macro-to-key change-window FN1
+
+;
+;    Alt F1 Toggle Borders
+;
+;    We can realy toggle to borders but we can turn off the mode line so...
+;    Maped to Esc-F1  M-FN1
+;
+;    May not work on slow terminals or over telnet. try a 1 second pause
+;    between the Esc and the F1.  ;-(
+;
+store-procedure brief_toggle_borders
+	!if $modeflag
+		set $modeflag FALSE
+	!else
+		set $modeflag TRUE
+	!endif
+	clear-and-redraw
+!endm
+macro-to-key brief_toggle_borders M-FN1
+
+;
+;    F2 Resize Window  tba
+;
+
+;
+;    Alt F2 Zoom Windows
+;
+;    Maped to Esc-F2  M-F2
+;    Just get rid of the other windows
+;
+bind-to-key delete-other-windows M-FN2
+
+;
+;    F3 Create Window
+;
+;    Not realy Brief Style
+;
+unbind-key ^X2
+bind-to-key split-current-window FN3 ; Brief Func Key 3
+
+;
+;    F4 Delete Window
+;
+;    Not realy Brief Style (yet)
+;
+bind-to-key delete-other-windows FN4
+
+;
+;    F5 Search Forward    
+;
+bind-to-key hunt-forward FN5
+
+;
+;    F6 Translate Forward
+;
+bind-to-key query-replace-string FN6
+
+;
+;    F7 Remember
+;
+store-procedure bf_remember
+	!if &seq %bf_macro TRUE
+		set %bf_macro FALSE
+		end-macro
+	!else
+		set %bf_macro TRUE
+		begin-macro
+	!endif
+!endm
+macro-to-key bf_remember FN7
+
+;
+;    F8 Playback
+;
+bind-to-key execute-macro FN8
+
+;
+;    F9 Load a Macro File
+;
+
+;
+;    F-10 Execute Command
+;
+bind-to-key execute-named-command FN0
+
+;
+;    HOME           Beginning of Line
+;    HOME HOME      Teginning of Window
+;    HOME HOME HOME Beginning of Buffer
+;
+store-procedure brief_home
+	!if &equ %brief_home 1
+		beginning-of-line
+	!else
+		!if &equ %brief_home 2
+			&sub $cwline 1 previous-line
+			beginning-of-line
+
+		!else
+			beginning-of-file
+		!endif
+	!endif
+!endm
+unbind-key FN<
+macro-to-key brief_home FN<
+
+;
+;    END          End of Line
+;    END END      Emd of Window
+;    END END END  End of Buffer
+;
+store-procedure brief-end
+	!if &equ %brief_end 1
+		end-of-line
+	!else
+		!if &equ %brief_end 2
+			&sub $wline $cwline next-line
+			end-of-line
+		!else
+			end-of-file
+		!endif
+	!endif
+!endm
+unbind-key ^D
+macro-to-key brief-end ^D
+
+;
+;    Ctrl-Right  Next Word
+;
+bind-to-key next-word M-:
+
+;
+;    Ctrl-Left Previous Word
+;
+;    My terminal emulator is bizarre Ctrl-Left_Arrow_Key returns M-9
+;    so no book mark 9 for me ;-(
+;
+bind-to-key previous-word M-9
+
+;
+;    Del Delete
+;
+store-procedure bf_delete
+	!if &SEQ $region "ERROR"
+		!force delete-next-character
+	!else
+		!if &LEN $region
+			kill-region
+			remove-mark	; otherwise you could kill another region when you move
+		!else
+			delete-next-character
+		!endif
+	!endif
+	clear-message-line
+!endm
+unbind-key ^?
+macro-to-key bf_delete ^?
+
+;
+;    Ins  Paste from Scrap
+;
+unbind-key FNC
+bind-to-key yank FNC
+
+;
+;    Keypad -
+;
+;    Maped to Esc -  M--
+;
+store-procedure bf_keypad_minus
+	!if &SEQ $region "ERROR"
+		beginning-of-line
+		!if &LEN $line
+			!force kill-to-end-of-line
+			!force kill-to-end-of-line
+		!else
+			!force kill-to-end-of-line
+		!endif
+		write-message "Line cut to scrap."
+	!else
+		!if &LEN $region
+			kill-region
+			remove-mark	; otherwise you could kill another region 
+			write-message "Block deleted to scrap."
+		!else
+			!if &LEN $line
+				!force kill-to-end-of-line
+				!force kill-to-end-of-line
+			!else
+				!force kill-to-end-of-line
+			!endif
+			write-message "Line cut to scrap."
+		!endif
+	!endif
+!endm
+macro-to-key bf_keypad_minus M--
+
+;
+;    Keypad +
+;
+;    Maped to Esc +  M-+
+;    WARNING changes MARK 0 & 1
+;    to make this work we need either a $MARKCOL[] $MARKLINE[]
+;    or you need to write more code to save the marks before the copy
+;
+store-procedure bf_keypad_plus
+	!if &SEQ $region "ERROR"
+		1 set-mark
+		beginning-of-line
+		set-mark
+		next-line
+		copy-region
+		previous-line
+		1 exchange-point-and-mark
+		remove-mark
+		1 remove-mark
+		write-message "Line copied to scrap."
+	!else
+		!if &LEN $region
+			copy-region
+			remove-mark
+			write-message "Block copied to scrap."
+		!else
+			set %brief_col $curcol
+			beginning-of-line
+			set-mark
+			next-line
+			copy-region
+			previous-line
+			beginning-of-line
+			%brief_col forward-character
+			remove-mark
+			write-message "Line copied to scrap."
+		!endif
+	!endif
+!endm
+macro-to-key bf_keypad_plus M-+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   Section 4  Non-Brief useful MicroEMACS bindings
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+bind-to-key goto-matching-fence M-%			; matching fence
+bind-to-key tag-word ^]						; vi c-tag
+bind-to-key back-from-tag-word ^^			; vi c-tag
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   Section 5  Brief Emulation Comments
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Functions not implemented
+;
+; Alt-C Set Column Mark. Colums not (yet) supported in Micro-Emacs
+; Ctrl-D is returned by the END key so no Brief "Scroll Buffer Down"
+; Alt-E "Display File Name" as the emacs status line handles this
+; Alt-P "Print Block" not available in micro-emacs
+; Alt-U "Undo" not available in micro-emacs (current in BETA test)
+; Ctrl-X "Write Files and Exit" conflict with emacs ^X
+; Shift Tab as my terminal emulator doesn't do this
+; bookmarks as they must be entered via the universal-argument method
+; Shift-End not in my terminal emulator
+;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   Section 6  Brief Startup
+;
+;   Requires modification to MicroEMACS 3.12 source to provide .emacsrc
+;	with some information on how many arguments where passed at startup.
+;	At present in my ALPHA source tree there is a new environment varialbe
+;   $argcnt which contains the number of arguments passed to MicroEMACS
+;	at startup. If $argcnt == 1 then no files as arguments, so restore
+;   the previous files stored in the file pointed at by $BFILE as per BRIEF
+;
+;   Hopefully Dan Lawerence will agree to incorporate this into the next
+;   release of MicroEMACS.  Brief Startup will also require Brief Shutdown
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   Section 7  Brief Exit
+;
+;	In order to store the information required by Brief Startup, a new
+;   environment variable $exithook will have to be provided.  This will
+;	allow a macro to loop through all the current buffers and store the
+;	required information on each file in $BFILE for processing during
+;	startup if required.  Again this is under ALPHA test and may be
+;	incorporated in the next release of MicroEMACS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+set $discmd TRUE
+
+;   uncomment to determine value of keys
+
+;store-procedure bf_test
+;	write-message "Type a key: "
+;	write-message &cat "The key value is: " $lastkey
+;!endm
+;macro-to-key bf_test ^L

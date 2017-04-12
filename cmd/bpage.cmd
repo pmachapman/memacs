@@ -1,7 +1,7 @@
 ;	BPAGE.CMD:	Box Macro and rectangualr region page
-;			for MicroEMACS 3.9d and above
-;			(C)opyright 1987 by Suresh Konda and Daniel M Lawrence
-;			Last Update: 11/02/87
+;			for MicroEMACS 3.13 and above
+;			(C)opyright 1987,1993 by Suresh Konda/Daniel M Lawrence
+;			Last Update: 11/13/93
 
 ; make sure the function key window is up
 	set %rcfkeys FALSE
@@ -10,18 +10,16 @@
 
 ; set the clean procedure up
 store-procedure clean
-	delete-buffer "[Macro 10]"
-	delete-buffer "[Macro 11]"
-	delete-buffer "[Macro 12]"
+	delete-buffer "[b-change-line]"
+	delete-buffer "[b-del-block]"
+	delete-buffer "[b-draw-box]"
+	delete-buffer "[b-ins-line]"
+	delete-buffer "[b-copy-block]"
+	delete-buffer "[b-yank-block]"
+	delete-buffer "[b-ins-blank]"
+	delete-buffer "[b-yank-block]"
 	delete-buffer "[getblock]"
 	delete-buffer "[putblock]"
-	delete-buffer "[Macro 13]"
-	delete-buffer "[Macro 14]"
-	delete-buffer "[Macro 15]"
-	delete-buffer "[Macro 16]"
-	delete-buffer "[Macro 17]"
-	delete-buffer "[Macro 18]"
-	delete-buffer "[Macro 19]"
 	delete-buffer "[drawbox]"
 	delete-buffer "[setpoints]"
 	delete-buffer "[horizontal]"
@@ -29,7 +27,6 @@ store-procedure clean
 	delete-buffer "[horline]"
 	delete-buffer "[vertline]"
 	delete-buffer "[delcol]"
-	delete-buffer "[iline]"
 !endm
 
 ; Write out the page instructions
@@ -37,21 +34,21 @@ store-procedure clean
 	1 next-window
 	beginning-of-file
 	set $curcol 25
-	overwrite-string " F1 Line type [DOUBLE]    F2 kill block   "
+	overwrite-string " F1 Line type [DOUBLE]    F2 kill block        "
 	next-line
 	set $curcol 25
-	overwrite-string " F3 draw box              F4 copy block   "
+	overwrite-string " F3 draw box              F4 copy block        "
 	next-line
 	set $curcol 25
-	overwrite-string " F5 insert line           F6 yank block   "
+	overwrite-string " F5 insert line           F6 yank block        "
 	next-line
 	set $curcol 18
 	overwrite-string "BOX "
 	set $curcol 25
-	overwrite-string " F7 insert space          F8 insert block "
+	overwrite-string " F7 insert space          F8 insert block      "
 	next-line
 	set $curcol 25
-	overwrite-string "                                          "
+	overwrite-string "                                               "
 	unmark-buffer
 	beginning-of-file
 	!force restore-window
@@ -62,7 +59,7 @@ set %rcinsert 0
 
 ;	change line type
 
-10	store-macro
+store-procedure b-change-line
 	!if &equ %rcltype 1
 		set %rcltype 2
 		set %rctmp "DOUBLE"
@@ -91,7 +88,7 @@ set %rcinsert 0
 
 ;	Draw a box
 
-12	store-macro
+store-procedure b-draw-box
 	!if &equal %rcltype  1
 		set %c1 "Ú"
 		set %c2 "Ä"
@@ -119,22 +116,18 @@ set %rcinsert 0
 	run drawbox	
 !endm
 
-;	insert a line in a box
-
-14	store-macro
-	run iline
-!endm
-
 ;	insert a blank line in a box
 
-16	store-macro
+store-procedure b-ins-blank
 	set %rctmp %rcltype
 	set %rcltype 0
-	run iline
+	run b-ins-line
 	set %rcltype %rctmp
 !endm
 
-store-procedure	iline
+;	insert a line in a box
+
+store-procedure	b-ins-line
 	run setpoints
 	!if &equal %pcol %mcol
 		run vertical
@@ -204,7 +197,7 @@ store-procedure drawbox
 	next-line
 	beginning-of-line
 	%width forward-character
-	6 forward-character
+!force	6 forward-character
 !endm
 
 ; user procedure to draw a horizontal from mark to point making spaces for
@@ -483,7 +476,7 @@ store-procedure delcol
 
 ;	delete a rectangular block of text
 
-11	store-macro
+store-procedure b-del-block
 	set %bkcopy FALSE
 	run getblock
 	write-message "[Block deleted]"
@@ -491,7 +484,7 @@ store-procedure delcol
 
 ;	copy a rectangular region
 
-13	store-macro
+store-procedure b-copy-block
 	set %bkcopy TRUE
 	run getblock
 	write-message "[Block copied]"
@@ -499,14 +492,14 @@ store-procedure delcol
 
 ;	yank a rectangular region
 
-15	store-macro
+store-procedure b-yank-block
 	set %bkcopy TRUE
 	run putblock
 !endm
 
 ;	insert a rectangular region
 
-17	store-macro
+store-procedure b-ins-block
 	set %bkcopy FALSE
 	run putblock
 !endm
@@ -628,7 +621,16 @@ store-procedure putblock
 	set $discmd TRUE
 !endm
 
-	; and init some variables
-	set %rcltype 2
-	write-message "[Block mode loaded]"
+macro-to-key b-change-line	S-FN1
+macro-to-key b-del-block	S-FN2
+macro-to-key b-draw-box		S-FN3
+macro-to-key b-copy-block	S-FN4
+macro-to-key b-ins-line		S-FN5
+macro-to-key b-yank-block	S-FN6
+macro-to-key b-ins-blank	S-FN7
+macro-to-key b-ins-block	S-FN8
+
+; and init some variables
+set %rcltype 2
+write-message "[Block mode loaded]"
 

@@ -22,17 +22,20 @@ HFILES = $(HDIR)\estruct.h $(HDIR)\edef.h $(HDIR)\efunc.h $(HDIR)\epath.h $(HDIR
 
 #list of source files
 
-F1 = $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
+F1 = $(OBJD)\abbrev.obj $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
 F2 = $(OBJD)\char.obj $(OBJD)\crypt.obj $(OBJD)\display.obj  $(OBJD)\dolock.obj
 F3 = $(OBJD)\eval.obj $(OBJD)\exec.obj $(OBJD)\file.obj
 F4 = $(OBJD)\fileio.obj $(OBJD)\os2.obj $(OBJD)\input.obj $(OBJD)\keyboard.obj
 F5 = $(OBJD)\isearch.obj $(OBJD)\line.obj $(OBJD)\lock.obj
 F6 = $(OBJD)\main.obj $(OBJD)\mouse.obj $(OBJD)\os2npm.obj $(OBJD)\screen.obj
 F7 = $(OBJD)\random.obj $(OBJD)\region.obj $(OBJD)\search.obj $(OBJD)\replace.obj
-F8 = $(OBJD)\tags.obj $(OBJD)\window.obj $(OBJD)\word.obj
+F8 = $(OBJD)\tags.obj $(OBJD)\undo.obj $(OBJD)\window.obj $(OBJD)\word.obj
 
 # compilation rules
 
+
+$(OBJD)\abbrev.obj: $(SRCD)\abbrev.c $(HFILES)
+	$(CC) $(CFLAGS) /Fo$(OBJD)\abbrev.obj $(SRCD)\abbrev.c
 
 $(OBJD)\basic.obj: $(SRCD)\basic.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\basic.obj $(SRCD)\basic.c
@@ -114,6 +117,9 @@ $(OBJD)\screen.obj: $(SRCD)\screen.c $(HFILES)
 
 $(OBJD)\tags.obj: $(SRCD)\tags.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\tags.obj $(SRCD)\tags.c
+
+$(OBJD)\undo.obj: $(SRCD)\undo.c $(HFILES)
+	$(CC) $(CFLAGS) /Fo$(OBJD)\undo.obj $(SRCD)\undo.c
 
 $(OBJD)\window.obj: $(SRCD)\window.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\window.obj $(SRCD)\window.c

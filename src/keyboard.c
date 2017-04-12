@@ -223,3 +223,311 @@ case 0x90:	return(SPEC | CTRL | '+');	/* ctrl grey + */
 
 #endif
 #endif
+
+#if BSD || FREEBSD || USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || (AVVION || TERMIOS) || (VMS && SMG) || MPE
+
+#define NKEYSEQ		300		/* Number of keymap entries	*/
+
+typedef struct keyent {			/* Key mapping entry		*/
+	struct keyent *samlvl;		/* Character on same level	*/
+	struct keyent *nxtlvl;		/* Character on next level	*/
+	unsigned char ch;		/* Character			*/
+	int code;			/* Resulting keycode		*/
+} KEYENT;
+
+/* Needed Prototype */
+#if	PROTO
+extern int PASCAL NEAR rec_seq(char *buf, char *bufstart, KEYENT *node);
+#else
+extern int PASCAL NEAR rec_seq();
+#endif
+
+/* some globals needed here */
+static unsigned char keyseq[256];	/* Prefix escape sequence table	*/
+static KEYENT keymap[NKEYSEQ];		/* Key map			*/
+static KEYENT *nxtkey = keymap;		/* Next free key entry		*/
+static BUFFER *seqbuf;			/* For the pop-up buffer	*/
+
+/*
+ * add-keymap "escape sequence" keyname
+ */
+#if PROTO
+int PASCAL NEAR addkeymap(int f, int n)
+#else
+int PASCAL NEAR addkeymap( f, n)
+int f;
+int n;
+#endif
+{
+	int c, ec;
+	int idx, col;
+	char esc_seq[NSTRING];	/* escape sequence to cook */
+	char codeseq[NSTRING];	/* fn key name */
+
+	memset(esc_seq, '\0', NSTRING);
+
+	if (clexec == TRUE) {
+		if (mlreply(NULL, esc_seq, NSTRING) != TRUE) {
+			TTbeep();
+			return FALSE;
+		}
+	}
+	else {
+		/* get the key sequence */
+		mlwrite(": add-keymap ");
+		col = strlen(": add-keymap ");
+		idx = 0;
+		for (;;) {
+			c = tgetc();
+			if ((ec = ctoec(c)) == abortc) {
+				TTbeep();
+				return FALSE;
+			} else if (c == '\r') {
+				break;
+			} else if (ec == quotec) {
+				c = tgetc();
+			}
+			esc_seq[idx++] = c;
+			movecursor(term.t_nrow, col);	/* Position the cursor	*/
+			col += echochar(c);
+		}
+
+		ostring(" ");
+	}
+
+	if (mlreply(NULL, codeseq, NSTRING) != TRUE) {	/* find the key name (e.g., S-FN#) */
+		TTbeep();
+		return FALSE;
+	}
+
+	ec = stock(codeseq);
+
+	ostring(codeseq);
+	return (addkey(esc_seq, ec));	/* Add to tree */
+}
+
+/*
+ * list-keymappings
+ */
+#if PROTO
+int PASCAL NEAR listkeymaps(int f, int n)
+#else
+int PASCAL NEAR listkeymaps( f, n)
+int f;
+int n;
+#endif
+{
+	char outseq[NSTRING];	/* output buffer for key sequence */
+
+	/*
+	 * Get a buffer for it.
+	 */
+	seqbuf = bfind("Key sequence list", TRUE, BFINVS);
+/*		   "Key sequence list" */
+
+	if (seqbuf == NULL || bclear(seqbuf) == FALSE) {
+		mlwrite("Cannot display key sequences list");
+/*			"Cannot display key sequences list" */
+		return(FALSE);
+	}
+
+	/*
+	 * Build the list, pop it if all went well.
+	 */
+	*outseq = '"';
+	if (rec_seq(outseq + 1, outseq, keymap) == TRUE) {
+		wpopup(seqbuf);
+		mlerase();
+		return(TRUE);
+	}
+	return FALSE;
+}
+
+/*
+ * recursively track through the tree, finding the escape sequences
+ * and their function name equivalents.
+ */
+#if PROTO
+int PASCAL NEAR rec_seq(char *buf, char *bufstart, KEYENT *node)
+#else
+int PASCAL NEAR rec_seq( buf, bufstart, node)
+char *buf;
+char *bufstart;
+KEYENT *node;
+#endif
+{
+	if (node == NULL)
+		return TRUE;
+
+	*buf = node->ch;
+
+	if (node->nxtlvl == NULL) {
+		*(buf + 1) = '"';
+		*(buf + 2) = '\0';
+		pad(bufstart, 20);
+		cmdstr(node->code, bufstart + 20);
+		if (addline(seqbuf, bufstart) != TRUE)
+			return FALSE;
+	}
+	else if (rec_seq(buf + 1, bufstart, node->nxtlvl) != TRUE)
+		return FALSE;
+
+	return (rec_seq(buf, bufstart, node->samlvl));
+}
+
+/*
+ *  addkey  -  Add key to key map
+ *
+ *  Adds a new escape sequence to the sequence table.
+ *  I am not going to try to explain this table to you in detail.
+ *  However, in short, it creates a tree which can easily be transversed
+ *  to see if input is in a sequence which can be translated to a
+ *  function key (arrows and find/select/do etc. are treated like
+ *  function keys).  If the sequence is ambiguous or duplicated,
+ *  it is silently ignored.
+ *
+ *  Replaces code in SMG.C, MPE.C, POSIX.C, and UNIX.C
+ *  Nothing returned
+ *
+ *  seq - character sequence
+ *  fn  - Resulting keycode
+ */
+#if PROTO
+int PASCAL NEAR addkey(unsigned char * seq, int fn)
+#else
+int PASCAL NEAR addkey( seq, fn)
+unsigned char * seq;
+int fn;
+#endif
+{
+	int first;
+	KEYENT *cur, *nxtcur;
+
+	/* Skip on null sequences or single character sequences. */
+	if (seq == NULL || strlen(seq) < 2)
+		return FALSE;
+
+
+	/* If no keys defined, go directly to insert mode */
+	first = 1;
+	if (nxtkey != keymap) {
+
+		/* Start at top of key map */
+		cur = keymap;
+
+		/* Loop until matches are exhausted */
+		while (*seq) {
+
+			/* Do we match current character */
+			if (*seq == cur->ch) {
+
+				/* Advance to next level */
+				seq++;
+				cur = cur->nxtlvl;
+				first = 0;
+			} else {
+
+				/* Try next character on same level */
+				nxtcur = cur->samlvl;
+
+				/* Stop if no more */
+				if (nxtcur)
+					cur = nxtcur;
+				else
+					break;
+			}
+		}
+	}
+
+	/* Check for room in keymap */
+	if (strlen(seq) > NKEYSEQ - (nxtkey - keymap)) {
+		mlwrite("No more room for key entries.");
+		return FALSE;
+	}
+
+	/* If first character in sequence is inserted, add to prefix table */
+	if (first)
+		keyseq[*seq] = 1;
+
+	/* If characters are left over, insert them into list */
+	for (first = 1; *seq; first = 0) {
+
+		/* Make new entry */
+		nxtkey->ch = *seq++;
+		nxtkey->code = fn;
+
+		/* If root, nothing to do */
+		if (nxtkey != keymap) {
+
+			/* Set first to samlvl, others to nxtlvl */
+			if (first)
+				cur->samlvl = nxtkey;
+			else
+				cur->nxtlvl = nxtkey;
+		}
+
+		/* Advance to next key */
+		cur = nxtkey++;
+	}
+	return TRUE;
+}
+
+/*
+ * Cook input characters, using the key sequences stored by addkey().
+ *
+ * To use, we need a grabwait(), grabnowait(), qin() and qrep() function.
+ */
+#define TIMEOUT	255
+VOID cook()
+{
+	register unsigned char ch;
+	KEYENT *cur;
+
+	qin(ch = grabwait());	/* Get first character untimed */
+
+	/*
+	 * Skip if the key isn't a special leading escape sequence.
+	 */
+	if (keyseq[ch] == 0) {
+		/*
+		 * But if it is a '\0', make it a (0/1/32).
+		 */
+		if (ch == 0) {
+			qin(CTRL >> 8);	/* control */
+			qin(32);	/* space */
+		}
+		return;
+	}
+
+	/* Start at root of keymap */
+	cur = keymap;
+
+	/* Loop until keymap exhausts */
+	while (cur) {
+
+		/* Did we find a matching character */
+		if (cur->ch == ch) {
+
+			/* Is this the end */
+			if (cur->nxtlvl == NULL) {
+				/* Replace all characters with a new sequence */
+				qrep(cur->code);
+				return;
+			} else {
+				/* Advance to next level */
+				cur = cur->nxtlvl;
+
+				/* Get next character, timed */
+				ch = grabnowait();
+				if (ch == TIMEOUT)
+					return;
+
+				/* Queue character */
+				qin(ch);
+			}
+		} else
+			/* Try next character on same level */
+			cur = cur->samlvl;
+	}
+}
+#endif

@@ -1,9 +1,9 @@
 /*	NEDERLANDS.H:	Dutch language text strings for
-                        MicroEMACS 3.12
+                        MicroEMACS 4.00
 
 			Translated by Paul De Bra
 			debra@research.att.com          
-			(C)opyright 1993 by Daniel Lawrence
+			(C)opyright 1995 by Daniel Lawrence
 */
 
 #define	TEXT1	"[Opstarten nieuwe CLI]"
@@ -66,7 +66,7 @@
 #define	TEXT56	"Lijst van variabelen"
 #define	TEXT57	"Kan lijst van variabelen niet tonen"
 #define	TEXT58	"[Opbouwen lijst van variabelen]"
-#define	TEXT59	"[Rechter marge is %d]"
+#define	TEXT59	UNUSED
 #define	TEXT60	"Lijn %D/%D Kolom %d/%d Kar. %D/%D (%d%%) Kar. = 0x%x"
 #define	TEXT61	"<NOT USED>"
 #define	TEXT62	"Globale modus om "
@@ -89,8 +89,8 @@
 #define	TEXT79	"Niet gevonden"
 #define	TEXT80	"Geen patroon gezet"
 #define	TEXT81	"Zoek achterwaards "
-#define	TEXT82	"Beschouwen van %d met sprong %d"
-#define	TEXT83	"Het andere geval is %d"
+#define	TEXT82	UNUSED
+#define	TEXT83	UNUSED
 #define	TEXT84	"Vervang"
 #define	TEXT85	"Vervang voorwaardelijk"
 #define	TEXT86	"door "
@@ -99,7 +99,7 @@
 #define	TEXT89	"Onderbroken!"
 #define	TEXT90	"(Y)Ja, (N)ee, (!)Doe rest, (U)Ongedaan, (^G)Breek af, (.)Stop, (?)Help: "
 #define	TEXT91	"Leeg woord vervangen en gestopt."
-#define	TEXT92	"%d vervangingen"
+#define	TEXT92	"%D vervangingen"
 #define	TEXT93	"%%FOUT tijdens wegvegen"
 #define	TEXT94	"%%Geen geheugen meer"
 #define	TEXT95	"%%mceq: wat is %d?"
@@ -248,6 +248,8 @@
 #define TEXT246 "%%Need function key number"
 #define TEXT247 "%%Function key number out of range"
 #define	TEXT248 "Enter Label String: "
+#define TEXT249 "Global variable to declare: "
+#define	TEXT250 "Local variable to declare: "
 
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrect menu]"

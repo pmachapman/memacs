@@ -140,9 +140,8 @@ vt52beep()
 
 vt52open()
 {
-#if     V7 | BSD
+#if     BSD
         register char *cp;
-        char *getenv();
 
         if ((cp = getenv("TERM")) == NULL) {
                 puts(TEXT4);

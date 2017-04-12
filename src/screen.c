@@ -1,5 +1,5 @@
 /*	SCREEN.C:	Screen manipulation commands
-			for MicroEMACS 3.12
+			for MicroEMACS 4.00
 			written by Daniel Lawrence
 */
 
@@ -32,7 +32,7 @@ char *msg;
 #if	WINDOW_TEXT
 /* Redraw given screen and all screens behind it */
 
-void PASCAL NEAR refresh_screen(sp)
+VOID PASCAL NEAR refresh_screen(sp)
 
 SCREEN *sp;	/* screen image to refresh */
 
@@ -119,8 +119,8 @@ SCREEN *sp;	/* screen to dump */
 
 {
 	register int cmark;	/* mark ordinal index */
-	register WINDOW *wp;	/* ptr to window to free */
-	register WINDOW *tp;	/* temp window pointer */
+	register EWINDOW *wp;	/* ptr to window to free */
+	register EWINDOW *tp;	/* temp window pointer */
 
 	/* first, free the screen's windows */
 	wp = sp->s_first_window;
@@ -149,7 +149,7 @@ SCREEN *sp;	/* screen to dump */
 	free((char *) sp);
 }
 
-PASCAL NEAR unlist_screen(sp)
+int PASCAL NEAR unlist_screen(sp)
 
 SCREEN *sp;         /* screen to remove from the list */
 {
@@ -211,10 +211,10 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 	int cmark;		/* current mark to initialize */
 	SCREEN *sp;		/* pointer to allocated screen */
 	SCREEN *last_sp;	/* pointer to last screen */
-	WINDOW *wp;		/* ptr to first window of new screen */
+	EWINDOW *wp;		/* ptr to first window of new screen */
 
 	/* allocate memory for this screen */
-	sp = (SCREEN *)malloc(sizeof(SCREEN));
+	sp = (SCREEN *)room(sizeof(SCREEN));
 	if (sp == (SCREEN *)NULL)
 		return(sp);
 
@@ -241,8 +241,8 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 #endif
 
 	/* allocate its first window */
-	wp = (WINDOW *)malloc(sizeof(WINDOW));
-	if (wp == (WINDOW *)NULL) {
+	wp = (EWINDOW *)room(sizeof(EWINDOW));
+	if (wp == (EWINDOW *)NULL) {
 		free((char *)sp);
 		return((SCREEN *)NULL);
 	}
@@ -323,7 +323,7 @@ SCREEN *sp;	/* ptr to screen to switch to */
 int announce;	/* announce the selection? */
 
 {
-	WINDOW *temp_wp;	/* backup of current window ptr (curwp) */
+	EWINDOW *temp_wp;	/* backup of current window ptr (curwp) */
 	SCREEN *temp_screen;	/* temp ptr into screen list */
 
 	/* make sure there is something here to set to! */
@@ -339,7 +339,7 @@ int announce;	/* announce the selection? */
         curwp->w_flag |= WFMODE;
 #else
 	temp_wp = curwp;
-	curwp = (WINDOW *)NULL;
+	curwp = (EWINDOW *)NULL;
 	modeline(temp_wp);
 	updupd(TRUE);
 	curwp = temp_wp;
@@ -416,7 +416,7 @@ int f,n;	/* prefix flag and argument */
  * by the list screens command. Return TRUE
  * if everything works. Return FALSE if there
  * is an error (if there is no memory). Iflag
- * indecates weather to list hidden screens.
+ * indicates whether to list hidden screens.
  */
 PASCAL NEAR screenlist(iflag)
 
@@ -424,7 +424,7 @@ int iflag;	/* list hidden screen flag */
 
 {
 	SCREEN *sp;		/* ptr to current screen to list */
-	WINDOW *wp;		/* ptr into current screens window list */
+	EWINDOW *wp;		/* ptr into current screens window list */
 	int status;		/* return status from functions */
 	char line[NSTRING];	/* buffer to construct list lines */
 	char bname[NSTRING];	/* name of next buffer */

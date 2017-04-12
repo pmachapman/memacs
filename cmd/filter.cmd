@@ -1,5 +1,5 @@
 ;	FILTER.CMD:	Filter a change through a lot of files
-;			written for MicroEMACS 3.12
+;			written for MicroEMACS 4.0
 ;
 ;	This is one incredably usefull command file for filtering changes
 ;	in a large collection of files (Like all the MicroEMACS source files)
@@ -47,7 +47,7 @@
 		;query-replace-string is good to use for comfirmations
 		;replace-string lets it all run automatically!!
 	
-		query-replace-string "3\.[0-9][0-9]" "3.12"
+		query-replace-string "3\.[0-9][0-9]" "4.0"
 		beginning-of-file
 		replace-string "nsearch" "search"
 		beginning-of-file

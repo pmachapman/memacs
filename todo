@@ -1,3 +1,0 @@
--   need a new flag for commands to signify that a update of the
-    scroll bar is needed. This would be set in next/prev-window
-    as well as when reframing in display()

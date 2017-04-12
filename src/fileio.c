@@ -106,7 +106,7 @@ PASCAL NEAR ffclose()
 	putc(26, ffp);		/* add a ^Z at the end of the file */
 #endif
 	
-#if     V7 | USG | AUX | SMOS | HPUX8 | HPUX9 | SUN | XENIX | BSD | WMCS | VMS | (MSDOS & (LATTICE | MSC | DTL | TURBO | IC | ZTC)) | WINNT | OS2 | (TOS & MWC) | AVIION
+#if     USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | SUN | XENIX | BSD || FREEBSD | WMCS | VMS | (MSDOS & (LATTICE | MSC | TURBO | IC | ZTC)) | WINNT | OS2 | (TOS & MWC) | AVIION
         if (fclose(ffp) != FALSE) {
                 mlwrite(TEXT156);
 /*                      "Error closing file" */
@@ -138,7 +138,7 @@ int nbuf;
 	if (cryptflag) {
 	        for (i = 0; i < nbuf; ++i) {
 			c = buf[i];
-			crypt(&c, 1);
+			ecrypt(&c, 1);
 			putc(c, ffp);
 		}
 	} else
@@ -203,7 +203,7 @@ int *nbytes;
 
 	/* if we don't have an fline, allocate one */
 	if (fline == NULL)
-		if ((fline = malloc(flen = NSTRING)) == NULL)
+		if ((fline = room(flen = NSTRING)) == NULL)
 			return(FIOMEM);
 
 	/* read the line in */
@@ -217,7 +217,7 @@ int *nbytes;
 				return(FIOMEM);
 #endif
 			flen *= 2;
-			if ((fline = realloc(fline, flen)) == NULL) {
+			if ((fline = reroom(fline, flen)) == NULL) {
 			    return(FIOMEM);
 			}
 		}
@@ -250,7 +250,7 @@ int *nbytes;
         fline[i] = 0;
 #if	CRYPT
 	if (cryptflag)
-		crypt(fline, strlen(fline));
+		ecrypt(fline, strlen(fline));
 #endif
         return(FIOSUC);
 }
@@ -274,35 +274,3 @@ char *fname;		/* file to check for existance */
 	fclose(fp);
 	return(TRUE);
 }
-
-#if	AZTEC & MSDOS
-/*	a1getc:		Get an ascii char from the file input stream
-			but DO NOT strip the high bit
-*/
-
-#undef	getc
-
-int a1getc(fp)
-
-FILE *fp;
-
-{
-	int c;		/* translated character */
-
-	c = getc(fp);	/* get the character */
-
-	/* if its a <LF> char, throw it out  */
-	while (c == 10)
-		c = getc(fp);
-
-	/* if its a <RETURN> char, change it to a LF */
-	if (c == '\r')
-		c = '\n';
-
-	/* if its a ^Z, its an EOF */
-	if (c == 26)
-		c = EOF;
-
-	return(c);
-}
-#endif

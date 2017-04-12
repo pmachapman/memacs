@@ -1,5 +1,5 @@
 /*  BUFFER.C:	buffer mgmt. routines
-		MicroEMACS 3.12
+		MicroEMACS 4.00
 
  * Buffer management.
  * Some of the functions are internal,
@@ -71,13 +71,14 @@ PASCAL NEAR swbuffer(bp)	/* make buffer BP current */
 BUFFER *bp;
 
 {
-	register WINDOW *wp;
+	register EWINDOW *wp;
 	SCREEN *scrp;		/* screen to fix pointers in */
 	register int cmark;		/* current mark */
 
 	/* let a user macro get hold of things...if he wants */
 	execkey(&exbhook, FALSE, 1);
 
+	/* unuse the current buffer, saving window info to buffer struct */
 	if (--curbp->b_nwnd == 0) {		/* Last use.		*/
 		curbp->b_dotp  = curwp->w_dotp;
 		curbp->b_doto  = curwp->w_doto;
@@ -87,7 +88,12 @@ BUFFER *bp;
 		}
 		curbp->b_fcol  = curwp->w_fcol;
 	}
+
+	/* let time march forward! */
+	access_time++;
+
 	curbp = bp;				/* Switch.		*/
+	bp->last_access = access_time;
 	if (curbp->b_active != TRUE) {		/* buffer not active yet*/
 		/* read it in and activate it */
 		readin(curbp->b_fname, ((curbp->b_mode&MDVIEW) == 0));
@@ -216,7 +222,8 @@ register BUFFER *bp;
 {
 	register BUFFER *bp1;
 	register BUFFER *bp2;
-	register int	s;
+	register int result;
+	register PARG *tmp_arg;
 
 	/* we can not kill a displayed buffer */
 	if (bp->b_nwnd != 0) {
@@ -232,8 +239,22 @@ register BUFFER *bp;
 		return(FALSE);
 	}
 
-	if ((s=bclear(bp)) != TRUE)		/* Blow text away.	*/
-		return(s);
+	/* dump any arguments */
+	while (bp->b_args) {
+		tmp_arg = bp->b_args;
+		bp->b_args = bp->b_args->next;
+		free(tmp_arg);
+	}
+
+	/* if anything is bound to the buffer,
+	   unbind them */
+	unbind_buf(bp);
+
+	/* dump it's undo stack */
+	undo_zot(bp);
+
+	if ((result = bclear(bp)) != TRUE)	/* Blow text away.	*/
+		return(result);
 	free((char *) bp->b_linep);		/* Release header line. */
 	bp1 = NULL;				/* Find the header.	*/
 	bp2 = bheadp;
@@ -304,7 +325,7 @@ int f,n;	/* prefix flag and argument */
  * by the list buffers command. Return TRUE
  * if everything works. Return FALSE if there
  * is an error (if there is no memory). Iflag
- * indecates weather to list hidden buffers.
+ * indicates whether to list hidden buffers.
  */
 PASCAL NEAR makelist(iflag)
 
@@ -313,7 +334,6 @@ int iflag;	/* list hidden buffer flag */
 {
 	register char	*cp1;
 	register char	*cp2;
-	register int	c;
 	register BUFFER *bp;
 	register LINE	*lp;
 	register int	s;
@@ -327,8 +347,8 @@ int iflag;	/* list hidden buffer flag */
 		return(s);
 	strcpy(blistp->b_fname, "");
 	if (addline(blistp, TEXT30) == FALSE
-/*		    "ACTN   Modes       Size Buffer	   File" */
-	||  addline(blistp, "---- ---------  ------- --------------- ----") == FALSE)
+/*		    "ACTN   Modes        Size Buffer	   File" */
+	||  addline(blistp, "---- ----------- ------- --------------- ----") == FALSE)
 		return(FALSE);
 	bp = bheadp;				/* For all buffers	*/
 
@@ -400,7 +420,7 @@ int iflag;	/* list hidden buffer flag */
 			nbytes += (long)lused(lp)+1L;
 			lp = lforw(lp);
 		}
-		flong_asc(b, 7, nbytes); 	    /* 6 digit buffer size. */
+		flong_asc(b, 7, nbytes); 	    /* 7 digit buffer size. */
 		cp2 = &b[0];
 		while (*cp2)
 			*cp1++ = *cp2++;
@@ -411,11 +431,25 @@ int iflag;	/* list hidden buffer flag */
 		*cp1++ = ' ';			/* Gap. 		*/
 		cp2 = &bp->b_fname[0];		/* File name		*/
 		if (*cp2 != 0) {
-			while (cp1 < &line[40])
+			while (cp1 < &line[41])
 				*cp1++ = ' ';
 			while (*cp2)
 				*cp1++ = *cp2++;
 		}
+
+		if (dispundo) {
+			while (cp1 - line < 50)
+				*cp1++ = ' ';
+			flong_asc(b, 5, bp->last_access);
+			cp2 = &b[0];
+			while (*cp2)
+				*cp1++ = *cp2++;
+			flong_asc(b, 7, bp->undo_count);
+			cp2 = &b[0];
+			while (*cp2)
+				*cp1++ = *cp2++;
+		}
+
 		*cp1 = 0;	      /* Add to the buffer.   */
 		if (addline(blistp, line) == FALSE)
 			return(FALSE);
@@ -497,7 +531,7 @@ int bflag;		/* bit settings for a new buffer */
 	if (cflag != FALSE) {
 
 		/* allocate the needed memory */
-		if ((bp=(BUFFER *)malloc(sizeof(BUFFER))) == NULL)
+		if ((bp=(BUFFER *)room(sizeof(BUFFER))) == NULL)
 			return(NULL);
 		if ((lp=lalloc(0)) == NULL) {
 			free((char *) bp);
@@ -525,6 +559,9 @@ int bflag;		/* bit settings for a new buffer */
 		/* and set up the other buffer fields */
 		bp->b_topline = NULL;
 		bp->b_botline = NULL;
+		bp->undo_head = (UNDO_OBJ *)NULL;
+		bp->undo_count = 0L;
+		bp->last_access = access_time;
 		bp->b_active = TRUE;
 		bp->b_dotp  = lp;
 		bp->b_doto  = 0;
@@ -543,6 +580,8 @@ int bflag;		/* bit settings for a new buffer */
 #if	CRYPT
 		bp->b_key[0] = 0;
 #endif
+		bp->b_numargs = NOTPROC;
+		bp->b_args = (PARG *)NULL;
 		lp->l_fp = lp;
 		lp->l_bp = lp;
 	}
@@ -581,6 +620,7 @@ register BUFFER *bp;
 		bp->b_marko[cmark] = 0;
 	}
 	bp->b_fcol = 0;
+	undo_zot(bp);	/* discard undo info for this buffer! */
 	return(TRUE);
 }
 
@@ -589,8 +629,6 @@ PASCAL NEAR unmark(f, n)	/* unmark the current buffers change flag */
 int f, n;	/* unused command arguments */
 
 {
-	register WINDOW *wp;
-
 	/* unmark the buffer */
 	curbp->b_flag &= ~BFCHG;
 
@@ -599,3 +637,36 @@ int f, n;	/* unused command arguments */
 
 	return(TRUE);
 }
+
+BUFFER *PASCAL NEAR getoldb()	/* get the most ancient visited buffer */
+
+{
+	BUFFER *bp;	/* current buffer */
+	BUFFER *old_bp;	/* ptr to oldest buffer */
+	long old_count;	/* oldest count */
+
+	/* Find the next buffer, which will be the default */
+	bp = bheadp;
+	old_bp = (BUFFER *)NULL;
+	old_count = 0;
+
+	/* Scan the buffer list */
+	while (bp) {
+
+		/* if this one is older..... */
+		if ((bp->last_access > 0L) &&
+		    ((old_bp == (BUFFER *)NULL) ||
+		     (bp->last_access < old_count))) {
+
+			/* record this as the oldest buffer */
+			old_bp = bp;
+			old_count = bp->last_access;
+		}
+
+		/* on to the next buffer in the list */
+		bp = bp->b_bufp;
+	}
+
+	return(old_bp);
+}
+

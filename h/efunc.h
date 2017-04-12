@@ -16,7 +16,11 @@
 
 NOSHARE NBIND	names[] = {
 	{"abort-command",		ctrlg},
+	{"add-abbrev",			add_abbrev},
 	{"add-global-mode",		setgmode},
+#if UNIX || (VMS && SMG) || MPE
+	{"add-keymap",			addkeymap},
+#endif
 	{"add-mode",			setmod},
 	{"append-file",			fileapp},
 	{"apropos",			apro},
@@ -58,6 +62,8 @@ NOSHARE NBIND	names[] = {
 #endif
 	{"cycle-ring",			cycle_ring},
 	{"cycle-screens",		cycle_screens},
+	{"define-abbrevs",		def_abbrevs},
+	{"delete-abbrev",		del_abbrev},
 	{"delete-blank-lines",		deblank},
 	{"delete-buffer",		killbuffer},
 	{"delete-global-mode",		delgmode},
@@ -69,19 +75,15 @@ NOSHARE NBIND	names[] = {
 	{"delete-previous-character",	backdel},
 	{"delete-previous-word",	delbword},
 	{"delete-screen",		delete_screen},
+	{"delete-undos",		undo_delete},
 	{"delete-window",		delwind},
+	{"describe-abbrevs",		desc_abbrevs},
 	{"describe-bindings",		desbind},
-#if	DEBUGM
 	{"describe-functions",		desfunc},
-#endif
 	{"describe-key",		deskey},
-#if	DEBUGM
 	{"describe-variables",		desvars},
-#endif
 	{"detab-region",		detab},
-#if	DEBUGM
 	{"display",			dispvar},
-#endif
 	{"end-macro",			ctlxrp},
 	{"end-of-file",			gotoeob},
 	{"end-of-line",			gotoeol},
@@ -92,46 +94,6 @@ NOSHARE NBIND	names[] = {
 	{"execute-command-line",	execcmd},
 	{"execute-file",		execfile},
 	{"execute-macro",		ctlxe},
-	{"execute-macro-1",		cbuf1},
-	{"execute-macro-10",		cbuf10},
-	{"execute-macro-11",		cbuf11},
-	{"execute-macro-12",		cbuf12},
-	{"execute-macro-13",		cbuf13},
-	{"execute-macro-14",		cbuf14},
-	{"execute-macro-15",		cbuf15},
-	{"execute-macro-16",		cbuf16},
-	{"execute-macro-17",		cbuf17},
-	{"execute-macro-18",		cbuf18},
-	{"execute-macro-19",		cbuf19},
-	{"execute-macro-2",		cbuf2},
-	{"execute-macro-20",		cbuf20},
-	{"execute-macro-21",		cbuf21},
-	{"execute-macro-22",		cbuf22},
-	{"execute-macro-23",		cbuf23},
-	{"execute-macro-24",		cbuf24},
-	{"execute-macro-25",		cbuf25},
-	{"execute-macro-26",		cbuf26},
-	{"execute-macro-27",		cbuf27},
-	{"execute-macro-28",		cbuf28},
-	{"execute-macro-29",		cbuf29},
-	{"execute-macro-3",		cbuf3},
-	{"execute-macro-30",		cbuf30},
-	{"execute-macro-31",		cbuf31},
-	{"execute-macro-32",		cbuf32},
-	{"execute-macro-33",		cbuf33},
-	{"execute-macro-34",		cbuf34},
-	{"execute-macro-35",		cbuf35},
-	{"execute-macro-36",		cbuf36},
-	{"execute-macro-37",		cbuf37},
-	{"execute-macro-38",		cbuf38},
-	{"execute-macro-39",		cbuf39},
-	{"execute-macro-4",		cbuf4},
-	{"execute-macro-40",		cbuf40},
-	{"execute-macro-5",		cbuf5},
-	{"execute-macro-6",		cbuf6},
-	{"execute-macro-7",		cbuf7},
-	{"execute-macro-8",		cbuf8},
-	{"execute-macro-9",		cbuf9},
 	{"execute-named-command",	namedcmd},
 	{"execute-procedure",		execproc},
 	{"execute-program",		execprg},
@@ -141,6 +103,7 @@ NOSHARE NBIND	names[] = {
 	{"find-file",			filefind},
 	{"find-screen",			find_screen},
 	{"forward-character",		forwchar},
+	{"global",			global_var},
 	{"goto-line",			gotoline},
 	{"goto-mark",			gotomark},
 	{"goto-matching-fence",		getfence},
@@ -157,12 +120,14 @@ NOSHARE NBIND	names[] = {
 	{"incremental-search",		fisearch},
 #endif
 	{"indent-region",		indent_region},
+	{"insert-abbrevs",		ins_abbrevs},
 #if	WINDOW_MSWIN
 	{"insert-clip", 		insertclip},
 #endif
 	{"insert-file",			insfile},
 	{"insert-space",		insspace},
 	{"insert-string",		istring},
+	{"kill-abbrevs",		kill_abbrevs},
 	{"kill-paragraph",		killpara},
 	{"kill-region",			killregion},
 	{"kill-to-end-of-line",		killtext},
@@ -170,7 +135,12 @@ NOSHARE NBIND	names[] = {
 	{"label-function-key",		fnclabel},
 #endif
 	{"list-buffers",		listbuffers},
+#if UNIX || (VMS && SMG) || MPE
+	{"list-keymappings",		listkeymaps},
+#endif
 	{"list-screens",		list_screens},
+	{"list-undos",			undo_list},
+	{"local",			local_var},
 	{"macro-to-key",		macrotokey},
 #if	WINDOW_MSWIN
 	{"macro-to-menu",		macrotomenu},
@@ -242,16 +212,14 @@ NOSHARE NBIND	names[] = {
 #if	CRYPT
 	{"set-encryption-key",		setekey},
 #endif
-	{"set-fill-column",		setfillcol},
 	{"set-mark",			setmark},
 	{"shell-command",		spawn},
 	{"show-files",			showfiles},
 	{"shrink-window",		shrinkwind},
 	{"source",			execfile},
 	{"split-current-window",	splitwind},
-	{"store-macro",			storemac},
 	{"store-procedure",		storeproc},
-#if	BSD || VMS || SUN || HPUX8 || HPUX9 || AVIION
+#if	BSD || FREEBSD || VMS || SUN || HPUX8 || HPUX9 || AVIION
 	{"suspend-emacs",		bktoshell},
 #endif
 #if	CTAGS
@@ -267,6 +235,7 @@ NOSHARE NBIND	names[] = {
 	{"unbind-menu", 		unbindmenu},
 #endif
 	{"undent-region",		undent_region},
+	{"undo",			undo},
 	{"universal-argument",		unarg},
 	{"unmark-buffer",		unmark},
 	{"update-screen",		upscreen},

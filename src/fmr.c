@@ -1,6 +1,6 @@
 /*	FMR.C:	Fujitsu FMR series Driver
- *		for MicroEMACS 3.12
- *		(C)Copyright 1993 by Daniel M. Lawrence
+ *		for MicroEMACS 4.00
+ *		(C)Copyright 1995 by Daniel M. Lawrence
  *
  *	Note that this driver relies on GDS.SYS being loaded!
  */

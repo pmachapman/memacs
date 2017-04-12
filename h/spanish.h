@@ -1,7 +1,7 @@
 /*	SPANISH.H:	Spanish language text strings for
-                        MicroEMACS 3.12
+                        MicroEMACS 4.00
 
-			(C)opyright 1993 by Daniel Lawrence
+			(C)opyright 1995 by Daniel Lawrence
 			Translated by Jose Berrios
 */
 
@@ -63,7 +63,7 @@
 #define	TEXT56	"Lista de variables"
 #define	TEXT57	"No puedo ensenar la lista de variables"
 #define	TEXT58	"[Creando lista de variables]"
-#define	TEXT59	"[La columna para llenar es %d]"
+#define	TEXT59	UNUSED
 #define	TEXT60	"Linea %D/%D Columna %d/%d Letra %D/%D (%d%%) Letra = 0x%x"
 #define	TEXT61	"<NOT USED>"
 #define	TEXT62	"Modo global a"
@@ -86,8 +86,8 @@
 #define	TEXT79	"No aparece"
 #define	TEXT80	"No pattern set"
 #define	TEXT81	"Buscar en reversa "
-#define	TEXT82	"Considerar %d con un brinco %d"
-#define	TEXT83	"Su otro caso es %d"
+#define	TEXT82	UNUSED
+#define	TEXT83	UNUSED
 #define	TEXT84	"Renplasa"
 #define	TEXT85	"Query replace"
 #define	TEXT86	"con "
@@ -96,7 +96,7 @@
 #define	TEXT89	"Aborted!"
 #define	TEXT90	"(Y)es, (N)o, (!)Do rest, (U)ndo last, (^G)Abort, (.)Abort back, (?)Help: "
 #define	TEXT91	"Empty string replaced, stopping."
-#define	TEXT92	"%d substituciones"
+#define	TEXT92	"%D substituciones"
 #define	TEXT93	"%%ERROR mientras borrando"
 #define	TEXT94	"%%Fuera de memoria"
 #define	TEXT95	"%%mceq: que es %d?"
@@ -245,6 +245,8 @@
 #define TEXT246 "%%Need function key number"
 #define TEXT247 "%%Function key number out of range"
 #define	TEXT248 "Enter Label String: "
+#define TEXT249 "Global variable to declare: "
+#define	TEXT250 "Local variable to declare: "
 
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrect menu]"

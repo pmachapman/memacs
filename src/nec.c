@@ -1,6 +1,6 @@
 /*	NEC:	NEC PC-9801vm driver for
-		MicroEMACS 3.12
-		(C)Copyright 1993 by Daniel M. Lawrence
+		MicroEMACS 4.00
+		(C)Copyright 1995 by Daniel M. Lawrence
 */
 
 #define	termdef	1			/* don't define term external */

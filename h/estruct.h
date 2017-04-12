@@ -1,7 +1,7 @@
 /*	ESTRUCT:	Structure and preprocesser defined for
-			MicroEMACS 3.12
+			MicroEMACS 4.00
 
-			(C)Copyright 1993 by Daniel Lawrence
+			(C)Copyright 1995 by Daniel Lawrence
 			written by Daniel Lawrence
 			based on code by Dave G. Conroy,
 				Steve Wilhite and George Jones
@@ -35,7 +35,7 @@
 */
 
 #define PROGNAME	"MicroEMACS"
-#define VERSION 	"3.12"
+#define VERSION 	"4.00"
 
 /*	Machine/OS definitions			*/
 /*	[Set one of these!!]			*/
@@ -43,9 +43,11 @@
 #define AMIGA	0			/* AmigaDOS			*/
 #define AOSVS	0			/* Data General AOS/VS		*/
 #define AUX     0                       /* Apple UNIX for Macintosh     */
+#define AIX     0                       /* IBM UNIX for various machines*/
 #define AVIION	0			/* Data General AViiON		*/
 #define BSD	0			/* UNIX BSD 4.2 and ULTRIX	*/
 #define FINDER	0			/* Macintosh OS 		*/
+#define	FREEBSD	0			/* FREEBSD 386 version 2 or +	*/
 #define HPUX8	0			/* HPUX HP 9000 ver 8 or less	*/
 #define HPUX9	0			/* HPUX HP 9000 ver 9           */
 #define MPE	0			/* HP MPE/XL			*/
@@ -56,7 +58,6 @@
 #define SUN	0			/* SUN v4.0			*/
 #define TOS	0			/* ST520, TOS			*/
 #define USG	0			/* UNIX system V		*/
-#define V7	0			/* V7 UNIX or Coherent or BSD4.2*/ 
 #define VMS	0			/* VAX/VMS			*/
 #define WMCS	0			/* Wicat's MCS			*/
 #define XENIX	0			/* IBM-PC SCO XENIX		*/
@@ -64,9 +65,8 @@
 /*	Compiler definitions			*/
 /*	[Set one of these!!]			*/
 #define ALCYON	0	/* ALCYON Atari ST compiler */ 
-#define AZTEC	0	/* Aztec C 3.20e */
+#define AZTEC	0	/* Aztec C 4.00e ONLY for the amiga now... */
 #define DGC	0	/* Data General AOS/VS C... */
-#define DTL	0	/* DataLight C v3.12 */
 #define GCC	0	/* the GNU C compiler */
 #define IC	0	/* Rational Systems Instant C */
 #define LATTICE 0	/* Lattice 2.14 through 3.0 compilers */
@@ -83,16 +83,11 @@
 
 #define STACK_GROWS_UP	0
 
-/*	Rational Systems, Inc DOS/16M dos extender allows MicroEMACS
-	to run in Protected Mode under MSDOS. It has a few special
-	requirements.							*/
-
-#define	DOS16M	0
-
 /*	Debugging options	*/
-#define RAMSIZE 0	/* dynamic RAM memory usage tracking */
-#define RAMSHOW 0	/* auto dynamic RAM reporting */
-#define RAMTRCK 0	/* send debug info to MALLOC.DAT */
+#define RAMSIZE		0	/* dynamic RAM memory usage tracking */
+#define RAMSHOW		0	/* auto dynamic RAM reporting */
+#define RAMTRCK		0	/* send debug info to MALLOC.DAT */
+#define DEBUG_SEARCH	0	/* pop some search info on patterns */
 
 /*   Special keyboard/network definitions	     */
 
@@ -126,13 +121,13 @@
 #define TERMCAP 0			/* Use TERMCAP			*/
 #define TIPC	0			/* TI Profesional PC driver	*/
 #define VT52	0			/* VT52 terminal (Zenith).	*/
+#define NTCON	0			/* Windows NT console		*/
+#define	XVT	0			/* XVT windowing system		*/
 #define Z309	0			/* Zenith 100 PC family driver	*/
-#define WINNTCON 0			/* Windows NT console		*/
 
 /*	Windowing system style (pick one)				*/
 
 #define WINDOW_TEXT	1		/* [default] Text mode		*/
-#define WINDOW_XVT	0		/* using XVT/any platform	*/
 #define WINDOW_MSWIN	0		/* MicroSoft Windows		*/
 #define WINDOW_MSWIN32	0		/* MicroSoft Windows 32 bit API */
 #define WINDOW_X	0		/* X/Unix			*/
@@ -151,7 +146,6 @@
 /*	Configuration options	*/
 
 #define TYPEAH	1	/* type ahead causes update to be skipped	*/
-#define DEBUGM	1	/* $debug triggers macro debugging		*/
 #define LOGFLG	0	/* send all executed commands to EMACS.LOG	*/
 #define VISMAC	0	/* update display during keyboard macros	*/
 #define CTRLZ	0	/* add a ^Z at end of files under MSDOS only	*/
@@ -161,16 +155,21 @@
 #define REVSTA	1	/* Status line appears in reverse video 	*/
 #define COLOR	1	/* color commands and windows			*/
 
-#define FILOCK	1	/* file locking under unix BSD 4.2		*/
+#define FILOCK	0	/* file locking under unix BSD 4.2		*/
 #define ISRCH	1	/* Incremental searches like ITS EMACS		*/
 #define FLABEL	0	/* function key label code [HP150]		*/
 #define CRYPT	1	/* file encryption enabled?			*/
 #define MAGIC	1	/* include regular expression matching? 	*/
 #define MOUSE	1	/* Include routines for mouse actions		*/
 #define NOISY	1	/* Use a fancy BELL if it exists		*/
-#define CTAGS	0	/* include vi-like tagging?			*/
+#define CTAGS	1	/* include vi-like tagging?			*/
 #define SPEECH	0	/* spoken EMACS, for the sight impared [not ready] */
 #define VARARG	1	/* use varargs.h for mlwrite()			*/
+
+#if	XVT
+#undef	COLOR
+#define	COLOR	1	/* overide this to be TRUE for XVT always	*/
+#endif
 
 /*	Character set options		*/
 /*	[Set one of these!!]		*/
@@ -189,15 +188,21 @@
 #define VOID
 #define NOSHARE $low32k $align(1)   /* attempt to optimize read/write vars. */
 #else
-#if	__STDC__ || MSC || TURBO || DTL || GCC
+
+#if	__STDC__ || MSC || TURBO || GCC || (AMIGA && LATTICE)
 #define CONST	const
 #define VOID	void
 #define NOSHARE
 #else
 #define CONST
+#if	IC
+#define	VOID	void
+#else
 #define VOID
+#endif
 #define NOSHARE
 #endif
+
 #endif
 #endif
 
@@ -217,9 +222,17 @@
 #define INSDEL	0
 #endif
 
+/*	Can we catch the SIGWINCH (the window size change signal)? */
+
+#if AIX || HPUX9
+#define HANDLE_WINCH	1
+#else
+#define HANDLE_WINCH	0
+#endif
+
 /*	Prototypes in use?	*/
 
-#if	MSC || TURBO || IC || DTL || VMS || GCC || ZTC
+#if	MSC || TURBO || IC || VMS || GCC || ZTC
 #define PROTO	1
 #else
 #define PROTO	0
@@ -228,7 +241,7 @@
 /*	the following define allows me to initialize unions...
 	otherwise we make them structures (like the keybinding table)  */
 
-#if	__STDC__ || MSC || TURBO || IC || DTL || ZTC
+#if	__STDC__ || MSC || TURBO || IC || ZTC
 #define ETYPE	union
 #else
 #define ETYPE	struct
@@ -261,7 +274,7 @@
 #endif
 #undef  VOID    /* windows.h will wind up defining this */
 #include <windows.h>    /* --------- Huge include file here !!! ---------*/
-#if     WINNTCON
+#if     NTCON
 #include <wincon.h>
 #include <stdio.h>
 #include <dos.h>
@@ -387,10 +400,6 @@ struct SREGS {
 };
 #endif
 
-#if	MSDOS & DTL
-#include	<dos.h>
-#endif
-
 #if	MSDOS & MWC
 #include	<dos.h>
 #define int86(a, b, c)	intcall(b, c, a)
@@ -420,6 +429,7 @@ union REGS {
 #define peek(a,b,c,d)	movedata(a,b,FP_SEG(c),FP_OFF(c),d)
 #define poke(a,b,c,d)	movedata(FP_SEG(c),FP_OFF(c),a,b,d)
 #define movmem(a, b, c) 	memcpy(b, a, c)
+#define _strrev(a)	strrev(a)
 #endif
 
 #if	MSDOS & LATTICE
@@ -430,7 +440,7 @@ union REGS {
 #endif
 
 /* System V doesn't name this the same as others */
-#if	USG | AUX | SUN | (OS2 & MSC)
+#if	USG | AIX | AUX | SUN | (OS2 & MSC)
 #define movmem(a, b, c) 	memcpy(b, a, c)
 #endif
 
@@ -453,7 +463,7 @@ union REGS {
 #define MEMMAP	0
 #endif
 
-#if	MSDOS | WINNT | OS2 | V7 | USG | AUX | SMOS | HPUX8 | HPUX9 | BSD | (TOS & MWC) | WMCS | SUN | MPE
+#if	MSDOS | WINNT | OS2 | USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | BSD | FREEBSD | (TOS & MWC) | WMCS | SUN | MPE
 #define ENVFUNC 1
 #else
 #define ENVFUNC 0
@@ -472,16 +482,16 @@ union REGS {
 #if	TOS || MSDOS || WINNT || OS2
 #define DIRSEPSTR	"\\"
 #define DIRSEPCHAR	'\\'
+#define DRIVESEPCHAR	':'
 #else
 #define DIRSEPSTR	"/"
 #define DIRSEPCHAR	'/'
+#define DRIVESEPCHAR	'\0'
 #endif
 #endif
-
-#define DRIVESEPCHAR	':'
 
 #if	VARARG
-#if	(GCC == 0) && (USG || AUX || BSD || SUN || XENIX || HPUX8 || HPUX9 || AVIION || MPE)
+#if	(GCC == 0) && (USG || AIX || AUX || BSD || FREEBSD || SUN || XENIX || HPUX8 || HPUX9 || AVIION || MPE)
 #define VARG	1
 #define SARG	0
 #include	<varargs.h>
@@ -501,19 +511,20 @@ union REGS {
 
 #define GFREAD	1	/* read first file in at startup */
 #define GFSDRAW 2	/* suppress a screen redraw */
+#define	GFEXIT	4	/* exit from emacs pending */
 
 /*	internal constants	*/
 
 #define NBINDS	300			/* max # of bound keys		*/
-#if	AOSVS | VMS | WINNT | SUN | BSD | V7 | ZENIX | OS2
+#if	AOSVS | VMS | WINNT | SUN | BSD | FREEBSD | USG | ZENIX | HPUX8 | HPUX9 | OS2
 #define NFILEN	256
 #else
 #define NFILEN	80			/* # of bytes, file name	*/
 #endif
-#define NBUFN	32			/* # of bytes, buffer name	*/
+#define NBUFN	128			/* # of bytes, buffer name	*/
 #define NLINE	256			/* # of bytes, input line	*/
 #define NSTRING 128			/* # of bytes, string buffers	*/
-#define NKBDM	256			/* # of strokes, keyboard macro */
+#define NKBDM	4096			/* # of strokes, keyboard macro */
 #define NPAT	128			/* # of bytes, pattern		*/
 #define HUGE	1000			/* Huge number			*/
 #define NLOCKS	256			/* max # of file locks active	*/
@@ -521,8 +532,10 @@ union REGS {
 #define KBLOCK	250			/* sizeof kill buffer chunks	*/
 #define NRING	16			/* # of buffers in kill ring	*/
 #define NBLOCK	16			/* line block chunk size	*/
-#define NVSIZE	10			/* max #chars in a var name	*/
+#define NVSIZE	16			/* max #chars in a var name	*/
 #define NMARKS	16			/* number of marks		*/
+#define	MAXSYM	32			/* max # chars in symbol to expand */
+#define MINFLEN 3			/* min # chars to match &func	*/
 
 #define CTRL	0x0100		/* Control flag, or'ed in		*/
 #define META	0x0200		/* Meta flag, or'ed in			*/
@@ -547,7 +560,7 @@ union REGS {
 #define FALSE	0			/* False, no, bad, etc. 	*/
 #define TRUE	1			/* True, yes, good, etc.	*/
 #define ABORT	2			/* Death, ^G, abort, etc.	*/
-#define FAILED	3			/* not-quite fatal false return */
+#define FAILD	3			/* not-quite fatal false return */
 
 #define STOP	0			/* keyboard macro not in use	*/
 #define PLAY	1			/*		  playing	*/
@@ -610,7 +623,7 @@ union REGS {
 #define BELL	0x07			/* a bell character		*/
 #define TAB	0x09			/* a tab character		*/
 
-#if	V7 | USG | AUX | SMOS | HPUX8 | HPUX9 | BSD | SUN | XENIX | AVIION
+#if	USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | BSD | FREEBSD | SUN | XENIX | AVIION
 #define PATHCHR ':'
 #else
 #if	WMCS || MPE
@@ -675,6 +688,44 @@ union REGS {
 #define FILENAMEREPLY(p,b,nb)   mlreply(p,b,nb)
 #endif
 
+/* formal parameters to procedures are stored as a linked list
+   of argument names using the following simple structure:
+*/
+
+typedef struct PARG {
+	struct PARG *next;	/* ptr to next linked argument */
+	char name[NVSIZE+1];	/* name of the argument */
+} PARG;
+
+/* UNDO definitions and types */
+
+typedef int OPTYPE;	/* type of operation being recorded/played back */
+
+#define	OP_CMND		1	/* beginning of command */
+#define	OP_DELC		2	/* delete a single character */
+#define	OP_INSC		3	/* insert a single character */
+#define OP_DSTR		4	/* delete a string of characters */
+#define	OP_ISTR		5	/* insert a string of characters */
+#define	OP_REPC		6	/* replace a character */
+#define	OP_CPOS		7	/* set the cursor position */
+
+/* object to be undone! */
+
+typedef union OBJECT {
+	char obj_char;		/* a character */
+	char obj_string[1];	/* many characters */
+	char *obj_sptr;		/* a ptr to a character */
+} OBJECT;
+
+typedef struct UNDO_OBJ {
+	struct UNDO_OBJ *next;	/* ptr to next undo object */
+	OPTYPE type;		/* type of operation */
+	long line_num;		/* line offset from buffer beginning */
+	int offset;		/* offset into that line */
+	long count;		/* repetitions? */
+	OBJECT undo_obj;	/* object to be undone */
+} UNDO_OBJ;
+
 /*
  * There is a window structure allocated for every active display window. The
  * windows are kept in a big list, in top to bottom screen order, with the
@@ -684,8 +735,8 @@ union REGS {
  * the full blown redisplay is just too expensive to run for every input
  * character.
  */
-typedef struct	WINDOW {
-	struct	WINDOW *w_wndp; 	/* Next window			*/
+typedef struct	EWINDOW {
+	struct	EWINDOW *w_wndp; 	/* Next window			*/
 	struct	BUFFER *w_bufp; 	/* Buffer displayed in window	*/
 	struct	LINE *w_linep;		/* Top line in the window	*/
 	struct	LINE *w_dotp;		/* Line containing "."		*/
@@ -701,7 +752,7 @@ typedef struct	WINDOW {
 	char	w_bcolor;		/* current background color	*/
 #endif
 	int	w_fcol; 		/* first column displayed	*/
-}	WINDOW;
+}	EWINDOW;
 
 #define WFFORCE 0x01			/* Window needs forced reframe	*/
 #define WFMOVE	0x02			/* Movement from line to line	*/
@@ -755,8 +806,8 @@ typedef struct	VIDEO {
 
 typedef struct SCREEN {
 	struct SCREEN *s_next_screen;	/* link to next screen in list */
-	WINDOW *s_first_window; 	/* head of linked list of windows */
-	WINDOW *s_cur_window;		/* current window in this screen */
+	EWINDOW *s_first_window; 	/* head of linked list of windows */
+	EWINDOW *s_cur_window;		/* current window in this screen */
 	char *s_screen_name;		/* name of the current window */
 	short s_roworg; 		/* row origin of stored screen */
 	short s_colorg; 		/* column origin of stored screen */
@@ -779,6 +830,8 @@ typedef struct SCREEN {
  * the header line in "b_linep".  Buffers may be "Inactive" which means the
  * files associated with them have not been read in yet.  These get read in
  * at "use buffer" time.
+ * Some buffers are really procedures and have a little extra information
+ * stored with them.
  */
 typedef struct	BUFFER {
 	struct	BUFFER *b_bufp; 	/* Link to next BUFFER		*/
@@ -798,8 +851,13 @@ typedef struct	BUFFER {
 	char	b_fname[NFILEN];	/* File name			*/
 	char	b_bname[NBUFN]; 	/* Buffer name			*/
 #if	CRYPT
-	char   b_key[NPAT];	       /* current encrypted key        */
+	char   b_key[NPAT];		/* current encrypted key        */
 #endif
+	int b_numargs;			/* number of arguments to procedure */
+	PARG *b_args;			/* ptr to the first argument	*/
+	UNDO_OBJ *undo_head;		/* head of undo stack for buffer */
+	long undo_count;		/* # of undo operations stacked */
+	long last_access;		/* time of last access		*/
 }	BUFFER;
 
 #define BFINVS	0x01			/* Internal invisable buffer	*/
@@ -807,8 +865,10 @@ typedef struct	BUFFER {
 #define BFTRUNC 0x04			/* buffer was truncated when read */
 #define BFNAROW 0x08			/* buffer has been narrowed	*/
 
+#define	NOTPROC	-1			/* buffer is not a procedure */
+
 /*	mode flags	*/
-#define NUMMODES	10	       /* # of defined modes	       */
+#define NUMMODES	11	       /* # of defined modes	       */
 
 #define MDWRAP	0x0001			/* word wrap			*/
 #define MDCMOD	0x0002			/* C indentation and fence match*/
@@ -820,6 +880,7 @@ typedef struct	BUFFER {
 #define MDCRYPT 0x0080			/* encrytion mode active	*/
 #define MDASAVE 0x0100			/* auto-save mode		*/
 #define MDREPL	0x0200			/* replace mode 		*/
+#define MDABBR	0x0400			/* abbreviation expansion mode	*/
 
 /*
  * The starting position of a region, and the size of the region in
@@ -848,11 +909,44 @@ typedef struct	LINE {
 
 #define lforw(lp)	((lp)->l_fp)
 #define lback(lp)	((lp)->l_bp)
+#if UNIX && (SUN || HPUX8 || HPUX9 || BSD || FREEBSD)
+#define lgetc(lp, n)	((unsigned char)(lp)->l_text[(n)])
+#else
 #define lgetc(lp, n)	((lp)->l_text[(n)])
+#endif
 #define lputc(lp, n, c) ((lp)->l_text[(n)]=(c))
 #define lused(lp)	((lp)->l_used)
 #define lsize(lp)	((lp)->l_size)
 #define ltext(lp)	((lp)->l_text)
+
+/*	This structure is used to hold a user variables name and its
+	current value. These are used for both the global and the
+	local symbol tables.
+*/
+
+typedef struct UVAR {
+	char u_name[NVSIZE + 1];	       /* name of user variable */
+	char *u_value;				/* value (string) */
+} UVAR;
+
+#define	VT_NONE		0	/* don't declare it if not found */
+#define	VT_LOCAL	1	/* local to the current procedure */
+#define	VT_GLOBAL	2	/* global to all procedures */
+
+/*	A UTABLE is a user variable table.... containing some header
+	information and an array of user variable names and definitions.
+	They are held together in a linked list, the last member of
+	the list being the global user variable table.
+*/
+
+typedef struct UTABLE {
+	struct UTABLE *next;	/* ptr to next user variable table */
+	int size;		/* max number of variables in table */
+	BUFFER *bufp;		/* ptr to buffer holding procedure
+				   assosiated with this symbol table. */
+	UVAR uv[1];		/* list of variable names/definitions
+				   in this variable table */
+} UTABLE;
 
 /*
  * The editor communicates with the display using a high level interface. A
@@ -1012,8 +1106,9 @@ typedef struct KILL {
 */
 
 typedef struct VDESC {
-	int v_type;    /* type of variable */
+	int v_type;	/* type of variable */
 	int v_num;	/* ordinal pointer to variable in list */
+	UTABLE *v_ut;	/* ptr to appropriate user table if user var */
 } VDESC;
 
 /*	The !WHILE directive in the execution language needs to
@@ -1032,12 +1127,34 @@ typedef struct WHBLOCK {
 #define BTWHILE 	1
 #define BTBREAK 	2
 
+/*	Abbreviations are short symbols that expand to longer strings
+	when typed into a buffer with no intervening whitespace or commands.
+	This structure grows dynamically as needed.
+*/
+
+typedef struct ABBREV {
+	struct ABBREV *ab_next;		/* pointer to the next abbreviation */
+	char ab_sym[MAXSYM + 1];	/* name to expand */
+	char ab_exp[1];			/* string to expand to */
+} ABBREV;
+
+/* Search definitions... */
 
 /* HICHAR - 1 is the largest character we will deal with.
  * BMAPSIZE represents the number of bytes in the bitmap.
  */
 #define HICHAR		256
 #define BMAPSIZE	HICHAR >> 3
+
+/*
+ * Jump table structures.
+ */
+typedef struct {
+	int	jump;
+	int	patlen;
+	int	delta[HICHAR];
+	char	patrn[NPAT];
+} DELTA;
 
 #if	MAGIC
 /*
@@ -1046,17 +1163,20 @@ typedef struct WHBLOCK {
  * and replace metachar-arrays.
  */
 #define MCNIL		0	/* Like the '\0' for strings.*/
-#define LITSTRING	1	/* Literal string.*/
-#define LITCHAR 	2	/* Literal character.*/
-#define ANY		3	/* Any character but the <NL>.*/
-#define CCL		4
-#define NCCL		5
-#define BOL		6
-#define EOL		7
-#define GRPBEG		8	/* Signal start of group.*/
-#define GRPEND		9	/* Signal end of group.*/
-#define GROUP		10	/* String of group match.*/
-#define DITTO		11	/* Replacement with match string.*/
+#define JMPTABLE	1
+#define LITSTRING	2	/* Literal string.*/
+#define LITCHAR 	3	/* Literal character.*/
+#define ANY		4	/* Any character but the <NL>.*/
+#define CCL		5
+#define NCCL		6
+#define BOL		7
+#define EOL		8
+#define BOWRD		9
+#define EOWRD		10
+#define GRPBEG		11	/* Signal start of group.*/
+#define GRPEND		12	/* Signal end of group.*/
+#define GROUP		13	/* String of group match.*/
+#define DITTO		14	/* Replacement with match string.*/
 
 #define CLOSURE 	0x0100	/* An or-able value for a closure modifier.*/
 #define CLOSURE_1	0x0200	/* An or-able value for a closure modifier.*/
@@ -1078,6 +1198,8 @@ typedef struct WHBLOCK {
 #define MC_DITTO	'&'	/* Use matched string in replacement.*/
 #define MC_GRPBEG	'('	/* Start of group (begun with a backslash).*/
 #define MC_GRPEND	')'	/* End of group (begun with a backslash).*/
+#define MC_BOWRD	'<'	/* Beginning of word (begun with a backslash).*/
+#define MC_EOWRD	'>'	/* End of word (begun with a backslash).*/
 #define MC_ESC		'\\'	/* Escape - suppress meta-meaning.*/
 
 #define MAXGROUPS	10		/* 1 + maximum # of r. e. groups. */
@@ -1094,6 +1216,8 @@ typedef struct {
 	union {
 		int	lchar;
 		int	group_no;
+		char	*lstring;
+		DELTA	*jmptable;
 		EBITMAP	cclmap;
 	} u;
 } MC;
@@ -1114,7 +1238,7 @@ typedef struct {
 
 	------------------------------------------
 	|					 |
-	|	 MicroEMACS v3.xx		 |
+	|	 MicroEMACS v4.xx		 |
 	|		for the ............	 |
 	|					 |
 	|    Text Editor and Corrector		 |

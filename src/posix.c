@@ -1,6 +1,6 @@
 /***
 	POSIX driver/Microemacs 3.11a,
-	Copyright 1989/1991 D. Lawrence, C. Smith
+	Copyright 1989-1995 D. Lawrence, C. Smith
 	Copyright 1992 H. Becker
 
  ***/
@@ -562,7 +562,7 @@ int n;					/* Argument count		*/
 	char line[NLINE];
 	int s;
 	BUFFER * bp;
-	WINDOW * wp;
+	EWINDOW * wp;
 	static char filnam[] = "command";
 
 	/* Don't allow this command if restricted */

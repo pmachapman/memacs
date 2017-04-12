@@ -1,7 +1,7 @@
 /*	VMS.C	Operating system specific I/O and spawning functions
 		For VAX/VMS operating system
-		for MicroEMACS 3.12
-		Copyright 1993 by Jeffrey A. Lomicka and Daniel M. Lawrence
+		for MicroEMACS 4.00
+		Copyright 1995 by Jeffrey A. Lomicka and Daniel M. Lawrence
 
 	All-new code replaces the previous VMS/SMG implementation which
 	prevented using non-SMG terminal drivers (ansi, termcap).  New
@@ -191,39 +191,42 @@ static readast()
  */
 static next_read(int flag)
 {
-    if ( waiting || stalled)
-    {	/* No current read outstanding, submit one */
-	unsigned size;
-/*
-	Wrap the input pointer if out of room
-*/
-	waiting = 0;
-	if (sizeof( tybuf) - tyin < MINREAD)
+	/* No current read outstanding, submit one */
+	if ( waiting || stalled)
 	{
-	    tymax = tyin;
-	    tyin = 0;
-	}
-	size = tymax - tylen;
-	if (tyin + size > sizeof( tybuf)) size = sizeof( tybuf) - tyin;
-	if (size >= MINREAD)
-	{	/* Only read if there is enough room */
-	    test( SYS$QIO(
-		0, vms_iochan,
-		flag ?
-		    IO$_READVBLK | IO$M_NOECHO | IO$M_TRMNOECHO |
-		    IO$M_NOFILTR | IO$M_TIMED
-		:
-		    IO$_READVBLK | IO$M_NOECHO | IO$M_TRMNOECHO |
-		    IO$M_NOFILTR,
-		&ttiosb, readast, 0, &tybuf[ tyin], flag ? size : 1,
-		0, noterm, 0, 0
-		));
-	    stalled = 0;
-	}
-	else stalled = 1;
-    }
-}
+		unsigned size;
+		/*
+		 * Wrap the input pointer if out of room.
+		 */
+		waiting = 0;
+		if (sizeof( tybuf) - tyin < MINREAD)
+		{
+			tymax = tyin;
+			tyin = 0;
+		}
 
+		size = tymax - tylen;
+
+		if (tyin + size > sizeof( tybuf)) size = sizeof( tybuf) - tyin;
+
+		if (size >= MINREAD)
+		{	/* Only read if there is enough room */
+			test( SYS$QIO(
+			0, vms_iochan,
+			flag ?
+				IO$_READVBLK | IO$M_NOECHO | IO$M_TRMNOECHO |
+				IO$M_NOFILTR | IO$M_TIMED
+			:
+				IO$_READVBLK | IO$M_NOECHO | IO$M_TRMNOECHO |
+				IO$M_NOFILTR,
+			&ttiosb, readast, 0, &tybuf[ tyin], flag ? size : 1,
+			0, noterm, 0, 0
+			));
+			stalled = 0;
+		}
+		else stalled = 1;
+	}
+}
 
 /***********************************************************
 * FUNCTION - RemoveEscapes - remove ANSI escapes from string
@@ -231,82 +234,72 @@ static next_read(int flag)
 ***********************************************************/
 static void RemoveEscapes(char *str)
 {
-    char *in=str,*out=str;
+	char *in=str, *out=str;
 
-    while (*in)
-    {
-        switch (*in)
-        {
-            case 0x1b:
-                in++; /* skip escape */
-                if (*in != '[') /* not a CSI */
-                {
-                    switch (*in)
-                    {
-                        /* skip special characters */
-                        case ';':
-                        case '?':
-                        case '0':
-                            in++;
-                    }
-                    /* skip any intermediate characters 0x20 to 0x2f */
-                    while (*in >= 0x20 && *in <= 0x2f) in++;
-                    /* skip any final characters 0x30 to 0x7e */
-                    if (*in >= 0x30 && *in <= 0x7e) in++;
-		    break;
-                }
-                /* fall through to CSI */
-            case 0x9b:	/* CSI */
-                in++; /* skip CSI */
-                /* skip any parameters 0x30 to 0x3f */
-                while (*in >= 0x30 && *in <= 0x3f) in++;
-                /* skip any intermediates 0x20 to 0x2f */
-                while (*in >= 0x20 && *in <= 0x2f) in++;
-                /* skip one final character 0x40 to 0x7e */
-                if (*in >= 0x40 && *in <= 0x7e) in++;
-		break;
-            default:
-            	*out++ = *in++;
-        }
-    }
-    *out = 0;
+	while (*in)
+	{
+		switch (*in)
+		{
+			case 0x1b:	/* skip escape */
+				in++;
+				if (*in != '[') /* not a CSI */
+				{
+					switch (*in)
+					{
+						/* skip special characters */
+						case ';':
+						case '?':
+						case '0':
+							in++;
+					}
+
+					/* skip any intermediate characters 0x20 to 0x2f */
+					while (*in >= 0x20 && *in <= 0x2f) in++;
+
+					/* skip any final characters 0x30 to 0x7e */
+					if (*in >= 0x30 && *in <= 0x7e) in++;
+					break;
+				}
+				/* fall through to CSI */
+			case 0x9b:	/* skip CSI */
+				in++;
+
+				/* skip any parameters 0x30 to 0x3f */
+				while (*in >= 0x30 && *in <= 0x3f) in++;
+
+				/* skip any intermediates 0x20 to 0x2f */
+				while (*in >= 0x20 && *in <= 0x2f) in++;
+
+				/* skip one final character 0x40 to 0x7e */
+				if (*in >= 0x40 && *in <= 0x7e) in++;
+				break;
+			default:
+				*out++ = *in++;
+		}
+	}
+	*out = 0;
 }
 
 /*
  * The argument msgbuf points to the buffer we want to
- * insert our broadcast message into. Handcraft the EOL
- * on the end.
+ * insert our broadcast message into.
  */
 static brdaddline(BUFFER *msgbuf)
 {
-        register LINE   *lp;
-        register int    i;
-        register int    ntext;
-        register int    cmark;
-        register WINDOW *wp;
+        register EWINDOW *wp;
 
-        ntext = strlen(brdcstbuf);
-        if ((lp=lalloc(ntext)) == NULL)
-                return(FALSE);
-        for (i=0; i<ntext; ++i)
-                lputc(lp, i, brdcstbuf[i]);
-        msgbuf->b_linep->l_bp->l_fp = lp;       /* Hook onto the end    */
-        lp->l_bp = msgbuf->b_linep->l_bp;
-        msgbuf->b_linep->l_bp = lp;
-        lp->l_fp = msgbuf->b_linep;
-        msgbuf->b_dotp = lp;            /* move it to new line  */
+	if (addline(msgbuf, brdcstbuf) == FALSE)
+		return FALSE;
 
+	/*
+	 * If one of the windows has the buffer
+	 * displayed, flag that window for update.
+	 */
         wp = wheadp;
         while (wp != NULL) {
-                if (wp->w_bufp == msgbuf) {
-                        wp->w_dotp  = lp;
-                        wp->w_doto  = 0;
-			for (cmark = 0; cmark < NMARKS; cmark++) {
-                        	wp->w_markp[cmark] = NULL;
-	                        wp->w_marko[cmark] = 0;
-	                }
+                if (wp->w_bufp == msgbuf)
                         wp->w_flag |= WFMODE|WFHARD;
-                }
+
                 wp = wp->w_wndp;
         }
         update(FALSE);
@@ -315,62 +308,60 @@ static brdaddline(BUFFER *msgbuf)
 
 static chkbrdcst()
 {
-    BUFFER *msgbuf;            /* buffer containing messages */
+	BUFFER *msgbuf; 		   /* buffer containing messages */
 
-    if (newbrdcst)
-    {
-        int oldrow=ttrow, oldcol=ttcol;
+	if (newbrdcst) {
+		int oldrow = ttrow, oldcol = ttcol;
 
-        SYS$SETAST(0);
+		SYS$SETAST(0);
 
-        msgbuf = bfind("[-messages-]", TRUE, 0);
+		msgbuf = bfind("[-messages-]", TRUE, BFINVS);
 
-        if (msgbuf)
-        {
-            msgbuf->b_mode |= MDVIEW;
-            msgbuf->b_flag |= BFINVS;
-            brdaddline(msgbuf);
-        }
+		if (msgbuf) {
+			msgbuf->b_mode |= MDVIEW;
+			brdaddline(msgbuf);
+		}
 
-	newbrdcst = FALSE;
-        movecursor(oldrow, oldcol);
-        TTmove(oldrow, oldcol);
-        SYS$SETAST(1);
-    }
+		newbrdcst = FALSE;
+		movecursor(oldrow, oldcol);
+		TTmove(oldrow, oldcol);
+		SYS$SETAST(1);
+	}
 }
 
 static mbreadast()
 {
-    if (mbiosb.status & 1)
-    {	/* Read completed okay, check for hangup message */
-	if (mbmsg.msgtype == MSG$_TRMHANGUP)
-	{
-		/* Got a termination message, process it */
-	}
-	else if (mbmsg.msgtype == MSG$_TRMUNSOLIC)
-	{	/* Got unsolicited input, get it */
-	    next_read(1);
-	}
-	else if (mbmsg.msgtype == MSG$_TRMBRDCST)
-	{	/* Got broadcast, get it */
-		/* Hard-coding the mbmsg.brdcnt to 511 is a temp solution.*/
-	    mbmsg.brdcnt = 511;
-	    memcpy(brdcstbuf, mbmsg.message, 511);
-	    brdcstbuf[511] = 0;
+	if (mbiosb.status & 1)
+	{	/* Read completed okay, check for hangup message */
+		if (mbmsg.msgtype == MSG$_TRMHANGUP)
+		{
+				/* Got a termination message, process it */
+		}
+		else if (mbmsg.msgtype == MSG$_TRMUNSOLIC)
+		{		/* Got unsolicited input, get it */
+			next_read(1);
+		}
+		else if (mbmsg.msgtype == MSG$_TRMBRDCST)
+		{		/* Got broadcast, get it */
+				/* Hard-coding the mbmsg.brdcnt to 511 is a temp solution.*/
+			mbmsg.brdcnt = 511;
+			memcpy(brdcstbuf, mbmsg.message, 511);
+			brdcstbuf[511] = 0;
 
-	    RemoveEscapes(brdcstbuf);
-	    pending_msg = newbrdcst = TRUE;
+			RemoveEscapes(brdcstbuf);
+			pending_msg = newbrdcst = TRUE;
+		}
+		else
+		{
+		}
+		test( SYS$QIO(		/* Post a new read to the associated mailbox */
+			0, mbchan, IO$_READVBLK, &mbiosb,
+			mbreadast, 0, &mbmsg, sizeof( mbmsg),
+			0, 0, 0, 0
+			));
 	}
-	else
-	{
-	}
-	test( SYS$QIO(	    /* Post a new read to the associated mailbox */
-	    0, mbchan, IO$_READVBLK, &mbiosb,
-	    mbreadast, 0, &mbmsg, sizeof( mbmsg),
-	    0, 0, 0, 0
-	    ));
-    }
-    else if (mbiosb.status != SS$_ABORT) LIB$SIGNAL( mbiosb.status);
+	else if (mbiosb.status != SS$_ABORT)
+		LIB$SIGNAL( mbiosb.status);
 }
 
 PASCAL NEAR ttopen()
@@ -528,7 +519,7 @@ PASCAL NEAR ttflush()
     }
 }
 /*
-	ttgetc_shortwait is a routine that tries to read another
+	grabnowait is a routine that tries to read another
 	character, and if one doesn't come in as fast as we expect
 	function keys sequences to arrive, we return -1.  This is called
 	after receving ESC to check for next character.  It's okay to wait
@@ -538,7 +529,7 @@ PASCAL NEAR ttflush()
 	Note that we also wake from hibernation if a character arrives, so
 	this never causes an undue delay if the user it actually typing.
 */
-PASCAL NEAR ttgetc_shortwait()
+int PASCAL NEAR grabnowait()
 {
     if (tylen == 0)
     {	/* Nothing immediately available, hibernate for a short time */
@@ -549,7 +540,12 @@ PASCAL NEAR ttgetc_shortwait()
     return ((tylen == 0)? -1: ttgetc());
 }
 
-PASCAL NEAR ttgetc()
+int PASCAL NEAR grabwait()
+{
+    return (ttgetc());
+}
+
+int PASCAL NEAR ttgetc()
 {
     register unsigned ret;
 
@@ -578,18 +574,6 @@ PASCAL NEAR ttgetc()
 	test( SYS$DCLAST( next_read, 1, 0));
     }
 
-#if 0
-/* This is obsolete - now pop-buffer the buffer [-messages-] to read
-   your messages.
- */
-    if (newbrdcst)
-    {	/* New broadcast message, update broadcast variable */
-	VDESC vd;
-	findvar( "%brdcst", &vd, 0);
-	svar( &vd, brdcstbuf);
-	newbrdcst = FALSE;
-    }
-#endif
     SYS$SETAST( 1);
     return( ret);
 }
@@ -597,7 +581,7 @@ PASCAL NEAR ttgetc()
 /*
  * Typahead - any characters pending?
  */
-PASCAL NEAR typahead()
+int PASCAL NEAR typahead()
 {
     return( tylen != 0);
 }
@@ -605,7 +589,7 @@ PASCAL NEAR typahead()
 /*
  * Shell out to DCL.
  */
-PASCAL NEAR spawncli(int f, int n)
+int PASCAL NEAR spawncli(int f, int n)
 {
     register char *cp;
 
@@ -624,7 +608,7 @@ PASCAL NEAR spawncli(int f, int n)
 /*
  * Spawn a command.
  */
-PASCAL NEAR spawn(int f, int n)
+int PASCAL NEAR spawn(int f, int n)
 {
     register int    s;
     char	    line[NLINE];
@@ -657,7 +641,7 @@ PASCAL NEAR spawn(int f, int n)
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X $".
  */
-PASCAL NEAR execprg(int f, int n)
+int PASCAL NEAR execprg(int f, int n)
 {
         register int    s;
         char            line[NLINE];
@@ -682,10 +666,10 @@ PASCAL NEAR execprg(int f, int n)
         return(TRUE);
 }
 
-PASCAL NEAR pipecmd()
+int PASCAL NEAR pipecmd()
 {
     register int    s;	    /* return status from CLI */
-    register WINDOW *wp;    /* pointer to new window */
+    register EWINDOW *wp;    /* pointer to new window */
     register BUFFER *bp;    /* pointer to buffer to zot */
     char    line[NLINE];    /* command line send to shell */
     static char bname[] = "command.log";
@@ -749,7 +733,7 @@ PASCAL NEAR pipecmd()
     return(TRUE);
 }
 
-PASCAL NEAR filter(int f, int n)
+int PASCAL NEAR filter(int f, int n)
 {
         register int    s;	/* return status from CLI */
 	register BUFFER *bp;	/* pointer to buffer to zot */
@@ -1264,7 +1248,7 @@ PASCAL NEAR ffputline(char buf[], int nbuf)
 		memcpy(fline,buf,nbuf);
 
 		/* encrypt it */
-		crypt(fline,nbuf);
+		ecrypt(fline,nbuf);
 
 		/* repoint output buffer */
 		obuf=fline;
@@ -1305,9 +1289,9 @@ int *nbytes;	/* save our caller hassle, calc the line length */
 	/* read the line in */
 	rab.rab$l_ubf=fline;
 	rab.rab$w_usz=flen;
-	*nbytes = rab.rab$w_usz;
 
 	status=SYS$GET(&rab);
+	*nbytes = rab.rab$w_rsz;
 	if (status == RMS$_EOF) return(FIOEOF);
         if (unsuccessful(status)) {
                 mlwrite(TEXT158);
@@ -1319,7 +1303,7 @@ int *nbytes;	/* save our caller hassle, calc the line length */
         fline[rab.rab$w_rsz] = 0;
 #if	CRYPT
 	if (cryptflag)
-		crypt(fline, *nbytes);
+		ecrypt(fline, *nbytes);
 #endif
         return(FIOSUC);
 }
@@ -1337,13 +1321,7 @@ static void PASCAL NEAR addspec(struct dsc$descriptor dsc, int *pargc,
 
     /* reallocate the argument array if necessary */
     if (*pargc == *pargcapacity)
-    {
-        if (*pargv)
-            *pargv = realloc(*pargv,sizeof(**pargv) * (*pargcapacity += ADDSPEC_INCREMENT));
-        else
-            *pargv = malloc(sizeof(**pargv) * (*pargcapacity += ADDSPEC_INCREMENT));
-    }
-
+        *pargv = realloc(*pargv,sizeof(**pargv) * (*pargcapacity += ADDSPEC_INCREMENT));
 
     /* allocate new argument */
     s=strncpy(malloc(dsc.dsc$w_length+1),dsc.dsc$a_pointer,dsc.dsc$w_length);

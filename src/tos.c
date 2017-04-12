@@ -1,7 +1,7 @@
 /*	TOS.C:		Operating specific I/O and Spawning functions
 			for the ATARI ST operating system (GEMDOS)
-			for MicroEMACS 3.12
-			(C)Copyright 1988 by Daniel M. Lawrence
+			for MicroEMACS 4.00
+			(C)Copyright 1995 by Daniel M. Lawrence
 */
 
 #include        <stdio.h>
@@ -95,13 +95,13 @@ ttgetc()
 typahead()
 
 {
-	int rval;	/* return value from BIOS call */
+	int rv;	/* return value from BIOS call */
 
 	/* get the status of the console */
-	rval = bios(BCONSTAT, CON);
+	rv = bios(BCONSTAT, CON);
 
 	/* end return the results */
-	if (rval == 0)
+	if (rv == 0)
 		return(FALSE);
 	else
 		return(TRUE);
@@ -119,7 +119,6 @@ spawncli(f, n)
 {
 #if	ENVFUNC
 	char *shell;	/* ptr to the name of the shell to execute */
-	char *getenv();
 #endif
 
 	/* don't allow this command if restricted */
@@ -217,7 +216,7 @@ execprg(f, n)
 pipecmd(f, n)
 {
         register int    s;	/* return status from CLI */
-	register WINDOW *wp;	/* pointer to new window */
+	register EWINDOW *wp;	/* pointer to new window */
 	register BUFFER *bp;	/* pointer to buffer to zot */
         char	line[NLINE];	/* command line send to shell */
 	static char bname[] = "command";
