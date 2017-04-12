@@ -3,3 +3,10 @@
 *.ko
 *.obj
 *.elf
+
+# Borland C++ 5.5 files
+/mswin/bcpp55/bin
+/mswin/bcpp55/obj
+
+# Visual Studio Code files
+.vscode
