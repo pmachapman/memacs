@@ -15,6 +15,7 @@
 #undef  HIBYTE
 
 #include <windows.h>
+#include <stdio.h>
 
 #include        "estruct.h"
 #include        "eproto.h"

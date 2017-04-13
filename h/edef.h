@@ -70,8 +70,8 @@ NOSHARE int DNEAR ssave = TRUE; 	/* safe save flag		*/
 NOSHARE struct BUFFER *bstore = NULL;	/* buffer to store macro text to*/
 NOSHARE int DNEAR vtrow = 0;		/* Row location of SW cursor	*/
 NOSHARE int DNEAR vtcol = 0;		/* Column location of SW cursor */
-NOSHARE int DNEAR ttrow = HUGE; 	/* Row location of HW cursor	*/
-NOSHARE int DNEAR ttcol = HUGE; 	/* Column location of HW cursor */
+NOSHARE int DNEAR ttrow = HUGENUM; 	/* Row location of HW cursor	*/
+NOSHARE int DNEAR ttcol = HUGENUM; 	/* Column location of HW cursor */
 NOSHARE int DNEAR lbound = 0;		/* leftmost column of current line
 					   being displayed		*/
 NOSHARE int DNEAR taboff = 0;		/* tab offset for display	*/

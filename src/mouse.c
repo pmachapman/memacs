@@ -18,8 +18,8 @@
 #define MDELETE	5
 
 #if	MOUSE
-NOSHARE int	lastypos = HUGE;	/* Last mouse event row.	*/
-NOSHARE int	lastxpos = HUGE;	/* Last mouse event column.	*/
+NOSHARE int	lastypos = HUGENUM;	/* Last mouse event row.	*/
+NOSHARE int	lastxpos = HUGENUM;	/* Last mouse event column.	*/
 NOSHARE int	lastmcmd = MNONE;	/* Last mouse command.		*/
 
 /*

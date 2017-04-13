@@ -152,7 +152,7 @@
 #define VISMAC	0	/* update display during keyboard macros	*/
 #define CTRLZ	0	/* add a ^Z at end of files under MSDOS only	*/
 #define CLEAN	0	/* de-alloc memory on exit			*/
-#define CALLED	1	/* is emacs a called subroutine? or stand alone */
+#define CALLED	0	/* is emacs a called subroutine? or stand alone */
 
 #define REVSTA	1	/* Status line appears in reverse video 	*/
 #define COLOR	1	/* color commands and windows			*/
@@ -530,7 +530,7 @@ union REGS {
 #define NSTRING 512			/* # of bytes, string buffers	*/
 #define NKBDM	4096			/* # of strokes, keyboard macro */
 #define NPAT	512			/* # of bytes, pattern		*/
-#define HUGE	1000			/* Huge number			*/
+#define HUGENUM	1000			/* Huge number			*/
 #define NLOCKS	256			/* max # of file locks active	*/
 #define NCOLORS 16			/* number of supported colors	*/
 #define KBLOCK	250			/* sizeof kill buffer chunks	*/

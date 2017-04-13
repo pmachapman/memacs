@@ -51,8 +51,8 @@ static int   PASCAL mswtopscr();
 NOSHARE TERM term    = {
         128,
         128,
-        HUGE,
-        HUGE,
+        HUGENUM,
+        HUGENUM,
         0,
         0,
 	MARGIN,
@@ -227,7 +227,7 @@ static int PASCAL mswopen ()
     }
     UpdateRow = -1;
     UpdateCol.rightmost = -1;
-    UpdateCol.leftmost = HUGE; /* empty range */
+    UpdateCol.leftmost = HUGENUM; /* empty range */
     return 0;
 } /* mswopen */
 
@@ -250,7 +250,7 @@ int     c;  /* character to write (or 0 for dummy write) */
     if (UpdateRow != CurrentRow) {
         ChangeUpdateRow (CurrentRow);
         UpdateCol.rightmost = -1;
-        UpdateCol.leftmost = HUGE; /* empty range */
+        UpdateCol.leftmost = HUGENUM; /* empty range */
     }
 
     /*-set the colors and reverse status in the display buffer */

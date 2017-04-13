@@ -10,3 +10,10 @@
 
 # Visual Studio Code files
 .vscode
+
+# Visual Studio 2017 Files
+*.user
+/xp/vs2017/.vs
+/xp/vs2017/Debug
+/xp/vs2017/Release
+/xp/vs2017/x64

@@ -164,8 +164,8 @@ static unsigned short msevntq[16];/* State of mouse keys at event */
 static int msevntin = 0;	/* Queue input ptr */
 static int msevntout = 0;	/* Queue output ptr */
 static int mousekeys1 = 0;	/* Last mouse key event */
-static int mousecol = HUGE;	/* current mouse column */
-static int mouserow = HUGE;	/* current mouse row */
+static int mousecol = HUGENUM;	/* current mouse column */
+static int mouserow = HUGENUM;	/* current mouse row */
 
 extern	int	ttopen();		/* Forward references.		*/
 extern	int	ttgetc();
