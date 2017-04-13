@@ -304,8 +304,11 @@ shell(void)
         if ((shell = getenv("COMSPEC")) == NULL) {
                 return(FALSE);          /*  No shell located  */
         }
-
-        return (_spawnlp(_P_WAIT, shell, shell, NULL));
+#ifdef __BORLANDC__
+        return (spawnlp(_P_WAIT, shell, shell, NULL));
+#else
+        return (_spawnlp(_P_WAIT, shell, NULL));
+#endif
 }
 
 

@@ -274,7 +274,8 @@
 #undef  WINDOW_MSWIN32
 #define WINDOW_MSWIN32  1
 #endif
-#if 0
+#if 1
+#undef  MAC     /* Mac conflicts with a definition used by rpc.h */
 #undef  VOID    /* windows.h will wind up defining this */
 #include <windows.h>    /* --------- Huge include file here !!! ---------*/
 #endif

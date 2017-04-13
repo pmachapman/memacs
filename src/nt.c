@@ -544,20 +544,3 @@ int extcode(
 #endif  /* obsolete */
 #endif
 
-#undef va_start
-#undef va_end
-#include <varargs.h>
-int dprintf(va_alist, ...)
-va_dcl
-{
-    va_list arg_ptr;
-    char buffer[200];
-    char *fmt;
-
-    va_start(arg_ptr);
-    fmt = va_arg(arg_ptr, char *);
-
-    vsprintf(buffer, fmt, arg_ptr);
-    SetConsoleTitle(buffer);
-}
-

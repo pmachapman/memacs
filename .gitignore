@@ -7,6 +7,10 @@
 # Borland C++ 5.5 files
 /mswin/bcpp55/bin
 /mswin/bcpp55/obj
+/nt/bcpp55/bin
+/nt/bcpp55/obj
+/xp/bcpp55/bin
+/xp/bcpp55/obj
 
 # Visual Studio Code files
 .vscode

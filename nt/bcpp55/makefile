@@ -5,7 +5,7 @@
 
 .AUTODEPEND
 
-# This makefile for Borland C++ 5.5 compiles MEWIN.EXE (with source-level
+# This makefile for Borland C++ 5.5 compiles MEMACS.EXE (with source-level
 # debugging information which you may want to remove with TDSTRIP)
 # Be advised that you need to change the path of the INCLUDE and LIB
 # directories to match their real location on your computer.
@@ -18,16 +18,13 @@ TASM = TASM
 ILINK = ilink32
 
 #	Compilation Information
-COPTS = +mewin.cfg
+COPTS = +memacs.cfg
 SRC = ..\..\src
 INC = ..\..\h
 OBJ = obj
 BIN = bin
-RES = ..
 
 #		*List Macros*
-Link_Exclude =  \
-  mewin.res
 
 Link_Include =  \
   $(OBJ)\abbrev.obj \
@@ -48,6 +45,8 @@ Link_Include =  \
   $(OBJ)\lock.obj \
   $(OBJ)\main.obj \
   $(OBJ)\mouse.obj \
+  $(OBJ)\nt.obj \
+  $(OBJ)\ntconio.obj \
   $(OBJ)\random.obj \
   $(OBJ)\region.obj \
   $(OBJ)\replace.obj \
@@ -56,23 +55,12 @@ Link_Include =  \
   $(OBJ)\tags.obj \
   $(OBJ)\undo.obj \
   $(OBJ)\window.obj \
-  $(OBJ)\word.obj \
-  $(OBJ)\mswdisp.obj \
-  $(OBJ)\mswdrv.obj \
-  $(OBJ)\mswemacs.obj \
-  $(OBJ)\mswexec.obj \
-  $(OBJ)\mswfile.obj \
-  $(OBJ)\mswfont.obj \
-  $(OBJ)\mswinput.obj \
-  $(OBJ)\mswmem.obj \
-  $(OBJ)\mswmenu.obj \
-  $(OBJ)\mswsys.obj \
-  $(RES)\mewin.def
+  $(OBJ)\word.obj
 
 #		*Explicit Rules*
-$(BIN)\MEWIN.exe: MEWIN.cfg $(Link_Include) $(Link_Exclude)
+$(BIN)\MEMACS.exe: MEMACS.cfg $(Link_Include)
   $(ILINK) /v/s/c/Tpe/P-/L$(LIBPATH) @&&|
-c0w32.obj+
+c0x32.obj+
 $(OBJ)\abbrev.obj+
 $(OBJ)\basic.obj+
 $(OBJ)\bind.obj+
@@ -91,6 +79,8 @@ $(OBJ)\line.obj+
 $(OBJ)\lock.obj+
 $(OBJ)\main.obj+
 $(OBJ)\mouse.obj+
+$(OBJ)\nt.obj+
+$(OBJ)\ntconio.obj+
 $(OBJ)\random.obj+
 $(OBJ)\region.obj+
 $(OBJ)\replace.obj+
@@ -99,36 +89,11 @@ $(OBJ)\search.obj+
 $(OBJ)\tags.obj+
 $(OBJ)\undo.obj+
 $(OBJ)\window.obj+
-$(OBJ)\word.obj+
-$(OBJ)\mswdisp.obj+
-$(OBJ)\mswdrv.obj+
-$(OBJ)\mswemacs.obj+
-$(OBJ)\mswexec.obj+
-$(OBJ)\mswfile.obj+
-$(OBJ)\mswfont.obj+
-$(OBJ)\mswinput.obj+
-$(OBJ)\mswmem.obj+
-$(OBJ)\mswmenu.obj+
-$(OBJ)\mswsys.obj
-$(BIN)\MEWIN,MEWIN
+$(OBJ)\word.obj
+$(BIN)\MEMACS,MEMACS
 import32.lib+
 cw32.lib
-$(RES)\mewin.def
 |
-
-	brc32 -i $(INC) -i $(RES) -T mewin.res $(BIN)\MEWIN.exe
-
-
-#		*Individual File Dependencies*
-mewin.res: $(RES)\mewin.rc $(INC)\mswrid.h $(INC)\mswmenu.h $(RES)\mswmenu.rc \
-	   $(RES)\mswfile.dlg $(RES)\mswabout.dlg $(RES)\mswfonts.dlg \
-	   $(RES)\mswmodes.dlg $(RES)\mswprg.dlg $(RES)\mswmlh.dlg \
-           $(RES)\mswapp.ico $(RES)\mswscr.ico $(RES)\mswcur.cur \
-	   $(RES)\mswnot.cur $(RES)\mswwait.ico $(RES)\mswgrin1.cur \
-	   $(RES)\mswgrin2.cur $(RES)\mswgrin3.cur $(RES)\mswgrin4.cur \
-           $(RES)\mswgrin5.cur $(RES)\mswgrin6.cur $(RES)\mswgrin7.cur \
-	   $(RES)\mswgrin8.cur
-	RC -R -I $(INC) -i $(RES) -I$(INCLUDEPATH) -FO mewin.res $(RES)\MEWIN.RC
 
 $(OBJ)\abbrev.obj: $(SRC)\abbrev.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\abbrev.obj $(SRC)\abbrev.c
@@ -184,35 +149,11 @@ $(OBJ)\main.obj: $(SRC)\main.c
 $(OBJ)\mouse.obj: $(SRC)\mouse.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\mouse.obj $(SRC)\mouse.c
 
-$(OBJ)\mswdisp.obj: $(SRC)\mswdisp.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswdisp.obj $(SRC)\mswdisp.c
+$(OBJ)\nt.obj: $(SRC)\nt.c 
+	$(CC) $(COPTS) -c -o$(OBJ)\nt.obj $(SRC)\nt.c
 
-$(OBJ)\mswdrv.obj: $(SRC)\mswdrv.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswdrv.obj $(SRC)\mswdrv.c
-
-$(OBJ)\mswemacs.obj: $(SRC)\mswemacs.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswemacs.obj $(SRC)\mswemacs.c
-
-$(OBJ)\mswexec.obj: $(SRC)\mswexec.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswexec.obj $(SRC)\mswexec.c
-
-$(OBJ)\mswfile.obj: $(SRC)\mswfile.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswfile.obj $(SRC)\mswfile.c
-
-$(OBJ)\mswfont.obj: $(SRC)\mswfont.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswfont.obj $(SRC)\mswfont.c
-
-$(OBJ)\mswinput.obj: $(SRC)\mswinput.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswinput.obj $(SRC)\mswinput.c
-
-$(OBJ)\mswmem.obj: $(SRC)\mswmem.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswmem.obj $(SRC)\mswmem.c
-
-$(OBJ)\mswmenu.obj: $(SRC)\mswmenu.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswmenu.obj $(SRC)\mswmenu.c
-
-$(OBJ)\mswsys.obj: $(SRC)\mswsys.c 
-	$(CC) $(COPTS) -c -o$(OBJ)\mswsys.obj $(SRC)\mswsys.c
+$(OBJ)\ntconio.obj: $(SRC)\ntconio.c 
+	$(CC) $(COPTS) -c -o$(OBJ)\ntconio.obj $(SRC)\ntconio.c
 
 $(OBJ)\search.obj: $(SRC)\search.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\search.obj $(SRC)\search.c
@@ -243,7 +184,7 @@ $(OBJ)\word.obj: $(SRC)\word.c
 
 #		Create the Compiler Configuration File
 
-mewin.cfg: makefile
+memacs.cfg: makefile
   copy &&|
 -6
 -K
@@ -259,5 +200,5 @@ mewin.cfg: makefile
 -w-rpt
 -I$(INCLUDEPATH)
 -I$(INC)
-| mewin.cfg
+| memacs.cfg
 
