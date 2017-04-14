@@ -1486,7 +1486,7 @@ char *wclist;	/* list of characters to consider "in a word" */
 	/* if we are turning this facility off, just flag so */
 	if (wclist == NULL || *wclist == 0) {
 		wlflag = FALSE;
-		return;
+		return 0;
 	}
 
 	/* first clear the table */
@@ -1498,7 +1498,7 @@ char *wclist;	/* list of characters to consider "in a word" */
 	while (*wclist)
 		wordlist[(unsigned char)(*wclist++)] = TRUE;	/* ep */
 	wlflag = TRUE;
-	return;
+	return 0;
 }
 
 /*	getwlist:	place in a buffer a list of characters
