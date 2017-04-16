@@ -57,8 +57,10 @@ Link_Include =  \
   $(OBJ)\window.obj \
   $(OBJ)\word.obj
 
+all: $(BIN)\MEMACS.exe $(BIN)\cmdfix.exe
+
 #		*Explicit Rules*
-$(BIN)\MEMACS.exe: MEMACS.cfg $(Link_Include)
+$(BIN)\MEMACS.exe: directories MEMACS.cfg $(Link_Include)
   $(ILINK) /v/s/c/Tpe/P-/L$(LIBPATH) @&&|
 c0x32.obj+
 $(OBJ)\abbrev.obj+
@@ -182,6 +184,20 @@ $(OBJ)\window.obj: $(SRC)\window.c
 $(OBJ)\word.obj: $(SRC)\word.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\word.obj $(SRC)\word.c
 
+#		Create cmdfix
+
+$(BIN)\cmdfix.exe: directories MEMACS.cfg $(OBJ)\cmdfix.obj
+  $(ILINK) /v/s/c/Tpe/P-/L$(LIBPATH) @&&|
+c0x32.obj+
+$(OBJ)\cmdfix.obj
+$(BIN)\cmdfix,cmdfix
+import32.lib+
+cw32.lib
+|
+
+$(OBJ)\cmdfix.obj: $(SRC)\cmdfix.c 
+	$(CC) $(COPTS) -c -o$(OBJ)\cmdfix.obj $(SRC)\cmdfix.c
+
 #		Create the Compiler Configuration File
 
 memacs.cfg: makefile
@@ -202,3 +218,17 @@ memacs.cfg: makefile
 -I$(INC)
 | memacs.cfg
 
+#		Create directories for the build
+
+directories:
+  if not exist $(BIN) mkdir $(BIN)
+  if not exist $(OBJ) mkdir $(OBJ)
+
+#		Clean up the build
+
+clean:
+  if exist $(BIN) rmdir /Q /S $(BIN)
+  if exist $(OBJ) rmdir /Q /S $(OBJ)
+  del memacs.cfg
+  del memacs.map
+  del cmdfix.map

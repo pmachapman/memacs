@@ -4,15 +4,16 @@
 			All Rights reserved
 
 	The names of function key command strings have been changed to
-	help make these names machine independant.  This program translates
+	help make these names machine independent.  This program translates
 	old files to new.
 
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "estruct.h"
 
-pascal fix();
+PASCAL fix();
 
 /*	Table of command key name changes */
 
@@ -142,7 +143,7 @@ char *argv[];	/* text of command line arguments */
 	exit(0);
 }
 
-pascal fix(fname)
+PASCAL fix(fname)
 
 char *fname;	/* file to fix */
 
@@ -159,7 +160,7 @@ char *fname;	/* file to fix */
 	infile = fopen(fname, "r");
 	if (infile == NULL) {
 		printf("%%No such file as %s\n", fname);
-		return;
+		return 0;
 	}
 
 	/* open the temporary output file */
@@ -167,7 +168,7 @@ char *fname;	/* file to fix */
 	if (outfile == NULL) {
 		puts("%Can not open output file");
 		fclose(infile);
-		return;
+		return 0;
 	}
 
 
@@ -209,7 +210,7 @@ char *fname;	/* file to fix */
 	infile = fopen("tempfile", "r");
 	if (infile == NULL) {
 		printf("%%No such file as %s\n", fname);
-		return;
+		return 0;
 	}
 
 	/* open the output file */
@@ -217,7 +218,7 @@ char *fname;	/* file to fix */
 	if (outfile == NULL) {
 		puts("%Can not open output file");
 		fclose(infile);
-		return;
+		return 0;
 	}
 
 	/* scan through the file... holding on FN sequences */
@@ -257,5 +258,5 @@ char *fname;	/* file to fix */
 
 	/* and report */
 	printf("[%u keys fixed in %s]\n", nseq, fname);
-	return;
+	return 0;
 }
