@@ -706,7 +706,9 @@ int f, n;	/* these are ignored... we get the new size info from
 	newwidth(TRUE, xpos + 1);
 	newsize(TRUE, ypos + 1);
 
+#if	WINDOW_TEXT
 	refresh_screen(first_screen);
+#endif
 	return(TRUE);
 }
 

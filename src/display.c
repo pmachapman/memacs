@@ -1762,7 +1762,7 @@ int c;	/* character to write */
 
 {
 #if WINDOW_MSWIN
-	if (ttcol + 1 < NSTRING)
+	if (ttcol + 1 < NSTRING) {
 #else
 	if (ttcol + 1 < term.t_ncol) {
 #endif

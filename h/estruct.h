@@ -276,8 +276,11 @@
 #endif
 #if 1
 #undef  MAC     /* Mac conflicts with a definition used by rpc.h */
-#undef  VOID    /* windows.h will wind up defining this */
+#undef  VOID    /* windows.h will wind up defining this when compiled as a console app */
 #include <windows.h>    /* --------- Huge include file here !!! ---------*/
+#ifndef VOID
+#define VOID void /* Redefine, incase we are compiled as a Windows app */
+#endif
 #endif
 #if     NTCON
 #include <WinCon.h>
@@ -302,7 +305,7 @@
 #endif
 #endif
 
-#if	WINNT || WINXP
+#if	(WINNT || WINXP) && !WINDOW_MSWIN
 #define	EXPORT	/* Windows NT doesn't like this */
 #endif
 
@@ -311,7 +314,9 @@
 #define TYPEAH  0   /* typeahead is handled at the term driver level */
 #undef  CALLED
 #define CALLED  1   /* under MS Windows, "main" resides in the sys driver */
-#if     MSC
+#if     WINNT || WINXP
+#define	EXPORT	/* Windows NT doesn't like this */
+#elif   MSC
 #define EXPORT  __export
 #else
 #define EXPORT  _export	/* Fine for TURBO and ZTC */

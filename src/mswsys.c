@@ -902,7 +902,7 @@ DefaultProc:
 /* WinMain: Application entry point */
 /* =======                          */
 
-int PASCAL  WinMain (HANDLE hInstance, HANDLE hPrevInstance,
+int PASCAL  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                      LPSTR lpCmdLine, int nCmdShow)
 {
     hEmacsInstance = hInstance;
@@ -1021,7 +1021,7 @@ int FAR PASCAL  TakeANap (int t)
 {
     TakingANap = TRUE;
     if ((t == 0) ||
-        (!SetTimer (hFrameWnd, T_SLEEP, t, (FARPROC)NULL))) {
+        (!SetTimer (hFrameWnd, T_SLEEP, t, (TIMERPROC)NULL))) {
 	ShowEmacsCaret (TRUE);
 	MessageLoop (FALSE);    /* let's do one relinquish anyway */
 	ShowEmacsCaret (FALSE);

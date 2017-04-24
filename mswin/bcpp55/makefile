@@ -66,8 +66,7 @@ Link_Include =  \
   $(OBJ)\mswinput.obj \
   $(OBJ)\mswmem.obj \
   $(OBJ)\mswmenu.obj \
-  $(OBJ)\mswsys.obj \
-  $(RES)\mewin.def
+  $(OBJ)\mswsys.obj
 
 #		*Explicit Rules*
 $(BIN)\MEWIN.exe: MEWIN.cfg $(Link_Include) $(Link_Exclude)
@@ -113,10 +112,9 @@ $(OBJ)\mswsys.obj
 $(BIN)\MEWIN,MEWIN
 import32.lib+
 cw32.lib
-$(RES)\mewin.def
 |
 
-	brc32 -i $(INC) -i $(RES) -T mewin.res $(BIN)\MEWIN.exe
+	brc32 -i$(INC);$(RES) mewin.res $(BIN)\MEWIN.exe
 
 
 #		*Individual File Dependencies*
@@ -128,7 +126,7 @@ mewin.res: $(RES)\mewin.rc $(INC)\mswrid.h $(INC)\mswmenu.h $(RES)\mswmenu.rc \
 	   $(RES)\mswgrin2.cur $(RES)\mswgrin3.cur $(RES)\mswgrin4.cur \
            $(RES)\mswgrin5.cur $(RES)\mswgrin6.cur $(RES)\mswgrin7.cur \
 	   $(RES)\mswgrin8.cur
-	RC -R -I $(INC) -i $(RES) -I$(INCLUDEPATH) -FO mewin.res $(RES)\MEWIN.RC
+	brc32 -R -i$(INC);$(RES);$(INCLUDEPATH) -fomewin.res $(RES)\MEWIN.RC
 
 $(OBJ)\abbrev.obj: $(SRC)\abbrev.c 
 	$(CC) $(COPTS) -c -o$(OBJ)\abbrev.obj $(SRC)\abbrev.c
