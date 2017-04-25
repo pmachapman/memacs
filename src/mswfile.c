@@ -10,7 +10,7 @@
 #include    "eproto.h"
 #include    "edef.h"
 
-#if WINNT
+#if WINNT || WINXP
 #define FNAMELEN NFILEN
 #else
 #define FNAMELEN 13
