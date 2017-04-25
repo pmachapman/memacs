@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>reverse-incremental-search command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="reverse-incremental-search">
+	<PARAM NAME="Keyword" VALUE="search">
+</OBJECT>
+
+<P><A NAME="reverse_incremental_search"></A><B>reverse-incremental-search</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">^XR</A></P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> is always interactive. It prompts the user for  a search string but, unlike what happens with the <A HREF="comm4t2d.htm">search-reverse</A> command, the search happens and the display is updated as each new search character is typed.</P>
+
+<P>While searching towards the beginning of the <A HREF="glos81bm.htm">buffer</A>, each successive character leaves the <A HREF="glos7kdw.htm">point</A> at the beginning of the matched string. Typing a <A HREF="glos3icl.htm">^R</A> causes the next occurrence of the string to be searched for (where the next occurrence does not overlap the current occurrence). A <A HREF="glos3icl.htm">^S</A> changes the direction to a forward search (as performed by an <A HREF="comm7rmw.htm">incremental-search</A> command), pressing the <A HREF="glos2it5.htm">meta key</A> terminates the search and <A HREF="glos3icl.htm">^G</A> aborts the operation. Pressing the Backspace key (or using <A HREF="glos3icl.htm">^H</A>) returns to the previous match of the string or, if the starting point is reached, it deletes the last character from the search string.</P>
+
+<P>The characters composing the search string are always interpreted literally. <A HREF="help9xur.htm">MAGIC</A> mode has no effect on incremental searches.</P>
+
+<P>If the search fails, a beep sounds and the search stalls until the search string is edited back into something that exists (or until the operation is aborted).</P>
+
+<P>This command is unaffected by <A HREF="glos9jec.htm">numeric arguments</A>.</P>
+
+</BODY>
+</HTML>

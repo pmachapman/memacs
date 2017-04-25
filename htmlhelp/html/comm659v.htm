@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>show-files command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="show-files">
+	<PARAM NAME="Keyword" VALUE="file">
+</OBJECT>
+
+<P><A NAME="show_files"></A><B>show-files</B></P>
+
+<P>No default binding</P>
+
+<P>Syntax:</P>
+
+<P>show-files  <I>starname</I></P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> creates a list of all the files matching the specified <I>starname</I>. The starname can contain a directory specification.</P>
+
+<P>For instance, under MS-Windows, the command:</P>
+
+<P>show-files  "C:\WINDOWS\*.INI"</P>
+
+<P>will create a list of all the files ending by ".INI" in the directory "C:\WINDOWS".</P>
+
+<P>MicroEMACS appends a star "<B>*</B>" to the end of the specified starname, and appends a dot-star "<B>.*</B>" if the starname does not contain a dot character. Thus:</P>
+
+<P>show-files  "C:\WINDOWS\A"</P>
+
+<P>is equivalent to specifying:</P>
+
+<P>show-files  "C:\WINDOWS\A*.*"</P>
+
+<P>This command is unaffected by <A HREF="glos9jec.htm">numeric arguments</A>.</P>
+
+<P>Note:The list is actually built in a special buffer named "<B>File List</B>". It is displayed as a <A HREF="glos1x6a.htm">popup buffer</A> or in a normal <A HREF="glos1zg7.htm">window</A>, depending on the value of the <A HREF="macr0td3.htm">$popflag</A> <A HREF="glos7v51.htm">variable</A>.</P>
+
+</BODY>
+</HTML>

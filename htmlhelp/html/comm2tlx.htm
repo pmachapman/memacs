@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>change-screen-size command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="change-screen-size">
+	<PARAM NAME="Keyword" VALUE="screen">
+</OBJECT>
+
+<P><A NAME="change_screen_size"></A><B>change-screen-size</B></P>
+
+<P>No default binding.</P>
+
+<P>Syntax:</P>
+
+<P><I>n</I>  change-screen-size</P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> modifies the height of the current <A HREF="glos0wxa.htm">screen</A>, causing it to be <I>n</I> lines. If the <A HREF="glos9jec.htm">numeric argument</A> <I>n</I> is not specified, it is taken to be the height of the whole desktop.</P>
+
+<P>As the height of the screen changes, the bottom <A HREF="glos1zg7.htm">window</A> is resized to fit. If the height is decreased, windows that do not fit any more are eliminated, starting from the bottom one.</P>
+
+<P>Using this command is equivalent to setting the <A HREF="macr2nxq.htm">$pagelen</A> variable.</P>
+
+<P>If <I>n</I> is lower than 3 or if it is greater than the height of the desktop, the command fails.</P>
+
+<P>Under Microsoft Windows:</P>
+
+<P>The height of a screen does not include the <A HREF="glos91id.htm">message line</A>.</P>
+
+<P>If <I>n</I> is not specified, the command fails.</P>
+
+</BODY>
+</HTML>

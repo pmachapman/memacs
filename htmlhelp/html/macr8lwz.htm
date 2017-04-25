@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Constants</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="constants">
+	<PARAM NAME="Keyword" VALUE="macro">
+</OBJECT>
+
+<H2><A NAME="constants"></A>Constants</H2>
+
+<P>Wherever <A HREF="macr0a3p.htm">macro language</A> statements need to have <A HREF="macr0hkj.htm">arguments</A>, it is legal to place constants. A constant is a double quote character, followed by a string of characters, and terminated by another double quote character.</P>
+
+<P>The double quotes around constants are not needed if the constant contains no white space and it also does not happen to meet the rules for any other MicroEMACS <A HREF="macr9ylv.htm">commands</A>, <A HREF="macr4183.htm">directives</A>, <A HREF="macr3d0z.htm">variables</A>, or <A HREF="macr6ctv.htm">functions</A>. This is very practical for numeric constants.</P>
+
+<P>To represent various special characters within a constant, the tilde "~" character is used. The character following the tilde is interpreted according to the following table:</P>
+
+<P><B>Sequence</B><B>Meaning</B></P>
+
+<P>~"double quote</P>
+
+<P>~~tilde</P>
+
+<P>~bbackspace (<A HREF="glos3icl.htm">^H</A>)</P>
+
+<P>~fformfeed (<A HREF="glos3icl.htm">^L</A>)</P>
+
+<P>~llinefeed (<A HREF="glos3icl.htm">^J</A>)</P>
+
+<P>~nnewline</P>
+
+<P>~rcarriage return (<A HREF="glos3icl.htm">^M</A>)</P>
+
+<P>~ttab (<A HREF="glos3icl.htm">^I</A>)</P>
+
+<P>Any character not in the above table which follows a tilde will be passed unmodified. This action is similar to the <A HREF="comm5eia.htm">quote-character</A> (<A HREF="glos3icl.htm">^Q</A>) command available from the keyboard.</P>
+
+<P>MicroEMACS may use different characters for line terminators on different computers. The "<B>~n</B>" combination will always get the proper line terminating sequence for the current system.</P>
+
+</BODY>
+</HTML>

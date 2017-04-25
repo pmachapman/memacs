@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>hunt-forward command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="hunt-forward">
+	<PARAM NAME="Keyword" VALUE="search">
+</OBJECT>
+
+<P><A NAME="hunt_forward"></A><B>hunt-forward</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">A-S</A></P>
+
+<P>Syntax:</P>
+
+<P><I>n</I>  hunt-forward</P>
+
+<P>If <I>n</I> is a positive number, this <A HREF="macr9ylv.htm">command</A> searches forward for the <I>n</I>th occurrence of the search string. That search string is the one that was used the last time a <A HREF="comm3obo.htm">search-forward</A> or <A HREF="comm4t2d.htm">search-reverse</A> command was issued. The interpretation of the search string is dependant on whether <A HREF="help9xur.htm">MAGIC</A> mode is set or not in the current <A HREF="glos81bm.htm">buffer</A>.</P>
+
+<P>If a matching text is found in the <A HREF="glos81bm.htm">buffer</A>, the <A HREF="glos7kdw.htm">point</A> is moved to the first character following that text. Otherwise, the command fails. The command also fails if there is no search string.</P>
+
+<P>If <I>n</I> is a negative number, this command acts as if the <A HREF="comm415w.htm">hunt-backward</A> command had been invoked with the corresponding positive number (-<I>n</I>).</P>
+
+<P>If no <A HREF="glos9jec.htm">numeric arguments</A> is specified, or if the numeric argument is null, it is equivalent to <I>n</I> = 1.</P>
+
+</BODY>
+</HTML>

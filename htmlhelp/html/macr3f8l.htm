@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>$cmode and $gmode variables</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="$cmode">
+	<PARAM NAME="Keyword" VALUE="$gmode">
+	<PARAM NAME="Keyword" VALUE="mode">
+</OBJECT>
+
+<P><A NAME="_cmode"></A><B>$cmode</B> and <B>$gmode</B></P>
+
+<P>The two <A HREF="macr3d0z.htm">variables</A> $cmode and $gmode contain a number that corresponds to the <A HREF="help9qjy.htm">modes</A> for the current <A HREF="glos81bm.htm">buffer</A> ($cmode) and the new buffers ($gmode). They are encoded as the sum of the following numbers for each of the possible modes:</P>
+
+<P><A HREF="help8rhs.htm">WRAP</A>1Word wrap</P>
+
+<P><A HREF="help24bp.htm">CMODE</A>2C indentation and fence matching</P>
+
+<P><B>SPELL</B>4Interactive spell checking (Not implemented yet)</P>
+
+<P><A HREF="help1vsk.htm">EXACT</A>8Exact matching for searches</P>
+
+<P><A HREF="help2czb.htm">VIEW</A>16Read-only buffer</P>
+
+<P><A HREF="help465u.htm">OVER</A>32Overwrite mode</P>
+
+<P><A HREF="help9xur.htm">MAGIC</A>64Regular expressions in search</P>
+
+<P><A HREF="help13w4.htm">CRYPT</A>128Encryption mode active</P>
+
+<P><A HREF="help5ftx.htm">ASAVE</A>256Auto-save mode</P>
+
+<P>Thus, if you wished to set the current buffer to have CMODE, EXACT, and MAGIC on, and all the others off, you would add up the values for those three, CMODE 2 + EXACT 8 + MAGIC 64 = 74, and use a statement like:</P>
+
+<P>set  $cmode  74</P>
+
+<P>or, use the binary or operator to combine the different modes:</P>
+
+<P>set  $cmode  &amp;bor  &amp;bor  2  8  64</P>
+
+<P>Alternatively, you can also modify the modes one by one, using the <A HREF="comm104l.htm">add-mode</A> and <A HREF="comm8usl.htm">add-global-mode</A> or <A HREF="comm1279.htm">delete-mode</A> and <A HREF="comm0bj9.htm">delete-global-mode</A> commands</P>
+
+</BODY>
+</HTML>

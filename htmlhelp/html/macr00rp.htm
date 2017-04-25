@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>!WHILE and !ENDWHILE directives</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="!WHILE">
+	<PARAM NAME="Keyword" VALUE="!ENDWHILE">
+	<PARAM NAME="Keyword" VALUE="loop">
+	<PARAM NAME="Keyword" VALUE="!BREAK">
+</OBJECT>
+
+<P><A NAME=".while"></A><B>!WHILE and !ENDWHILE</B></P>
+
+<P>This pair of <A HREF="macr4183.htm">directives</A> facilitates repetitive execution within a <A HREF="macr0a3p.htm">macro</A>. If a group of statements needs to be executed while a certain expression <A HREF="macr0hkj.htm">evaluates</A> to TRUE, enclose them with a while loop. For example:</P>
+
+<P><B>!while</B> &amp;less $curcol 70</P>
+
+<P>insert-string &amp;cat &amp;cat "[" #stuff "]"</P>
+
+<P><B>!endwhile</B></P>
+
+<P>While loops may be nested and can contain and be the targets of <A HREF="macr9y7j.htm">!GOTOs</A> with no ill effects.  Using a while loop to enclose a repeated task will run much faster than the corresponding construct using <A HREF="macr46na.htm">!IFs</A>.</P>
+
+</BODY>
+</HTML>

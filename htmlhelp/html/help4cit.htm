@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Shell and ShellExecOption Profiles</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="profile">
+	<PARAM NAME="Keyword" VALUE="Shell">
+</OBJECT>
+
+<H2><A NAME="shellprofile"></A>Shell and ShellExecOption Profiles</H2>
+
+<P>The <B>Shell</B> <A HREF="help8nxv.htm">profile</A> specifies the path name of the shell executable used by the <A HREF="comm90x0.htm">pipe-command</A>, <A HREF="comm0zoy.htm">filter-buffer</A>, <A HREF="comm05bg.htm">i-shell</A> and <A HREF="comm0lpg.htm">shell-command</A> commands under Windows NT. If this profile does not appear in the [MicroEMACS] section of the WIN.INI file, the default path name is "CMD.EXE". This is appropriate if that file is located in a directory that appears in the system path.</P>
+
+<P>The <B>ShellExecOption</B> profile specifies the string to be inserted between the string specified by the Shell profile and the actual command to be executed (for pipe-command, filter-buffer and shell-command). If this profile does not appear in the [MicroEMACS] section of the WIN.INI file, the default is " /c ". This is appropriate for "CMD.EXE".</P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>previous-line command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="position">
+	<PARAM NAME="Keyword" VALUE="point">
+	<PARAM NAME="Keyword" VALUE="previous-line">
+</OBJECT>
+
+<P><A NAME="previous_line"></A><B>previous-line</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">^P</A></P>
+
+<P>Syntax:</P>
+
+<P><I>n</I>  previous-line</P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> moves the <A HREF="glos7kdw.htm">point</A> to the <I>n</I>th previous line. If the <A HREF="glos9jec.htm">numeric arguments</A> <I>n</I> is absent, it is taken as 1.</P>
+
+<P>If <I>n</I> is negative, the point is moved to the <I>n</I>th next line. If <I>n</I> is 0, nothing happens.</P>
+
+<P>When line move commands (<A HREF="comm0r8l.htm">next-line</A> or <B>previous-line</B>) are used in a row, the point is kept at the same column it was at before the first of the line moves. If that column lies beyond the end of the current line the point is temporarily brought back to the end of that line.</P>
+
+<P>The command fails if the point is already at the beginning of the <A HREF="glos81bm.htm">buffer</A> (or the end if <I>n</I> is negative) </P>
+
+</BODY>
+</HTML>

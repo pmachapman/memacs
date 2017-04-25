@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>newline command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="newline">
+</OBJECT>
+
+<P><A NAME="newline"></A><B>newline</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">^M</A> (Return key)</P>
+
+<P>Syntax:</P>
+
+<P><I>n</I>  newline</P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> inserts <I>n</I> newline characters at the <A HREF="glos7kdw.htm">point</A>. If the <A HREF="glos9jec.htm">numeric arguments</A> is absent, it is taken as 1.</P>
+
+<P>If <I>n</I> is equal to 1 and the <A HREF="glos81bm.htm">buffer</A> is in <A HREF="help24bp.htm">CMODE</A> mode, C language indentation is performed:</P>
+
+<P>If the new line is not empty (i.e. the point was not at the end of a line), no other action takes place.</P>
+
+<P>The new line is indented at the same level as the closest preceding non blank line</P>
+
+<P>If the newline was inserted right after an opening brace "<B>{</B>", the new line is further indented by one tab stop (as if the <A HREF="comm3aci.htm">handle-tab</A> command had been used).</P>
+
+<P>If the buffer is in <A HREF="help8rhs.htm">WRAP</A> mode and the point is past the fill column, wrapping is performed on the last word of the current line before the newline character is inserted.</P>
+
+<P>The command fails if <I>n</I> is negative.</P>
+
+</BODY>
+</HTML>

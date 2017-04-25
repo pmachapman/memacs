@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>TimeSlice Profile</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="profile">
+	<PARAM NAME="Keyword" VALUE="timeslice">
+	<PARAM NAME="Keyword" VALUE="WIN.INI">
+</OBJECT>
+
+<H2><A NAME="timesliceprofile"></A>TimeSlice Profile</H2>
+
+<P>Under Microsoft Windows 3.x, when MicroEMACS performs a long operation (reading or writing a large file, searching text, moving large chunks of text to/from the <A HREF="glos7c8i.htm">kill buffer</A> or <A HREF="glos6fz8.htm">clipboard</A>, killing a buffer, etc...), it allows other applications to run concurrently with itself.</P>
+
+<P>The TimeSlice <A HREF="help8nxv.htm">profile</A> specifies how often MicroEMACS should relinquish the processor: when a long operation is in process, MicroEMACS does not yield to other applications until the number of milliseconds thus specified has elapsed.</P>
+
+<P>The default value is 100 milliseconds.</P>
+
+<P>Notes:Under Windows NT, the preemptive multitasking nature of the operating system alleviates the need for MicroEMACS to voluntarily yield to other applications. The TimeSlice profile is still used to determine how often input (like a command to exit the editor) is checked.</P>
+
+<P>If the <A HREF="macr5wdu.htm">animated grinder</A> (replacing the hourglass mouse cursor) is enabled, the TimeSlice profile also determines the time interval between each change of the cursor image.</P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>WRAP Mode</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="WRAP">
+	<PARAM NAME="Keyword" VALUE="mode">
+	<PARAM NAME="Keyword" VALUE="fill">
+	<PARAM NAME="Keyword" VALUE="word">
+</OBJECT>
+
+<P><A NAME="wrap"></A><B>WRAP Mode</B></P>
+
+<P>This mode causes the <A HREF="glos7kdw.htm">point</A> and the previous <A HREF="help5i0j.htm">word</A> to jump down to the next line when you type a space and are beyond the current fill column. This is normally set to column 72, allowing you to enter text non-stop on a standard screen without bothering to use the return key.</P>
+
+<P>To change the column that text is wrapped past, use the <A HREF="comm08j8.htm">set</A> (<A HREF="glos3icl.htm">^XA</A>) <A HREF="glos3a3o.htm">command</A> to change the value of the <A HREF="macr2ip8.htm">$fillcol</A> <A HREF="glos7v51.htm">variable</A>, like this:</P>
+
+<P>^XA $fillcol <I>new_value</I></P>
+
+<P>MicroEMACS will then be set to wrap words past column <I>new_value</I>.</P>
+
+<P>The <A HREF="macr8n57.htm">$wraphook</A> <A HREF="glos7v51.htm">variable</A> contains the command or <A HREF="glos9lnz.htm">macro</A> used to perform word wrapping. By default, it is the <A HREF="comm8q90.htm">wrap-word</A> command.</P>
+
+</BODY>
+</HTML>

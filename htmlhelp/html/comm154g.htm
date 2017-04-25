@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>mouse-move-up command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="mouse-move-up">
+</OBJECT>
+
+<P><A NAME="mouse_move_up"></A><B>mouse-move-up</B></P>
+
+<P>Default binding: <A HREF="glos3hgu.htm">MSb</A> (Release of left mouse button)</P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> is meant to be associated with a mouse action. It depends on the <A HREF="macr5nhv.htm">$xpos</A> and <A HREF="macr19rn.htm">$ypos</A> <A HREF="glos7v51.htm">variables</A> to contain the coordinates of the mouse pointer. The actions performed by this command depend of where the previous <A HREF="comm3hv2.htm">mouse-move-down</A> command was invoked:</P>
+
+<P>If the mouse pointer was in the <A HREF="glos0bxh.htm">mode line</A> part of a <A HREF="glos1zg7.htm">window</A> and still is within that mode line, or if it was in the text part of the window and still is, the text in the window is scrolled as if it had been <A HREF="help41mf.htm">dragged</A> by the mouse. Note that diagonal dragging is possible only if the <A HREF="macr5bxj.htm">$diagflag</A> <A HREF="glos7v51.htm">variable</A> is set to TRUE.</P>
+
+<P>If the mouse pointer was on a mode line (except the bottom one), but has moved above or under it, the mode line is <A HREF="help2ig5.htm">moved</A> up or down as if it had been dragged by the mouse, thus resizing the affected windows.</P>
+
+<P>Other cases produce no effect.</P>
+
+<P>The command fails (putting FALSE in the <A HREF="macr38hf.htm">$status</A> variable) if the position of the mouse pointer is the same as that for the last mouse-move-down command. This allows easy detection of lack of mouse movement when the command is used in a <A HREF="glos9lnz.htm">macro</A>.</P>
+
+<P>This command is unaffected by <A HREF="glos9jec.htm">numeric arguments</A>.</P>
+
+<P>Note:Under the MS-Windows version of MicroEMACS, the top left and bottom right corners of a <A HREF="glos0wxa.htm">screen</A> have no special meaning. Under other versions, mouse-move-up will move the screen if the mouse-move-down was done in the top left corner and resize the screen if mouse-move-down was done in the bottom right corner.</P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Undoing Your Edits</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="scope">
+	<PARAM NAME="Keyword" VALUE="buffer">
+	<PARAM NAME="Keyword" VALUE="region">
+</OBJECT>
+
+<P><A NAME="undoingyouredits"></A><B>Undoing Your Edits</B></P>
+
+<P>It is all too easy to make mistakes while editing. But mistakes need not be permament. While MicroEMACS edits your file, it keeps track of the changes it makes to each buffer.  At any time you can undo each change done to your current buffer, starting with the last and moving backwards. This is done with the</P>
+
+<P><A HREF="glos3icl.htm">^_</A><A HREF="comm76gf.htm">undo</A></P>
+
+<P>command. You can also get a look at what MicroEMACS remembers of these editing changes by issuing the</P>
+
+<P><A HREF="glos3icl.htm">^XU</A><A HREF="comm0jw3.htm">list-undos</A></P>
+
+<P>command. There are also some environment variables responcible for deciding how the undo command currently work. These are:</P>
+
+<P><A HREF="macr1oo7.htm">$undoflag</A>if FALSE, the undo mechinism is disabled</P>
+
+<P><A HREF="macr8dtb.htm">$dispundo</A>if TRUE, the number of basic editing operations in the undo stack of the current buffer is displayed on the mode line.</P>
+
+</BODY>
+</HTML>

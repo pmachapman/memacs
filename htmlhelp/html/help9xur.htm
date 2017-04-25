@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>MAGIC Mode</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="MAGIC">
+	<PARAM NAME="Keyword" VALUE="mode">
+	<PARAM NAME="Keyword" VALUE="search">
+	<PARAM NAME="Keyword" VALUE="replace">
+	<PARAM NAME="Keyword" VALUE="regular expressions">
+</OBJECT>
+
+<P><A NAME="magic"></A><B>MAGIC Mode</B></P>
+
+<P>Normally, MicroEMACS uses the string you type in response to a search or replace <A HREF="glos3a3o.htm">command</A> as the string to find.  When magic mode is enabled, MicroEMACS considers the string you type as a pattern or template to use in finding a string to match.  Many characters in this template have special meaning:</P>
+
+<P><B>.</B>any single character, except newline.</P>
+
+<P><B>[</B><I>set</I><B>]</B>any single character from the bracketed <I>set</I>.</P>
+
+<P><B>^</B>beginning of a line.</P>
+
+<P><B>$</B>end of a line.</P>
+
+<P><B>\</B>the next character has no special meaning, take the next character literally (unless it is a parenthesis)</P>
+
+<P><B>?</B>the preceding character (or "<B>.</B>" or <B>[</B><I>set</I><B>]</B>) is optional.</P>
+
+<P><B>*</B>the preceding character (or "<B>.</B>" or <B>[</B><I>set</I><B>]</B>) matches zero to many times.</P>
+
+<P><B>+</B>the preceding character (or "<B>.</B>" or <B>[</B><I>set</I><B>]</B>) matches one to many times.</P>
+
+<P><B>\(</B><I>group</I><B>\)</B>define a <A HREF="glos8m28.htm">group</A> for the replacement string, or for the &amp;group <A HREF="glos66y6.htm">function</A>.</P>
+
+<P>Some characters in the replacement string can have special meanings:</P>
+
+<P><B>&amp;</B>insert all of the text matched by the search.</P>
+
+<P><B>\</B>the next character has no special meaning (but see groups below...)</P>
+
+<P><B>\1</B> to <B>\9</B>insert the text defined by the <I>n</I>th group in the search string.</P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>!BREAK directive</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="!BREAK">
+	<PARAM NAME="Keyword" VALUE="!WHILE">
+	<PARAM NAME="Keyword" VALUE="loop">
+</OBJECT>
+
+<P><A NAME=".break"></A><B>!BREAK</B></P>
+
+<P>This <A HREF="macr4183.htm">directive</A> lets you abort out of the most inner currently executing <A HREF="macr00rp.htm">while loop</A>, in a <A HREF="macr0a3p.htm">macro</A>. It is often used to abort processing for error conditions. For example:</P>
+
+<P>; Read in files and substitute "beginning" with "beginning"</P>
+
+<P>set %filename #list</P>
+
+<P>!while &amp;not &amp;seq %filename "&lt;end&gt;"</P>
+
+<P>!force    find-file %filename</P>
+
+<P>!if &amp;seq $status FALSE</P>
+
+<P>write-message "[File read error]"</P>
+
+<P><B>!break</B></P>
+
+<P>!endif</P>
+
+<P>beginning-of-file</P>
+
+<P>replace-string "beginning" "beginning"</P>
+
+<P>save-file</P>
+
+<P>set %filename #list</P>
+
+<P>!endwhile</P>
+
+</BODY>
+</HTML>

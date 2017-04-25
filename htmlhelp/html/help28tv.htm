@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Menu Examples</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="menu">
+</OBJECT>
+
+<H2><A NAME="menuexamples"></A>Menu Examples</H2>
+
+<P>bind-to-menu  forward-character  "&gt;&amp;Search&gt;&amp;Character@15&gt;&amp;Next"</P>
+
+<P>bind-to-menu  nop                "-"</P>
+
+<P>bind-to-menu  backward-character  "&amp;Previous"</P>
+
+<P>This creates a new popup menu named "<U>C</U>haracter" under the "<U>S</U>earch" menu, containing the two items "<U>N</U>ext" and "<U>P</U>revious", with a separator (for the sake of the demonstration) between the two.</P>
+
+<P>unbind-menu    "&gt;&amp;Search&gt;&amp;Character&gt;@1"</P>
+
+<P>removes the above-created separator.</P>
+
+<P>macro-to-menu  load-c-page    "&gt;Code &amp;page@4&gt;&amp;Load&gt;&amp;C"</P>
+
+<P>macro-to-menu  load-cpp-page  "C&amp;++"</P>
+
+<P>macro-to-menu  load-p-page    "&amp;Pascal"</P>
+
+<P>macro-to-menu  remove-c-page  "&lt;&amp;Remove&gt;&amp;C"</P>
+
+<P>macro-to-menu  remove-cpp-page   "C&amp;++"</P>
+
+<P>macro-to-menu  remove-p-page  "&amp;Pascal"</P>
+
+<P>bind-to-menu   nop            "&lt;-"</P>
+
+<P>macro-to-menu  remove-all-pages  "Remove &amp;all"</P>
+
+<P>This (assuming the specified macros actually exist) creates a new menu "Code <U>p</U>age", located between the "E<U>x</U>ecute" and the "<U>M</U>iscellaneous" menus in the menu bar. This new menu contains the "<U>L</U>oad", "<U>R</U>emove" and "Remove <U>a</U>ll" items, the later being preceded by a separator. Both the "<U>L</U>oad" and "<U>R</U>emove" items actually lead to sub-menus that both contain "<U>C</U>", "C<U>+</U>+" and "<U>P</U>ascal".</P>
+
+</BODY>
+</HTML>

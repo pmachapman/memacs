@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>previous-word command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="previous-word">
+	<PARAM NAME="Keyword" VALUE="position">
+	<PARAM NAME="Keyword" VALUE="point">
+	<PARAM NAME="Keyword" VALUE="word">
+</OBJECT>
+
+<P><A NAME="previous_word"></A><B>previous-word</B></P>
+
+<P>Default bindings: <A HREF="glos3icl.htm">M-B</A> and <A HREF="glos3icl.htm">FN^B</A> (Ctrl + Left arrow)</P>
+
+<P>Syntax:</P>
+
+<P><I>n</I>  previous-word</P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> moves the <A HREF="glos7kdw.htm">point</A> to the beginning character of the <I>n</I>th preceding <A HREF="help5i0j.htm">word</A>. If the point was located within a word before invoking the command, that word counts as the first one (thus, if <I>n</I> is 1, the point moves to the first character of the current word). If an attempt is made to move beyond the <A HREF="glos81bm.htm">buffer</A>'s beginning, the command fails but the point is still moved to the beginning of the buffer.</P>
+
+<P>If no <A HREF="glos9jec.htm">numeric argument</A> is specified, it is equivalent to <I>n</I> = 1.</P>
+
+<P>If <I>n</I> is null, the command has no effect.</P>
+
+<P>If <I>n</I> is negative, it causes the command to behave like <A HREF="comm33dw.htm">next-word</A> (invoked with the numeric argument <I>-n</I>).</P>
+
+</BODY>
+</HTML>

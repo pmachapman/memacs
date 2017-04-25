@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Setting Colors</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="color">
+</OBJECT>
+
+<H2><A NAME="colors"></A>Setting Colors</H2>
+
+<P>On systems which are capable of displaying colors, the mode commands can be used to set the background and foreground character colors. Using <A HREF="comm104l.htm">add-mode</A> (<A HREF="glos3icl.htm">^XM</A>) or <A HREF="comm1279.htm">delete-mode</A> (<A HREF="glos3icl.htm">^X^M</A>) and typing a lowercase color will set the background color in the current window. An uppercase color will set the foreground color in the current window.</P>
+
+<P>In a similar manner, <A HREF="comm8usl.htm">add-global-mode</A> (<A HREF="glos3icl.htm">M-M</A>) and <A HREF="comm0bj9.htm">delete-global-mode</A> (<A HREF="glos3icl.htm">M-^M</A>) will set the background or foreground colors of future windows.</P>
+
+<P>Colors that MicroEMACS knows about are: <B>white</B>, <B>gray</B> (dark grey), <B>grey</B> (light grey), <B>cyan</B>, <B>lcyan</B> (light cyan), <B>magenta</B>, <B>lmagenta</B> (light magenta), <B>yellow</B>, <B>lyellow</B> (light yellow), <B>blue</B>, <B>lblue</B> (light blue), <B>red</B>, <B>lred</B> (light red), <B>green</B>, <B>lgreen</B> (light green) and <B>black</B>. If the computer you are running on does not have enough colors, MicroEMACS will attempt to guess at what color to use when you ask for one which is not there (systems with only 8 colors support: white, cyan, magenta, yellow, blue, red, green and black).</P>
+
+<P>Under Microsoft Windows, the whole 16 colors above are available if the display system supports them (depending on the value of the <A HREF="help8kbp.htm">Colors profile</A>). In that case, <A HREF="glos0bxh.htm">Mode lines</A> are displayed as black characters on a light grey background. The <A HREF="glos91id.htm">message line</A> and desktop colors can be modified through the Windows "control panel" as "window text", "window background" and "application workspace". The value of the <A HREF="macr9diq.htm">$deskcolor</A> <A HREF="glos7v51.htm">variable</A> is always irrelevant.</P>
+
+</BODY>
+</HTML>

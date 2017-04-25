@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>!GOTO directive</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="!GOTO">
+	<PARAM NAME="Keyword" VALUE="!WHILE">
+	<PARAM NAME="Keyword" VALUE="loop">
+</OBJECT>
+
+<P><A NAME=".goto"></A><B>!GOTO</B></P>
+
+<P>The flow of execution within a MicroEMACS <A HREF="macr0a3p.htm">macro</A> can be controlled using the !GOTO <A HREF="macr4183.htm">directive</A>. It takes a label as argument. A label consists of a line starting with an asterisk "*" and then an alphanumeric label. Only labels in the currently executing macro can be jumped to, and trying to jump to a non-existing label terminates execution of a macro. For example:</P>
+
+<P>; Create a block of DATA statements for a BASIC program</P>
+
+<P>insert-string "1000 DATA "</P>
+
+<P>set %linenum 1000</P>
+
+<P><B>*nxtin</B></P>
+
+<P>update-screen    ;make sure we see the changes</P>
+
+<P>set %data @@"Next number: "</P>
+
+<P>!if &amp;equal %data 0</P>
+
+<P><B>!goto</B> finish</P>
+
+<P>!endif</P>
+
+<P>!if &amp;greater $curcol 60</P>
+
+<P>2 delete-previous-character</P>
+
+<P>newline</P>
+
+<P>set %linenum &amp;add %linenum 10</P>
+
+<P>insert-string &amp;cat %linenum " DATA "</P>
+
+<P>!endif</P>
+
+<P>insert-string &amp;cat %data ", "</P>
+
+<P><B>!goto</B> nxtin</P>
+
+<P><B>*finish</B></P>
+
+<P>2 delete-previous-character</P>
+
+<P>newline</P>
+
+<P>Note that loops constructed with <A HREF="macr00rp.htm">!WHILE</A> are usually more efficient than those constructed purely by !GOTOs.</P>
+
+</BODY>
+</HTML>

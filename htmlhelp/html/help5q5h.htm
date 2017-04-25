@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Menu Name Syntax</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="menu">
+</OBJECT>
+
+<H2><A NAME="menuname"></A>Menu Name Syntax</H2>
+
+<P>Menu names used by the <A HREF="comm9njp.htm">bind-to-menu</A>, <A HREF="comm17jp.htm">macro-to-menu</A> and <A HREF="comm4qut.htm">unbind-menu</A> commands follow a common syntax. A menu name is composed of <A HREF="help9agd.htm">menu item</A> names separated by right brackets:</P>
+
+<P>&gt;<I>item1</I>&gt;<I>item2</I>&gt;<I>item3</I></P>
+
+<P>When a menu name begins by a right bracket "<B>&gt;</B>", it means that the menu item immediately following this right bracket is located within the menu bar. A menu name can also be specified as:</P>
+
+<P><I>item1</I>&gt;<I>item2</I></P>
+
+<P>In this case <I>item1</I> is located within the last accessed menu. One or more left brackets "<B>&lt;</B>" can appear before the first item, meaning it is located as many levels up in the menu hierarchy:</P>
+
+<P>&lt;&lt;<I>item1</I>&gt;<I>item2</I></P>
+
+<P>Notes:The tilde character "~" cannot be used to escape the meaning of the brackets ("<B>&lt;</B>" or "<B>&gt;</B>") and ampersand "<B>&amp;</B>" characters within menu names. The brackets simply cannot be escaped. The ampersand can be escaped (i.e. considered as a real ampersand instead of indicating the underscoring of a character) by using two consecutive ampersands: "<B>&amp;&amp;</B>".</P>
+
+<P>It is good practice to enclose menu names in double quotes. This is necessary when there are embedded spaces within a name. Also, when a menu name begins by an ampersand, MicroEMACS may misinterpret it as a function name.</P>
+
+<P>See the <A HREF="help28tv.htm">examples</A> for a more practical explanation...</P>
+
+</BODY>
+</HTML>

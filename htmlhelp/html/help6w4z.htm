@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>MS-Windows Specifics</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="MS-Windows">
+	<PARAM NAME="Keyword" VALUE="windows">
+</OBJECT>
+
+<H1><A NAME="ms_windowsspecifics"></A>MS-Windows Specifics</H1>
+
+<P>The port of MicroEMACS to the Microsoft Windows environment exhibits a few particularities not encountered with other versions of the editor:</P>
+
+<P>All the standard <A HREF="glos3a3o.htm">commands</A> are available. <A HREF="macr5zar.htm">Additional commands</A> are available: they allow access to the <A HREF="glos6fz8.htm">clipboard</A>, <A HREF="help5x2r.htm">menu customization</A>, invocation of the <A HREF="comm7h7p.htm">help engine</A> and control of <A HREF="glos0wxa.htm">screens</A> as MDI (Multiple Document Interface) windows.</P>
+
+<P>In interactive mode, the file access commands use a dialog box instead of the <A HREF="glos91id.htm">message line</A> prompt.</P>
+
+<P>It is possible to <A HREF="help706o.htm">drag files</A> from the Windows File Manager onto MicroEMACS, providing a <A HREF="glos9lnz.htm">macro</A> has been set-up to handle them.</P>
+
+<P>MDI windows (aka screens) and the MicroEMACS frame window can be resized by dragging their border with the mouse or using the sizing buttons.</P>
+
+<P>Text can be scrolled into view by using the scroll bars located at the right and bottom of each screen.</P>
+
+<P>When MicroEMACS is running a <A HREF="glos9lnz.htm">macro</A>, waiting for user input on the message line, or reading/writing a file, it is possible to input menu or other mouse commands, but only a subset of features is available. In particular, resizing is disabled and most menu options are grayed.</P>
+
+<P>It is possible to terminate MicroEMACS at any time, using the "<U>C</U>lose"<B> </B>(Alt+F4) item of the upper-left corner menu box. If there are modified <A HREF="glos81bm.htm">buffers</A>, or a file write operation is in progress, a confirmation is requested.</P>
+
+<P>The amount of <A HREF="help7y91.htm">memory</A> available for buffers is limited only by the actual (conventional and extended) memory available, including virtual memory when running Windows NT or Windows 3.x in 386-enhanced mode.</P>
+
+<P>MicroEMACS can <A HREF="help7fso.htm">synchronize</A> with other applications it launches.</P>
+
+<P>MicroEMACS runs as a well-behaved Windows application, <A HREF="help7z6t.htm">sharing the processor</A> with other applications, even when a lengthy operation is in process.</P>
+
+<P>Under Windows 3.x, MicroEMACS is a protected mode-only application: <B>it does not support real mode</B>, and runs only under standard or 386-enhanced mode.</P>
+
+<P>The following <A HREF="glos7y5h.htm">page</A> are distributed with MicroEMACS for Windows and loaded by the <A HREF="help3d5x.htm">emacs.rc</A> start-up file supplied in the distribution package:</P>
+
+<P><A HREF="help8fms.htm">CUA.CMD</A>Common User Access macros</P>
+
+<P><A HREF="help2kdg.htm">DEV.CMD</A>example macro for software development</P>
+
+<P><A HREF="help5qck.htm">MDI.CMD</A>macros to map files to MDI windows</P>
+
+<P>In addition, if a page named CUSTOM.CMD (to be supplied by the user) is found in the path, it is loaded after the three above.</P>
+
+</BODY>
+</HTML>

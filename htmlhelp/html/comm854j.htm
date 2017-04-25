@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>list-buffers command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="list-buffers">
+	<PARAM NAME="Keyword" VALUE="buffer">
+</OBJECT>
+
+<P><A NAME="list_buffers"></A><B>list-buffers</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">^X^B</A></P>
+
+<P>Syntax:</P>
+
+<P>list-buffers</P>
+
+<P>or:</P>
+
+<P><I>n</I>  list-buffers</P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> creates a list of all the <A HREF="glos81bm.htm">buffer</A> with, for each buffer, the file it was read from, its size, and the active <A HREF="help9qjy.htm">modes</A>. The list is stored in a buffer named "<B>[Buffers]</B>" and is displayed in either a <A HREF="glos1x6a.htm">popup buffer</A> </P>
+
+<P>or a regular <A HREF="glos1zg7.htm">window</A>, depending on the value of the <A HREF="macr0td3.htm">$popflag</A> <A HREF="glos7v51.htm">variable</A>.</P>
+
+<P>Within the list, an at sign "<B>@</B>" in column one shows that a file has already been read into a buffer. A star "<B>*</B>" in column two means that the contents of the buffer have been modified since the last time they were written to disk. A pound sign "<B>#</B>" in column three indicates the file was to large to read into memory and was truncated. A lower than sign "<B>&lt;</B>" in column four indicates that the buffer has been <A HREF="help3qed.htm">narrowed</A>.</P>
+
+<P>The <A HREF="help9qjy.htm">modes</A> are shown in columns 5 through 14, using a single letter code for each active mode:</P>
+
+<P><B>CodeCorresponding mode:</B></P>
+
+<P>W<A HREF="help8rhs.htm">WRAP</A></P>
+
+<P>C<A HREF="help24bp.htm">CMODE</A></P>
+
+<P>E<A HREF="help1vsk.htm">EXACT</A></P>
+
+<P>V<A HREF="help2czb.htm">VIEW</A></P>
+
+<P>O<A HREF="help465u.htm">OVER</A></P>
+
+<P>M<A HREF="help9xur.htm">MAGIC</A></P>
+
+<P>Y<A HREF="help13w4.htm">CRYPT</A></P>
+
+<P>A<A HREF="help5ftx.htm">ASAVE</A></P>
+
+<P>R<A HREF="help05dc.htm">REP</A></P>
+
+<P>Used without a <A HREF="help6uer.htm">numeric argument</A>, list-buffers does not list invisible buffers. If a numeric argument is given, this command lists all buffers, including those hidden buffers used by MicroEMACS for internal data and <A HREF="glos9lnz.htm">macros</A> storage.</P>
+
+</BODY>
+</HTML>

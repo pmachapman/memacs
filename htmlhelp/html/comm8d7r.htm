@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>query-replace-string command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="query-replace-string">
+	<PARAM NAME="Keyword" VALUE="replace">
+</OBJECT>
+
+<P><A NAME="query_replace_string"></A><B>query-replace-string</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">M-^R</A></P>
+
+<P>Syntax:</P>
+
+<P><I>n</I>  query-replace-string  <I>pattern</I>  <I>replacement</I></P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> attempts to replace, from the <A HREF="glos7kdw.htm">point</A> onward, each piece of text that matches the <I>pattern</I> string by the <I>replacement</I> string. The <I>pattern</I> string is interpreted literally, unless <A HREF="help9xur.htm">MAGIC</A> mode is enabled in the current <A HREF="glos81bm.htm">buffer</A>.</P>
+
+<P>Each time a match is found, you are queried and can answer by one of the following keystrokes:</P>
+
+<P><B>Y</B>replaces the current matching text</P>
+
+<P><B>N</B>skips the current match</P>
+
+<P><B>!</B>replaces the current matching text and all following matches without anymore queries.</P>
+
+<P><B>U</B>jumps back to the last performed replacement and undoes it</P>
+
+<P><A HREF="glos3icl.htm">^G</A>aborts the command, leaving the <A HREF="glos7kdw.htm">point</A> at its current position</P>
+
+<P><B>.</B> (dot)aborts and moves the point back to where the command was originally issued</P>
+
+<P><B>?</B>lists the above options</P>
+
+<P>If no <A HREF="glos9jec.htm">numeric arguments</A> is specified, all the matching pieces of text are processed until the end of the buffer is reached. If a positive numeric argument is used, only the first <I>n</I> matches are taken into account. If <I>n</I> is negative, the command fails.</P>
+
+<P>When this command is invoked interactively, the keystroke used to signal the end of the <I>pattern</I> or <I>replacement</I> string is specified by the <A HREF="macr5ect.htm">$sterm</A> <A HREF="glos7v51.htm">variable</A> (it is usually the <A HREF="glos2it5.htm">Meta key</A>). Also, both strings may have default values (which are stored in the <A HREF="macr94iw.htm">$search</A> and <A HREF="macr76lh.htm">$replace</A> variables). If you want to replace a string with nothing, and there is a non-empty default for the <I>replacement</I> string, striking <A HREF="glos3icl.htm">^K</A> will override that default and enter an empty string instead.</P>
+
+<P>Note:to perform global string replacements without interactive involvement, use the <A HREF="comm0gkn.htm">replace-string</A> command.</P>
+
+</BODY>
+</HTML>

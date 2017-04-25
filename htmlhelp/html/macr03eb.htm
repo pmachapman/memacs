@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Interactive Variables</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="interactive">
+	<PARAM NAME="Keyword" VALUE="variable">
+</OBJECT>
+
+<H2><A NAME="interactivevariables"></A>Interactive Variables</H2>
+
+<P>Interactive <A HREF="macr3d0z.htm">variables</A> are actually a method to prompt the user for a string. This is done by using an at sign "@" followed with a string <A HREF="macr0hkj.htm">argument</A>. The string is displayed on the <A HREF="glos91id.htm">message line</A>, and the editor waits for the user to type in a string which is then returned as the value of the interactive variable. For example:</P>
+
+<P>find-file <B>@</B>"What file? "</P>
+
+<P>will ask the user for a file name, and then attempt to find it. Note also that complex expressions can be built up with these operators, such as: </P>
+
+<P>set %default "file1"</P>
+
+<P><B>@</B>&amp;cat &amp;cat "File to decode[" %default "]: "</P>
+
+<P>which prompts the user with the string:</P>
+
+<P>File to decode[file1]:</P>
+
+</BODY>
+</HTML>

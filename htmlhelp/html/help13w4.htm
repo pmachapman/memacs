@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>CRYPT Mode</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="CRYPT">
+	<PARAM NAME="Keyword" VALUE="mode">
+	<PARAM NAME="Keyword" VALUE="encryption">
+	<PARAM NAME="Keyword" VALUE="secret">
+</OBJECT>
+
+<P><A NAME="crypt"></A><B>CRYPT Mode</B></P>
+
+<P>For files of a sensitive nature, MicroEMACS can encrypt text as it is written or read. The encryption algorithm is a Beaufort Cipher with a variant key. This is reasonably difficult to decrypt.</P>
+
+<P>When you write out text, if CRYPT mode is active and there is no encryption key, MicroEMACS will ask:</P>
+
+<P>Encryption String:</P>
+
+<P>Type in a word or phrase of at least five and up to 128 characters for the encryption to use. If you look at the file which is then written out, all the printable characters have been scrambled.To read such a file later, you can use the <B>-k</B> <A HREF="help46cz.htm">switch</A> when calling up MicroEMACS:</P>
+
+<P>emacs -k <I>filename</I></P>
+
+<P>and you will be asked the encryption key before the file is read.</P>
+
+<P>You can modify the encryption key by using the <A HREF="comm9nax.htm">set-encryption-key</A> (<A HREF="glos3icl.htm">M-E</A>) command.</P>
+
+<P>Note: previous versions of MicroEMACS used a defective encryption method. For compatibility, you can chose to use the older algorithm by setting the <A HREF="macr09o4.htm">$oldcrypt</A> <A HREF="glos7v51.htm">variable</A> to TRUE.</P>
+
+</BODY>
+</HTML>

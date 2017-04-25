@@ -15,6 +15,7 @@
 #include    "edef.h"
 
 #include    "mswin.h"
+#include    "mswhelp.h"
 
 #if WINDOW_MSWIN32
 #include <setjmp.h>
@@ -197,7 +198,11 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
     if (!MainHelpFile) {    /* default WinHelp file name */
         if (i > 0) text[i+1] = '\0';
         else text[0] = '\0';
-        strcat (text, "mewin.hlp");
+#if WINXP
+        strcat (text, "mewin.chm");
+#else
+        strcat(text, "mewin.hlp");
+#endif
         MainHelpFile = copystr (text);
     }
     if (i > 0) {
@@ -859,9 +864,15 @@ LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, UINT wParam,
 	break;
 	
     case WM_DESTROY:
-	if (MainHelpUsed) WinHelp (hFrameWnd, MainHelpFile, HELP_QUIT, NULL);
-	if (HelpEngineFile[0] != '\0') WinHelp (hFrameWnd, HelpEngineFile,
+#if WINXP
+	if (MainHelpUsed) HtmlHelp (hFrameWnd, MainHelpFile, HH_CLOSE_ALL, NULL);
+	if (HelpEngineFile[0] != '\0') HtmlHelp (hFrameWnd, HelpEngineFile,
+                                                HH_CLOSE_ALL, NULL);
+#else
+	if (MainHelpUsed) WinHelp(hFrameWnd, MainHelpFile, HELP_QUIT, NULL);
+	if (HelpEngineFile[0] != '\0') WinHelp(hFrameWnd, HelpEngineFile,
                                                 HELP_QUIT, NULL);
+#endif
 	EmacsBroadcast (MAKELONG(EMACS_ENDING,EMACS_PROCESS));
 	PostQuitMessage (0);
 	break;

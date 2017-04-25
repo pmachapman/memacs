@@ -1,0 +1,422 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+	<param name="Auto Generated" value="Yes">
+</OBJECT>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="MicroEMACS 4.0 for MS-Windows">
+		<param name="Local" value="html/help7jnc.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Index">
+		<param name="Local" value="html/help7jnc.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Introduction">
+			<param name="Local" value="html/help1nzi.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="History">
+			<param name="Local" value="html/help1ptl.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Support">
+			<param name="Local" value="html/help4a5w.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Copyright">
+			<param name="Local" value="html/help1ks4.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Keyboard">
+		<param name="Local" value="html/help2uec.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Procedures">
+		<param name="Local" value="html/help8f1v.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="The Basics">
+			<param name="Local" value="html/help8j3n.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Getting at Files">
+			<param name="Local" value="html/help10dv.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Searching and Replacing">
+			<param name="Local" value="html/help0ndz.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Cutting and Pasting">
+			<param name="Local" value="html/help1mqv.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Moving Text">
+			<param name="Local" value="html/help0xkk.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Copying Text">
+			<param name="Local" value="html/help4ub8.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Using the Mouse">
+			<param name="Local" value="html/help4s2t.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Repositioning the Point with the Mouse">
+			<param name="Local" value="html/help435g.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Scrolling Text Inside a Window with the Mouse">
+			<param name="Local" value="html/help41mf.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Moving a Mode Line with the Mouse">
+			<param name="Local" value="html/help2ig5.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Copying a Region with the Mouse">
+			<param name="Local" value="html/help3zce.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Killing a Region with the Mouse">
+			<param name="Local" value="html/help77hq.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Pasting Text with the Mouse">
+			<param name="Local" value="html/help3xpw.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Using menus">
+			<param name="Local" value="html/help9q5v.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="File menu">
+			<param name="Local" value="html/help54vp.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Edit menu">
+			<param name="Local" value="html/help2fed.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Search menu">
+			<param name="Local" value="html/help0fw5.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Execute menu">
+			<param name="Local" value="html/help4a2d.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Miscellaneous menu">
+			<param name="Local" value="html/help8rxx.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Screen menu">
+			<param name="Local" value="html/help5wtx.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Help menu">
+			<param name="Local" value="html/help3j3p.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Customizing Command Keys">
+			<param name="Local" value="html/help329f.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Issuing Commands">
+			<param name="Local" value="html/help9d2r.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Interactive Numeric Arguments">
+			<param name="Local" value="html/help6uer.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Command Lines">
+			<param name="Local" value="html/help5hrn.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="The Outside World">
+			<param name="Local" value="html/help5010.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Synchronizing With Another Program">
+			<param name="Local" value="html/help7fso.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Buffers">
+			<param name="Local" value="html/help4cqb.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Regions">
+			<param name="Local" value="html/help7i43.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Paragraphs">
+			<param name="Local" value="html/help21o3.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Words">
+			<param name="Local" value="html/help5i0j.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Screens">
+			<param name="Local" value="html/help8j8z.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Windows">
+			<param name="Local" value="html/help70vn.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Setting Colors">
+			<param name="Local" value="html/help908j.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Setting the Font">
+			<param name="Local" value="html/help22nn.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Case Control">
+			<param name="Local" value="html/help01ik.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Controlling Tabs">
+			<param name="Local" value="html/help1lkj.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Repetitive Tasks">
+			<param name="Local" value="html/help03sj.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Narrowing Your Scope">
+			<param name="Local" value="html/help3qed.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Creating New Commands">
+			<param name="Local" value="html/help7bar.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Customizing Menus">
+			<param name="Local" value="html/help5x2r.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Menu Name Syntax">
+			<param name="Local" value="html/help5q5h.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Menu Item Syntax">
+			<param name="Local" value="html/help9agd.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Menu Examples">
+			<param name="Local" value="html/help28tv.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Drag and Drop">
+			<param name="Local" value="html/help706o.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Modes of Operation">
+		<param name="Local" value="html/help9qjy.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Start-up">
+		<param name="Local" value="html/help81f4.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Start-up File">
+			<param name="Local" value="html/help3d5x.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Command Line Switches">
+			<param name="Local" value="html/help46cz.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Profiles">
+			<param name="Local" value="html/help8nxv.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Colors Profile">
+			<param name="Local" value="html/help8kbp.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="DOSExec Profile">
+			<param name="Local" value="html/help9jdx.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="DOSBox Profile">
+			<param name="Local" value="html/help8qud.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="HelpFile Profile">
+			<param name="Local" value="html/help2411.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="InitialSize Profile">
+			<param name="Local" value="html/help0t7p.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Shell and ShellExecOption Profiles">
+			<param name="Local" value="html/help4cit.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="TimeSlice Profile">
+			<param name="Local" value="html/help7z6t.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Memory Usage">
+		<param name="Local" value="html/help7y91.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="MS-Windows Specifics">
+		<param name="Local" value="html/help6w4z.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="CUA.CMD">
+			<param name="Local" value="html/help8fms.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="DEV.CMD">
+			<param name="Local" value="html/help2kdg.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="MDI.CMD">
+			<param name="Local" value="html/help5qck.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Sorry, no help available on this topic">
+		<param name="Local" value="html/help55r9.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Glossary">
+		<param name="Local" value="html/glos5oft.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Macro Language">
+		<param name="Local" value="html/macr0a3p.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Commands">
+			<param name="Local" value="html/macr9ylv.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Binding commands">
+			<param name="Local" value="html/macr2epf.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Block of Text commands">
+			<param name="Local" value="html/macr30fn.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Buffer, Window and Screen commands">
+			<param name="Local" value="html/macr3wj7.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Clipboard and Kill Buffer commands">
+			<param name="Local" value="html/macr7ng3.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Execution, Macro and Variable commands">
+			<param name="Local" value="html/macr7183.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="File Commands">
+			<param name="Local" value="html/macr2s1f.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Mouse commands">
+			<param name="Local" value="html/macr038z.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Positioning commands">
+			<param name="Local" value="html/macr4k8j.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Search and Replace commands">
+			<param name="Local" value="html/macr9437.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Miscellaneous Commands">
+			<param name="Local" value="html/macr56nn.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Standard commands">
+			<param name="Local" value="html/macr5kz7.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Additional commands">
+			<param name="Local" value="html/macr5zar.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Directives">
+			<param name="Local" value="html/macr4183.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Arguments">
+			<param name="Local" value="html/macr0hkj.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Constants">
+			<param name="Local" value="html/macr8lwz.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Variables">
+			<param name="Local" value="html/macr3d0z.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Buffer Variables">
+			<param name="Local" value="html/macr6h83.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Environmental Variables">
+			<param name="Local" value="html/macr7ovn.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Interactive Variables">
+			<param name="Local" value="html/macr03eb.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="User Variables">
+			<param name="Local" value="html/macr3m7n.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Functions">
+			<param name="Local" value="html/macr6ctv.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Boolean Functions">
+			<param name="Local" value="html/macr7myb.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Numeric Functions">
+			<param name="Local" value="html/macr2po3.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="String Functions">
+			<param name="Local" value="html/macr8ewj.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Miscellaneous Functions">
+			<param name="Local" value="html/macr0nzn.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Comments">
+			<param name="Local" value="html/macr2ghf.htm">
+			</OBJECT>
+	</UL>
+</UL>
+</BODY></HTML>

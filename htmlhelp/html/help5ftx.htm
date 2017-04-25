@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>ASAVE Mode</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="ASAVE">
+	<PARAM NAME="Keyword" VALUE="mode">
+	<PARAM NAME="Keyword" VALUE="autosave">
+	<PARAM NAME="Keyword" VALUE="save">
+</OBJECT>
+
+<P><A NAME="asave"></A><B>ASAVE Mode</B></P>
+
+<P>When this mode is on, MicroEMACS automatically saves the contents of your current <A HREF="glos81bm.htm">buffer</A> to disk every time you have typed 256 characters. The buffer is saved to the file named on the <A HREF="glos0bxh.htm">mode line</A> of the buffer. This mode assures you that you will loose very little text should your computer crash while you are editing. Be sure you are willing to have your original file replaced automatically before you add this mode.</P>
+
+<P>The frequency of saving can be altered by changing the contents of the <A HREF="macr6qqt.htm">$asave</A> <A HREF="glos7v51.htm">variable</A>.Use the <A HREF="comm08j8.htm">set</A> (<A HREF="glos3icl.htm">^XA</A>) <A HREF="glos3a3o.htm">command</A> like this:</P>
+
+<P>^XA $asave 2048</P>
+
+<P>to tell MicroEMACS to automatically save the current buffer after 2048 characters are typed.</P>
+
+<P>Note:the <A HREF="macr6mpg.htm">$acount</A> variable contains the count down to the next auto-save.</P>
+
+</BODY>
+</HTML>

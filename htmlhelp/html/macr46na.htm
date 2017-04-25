@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>!IF, !ELSE and !ENDIF directives</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="!IF">
+	<PARAM NAME="Keyword" VALUE="!ELSE">
+	<PARAM NAME="Keyword" VALUE="!ENDIF">
+</OBJECT>
+
+<P><A NAME=".if"></A><B>!IF, !ELSE and !ENDIF</B></P>
+
+<P>The !IF <A HREF="macr4183.htm">directive</A> allows for conditional execution within a <A HREF="macr0a3p.htm">macro</A>.</P>
+
+<P>Lines following the !IF directive, until the corresponding !ELSE or !ENDIF, are executed only if the expression within the !IF line <A HREF="macr0hkj.htm">evaluates</A> to a TRUE value. Lines following an !ELSE directive, until the corresponding !ENDIF, are executed only if the expression within the corresponding !IF line did not evaluate to a TRUE value.</P>
+
+<P>For example, the following macro creates the portion of a text file automatically:</P>
+
+<P><B>!if</B> &amp;sequal %curplace "timespace vortex"</P>
+
+<P>insert-string "First, rematerialize~n"</P>
+
+<P><B>!endif</B></P>
+
+<P><B>!if</B> &amp;sequal %planet "earth"    ;If we have landed on earth...</P>
+
+<P><B>!if</B> &amp;sequal %time "late 20th century"    ;and we are then</P>
+
+<P>write-message "Contact U.N.I.T."</P>
+
+<P><B>!else</B></P>
+
+<P>insert-string "Investigate the situation....~n"</P>
+
+<P>insert-string "(SAY 'stay here Sarah)~n"</P>
+
+<P><B>!endif</B></P>
+
+<P><B>!else</B></P>
+
+<P>set %conditions @"Atmosphere conditions outside? "</P>
+
+<P><B>!if</B> &amp;sequal %conditions "safe"</P>
+
+<P>insert-string &amp;cat "Go outside......" "~n"</P>
+
+<P>insert-string "lock the door~n"</P>
+
+<P><B>!else</B></P>
+
+<P>insert-string "Dematerialize..try somewhen else"</P>
+
+<P>newline</P>
+
+<P><B>!endif</B></P>
+
+<P><B>!endif</B></P>
+
+</BODY>
+</HTML>

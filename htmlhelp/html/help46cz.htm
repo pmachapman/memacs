@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Command Line Switches</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="switches">
+	<PARAM NAME="Keyword" VALUE="start-up">
+</OBJECT>
+
+<H2><A NAME="commandlineswitches"></A>Command Line Switches</H2>
+
+<P>The command line used to launch MicroEMACS looks like this:</P>
+
+<P>EMACS.EXE   <I>switches    files to edit</I></P>
+
+<P>The following <I>switches</I> can be specified:</P>
+
+<P><B>@</B><I>file</I>This causes the named <I>file</I> to be executed instead of the standard <A HREF="help3d5x.htm">EMACS.RC</A> file before MicroEMACS reads in any other files. More than one of these can be placed on the command line, and they will be executed in the order that they appear.</P>
+
+<P><B>-C</B>The following source files on the command line can be changed (as opposed to being in VIEW mode). This is mainly used to cancel the effects of the -v switch used previously in the same command line. </P>
+
+<P><B>-E</B>This flag causes emacs to automatically run the start-up file "error.cmd" instead of emacs.rc. This can be used by compilers for error processing.</P>
+
+<P><B>-G</B><I>num</I> or <B>+</B><I>num</I>Upon entering MicroEMACS, position the cursor at the <I>num</I> line of the first file.</P>
+
+<P><B>-I</B><I>var  value</I>Initialize a MicroEMACS <A HREF="macr3d0z.htm">variable</A> with <I>value</I>.</P>
+
+<P><B>-K</B><I>key</I>This tells MicroEMACS to place the source files in <A HREF="help13w4.htm">CRYPT mode</A> and read it in using <I>key</I> as the encryption key. If no key is listed after the <B>-K</B> switch, you will be prompted for a key, and it will not be echoed as it is typed.</P>
+
+<P><B>-R</B>This places MicroEMACS in "restricted mode" where any <A HREF="macr9ylv.htm">commands</A> allowing the user to read or write any files other than the ones listed on the command line are disabled. Also all commands allowing the user access to the operating system are disabled. This makes MicroEMACS a "safe" environment for use within other applications and especially used as a remote editor for an electronic Bulletin Board System (BBS).</P>
+
+<P><B>-S</B><I>string</I>After MicroEMACS is started, it automatically <A HREF="help0ndz.htm">searches</A> for <I>string </I>in the first source file.</P>
+
+<P><B>-V</B>This tells MicroEMACS that all the following files on the command line should be in <A HREF="help2czb.htm">VIEW mode</A> to prevent any changes being made to them. </P>
+
+</BODY>
+</HTML>

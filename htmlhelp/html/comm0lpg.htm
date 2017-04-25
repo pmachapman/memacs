@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>shell-command command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="shell-command">
+	<PARAM NAME="Keyword" VALUE="execute">
+	<PARAM NAME="Keyword" VALUE="spawn">
+	<PARAM NAME="Keyword" VALUE="shell">
+	<PARAM NAME="Keyword" VALUE="DOS">
+</OBJECT>
+
+<P><A NAME="shell_command"></A><B>shell-command</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">^X!</A></P>
+
+<P>Syntax:</P>
+
+<P>shell-command  <I>program</I></P>
+
+<P>or:</P>
+
+<P><I>n</I>  shell-command  <I>program</I></P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> uses the shell to execute the named <I>program</I>.</P>
+
+<P>The <I>program</I> argument is a string. Note that if it contains spaces (as would be necessary to specify command line options), the string should be quoted.</P>
+
+<P>Under MS-Windows:</P>
+
+<P>This command launches the <I>program</I> within a <A HREF="glos17eg.htm">DOS box</A>. The current working directory where the <I>program</I> executes is set to the directory of the file in the current <A HREF="glos1zg7.htm">window</A> (or, if that window is not associated to a filename, to the last visited directory).</P>
+
+<P>If no <A HREF="glos9jec.htm">numeric argument</A> is specified, MicroEMACS and the launched <I>program</I> run independently. If a numeric argument is specified, MicroEMACS <A HREF="help7fso.htm">synchronizes</A> with the <I>program</I>.</P>
+
+<P>Note:Under MS-Windows 3.x, you cannot use this command to launch a Windows application. Use <A HREF="comm7nzh.htm">execute-program</A> instead.</P>
+
+</BODY>
+</HTML>

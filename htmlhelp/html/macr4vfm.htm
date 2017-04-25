@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>$softtab variable</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="$softtab">
+</OBJECT>
+
+<P><A NAME="_softtab"></A><B>$softtab</B></P>
+
+<P>The value of this <A HREF="macr3d0z.htm">variable</A> relates to the number of spaces inserted by MicroEMACS when the <A HREF="comm3aci.htm">handle-tab</A> command (which is normally bound to the TAB key) is invoked:</P>
+
+<P>If $softtab is <I>n</I>, strictly positive, tabs stops are located at every <I>n</I>th column and the handle-tab command inserts <U>space characters</U><B> </B>in sufficient number to move the <A HREF="glos7kdw.htm">point</A> to the next tab stop.</P>
+
+<P>If $softtab is zero, the handle-tab command inserts <U>true tab characters</U>.<B> </B></P>
+
+<P>If $softtab is strictly negative, the handle-tab command fails.</P>
+
+<P>This variable can be set by passing a <A HREF="glos9jec.htm">numeric argument</A> to handle-tab or by directly using the <A HREF="comm08j8.htm">set</A> command.</P>
+
+<P>Default value: 0</P>
+
+</BODY>
+</HTML>

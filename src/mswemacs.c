@@ -17,6 +17,7 @@
 #include    "mswin.h"
 
 #include    "mswmenu.h"
+#include    "mswhelp.h"
 /* to invoke the commands corresponding to scroll bar actions */
 
 #define MAXSCROLL 32767 /* maximum position for scrollbars */
@@ -221,6 +222,15 @@ int PASCAL helpengine (int f, int n)
         Result = mlreply (TEXT308, HelpKey, NLINE);
 	if ((Result != TRUE) && (Result != FALSE)) return Result;
 	    /* "Help key: " */
+#if WINXP
+	if (HelpKey[0] == '\0') {
+	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_HELP_FINDER, NULL);
+	}
+	else {
+	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_KEYWORD_LOOKUP,
+                     (DWORD)(LPSTR)&HelpKey[0]);
+	}
+#else
 	if (HelpKey[0] == '\0') {
 	    WinHelp (hFrameWnd, HelpEngineFile, HELP_INDEX, NULL);
 	}
@@ -228,6 +238,7 @@ int PASCAL helpengine (int f, int n)
 	    WinHelp (hFrameWnd, HelpEngineFile, HELP_KEY,
                      (DWORD)(LPSTR)&HelpKey[0]);
 	}
+#endif
     }
     return TRUE;
 } /* helpengine */

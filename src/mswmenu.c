@@ -789,7 +789,11 @@ static void PASCAL  SimulateExtendedKey (int ec)
 BOOL FAR PASCAL MenuCommand (UINT wParam, LONG lParam)
 {
     FARPROC     ProcInstance;
+#if WINXP
+    char        HelpTopic[NFILEN + NFILEN + 2];
+#else
     DWORD       HelpContext;
+#endif
 
     switch (LOWORD(wParam)) {
         /* the menu choices from here down to the default statement are
@@ -818,6 +822,25 @@ BOOL FAR PASCAL MenuCommand (UINT wParam, LONG lParam)
 	SimulateExtendedKey (abortc);
 	break;
 	
+#if WINXP
+	case IDM_WHELPINDEX:
+		strcpy(HelpTopic, MainHelpFile);
+		strcat(HelpTopic, "::/html/help7jnc.htm");
+		goto InvokeHelp;
+	case IDM_WHELPKEYBOARD:
+		strcpy(HelpTopic, MainHelpFile);
+		strcat(HelpTopic, "::/html/help2uec.htm");
+		goto InvokeHelp;
+	case IDM_WHELPCOMMANDS:
+		strcpy(HelpTopic, MainHelpFile);
+		strcat(HelpTopic, "::/html/macr9ylv.htm");
+		goto InvokeHelp;
+	case IDM_WHELPPROCEDURES:
+		strcpy(HelpTopic, MainHelpFile);
+		strcat(HelpTopic, "::/html/help8f1v.htm");
+InvokeHelp:
+	HtmlHelp(hFrameWnd, HelpTopic, HH_HELP_FINDER, NULL);
+#else
     case IDM_WHELPINDEX:
 	HelpContext = 0;
 	goto InvokeHelp;
@@ -830,8 +853,9 @@ BOOL FAR PASCAL MenuCommand (UINT wParam, LONG lParam)
     case IDM_WHELPPROCEDURES:
 	HelpContext = HELPID_PROCEDURES;
 InvokeHelp:
-	WinHelp (hFrameWnd, MainHelpFile,
-                 HelpContext ? HELP_CONTEXT : HELP_INDEX, HelpContext);
+	WinHelp(hFrameWnd, MainHelpFile,
+		HelpContext ? HELP_CONTEXT : HELP_INDEX, HelpContext);
+#endif
 	MainHelpUsed = TRUE;
 	break;
 	

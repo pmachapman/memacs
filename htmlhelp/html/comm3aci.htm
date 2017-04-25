@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>handle-tab command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="tabs">
+	<PARAM NAME="Keyword" VALUE="handle-tab">
+</OBJECT>
+
+<P><A NAME="handle_tab"></A><B>handle-tab</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">^I</A> (Tab key)</P>
+
+<P>Syntax:</P>
+
+<P><I>n</I>  handle-tab</P>
+
+<P>or:</P>
+
+<P>handle-tab</P>
+
+<P>The behavior of this <A HREF="macr9ylv.htm">command</A> depends on the <A HREF="glos9jec.htm">numeric argument</A> (<I>n</I>) that is supplied to it:</P>
+
+<P>With no argument, it simply inserts a single tab character or enough space characters (depending on its configuration...) to get to the next tab stop.</P>
+
+<P>With an non-zero argument <I>n</I>, tabs stops are reset to every <I>n</I>th column and <B>handle-tab</B> is reconfigured to insert <U>space characters</U> in sufficient number to get to the next tab stop. This also sets the <A HREF="macr4vfm.htm">$softtab</A> <A HREF="glos7v51.htm">variable</A> to <I>n</I>.</P>
+
+<P>With an argument <I>n</I> of zero, <B>handle-tab</B> is reconfigured so that it inserts <U>true tab characters</U> (its default behavior) and the tab stop interval is reset to its default value of 8.</P>
+
+<P>The distance which a true tab character moves the cursor is reflected by the value of the <A HREF="macr8942.htm">$hardtab</A> <A HREF="glos7v51.htm">variable</A>. Initially set to 8, this determines how far each tab stop is placed from the previous one.</P>
+
+</BODY>
+</HTML>

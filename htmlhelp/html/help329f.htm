@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Customizing Command Keys</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="keyboard">
+	<PARAM NAME="Keyword" VALUE="binding">
+	<PARAM NAME="Keyword" VALUE="command">
+	<PARAM NAME="Keyword" VALUE="macro">
+</OBJECT>
+
+<H2><A NAME="customizingcommandkeys"></A>Customizing Command Keys</H2>
+
+<P>MicroEMACS lets you decide what keys activate what <A HREF="glos3a3o.htm">command</A> or <A HREF="glos9lnz.htm">macro</A> through the use of: </P>
+
+<P><A HREF="glos3icl.htm">M-K</A><A HREF="comm208p.htm">bind-to-key</A></P>
+
+<P><A HREF="glos3icl.htm">^X^K</A><A HREF="comm1k8p.htm">macro-to-key</A></P>
+
+<P><A HREF="glos3icl.htm">M-^K</A><A HREF="comm233t.htm">unbind-key</A></P>
+
+<P>These commands can be used to permanently change your key <A HREF="glos21rb.htm">bindings</A> by placing them in your start up file. For example, if you have one of those nasty keyboards with a tilde "<B>~</B>" in the upper left corner, where the Escape key should be, and you want the tilde to become the <A HREF="glos2it5.htm">meta key</A>, add this line to <A HREF="help3d5x.htm">emacs.rc</A>: </P>
+
+<P>bind-to-key   meta-prefix   ~</P>
+
+<P>You can use this to make MicroEMACS feel similar to another editor by changing what keys activate which commands. </P>
+
+<P>The <A HREF="comm233t.htm">unbind-key</A> command is useful if you have a function key you keep tripping over, or if you are trying to make MicroEMACS look like a much more minimalist editor. </P>
+
+<P>You can get a list of all the key bindings that MicroEMACS uses by using the <A HREF="comm560j.htm">describe-bindings</A> command. Just do <A HREF="glos3icl.htm">M-X</A> and type:</P>
+
+<P>describe-bindings</P>
+
+</BODY>
+</HTML>

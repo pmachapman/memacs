@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>REP Mode</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="REP">
+	<PARAM NAME="Keyword" VALUE="mode">
+	<PARAM NAME="Keyword" VALUE="insert">
+	<PARAM NAME="Keyword" VALUE="OVER">
+</OBJECT>
+
+<P><A NAME="rep"></A><B>REP Mode</B></P>
+
+<P>MicroEMACS is normally in what many other editors consider "insert" mode. This means when you strike a character, MicroEMACS makes room for that character in the current line, inserting it between the existing characters. In REP mode, MicroEMACS instead replaces the existing character under the <A HREF="glos7kdw.htm">point</A> with the character you type. REP mode will not maintain the position of text which takes up multiple columns using tabs since it will replace a single tab character with the typed character which will not take up the same space on screen. For this purpose, the <A HREF="help465u.htm">OVER mode</A> is more appropriate</P>
+
+<P>However, Japanese KANJI characters will correctly replace and be replaced in this mode as the two bytes will be considered together when either style character is used.</P>
+
+</BODY>
+</HTML>

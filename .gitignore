@@ -27,3 +27,7 @@
 /xp/vs2017/Debug
 /xp/vs2017/Release
 /xp/vs2017/x64
+
+# Help Temporary Files
+*.chw
+*.gid

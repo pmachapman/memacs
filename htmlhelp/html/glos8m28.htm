@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Groups (glossary)</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="group">
+	<PARAM NAME="Keyword" VALUE="search">
+	<PARAM NAME="Keyword" VALUE="replace">
+</OBJECT>
+
+<P><A NAME="group"></A><B>Groups</B> can be used with text substitution commands or macros in MAGIC mode, to duplicate parts of the target into the result.</P>
+
+<P>In the search string, a group is defined as a portion beginning by the characters backlash and opening parenthesis "<B>\(</B>" and ended by the characters backlash and closing parenthesis "<B>\)</B>". There can be up to nine such groups.</P>
+
+<P>In the replace string, groups appear as a backlash followed by a decimal digit ("<B>\1</B>" to "<B>\9</B>"). The portion of the target string matched by the <I>n</I>th group is substituted to each occurrence of \<I>n</I> to form the replacement string.</P>
+
+<P>The function &amp;group <I>n</I> can be used in macros to obtain the text matched by the <I>n</I>th group in a search.</P>
+
+</BODY>
+</HTML>

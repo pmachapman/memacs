@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Arguments</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="argument">
+	<PARAM NAME="Keyword" VALUE="evaluate">
+	<PARAM NAME="Keyword" VALUE="expression">
+</OBJECT>
+
+<H2><A NAME="arguments"></A>Arguments</H2>
+
+<P>In the MicroEMACS <A HREF="macr0a3p.htm">macro language</A>, <A HREF="macr9ylv.htm">commands</A> and <A HREF="macr6ctv.htm">functions</A> often require arguments. There are three types of arguments and they are automatically converted to the proper type when used:</P>
+
+<P><B>Numerical</B>An ASCII string of digits which is interpreted as a numeric value. Any string which does not start with a digit or a minus sign "<B>-</B>" will be considered zero.</P>
+
+<P><B>String</B>An arbitrary string of characters. Strings are limited to 128 characters in length. </P>
+
+<P><B>Boolean</B>A logical value consisting of the string "TRUE" or "FALSE". Numeric strings will also evaluate to "FALSE" if they are equal to zero, and "TRUE" if they are non-zero. Arbitrary text strings will be considered equivalent "FALSE".</P>
+
+<P>While arguments usually follow the command or function that uses them, a single numerical argument can also be placed in front of a command, producing an effect similar to the <A HREF="help6uer.htm">numeric arguments</A> used in interactive mode.</P>
+
+<P>If a command needs more arguments than have be supplied on the line, the command fails.</P>
+
+</BODY>
+</HTML>

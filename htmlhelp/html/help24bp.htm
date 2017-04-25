@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>CMODE Mode</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="CMODE">
+	<PARAM NAME="Keyword" VALUE="mode">
+	<PARAM NAME="Keyword" VALUE="C language">
+	<PARAM NAME="Keyword" VALUE="brace">
+	<PARAM NAME="Keyword" VALUE="parenthesis">
+	<PARAM NAME="Keyword" VALUE="bracket">
+</OBJECT>
+
+<P><A NAME="cmode"></A><B>CMODE Mode</B></P>
+
+<P>This mode is specifically for editing programs written in the C language. When CMODE is active, MicroEMACS will try to anticipate what indentation is needed when the <A HREF="comm9tnp.htm">newline</A> (<A HREF="glos3icl.htm">^M</A> or Enter key) <A HREF="glos3a3o.htm">command</A> is used. It will always bring a pound sign "#" with only leading white space back to the left margin. It will also attempt to flash the cursor over the proper opening fence character matching any closing fence character (one of "<B>)}]</B>") that is typed (the duration of this flashing can be controlled by setting the <A HREF="macr8yhx.htm">$tpause</A> <A HREF="glos7v51.htm">variable</A>).</P>
+
+<P>Note that the standard start-up files for MicroEMACS install a <A HREF="glos9lnz.htm">macro</A> which checks any file being read into MicroEMACS and sets CMODE if the file ends with a .c or .h extension.</P>
+
+<P>Related <A HREF="glos3a3o.htm">command</A>:</P>
+
+<P><A HREF="glos3icl.htm">M-^F</A><A HREF="comm39np.htm">goto-matching-fence</A></P>
+
+</BODY>
+</HTML>

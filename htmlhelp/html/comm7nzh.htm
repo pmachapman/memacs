@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>execute-program command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="execute-program">
+	<PARAM NAME="Keyword" VALUE="execute">
+	<PARAM NAME="Keyword" VALUE="spawn">
+</OBJECT>
+
+<P><A NAME="execute_program"></A><B>execute-program</B></P>
+
+<P>Default binding: <A HREF="glos3icl.htm">^X$</A></P>
+
+<P>Syntax:</P>
+
+<P>execute-program  <I>program</I></P>
+
+<P>or:</P>
+
+<P><I>n</I>  execute-program  <I>program</I></P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> spawns an external <I>program</I>, without an intervening shell.</P>
+
+<P>The <I>program</I> argument is a string. Note that if it contains spaces (as would be necessary to specify command line options), the string should be quoted.</P>
+
+<P>Under MS-Windows:</P>
+
+<P>This command allows you to launch a Windows application from MicroEMACS. The current working directory where the application executes is set to the directory of the file in the current <A HREF="glos1zg7.htm">window</A> (or, if that window is not associated to a filename, to the last visited directory).</P>
+
+<P>If no <A HREF="glos9jec.htm">numeric argument</A> is specified, MicroEMACS and the launched application run independently. If a numeric argument is specified, MicroEMACS <A HREF="help7fso.htm">synchronizes</A> with the application.</P>
+
+<P>Note:Under MS-DOS, you cannot use this command to invoke built-in system commands (like DIR, for instance). Use <A HREF="comm0lpg.htm">shell-command</A> instead.</P>
+
+</BODY>
+</HTML>

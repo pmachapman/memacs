@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>next-page command</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="position">
+	<PARAM NAME="Keyword" VALUE="next-page">
+</OBJECT>
+
+<P><A NAME="next_page"></A><B>next-page</B></P>
+
+<P>Default bindings: <A HREF="glos3icl.htm">^V</A> and <A HREF="glos3icl.htm">FNV</A> (Page Down key)</P>
+
+<P>Syntax:</P>
+
+<P>next-page</P>
+
+<P>or:</P>
+
+<P><I>n</I>  next-page</P>
+
+<P>This <A HREF="macr9ylv.htm">command</A> has two different behaviors, depending on the presence or absence of a <A HREF="glos9jec.htm">numeric arguments</A>:</P>
+
+<P>If no numeric argument is specified, the <A HREF="glos1zg7.htm">window's</A> view into it's <A HREF="glos81bm.htm">buffer</A> is paged down. The new view overlaps the previous one by the number of lines specified by the <A HREF="macr3x9s.htm">$overlap</A> <A HREF="glos7v51.htm">variable</A>. By default, $overlap is equal to 2, so the last two lines of text in the initial view are displayed at the top of the window.</P>
+
+<P>If a positive numeric argument <I>n</I> is specified, the window's view into it's buffer is moved down by <I>n</I> lines, causing the text visible in the window to scroll up.</P>
+
+<P>If a negative numeric argument <I>n</I> is specified, the window's view into it's buffer is moved up by <I>n</I> lines, causing the text visible in the window to scroll down, as if the <A HREF="comm3ztx.htm">previous-page</A> command had been invoked, with a numeric argument of -<I>n</I>.</P>
+
+<P>In all cases, even if a numeric argument of 0 is given, the <A HREF="glos7kdw.htm">point</A> is moved to the first character at the top of the window.</P>
+
+</BODY>
+</HTML>
