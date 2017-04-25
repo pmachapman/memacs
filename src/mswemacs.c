@@ -227,8 +227,17 @@ int PASCAL helpengine (int f, int n)
 	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_HELP_FINDER, NULL);
 	}
 	else {
+		HH_AKLINK link;
+		link.cbStruct = sizeof(HH_AKLINK);
+		link.fReserved = FALSE;
+		link.pszKeywords = (LPCTSTR)HelpKey;
+		link.pszUrl = NULL;
+		link.pszMsgText = NULL;
+		link.pszMsgTitle = NULL;
+		link.pszWindow = NULL;
+		link.fIndexOnFail = TRUE;
 	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_KEYWORD_LOOKUP,
-                     (DWORD)(LPSTR)&HelpKey[0]);
+                     (DWORD)&link);
 	}
 #else
 	if (HelpKey[0] == '\0') {
