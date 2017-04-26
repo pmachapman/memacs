@@ -99,7 +99,7 @@ PASCAL typahead (void)
 /* EatKey: processes WM_(SYS)KEYxxx and WM_(SYS/MENU)CHAR messages */
 /* ======                                                          */
 
-BOOL FAR PASCAL EatKey (UINT MsgCode, UINT wParam, LONG lParam)
+BOOL FAR PASCAL EatKey (UINT MsgCode, WPARAM wParam, LPARAM lParam)
 
 /* This function must be called for each WM_(SYS)KEYxxx or
    WM_(SYS/MENU)CHAR message. It returns TRUE if it has taken possesion
@@ -224,7 +224,7 @@ KeyDown:
 /* PutMouseMessage: feeds a mouse message into the in_put queue */
 /* ===============                                              */
 
-void PASCAL    PutMouseMessage (UINT wMsg, UINT wParam, POINT Position)
+void PASCAL    PutMouseMessage (UINT wMsg, WPARAM wParam, POINT Position)
 
 {
     char    c;
@@ -277,7 +277,7 @@ void PASCAL    PutMouseMessage (UINT wMsg, UINT wParam, POINT Position)
 /* MouseMessage:    handles client area mouse messages */
 /* ============                                        */
 
-void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, UINT wParam, LONG lParam)
+void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     POINT           Position;
     static POINT old_Position = {-1, -1};/* last position reported by movement */
@@ -355,7 +355,11 @@ void FAR PASCAL DropMessage (HWND hWnd, HDROP hDrop)
         }
         else {
             /* the drop occured on a screen */
-            addline (DropBuf, ((SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR))->s_screen_name);
+#if WINXP
+			addline(DropBuf, ((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR))->s_screen_name);
+#else
+			addline(DropBuf, ((SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR))->s_screen_name);
+#endif
             if (DragQueryPoint (hDrop, &Point)) {
                 ClientToCell (hWnd, Point, &Point);
             }

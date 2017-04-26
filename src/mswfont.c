@@ -98,7 +98,7 @@ static void PASCAL UpdateSample (HWND hDlg, HFONT hFont,
 	SampleText[i++] = lowerc (c);
     }
     SampleText[i] = '\0';
-    SendDlgItemMessage (hDlg, ID_SAMPLE, WM_SETFONT, (UINT)hFont, (long)FALSE);
+    SendDlgItemMessage (hDlg, ID_SAMPLE, WM_SETFONT, (WPARAM)hFont, (LPARAM)FALSE);
     SetDlgItemText (hDlg, ID_SAMPLE, SampleText);
 } /* UpdateSample */
 
@@ -122,7 +122,7 @@ static void PASCAL    NewFont (HWND hDlg, BOOL TrustSizeEdit)
     if (i == LB_ERR) lf.lfFaceName[0] = 0;
     else {
 	SendDlgItemMessage (hDlg, ID_FONT, LB_GETTEXT, i,
-	                    (DWORD)(LPSTR)lf.lfFaceName);
+	                    (LPARAM)(LPSTR)lf.lfFaceName);
     }
     if (TrustSizeEdit) {
         i = GetDlgItemInt (hDlg, ID_FONTSIZE, &FontSizeOK, FALSE);
@@ -169,9 +169,9 @@ static void PASCAL AddSize (HWND hDlg, short int Height, short int Width)
 
     itoa (Height, ItemText, 10);
     i = SendDlgItemMessage (hDlg, ID_FONTSIZE, CB_ADDSTRING, 0,
-			    (DWORD)(LPSTR)ItemText);
+			    (LPARAM)(LPSTR)ItemText);
     SendDlgItemMessage (hDlg, ID_FONTSIZE, CB_SETITEMDATA, i,
-			MAKELONG(Width,Height));
+			(LPARAM)MAKELONG(Width,Height));
     
 } /* AddSize */
 
@@ -235,9 +235,9 @@ static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
 	char    FaceName[LF_FACESIZE];
 
 	SendDlgItemMessage (hDlg, ID_FONT, LB_GETTEXT,
-			    (UINT)SendDlgItemMessage (hDlg, ID_FONT,
+			    (WPARAM)SendDlgItemMessage (hDlg, ID_FONT,
 						      LB_GETCURSEL, 0, 0L),
-			    (DWORD)(LPSTR)&FaceName[0]);
+			    (LPARAM)(LPSTR)&FaceName[0]);
 	    /* FaceName now contains the currently selected face name */
 	hDC = GetDC (hDlg);
 	ProcInstance = MakeProcInstance ((FARPROC)EnumSizesProc,
@@ -318,7 +318,7 @@ static void PASCAL AddFace (HWND hDlg, char *CandidateFace)
     do {
 	From = At;
 	At = SendDlgItemMessage (hDlg, ID_FONT, LB_FINDSTRING, From,
-                                 (DWORD)CandidateFace);
+                                 (LPARAM)CandidateFace);
         if (At == LB_ERR) break;    /* no match, implies not duplicate */
 	if (SendDlgItemMessage (hDlg, ID_FONT, LB_GETTEXTLEN, At, 0L) ==
             strlen(CandidateFace)) {
@@ -330,7 +330,7 @@ static void PASCAL AddFace (HWND hDlg, char *CandidateFace)
 			       bottom of the list box */
 
     /*-it is a brand new face, let's add it to the list */
-    SendDlgItemMessage (hDlg, ID_FONT, LB_ADDSTRING, 0, (DWORD)CandidateFace);
+    SendDlgItemMessage (hDlg, ID_FONT, LB_ADDSTRING, 0, (LPARAM)CandidateFace);
     return;
 } /* AddFace */
 
@@ -371,7 +371,7 @@ static void PASCAL BuildFaceList (HWND hDlg, char *FaceName)
     InvalidateRect (GetDlgItem (hDlg, ID_FONT), NULL, TRUE);
     /*-select the same facename as before or default to the first item */
     if (SendDlgItemMessage (hDlg, ID_FONT, LB_SELECTSTRING, -1,
-                            (DWORD)FaceName) == LB_ERR) {
+                            (LPARAM)FaceName) == LB_ERR) {
 	SendDlgItemMessage (hDlg, ID_FONT, LB_SETCURSEL, 0, 0L);
     }
     BuildSizeList (hDlg, &Metrics);
@@ -379,8 +379,8 @@ static void PASCAL BuildFaceList (HWND hDlg, char *FaceName)
 
 /* FontDlgProc: Emacs Font dialog box function */
 /* ===========                                 */
-int EXPORT FAR PASCAL  FontDlgProc (HWND hDlg, UINT wMsg, UINT wParam,
-				    LONG lParam)
+int EXPORT FAR PASCAL  FontDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+				    LPARAM lParam)
 {
     switch (wMsg) {
         

@@ -55,8 +55,8 @@ static  char    StarName [FNAMELEN] = "*.*";    /* starname */
 static  PARAMS  *Par;
 
 /* function prototypes */
-int EXPORT FAR PASCAL FileDlgProc (HWND hDlg, UINT wMsg, UINT wParam,
-                                   LONG lParam);
+int EXPORT FAR PASCAL FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+                                   LPARAM lParam);
 static void    CompletePath (char *s, char *FileName);
 static void    UpdateAll (HWND hDlg, char *s);
 
@@ -242,7 +242,7 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
         SetDlgItemText (hDlg, ID_FILENAME, s);  /* remove the spaces */
 #if WINDOW_MSWIN32
         SendDlgItemMessage (hDlg, ID_FILENAME, EM_SETSEL,
-                            (UINT)LOWORD(LastSel), (DWORD)HIWORD(LastSel));
+                            (WPARAM)LOWORD(LastSel), (LPARAM)HIWORD(LastSel));
 #else
         SendDlgItemMessage (hDlg, ID_FILENAME, EM_SETSEL, 0, LastSel);
 #endif
@@ -253,7 +253,7 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
 			   completion so we do not attempt anything */
     }
     i = SendDlgItemMessage (hDlg, ID_FILES, LB_SELECTSTRING,
-                            -1, (DWORD)(LPSTR)&s[0]);
+                            -1, (LPARAM)(LPSTR)&s[0]);
     if (i == LB_ERR) {
         /* no match, give up! */
         return FALSE;
@@ -263,12 +263,12 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
     }
     if (PleaseComplete) {
         if (i != SendDlgItemMessage (hDlg, ID_FILES, LB_FINDSTRING,
-                                     i, (DWORD)(LPSTR)&s[0])) {
+                                     i, (LPARAM)(LPSTR)&s[0])) {
             return FALSE;   /* not unique ==> completion fails */
         }
         else {
             SendDlgItemMessage (hDlg, ID_FILES, LB_GETTEXT,
-                                i, (DWORD)(LPSTR)&s[0]);
+                                i, (LPARAM)(LPSTR)&s[0]);
             SetDlgItemText (hDlg, ID_FILENAME, s);
             return TRUE;
         }
@@ -278,8 +278,8 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
 
 /* FileDlgProc: Open file dialog function */
 /* ===========                            */
-int EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, UINT wParam,
-                                    LONG lParam)
+int EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+                                    LPARAM lParam)
 {
     char    s [NFILEN];    /* all purpose */
     int     i;

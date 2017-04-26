@@ -225,8 +225,8 @@ void FAR PASCAL GenerateMenuSeq (UINT ID)
 
 /* AboutDlgProc:  About box dialog function */
 /* ============                             */
-int EXPORT FAR PASCAL  AboutDlgProc (HWND hDlg, UINT wMsg, UINT wParam,
-                                     LONG lParam)
+int EXPORT FAR PASCAL  AboutDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+                                     LPARAM lParam)
 {
     char    s [50];
     static RECT FullBox;
@@ -295,8 +295,8 @@ BOOL  PASCAL    GetCheck (HWND hDlg, int BoxID)
 /* must be invoked through DialogBoxParam, with LOWORD(dwInitParam) set
    to TRUE for global modes and FALSE for current buffer modes */
 
-int EXPORT FAR PASCAL  ModeDlgProc (HWND hDlg, UINT wMsg, UINT wParam,
-                                    LONG lParam)
+int EXPORT FAR PASCAL  ModeDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+                                    LPARAM lParam)
 {
     char    s[40+NBUFN];
     static int *modep;      /* mode flags pointer */
@@ -588,7 +588,7 @@ no_binding:
 /* here, we may gray menu entries that are invalid. We also try to
    display a key binding after each menu item */
 
-void FAR PASCAL InitMenuPopup (HMENU hMenu, LONG lParam)
+void FAR PASCAL InitMenuPopup (HMENU hMenu, LPARAM lParam)
 {
     int     Position;
     int     ItemCount;
@@ -786,7 +786,7 @@ static void PASCAL  SimulateExtendedKey (int ec)
 /* returns TRUE if the command has been recognized and FALSE otherwise
    */
 
-BOOL FAR PASCAL MenuCommand (UINT wParam, LONG lParam)
+BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam)
 {
     FARPROC     ProcInstance;
 #if WINXP
@@ -899,10 +899,11 @@ InvokeHelp:
 	case IDM_NORMALIZE:
 	    {
 		SCREEN  *sp;
-
-		sp = (SCREEN*)GetWindowLong ((HWND)(SendMessage (hMDIClientWnd,
-					            WM_MDIGETACTIVE, 0, 0L)),
-		                             GWL_SCRPTR);
+#if WINXP
+		sp = (SCREEN*)GetWindowLongPtr((HWND)(SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0)), GWL_SCRPTR);
+#else
+		sp = (SCREEN*)GetWindowLong((HWND)(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L)), GWL_SCRPTR);
+#endif
 		newsize (TRUE, sp->s_nrow);
 		newwidth (TRUE, sp->s_ncol);
 		update (FALSE);
@@ -948,10 +949,10 @@ static int PASCAL   MenuEntryCount (HMENU hMenu)
 
     Count = GetMenuItemCount (hMenu);
     if (hMenu == GetMenu (hFrameWnd)) {
-#if WINDOW_MSWIN32
-        if (GetWindowLong((HWND)SendMessage (hMDIClientWnd, WM_MDIGETACTIVE,
-                                             0, 0L), GWL_STYLE) &
-            WS_MAXIMIZE) {
+#if WINXP
+		if (GetWindowLongPtr((HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0), GWL_STYLE) & WS_MAXIMIZE) {
+#elif WINDOW_MSWIN32
+		if (GetWindowLong((HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L), GWL_STYLE) & WS_MAXIMIZE) {
 #else
         if (HIWORD(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L))) {
 #endif
@@ -969,10 +970,10 @@ static int PASCAL   MenuEntryCount (HMENU hMenu)
 static int PASCAL   MenuEntryOffset (HMENU hMenu)
 {
     if (hMenu == GetMenu (hFrameWnd)) {
-#if WINDOW_MSWIN32
-        if (GetWindowLong((HWND)SendMessage (hMDIClientWnd, WM_MDIGETACTIVE,
-                                             0, 0L), GWL_STYLE) &
-            WS_MAXIMIZE) {
+#if WINXP
+		if (GetWindowLongPtr((HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0), GWL_STYLE) & WS_MAXIMIZE) {
+#elif WINDOW_MSWIN32
+		if (GetWindowLong((HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L), GWL_STYLE) & WS_MAXIMIZE) {
 #else
         if (HIWORD(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L))) {
 #endif

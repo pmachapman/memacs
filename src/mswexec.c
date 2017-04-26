@@ -63,7 +63,7 @@ static void PASCAL  HandleTimer (HWND hDlg)
 /* WAITFORPRGDlgProc:   dialog proc for WAITFORPRG dialog box */
 /* =================                                          */
 int EXPORT FAR PASCAL  WAITFORPRGDlgProc (HWND hDlg, UINT wMsg,
-					  UINT wParam, LONG lParam)
+					  WPARAM wParam, LPARAM lParam)
 {
     switch (wMsg) {
     case WM_INITDIALOG:
@@ -87,7 +87,7 @@ int EXPORT FAR PASCAL  WAITFORPRGDlgProc (HWND hDlg, UINT wMsg,
 
 /* LaunchPrgEnumProc:   used by LaunchPrg */
 /* =================                      */
-BOOL EXPORT FAR PASCAL LaunchPrgEnumProc (HWND hWnd, LONG lParam)
+BOOL EXPORT FAR PASCAL LaunchPrgEnumProc (HWND hWnd, LPARAM lParam)
 
 /* this function sets hPrgWnd when it finds a window that matches the
    module instance handle passed in lParam */

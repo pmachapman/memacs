@@ -134,7 +134,7 @@ static void PASCAL  PushMLHist (void)
 /* =============                                             */
 
 int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
-                                      UINT wParam, LONG lParam)
+                                      WPARAM wParam, LPARAM lParam)
 {
     switch (wMsg) {
         
@@ -149,7 +149,7 @@ int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
         /*-fill the list box */
         while (MLHistOld != MLHistNew) {
             SendDlgItemMessage (hDlg, ID_HIST, LB_ADDSTRING, 0,
-                                (DWORD)MLHistory[MLHistOld]);
+                                (LPARAM)MLHistory[MLHistOld]);
             free (MLHistory[MLHistOld]);
             MLHistOld = (MLHistOld + 1) & MLHISTMASK;
         }
@@ -456,7 +456,12 @@ static int PASCAL mswnewscr (SCREEN *sp)
     MDICREATESTRUCT cs;
     BOOL    Maximized;
 
-#if WINDOW_MSWIN32
+#if WINXP
+	Maximized = (GetWindowLongPtr((HWND)SendMessage(hMDIClientWnd,
+		WM_MDIGETACTIVE,
+		0, 0),
+		GWL_STYLE) & WS_MAXIMIZE);
+#elif WINDOW_MSWIN32
     Maximized = (GetWindowLong((HWND)SendMessage (hMDIClientWnd,
                                                   WM_MDIGETACTIVE,
                                                   0, 0L),
@@ -478,10 +483,10 @@ static int PASCAL mswnewscr (SCREEN *sp)
     if (Maximized) cs.style = WS_MAXIMIZE;
     else cs.style = 0;
     cs.style |= WS_HSCROLL | WS_VSCROLL;
-    cs.lParam = (DWORD)sp;
+    cs.lParam = (LPARAM)sp;
     sp->s_virtual = NULL;     /* not NULL will testify of success */
     InternalRequest = TRUE;
-    SendMessage (hMDIClientWnd, WM_MDICREATE, 0, (DWORD)(LPSTR)&cs);
+    SendMessage (hMDIClientWnd, WM_MDICREATE, 0, (LPARAM)(LPSTR)&cs);
     if (sp->s_virtual) {
         if (hFrameWnd == GetActiveWindow ()) SetFocus (sp->s_drvhandle);
     }
@@ -502,7 +507,7 @@ static int PASCAL mswdelscr (SCREEN *sp)
     if (sp->s_drvhandle == hIOWnd) mswflush ();
     if (sp == IOScr) mswselscr (first_screen);
         /* hopefully, at this time, sp!=first_screen */ 
-    SendMessage (hMDIClientWnd, WM_MDIDESTROY, (UINT)sp->s_drvhandle, 0L);
+    SendMessage (hMDIClientWnd, WM_MDIDESTROY, (WPARAM)sp->s_drvhandle, 0);
 } /* mswdelscr */
 
 /* mswselscr:   select a window/screen combination for the next IOs */
@@ -538,8 +543,11 @@ static int PASCAL mswsizscr (SCREEN *sp)
 	   allowed to change its size. If it is the active MDI child and
 	   is maximized, we will actually resize the frame window so, if
 	   the later is maximized, we restore it first. */
-	   
-#if WINDOW_MSWIN32
+#if WINXP
+		HWND hActiveScr;
+		hActiveScr = (HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0);
+		Maximized = (hScrWnd == hActiveScr) && (GetWindowLongPtr(hScrWnd, GWL_STYLE) & WS_MAXIMIZE);
+#elif WINDOW_MSWIN32
 	HWND   hActiveScr;
 
 	hActiveScr = (HWND)SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L);
@@ -552,7 +560,7 @@ static int PASCAL mswsizscr (SCREEN *sp)
         Maximized = (hScrWnd == LOWORD(ActiveScr)) && HIWORD(ActiveScr);
 #endif
 	if (IsIconic (hScrWnd)) {
-	    SendMessage (hMDIClientWnd, WM_MDIRESTORE, (UINT)hScrWnd, 0L);
+	    SendMessage (hMDIClientWnd, WM_MDIRESTORE, (WPARAM)hScrWnd, 0L);
 	}
         if (Maximized && IsZoomed (hFrameWnd)) {
             ShowWindow (hFrameWnd, SW_RESTORE);
@@ -650,8 +658,10 @@ static int PASCAL mswtopscr (SCREEN *sp)
     if (!InternalRequest) {
 	InternalRequest = TRUE;
 	SendMessage (hMDIClientWnd, WM_MDIACTIVATE,
-		     (UINT)sp->s_drvhandle, 0L);
-#if WINDOW_MSWIN32
+		     (WPARAM)sp->s_drvhandle, 0L);
+#if WINXP
+	if (GetWindowLongPtr(sp->s_drvhandle, GWL_STYLE) & WS_MAXIMIZE) {
+#elif WINDOW_MSWIN32
     if (GetWindowLong(sp->s_drvhandle, GWL_STYLE) & WS_MAXIMIZE) {
 #else
     if (HIWORD(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L))) {

@@ -237,7 +237,7 @@ int PASCAL helpengine (int f, int n)
 		link.pszWindow = NULL;
 		link.fIndexOnFail = TRUE;
 	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_KEYWORD_LOOKUP,
-                     (DWORD)&link);
+                     (DWORD_PTR)&link);
 	}
 #else
 	if (HelpKey[0] == '\0') {
@@ -269,7 +269,7 @@ PASCAL  minimizescreen (int f, int n)
 /* ForceMessage:    do a SendMessage, forcing quiescent mode */
 /* ============                                              */
 
-static PASCAL ForceMessage (HWND hWnd, UINT wMsg, UINT wParam, LONG lParam)
+static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     BOOL    nq;
 

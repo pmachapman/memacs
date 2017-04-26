@@ -56,7 +56,11 @@
 
 /* offsets for the screen windows extra bytes */
 #define GWL_SCRPTR  0                   /* SCREEN structure pointer */
+#if WINXP
+#define GWW_SCRCX   (GWL_SCRPTR+sizeof(LONG_PTR))   /* client area width */
+#else
 #define GWW_SCRCX   (GWL_SCRPTR+sizeof(LONG))   /* client area width */
+#endif
 #define GWW_SCRCY   (GWW_SCRCX+sizeof(WORD))       /* client area height */
 #define SCRWNDEXTRA (GWW_SCRCY+sizeof(WORD))
 
@@ -153,21 +157,21 @@ void in_put (int event);
 int  in_get (void);
 
 /* Windows-implementation specific functions */
-LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, UINT wParam,
-				   LONG lParam);
-LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, UINT wParam,
-				     LONG lParam);
+LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+				   LPARAM lParam);
+LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+				     LPARAM lParam);
 int FAR PASCAL GetInput (void);
 int FAR PASCAL TakeANap (int t);
 
 void FAR PASCAL GenerateMenuSeq (UINT ID);
 KEYTAB * FAR PASCAL FindKeyBinding (void *Func);
-void FAR PASCAL InitMenuPopup (HMENU hMenu, LONG lParam);
-BOOL FAR PASCAL MenuCommand (UINT wParam, LONG lParam);
+void FAR PASCAL InitMenuPopup (HMENU hMenu, LPARAM lParam);
+BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam);
 HMENU FAR PASCAL GetScreenMenuHandle (void);
 
-BOOL FAR PASCAL EatKey (UINT MsgCode, UINT wParam, LONG lParam);
-void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, UINT wParam, LONG lParam);
+BOOL FAR PASCAL EatKey (UINT MsgCode, WPARAM wParam, LPARAM lParam);
+void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam);
 void FAR PASCAL DropMessage (HWND hWnd, HANDLE hDrop);
 
 void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont);
@@ -183,7 +187,7 @@ void FAR PASCAL ShowEmacsCaret (BOOL Show);
 void FAR PASCAL CellToClient (HWND hWnd, POINT Cell, LPPOINT Client);
 void FAR PASCAL ClientToCell (HWND hWnd, POINT Client, LPPOINT Cell);
 void FAR PASCAL GetMinMaxInfo (HWND hWnd, LPPOINT rgpt);
-BOOL FAR PASCAL ScrReSize (HWND hWnd, UINT wParam, WORD cx, WORD cy);
+BOOL FAR PASCAL ScrReSize (HWND hWnd, WPARAM wParam, WORD cx, WORD cy);
 void FAR PASCAL ScrPaint (HWND hWnd);
 void FAR PASCAL MLPaint (void);
 

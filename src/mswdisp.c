@@ -352,8 +352,11 @@ void FAR PASCAL ClientToCell (HWND hWnd, POINT Client, LPPOINT Cell)
     }
     else {                      /* screen case */
         register SCREEN *sp;
-
-        sp = (SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR);
+#if WINXP
+		sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
+#else
+		sp = (SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR);
+#endif
         MaxCol = sp->s_ncol - 1;
         MaxRow = sp->s_nrow - 1;
     }
@@ -400,7 +403,7 @@ void FAR PASCAL GetMinMaxInfo (HWND hWnd, LPPOINT rgpt)
 /* ScrReSize:    processes the WM_SIZE message */
 /* =========                                   */
 
-BOOL FAR PASCAL ScrReSize (HWND hWnd, UINT wParam, WORD cx, WORD cy)
+BOOL FAR PASCAL ScrReSize (HWND hWnd, WPARAM wParam, WORD cx, WORD cy)
 
 /* returns TRUE only if real resizing performed */
 {
@@ -420,7 +423,11 @@ BOOL FAR PASCAL ScrReSize (HWND hWnd, UINT wParam, WORD cx, WORD cy)
 
         InternalRequest = TRUE;
         TopScreen = first_screen;
-	select_screen ((SCREEN *)GetWindowLong (hWnd, GWL_SCRPTR), FALSE);
+#if WINXP
+		select_screen((SCREEN *)GetWindowLongPtr(hWnd, GWL_SCRPTR), FALSE);
+#else
+		select_screen((SCREEN *)GetWindowLong(hWnd, GWL_SCRPTR), FALSE);
+#endif
 	if (ChgWidth) {
             newwidth (TRUE, DisplayableColumns (hWnd, cx, &EmacsCM));
         }
@@ -453,7 +460,11 @@ void FAR PASCAL ScrPaint (HWND hWnd)
        has been deffered */
 
     BeginPaint (hWnd, &ps);
-    sp = (SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR);
+#if WINXP
+	sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
+#else
+	sp = (SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR);
+#endif
 
     /*-calculate the row/col loop control variables and normalize the
        coordinates of the first line's rectangle into Rect */

@@ -63,7 +63,7 @@ static HCURSOR  hRealHourglass;
 
 /* prototypes */
 static void  PASCAL MessageLoop (BOOL WaitMode);
-static BOOL  PASCAL UpdateCursor (HWND hWnd, UINT wParam, LONG lParam);
+static BOOL  PASCAL UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void  PASCAL SetHourglass (BOOL hg);
 
 /* timeset: return a system-dependant time string */
@@ -369,7 +369,7 @@ static void PASCAL  SetFrameCaption (void)
 
 /* BroadcastEnumProc:   used by EmacsBroadcast */
 /* =================                           */
-BOOL EXPORT FAR PASCAL BroadcastEnumProc (HWND hWnd, LONG lParam)
+BOOL EXPORT FAR PASCAL BroadcastEnumProc (HWND hWnd, LPARAM lParam)
 {
     char    ClassName [sizeof(FrameClassName)+1];
     UINT    RetVal;
@@ -382,7 +382,7 @@ BOOL EXPORT FAR PASCAL BroadcastEnumProc (HWND hWnd, LONG lParam)
             if (lParam != 0) {
                 /*-compute max of all returned values */
                 RetVal = SendMessage (hWnd, EmacsBroadcastMsg,
-                                      (UINT)hFrameWnd, lParam);
+                                      (WPARAM)hFrameWnd, lParam);
 		BroadcastVal = max(BroadcastVal, RetVal);
 	    }
 	    else {
@@ -423,8 +423,8 @@ static DWORD PASCAL   EmacsBroadcast (DWORD MsgParam)
 /* MDIClientSubProc:    Subclassing window proc for the MDI Client window */
 /* ================                                                       */
 
-LONG EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, UINT wParam,
-				         LONG lParam)
+LONG EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+				         LPARAM lParam)
 {
     switch (wMsg) {
 
@@ -512,9 +512,9 @@ void FAR PASCAL FrameInit (CREATESTRUCT *cs)
         /* we subclass the MDIClient */
         FARPROC ProcInstance;
 #if WINXP
-		MDIClientProc = (WNDPROC)GetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC);
-		ProcInstance = MakeProcInstance((FARPROC)MDIClientSubProc, hEmacsInstance);
-		SetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC, (DWORD)ProcInstance);
+		MDIClientProc = GetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC);
+		ProcInstance = MakeProcInstance(MDIClientSubProc, hEmacsInstance);
+		SetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC, ProcInstance);
 #else
 		MDIClientProc = (WNDPROC)GetWindowLong (hMDIClientWnd, GWL_WNDPROC);
 		ProcInstance = MakeProcInstance ((FARPROC)MDIClientSubProc, hEmacsInstance);
@@ -558,8 +558,8 @@ static BOOL  PASCAL CloseEmacs (UINT wMsg)
 
 /* ScrWndProc:  MDI child (screen) window function */
 /* ==========                                      */
-LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, UINT wParam,
-				   LONG lParam)
+LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+				   LPARAM lParam)
 {
     switch (wMsg) {
 
@@ -579,13 +579,21 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, UINT wParam,
 
 	    sp = (SCREEN*)(((MDICREATESTRUCT*)(((CREATESTRUCT*)lParam)->
 					       lpCreateParams))->lParam);
-	    SetWindowLong (hWnd, GWL_SCRPTR, (LONG)sp);
+#if WINXP
+		SetWindowLongPtr(hWnd, GWL_SCRPTR, sp);
+#else
+		SetWindowLong (hWnd, GWL_SCRPTR, (LONG)sp);
+#endif
 	    sp->s_drvhandle = hWnd;
 	}
 	goto DefaultProc;
 	
     case WM_DESTROY:
-	vtfreescr ((SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR));
+#if WINXP
+		vtfreescr((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR));
+#else
+		vtfreescr((SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR));
+#endif
 	break;
 	
     case WM_KILLFOCUS:
@@ -607,14 +615,20 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, UINT wParam,
             /* this one is becoming active */
 	    if (!InternalRequest) {
 	        InternalRequest = TRUE;
-	        select_screen ((SCREEN *) GetWindowLong (hWnd, GWL_SCRPTR),
-                               FALSE);
+#if WINXP
+			select_screen((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR), FALSE);
+#else
+			select_screen((SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR), FALSE);
+#endif
 		InternalRequest = FALSE;
 	    }
 	    else {
 		SCREEN  *sp;
-
-		sp = (SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR);
+#if WINXP
+		sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
+#else
+		sp = (SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR);
+#endif
 		if (sp->s_virtual == NULL) {
 		    /* this is initialization time! */
 		    vtinitscr (sp, DisplayableRows (hWnd, 0, &EmacsCM),
@@ -695,7 +709,11 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, UINT wParam,
 		SCREEN  *sp;
 
 		/* this must be done here, before any MDI mumbo-jumbo */
-	        sp = (SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR);
+#if WINXP
+		sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
+#else
+		sp = (SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR);
+#endif
 		if (sp == first_screen) {
 		    cycle_screens (FALSE, 0);
                 }
@@ -728,8 +746,8 @@ DefaultProc:
 
 /* FrameWndProc:    frame window function */
 /* ============                           */
-LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, UINT wParam,
-				     LONG lParam)
+LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+				     LPARAM lParam)
 {
     switch (wMsg) {
         
@@ -1059,7 +1077,7 @@ int FAR PASCAL  TakeANap (int t)
 /* UpdateCursor:    sets the apropriate Emacs cursor shape */
 /* ============                                            */
 
-static BOOL  PASCAL UpdateCursor (HWND hWnd, UINT wParam, LONG lParam)
+static BOOL  PASCAL UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 /* this function should be called on each WM_SETCURSOR message, to
    display the appropriate cursor. It returns TRUE if all processing has
