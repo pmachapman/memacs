@@ -511,11 +511,15 @@ void FAR PASCAL FrameInit (CREATESTRUCT *cs)
     if (hMDIClientWnd) {
         /* we subclass the MDIClient */
         FARPROC ProcInstance;
-
-        MDIClientProc = (WNDPROC)GetWindowLong (hMDIClientWnd, GWL_WNDPROC);
-        ProcInstance = MakeProcInstance ((FARPROC)MDIClientSubProc,
-				         hEmacsInstance);
-        SetWindowLong (hMDIClientWnd, GWL_WNDPROC, (DWORD)ProcInstance);
+#if WINXP
+		MDIClientProc = (WNDPROC)GetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC);
+		ProcInstance = MakeProcInstance((FARPROC)MDIClientSubProc, hEmacsInstance);
+		SetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC, (DWORD)ProcInstance);
+#else
+		MDIClientProc = (WNDPROC)GetWindowLong (hMDIClientWnd, GWL_WNDPROC);
+		ProcInstance = MakeProcInstance ((FARPROC)MDIClientSubProc, hEmacsInstance);
+		SetWindowLong (hMDIClientWnd, GWL_WNDPROC, (DWORD)ProcInstance);
+#endif
     }
 } /* FrameInit */
 
