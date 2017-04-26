@@ -31,3 +31,6 @@
 # Help Temporary Files
 *.chw
 *.gid
+
+# Mac OS Files
+.DS_Store
