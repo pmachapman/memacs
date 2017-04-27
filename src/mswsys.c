@@ -512,9 +512,9 @@ void FAR PASCAL FrameInit (CREATESTRUCT *cs)
         /* we subclass the MDIClient */
         FARPROC ProcInstance;
 #if WINXP
-		MDIClientProc = GetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC);
+		MDIClientProc = (WNDPROC)GetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC);
 		ProcInstance = MakeProcInstance(MDIClientSubProc, hEmacsInstance);
-		SetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC, ProcInstance);
+		SetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC, (LONG_PTR)ProcInstance);
 #else
 		MDIClientProc = (WNDPROC)GetWindowLong (hMDIClientWnd, GWL_WNDPROC);
 		ProcInstance = MakeProcInstance ((FARPROC)MDIClientSubProc, hEmacsInstance);
@@ -580,7 +580,7 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	    sp = (SCREEN*)(((MDICREATESTRUCT*)(((CREATESTRUCT*)lParam)->
 					       lpCreateParams))->lParam);
 #if WINXP
-		SetWindowLongPtr(hWnd, GWL_SCRPTR, sp);
+		SetWindowLongPtr(hWnd, GWL_SCRPTR, (LONG_PTR)sp);
 #else
 		SetWindowLong (hWnd, GWL_SCRPTR, (LONG)sp);
 #endif

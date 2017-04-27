@@ -66,11 +66,12 @@ Link_Include =  \
   $(OBJ)\mswinput.obj \
   $(OBJ)\mswmem.obj \
   $(OBJ)\mswmenu.obj \
-  $(OBJ)\mswsys.obj
+  $(OBJ)\mswsys.obj \
+  $(OBJ)\htmlhelp.lib
 
 #		*Explicit Rules*
 $(BIN)\MEWIN.exe: MEWIN.cfg $(Link_Include) $(Link_Exclude)
-  $(ILINK) /v/s/c/Tpe/P-/L$(LIBPATH) @&&|
+  $(ILINK) /aa/v/s/c/Tpe/P-/L$(LIBPATH) @&&|
 c0w32.obj+
 $(OBJ)\abbrev.obj+
 $(OBJ)\basic.obj+
@@ -110,14 +111,16 @@ $(OBJ)\mswmem.obj+
 $(OBJ)\mswmenu.obj+
 $(OBJ)\mswsys.obj
 $(BIN)\MEWIN,MEWIN
+$(OBJ)\htmlhelp.lib+
 import32.lib+
-cw32.lib
+cw32.lib,
+mewin.res
 |
 
-	brc32 -i$(INC);$(RES) mewin.res $(BIN)\MEWIN.exe
-
-
 #		*Individual File Dependencies*
+$(OBJ)\htmlhelp.lib:
+	implib $(OBJ)\htmlhelp.lib $(SYSTEMROOT)\system32\hhctrl.ocx
+
 mewin.res: $(RES)\mewin.rc $(INC)\mswrid.h $(INC)\mswmenu.h $(RES)\mswmenu.rc \
 	   $(RES)\mswfile.dlg $(RES)\mswabout.dlg $(RES)\mswfonts.dlg \
 	   $(RES)\mswmodes.dlg $(RES)\mswprg.dlg $(RES)\mswmlh.dlg \

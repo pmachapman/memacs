@@ -5,6 +5,7 @@
 *.elf
 
 # Borland C++ 5.5 files
+memacs.cfg
 *.map
 /mswin/bcpp55/bin
 /mswin/bcpp55/obj
