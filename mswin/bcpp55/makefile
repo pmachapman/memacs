@@ -70,7 +70,7 @@ Link_Include =  \
   $(OBJ)\htmlhelp.lib
 
 #		*Explicit Rules*
-$(BIN)\MEWIN.exe: MEWIN.cfg $(Link_Include) $(Link_Exclude)
+$(BIN)\MEWIN.exe: directories MEWIN.cfg $(Link_Include) $(Link_Exclude)
   $(ILINK) /aa/v/s/c/Tpe/P-/L$(LIBPATH) @&&|
 c0w32.obj+
 $(OBJ)\abbrev.obj+
@@ -262,3 +262,17 @@ mewin.cfg: makefile
 -I$(INC)
 | mewin.cfg
 
+#		Create directories for the build
+
+directories:
+  if not exist $(BIN) mkdir $(BIN)
+  if not exist $(OBJ) mkdir $(OBJ)
+
+#		Clean up the build
+
+clean:
+  if exist $(BIN) rmdir /Q /S $(BIN)
+  if exist $(OBJ) rmdir /Q /S $(OBJ)
+  del memacs.cfg
+  del memacs.map
+  del cmdfix.map
