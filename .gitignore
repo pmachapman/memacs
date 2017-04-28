@@ -36,3 +36,8 @@
 
 # Mac OS Files
 .DS_Store
+
+# Microsoft C Files
+/mswin/msc/bin
+/mswin/msc/obj.c6
+/mswin/msc/obj.c7

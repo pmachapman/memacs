@@ -5,6 +5,7 @@
 
 # modify the following lines with the proper relative directories
 
+BIND = bin
 OBJD = obj			# object file directory
 SRCD = ..\..\src			# source file directory
 HDIR = ..\..\h			# header file directory
@@ -33,6 +34,8 @@ F8 = $(OBJD)\tags.obj $(OBJD)\window.obj $(OBJD)\word.obj $(OBJD)\execpr.obj
 
 # compilation rules
 
+
+all: $(BIND)\emacs.exe
 
 $(OBJD)\basic.obj: $(SRCD)\basic.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\basic.obj $(SRCD)\basic.c
@@ -127,9 +130,15 @@ $(OBJD)\keyboard.obj: $(SRCD)\keyboard.c $(HFILES)
 $(OBJD)\execpr.obj: $(SRCD)\execpr.asm
 	masm $(SRCD)\execpr.asm, $(OBJD)\execpr.obj, , ,
 
+# directories
+
+$(OBJD):
+        mkdir $(OBJD)
+
+$(BIND):
+        mkdir $(BIND)
+
 # product list
 
-bin\emacs.exe: $(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8)
+$(BIND)\emacs.exe: $(OBJD) $(BIND) $(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8)
 	link @emacsm.lnk
-
-

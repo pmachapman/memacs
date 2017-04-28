@@ -145,10 +145,10 @@ RC  = rc
 RCFLAGS2  = /30 /t
 CVFLAGS  = /25
 
-H_FILES = estruct.h $(INC)\eproto.h $(INC)\edef.h $(INC)\elang.h\
+H_FILES = $(INC)\estruct.h $(INC)\eproto.h $(INC)\edef.h $(INC)\elang.h\
 	$(INC)\english.h
 
-OBJ_FILES = $(OBJ)\BASIC.obj $(OBJ)\BIND.obj $(OBJ)\BUFFER.obj $(OBJ)\CHAR.obj\
+OBJ_FILES = $(OBJ)\ABBREV.obj $(OBJ)\BASIC.obj $(OBJ)\BIND.obj $(OBJ)\BUFFER.obj $(OBJ)\CHAR.obj\
         $(OBJ)\CRYPT.obj $(OBJ)\DISPLAY.obj $(OBJ)\DOLOCK.obj $(OBJ)\EVAL.obj\
         $(OBJ)\EXEC.obj $(OBJ)\FILE.obj $(OBJ)\FILEIO.obj $(OBJ)\INPUT.obj\
         $(OBJ)\ISEARCH.obj $(OBJ)\LINE.obj $(OBJ)\LOCK.obj $(OBJ)\MAIN.obj\
@@ -157,13 +157,15 @@ OBJ_FILES = $(OBJ)\BASIC.obj $(OBJ)\BIND.obj $(OBJ)\BUFFER.obj $(OBJ)\CHAR.obj\
         $(OBJ)\MSWFONT.obj $(OBJ)\MSWINPUT.obj $(OBJ)\MSWMEM.obj\
         $(OBJ)\MSWMENU.obj $(OBJ)\MSWSYS.obj $(OBJ)\RANDOM.obj\
         $(OBJ)\REGION.obj $(OBJ)\REPLACE.obj $(OBJ)\SCREEN.obj\
-        $(OBJ)\SEARCH.obj $(OBJ)\UNDO.obj $(OBJ)\WINDOW.obj $(OBJ)\WORD.obj
+        $(OBJ)\SEARCH.obj $(OBJ)\TAGS.obj $(OBJ)\UNDO.obj $(OBJ)\WINDOW.obj $(OBJ)\WORD.obj
 
 all: $(PROG)
 
 SUFFIXES:
 SUFFIXES: .obj .c
 SUFFIXES: .obj .c
+
+$(OBJ)\ABBREV.obj : $(SRC)\ABBREV.C $(H_FILES)
 
 $(OBJ)\BASIC.obj : $(SRC)\BASIC.C $(H_FILES)
 
@@ -231,6 +233,8 @@ $(OBJ)\REPLACE.obj : $(SRC)\REPLACE.C $(H_FILES)
 $(OBJ)\SCREEN.obj : $(SRC)\SCREEN.C $(H_FILES)
 
 $(OBJ)\SEARCH.obj : $(SRC)\SEARCH.C $(H_FILES)
+
+$(OBJ)\TAGS.obj : $(SRC)\TAGS.C $(H_FILES)
 
 $(OBJ)\UNDO.obj : $(SRC)\UNDO.C $(H_FILES)
 
