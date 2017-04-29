@@ -41,3 +41,7 @@
 /mswin/msc/bin
 /mswin/msc/obj.c6
 /mswin/msc/obj.c7
+
+# Microsoft MASM Files
+*.lst
+*.sbr

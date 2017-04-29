@@ -8,7 +8,7 @@
 OBJD = obj			# object file directory
 SRCD = ..\..\src		# source file directory
 HDIR = ..\..\h			# header file directory
-INCD = c:\sys\turbo\include	# system include directory
+INCD = c:\tc\include	# system include directory
 
 # options and arguments to the C compiler
 

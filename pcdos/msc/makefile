@@ -23,19 +23,22 @@ HFILES = $(HDIR)\estruct.h $(HDIR)\edef.h $(HDIR)\efunc.h $(HDIR)\epath.h $(HDIR
 
 #list of source files
 
-F1 = $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
+F1 = $(OBJD)\abbrev.obj $(OBJD)\basic.obj $(OBJD)\bind.obj $(OBJD)\buffer.obj
 F2 = $(OBJD)\char.obj $(OBJD)\crypt.obj $(OBJD)\display.obj
 F3 = $(OBJD)\eval.obj $(OBJD)\exec.obj $(OBJD)\file.obj $(OBJD)\dolock.obj
 F4 = $(OBJD)\fileio.obj $(OBJD)\ibmpc.obj $(OBJD)\input.obj $(OBJD)\lock.obj
 F5 = $(OBJD)\isearch.obj $(OBJD)\line.obj $(OBJD)\lock.obj $(OBJD)\screen.obj
 F6 = $(OBJD)\main.obj $(OBJD)\mouse.obj $(OBJD)\msdos.obj $(OBJD)\keyboard.obj
 F7 = $(OBJD)\random.obj $(OBJD)\region.obj $(OBJD)\search.obj $(OBJD)\replace.obj
-F8 = $(OBJD)\tags.obj $(OBJD)\window.obj $(OBJD)\word.obj $(OBJD)\execpr.obj
+F8 = $(OBJD)\tags.obj $(OBJD)\undo.obj $(OBJD)\window.obj $(OBJD)\word.obj $(OBJD)\execpr.obj
 
 # compilation rules
 
 
 all: $(BIND)\emacs.exe
+
+$(OBJD)\abbrev.obj: $(SRCD)\abbrev.c $(HFILES)
+	$(CC) $(CFLAGS) /Fo$(OBJD)\abbrev.obj $(SRCD)\abbrev.c
 
 $(OBJD)\basic.obj: $(SRCD)\basic.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\basic.obj $(SRCD)\basic.c
@@ -114,6 +117,9 @@ $(OBJD)\replace.obj: $(SRCD)\replace.c $(HFILES)
 
 $(OBJD)\screen.obj: $(SRCD)\screen.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\screen.obj $(SRCD)\screen.c
+
+$(OBJD)\undo.obj: $(SRCD)\undo.c $(HFILES)
+	$(CC) $(CFLAGS) /Fo$(OBJD)\undo.obj $(SRCD)\undo.c
 
 $(OBJD)\tags.obj: $(SRCD)\tags.c $(HFILES)
 	$(CC) $(CFLAGS) /Fo$(OBJD)\tags.obj $(SRCD)\tags.c
