@@ -21,6 +21,7 @@
 # Visual Studio 2017 Files
 *.aps
 *.user
+/.vs
 /mswin/vs2017/.vs
 /mswin/vs2017/Debug
 /mswin/vs2017/Release
