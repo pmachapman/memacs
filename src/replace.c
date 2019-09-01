@@ -301,11 +301,11 @@ VOID PASCAL NEAR mlrquery()
 	mlwrite(TEXT87);
 /*		"Replace '" */
 
-	tcol = echostring(patmatch, strlen(TEXT87), NPAT / 2);
+	tcol = echostring(patmatch, (int)strlen(TEXT87), NPAT / 2);
 
 	mlputs(TEXT88);
 /*		"' with '" */
-	tcol += strlen(TEXT88);
+	tcol += (int)strlen(TEXT88);
 
 #if	MAGIC
 	if (rmagical && (curwp->w_bufp->b_mode & MDMAGIC)) {
@@ -364,7 +364,7 @@ int	use_rmc;
 					status = linstr(rstr = patmatch);
 				else
 					status = linstr(rstr = fixnull(grpmatch[rmcptr->u.group_no]));
-				replen += strlen(rstr);
+				replen += (int)strlen(rstr);
 				rmcptr++;
 			}
 		}
@@ -372,7 +372,7 @@ int	use_rmc;
 #endif
 		{
 			status = linstr(instr);
-			replen = strlen(instr);
+			replen = (int)strlen(instr);
 		}
 
 	return (status);

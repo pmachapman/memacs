@@ -62,7 +62,7 @@ static void PASCAL  HandleTimer (HWND hDlg)
 
 /* WAITFORPRGDlgProc:   dialog proc for WAITFORPRG dialog box */
 /* =================                                          */
-int EXPORT FAR PASCAL  WAITFORPRGDlgProc (HWND hDlg, UINT wMsg,
+INT_PTR EXPORT FAR PASCAL  WAITFORPRGDlgProc (HWND hDlg, UINT wMsg,
 					  WPARAM wParam, LPARAM lParam)
 {
     switch (wMsg) {
@@ -134,12 +134,13 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
    FALSE). */
 {
     char    FullCmd [CMDLENGTH];
+#if !WINDOW_MSWIN32
     HANDLE  hModule;
     int     nCmdShow;
-    BOOL    Synchronize;
-#if !WINDOW_MSWIN32
+
     FARPROC ProcInstance;
 #endif
+	BOOL    Synchronize;
 
     if (OutFile) {
         Synchronize = TRUE;
@@ -237,7 +238,7 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
     if (CreateProcess (NULL, DOSApp ? FullCmd : Cmd, NULL, NULL,
                        DETACHED_PROCESS, 
                        FALSE, NULL, NULL, &suInfo, &pInfo)) {
-        int Result;
+        INT_PTR Result;
 
         if (Synchronize) {
             /* put up a dialog box to wait for termination */
@@ -251,7 +252,7 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
         CloseHandle(pInfo.hThread);
         CloseHandle(pInfo.hProcess);
 
-        return Result;
+        return (BOOL)Result;
     } else return FALSE;
 #else
     if (Win386Enhanced) {
@@ -355,11 +356,11 @@ PASCAL pipecmd (int f, int n)
     char    OutFile[NFILEN];
     static  char bname[] = "command";
     BUFFER  *bp;
-    EWINDOW  *wp;
     int     Result;
     int     bmode;
     char    bflag;
 #if WINDOW_MSWIN32
+/*	EWINDOW  *wp; */
     char    TempDir[NFILEN] = "\\";
 #endif
 
@@ -433,9 +434,9 @@ PASCAL filter (int f, int n)
     char    OutFile[NFILEN];
     char    fname[NFILEN];
     BUFFER  *bp;
-    EWINDOW  *wp;
     int     Result;
 #if WINDOW_MSWIN32
+/*	EWINDOW  *wp; */
     char    TempDir[NFILEN] = "\\";
 #endif
 

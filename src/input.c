@@ -1139,7 +1139,7 @@ int eolchar;
 	}
 }
 
-PASCAL NEAR outstring(s) /* output a string of input characters */
+void PASCAL NEAR outstring(s) /* output a string of input characters */
 
 char *s;	/* string to output */
 
@@ -1149,7 +1149,7 @@ char *s;	/* string to output */
 			mlout(*s++);
 }
 
-PASCAL NEAR ostring(s)	/* output a string of output characters */
+void PASCAL NEAR ostring(s)	/* output a string of output characters */
 
 char *s;	/* string to output */
 
@@ -1177,7 +1177,7 @@ int iterm;
 
 	/* show the passed in prompt */
 	mlwrite(prompt);
-	tcol = strlen(prompt);
+	tcol = (int)strlen(prompt);
 
 	/* If there's a default, put it in brackets and show it. */
 	if (dflt != NULL && *dflt != '\0') {
@@ -1195,7 +1195,7 @@ int iterm;
 			mlputs("NL"); tcol += 6; break;
 		default:
 			mlputs(cmdstr(iterm, buf));
-			tcol += strlen(buf) + 4;
+			tcol += (int)strlen(buf) + 4;
 	}
 	mlputs(">: ");
 	movecursor(term.t_nrow, tcol);	/* Position the cursor	*/

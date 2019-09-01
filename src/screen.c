@@ -113,7 +113,7 @@ int f,n;	/* prefix flag and argument */
 	return(select_screen(sp, TRUE));
 }
 
-PASCAL NEAR free_screen(sp)	/* free all resouces associated with a screen */
+void PASCAL NEAR free_screen(sp)	/* free all resouces associated with a screen */
 
 SCREEN *sp;	/* screen to dump */
 
@@ -149,7 +149,7 @@ SCREEN *sp;	/* screen to dump */
 	free((char *) sp);
 }
 
-int PASCAL NEAR unlist_screen(sp)
+void PASCAL NEAR unlist_screen(sp)
 
 SCREEN *sp;         /* screen to remove from the list */
 {

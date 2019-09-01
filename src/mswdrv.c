@@ -41,10 +41,10 @@ static int   PASCAL mswsetback();
 #endif
 static int   PASCAL mswsleep();
 static int   PASCAL mswnewscr();
-static int   PASCAL mswdelscr();
-static int   PASCAL mswselscr();
-static int   PASCAL mswsizscr();
-static int   PASCAL mswtopscr();
+static void   PASCAL mswdelscr();
+static void   PASCAL mswselscr();
+static void   PASCAL mswsizscr();
+static void   PASCAL mswtopscr();
 
 /* Standard terminal interface dispatch table.
 */
@@ -155,7 +155,7 @@ int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
         }
 	/*-scroll the last message into view */
         {
-            int     i;
+            LRESULT     i;
 
             i = SendDlgItemMessage (hDlg, ID_HIST, LB_GETCOUNT, 0, 0L);
             SendDlgItemMessage (hDlg, ID_HIST, LB_SETCURSEL, i - 1, 0L);
@@ -183,13 +183,13 @@ int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
    core editor loop will pop up a dialog box showing up to MAXMLHIST-1
    past messages */
 
-PASCAL mlhistory (void)
+void PASCAL mlhistory (void)
 {
-    FARPROC     ProcInstance;
+	DLGPROC     ProcInstance;
 
     PushMLHist ();
     mlferase ();
-    ProcInstance = MakeProcInstance ((FARPROC)MLHistDlgProc,
+    ProcInstance = MakeProcInstance ((DLGPROC)MLHistDlgProc,
 			             hEmacsInstance);
     DialogBox (hEmacsInstance, "MLHIST", hFrameWnd, ProcInstance);
     FreeProcInstance (ProcInstance);
@@ -501,7 +501,7 @@ static int PASCAL mswnewscr (SCREEN *sp)
 /* mswdelscr:   destroys an MDI window for a disappearing screen */
 /* =========                                                     */
 
-static int PASCAL mswdelscr (SCREEN *sp)
+static void PASCAL mswdelscr (SCREEN *sp)
 /* called by screen.c before the screen structure is deallocated */
 {
     if (sp->s_drvhandle == hIOWnd) mswflush ();
@@ -513,7 +513,7 @@ static int PASCAL mswdelscr (SCREEN *sp)
 /* mswselscr:   select a window/screen combination for the next IOs */
 /* =========                                                        */
 
-static int PASCAL mswselscr (SCREEN *sp)
+static void PASCAL mswselscr (SCREEN *sp)
 {
     hIOWnd = sp->s_drvhandle;
     IOScr = sp;
@@ -522,7 +522,7 @@ static int PASCAL mswselscr (SCREEN *sp)
 /* mswsizscr:   resize an MDI window to fit the associated screen */
 /* =========                                                      */
 
-static int PASCAL mswsizscr (SCREEN *sp)
+static void PASCAL mswsizscr (SCREEN *sp)
 /* called by Emacs when the screen's dimensions have been changed. A resize
    through the MS-Windows interface is handled by the ReSize function in
    mswdisp.c */
@@ -651,7 +651,7 @@ static int PASCAL mswsizscr (SCREEN *sp)
 /* mswtopscr:   bring a screen's window to top. */
 /* =========                                    */
 
-static int PASCAL mswtopscr (SCREEN *sp)
+static void PASCAL mswtopscr (SCREEN *sp)
 
 /* called by screen.c when selecting a screen for current */
 {

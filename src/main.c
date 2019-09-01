@@ -381,7 +381,7 @@ int firstflag;			/* is this the first time in? */
 			if (cryptflag) {
 				bp->b_mode |= MDCRYPT;
 				ecrypt((char *) NULL, 0);
-				ecrypt(ekey, strlen(ekey));
+				ecrypt(ekey, (unsigned int)strlen(ekey));
 				bytecopy(bp->b_key, ekey, NPAT);
 			}
 #endif
@@ -1136,7 +1136,7 @@ char *sp;				/* string to copy */
 	char *dp;			/* copy of string */
 
 	/* make room! */
-	dp = room(strlen(sp) + 1);
+	dp = room((int)strlen(sp) + 1);
 	if (dp == NULL)
 		return(NULL);
 	strcpy(dp, sp);

@@ -250,7 +250,7 @@ int *nbytes;
         fline[i] = 0;
 #if	CRYPT
 	if (cryptflag)
-		ecrypt(fline, strlen(fline));
+		ecrypt(fline, (unsigned int)strlen(fline));
 #endif
         return(FIOSUC);
 }

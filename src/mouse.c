@@ -154,8 +154,10 @@ int f,n;	/* prefix flag and argument */
 	register EWINDOW *wp;
 	register EWINDOW *lastwp;
 	register LINE	*lp;
+#if	!WINDOW_MSWIN
 	SCREEN *sp;
 	char scr_name[12];		/* constructed temp screen name */
+#endif
 	static int temp_count = 0;	/* next temp screen number! */
 
 	/* make sure we are on the proper screen */
@@ -604,7 +606,7 @@ register int	col;
 	return(offset);
 }
 
-PASCAL NEAR mouse_screen()
+void PASCAL NEAR mouse_screen()
 
 {
 	register SCREEN *screen_ptr;	/* screen to test mouse in */

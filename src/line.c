@@ -60,7 +60,7 @@ register int used;
  * might be in. Release the memory. The buffers are updated too; the magic
  * conditions described in the above comments don't hold here.
  */
-PASCAL NEAR lfree(lp)
+void PASCAL NEAR lfree(lp)
 register LINE	*lp;
 {
 	register BUFFER *bp;
@@ -129,7 +129,7 @@ register LINE	*lp;
  * displayed in more than 1 window we change EDIT t HARD. Set MODE if the
  * mode line needs to be updated (the "*" has to be set).
  */
-PASCAL NEAR lchange(flag)
+void PASCAL NEAR lchange(flag)
 register int	flag;
 {
 	register EWINDOW *wp;
@@ -886,7 +886,7 @@ char *text;	/* line to add */
 	register int	ntext;
 
 	/* allocate the memory to hold the line */
-	ntext = strlen(text);
+	ntext = (int)strlen(text);
 	if ((lp=lalloc(ntext)) == NULL)
 		return(FALSE);
 

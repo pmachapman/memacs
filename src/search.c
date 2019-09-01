@@ -767,7 +767,7 @@ DELTA *tbl;
 
 	strcpy(tbl->patrn, pstring);
 
-	jump_by = strlen(pstring);
+	jump_by = (int)strlen(pstring);
 
 	for (j = 0; j < HICHAR; j++)
 		tbl->delta[j] = jump_by;

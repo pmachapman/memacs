@@ -209,7 +209,7 @@ start_over:				/* This is a good place to start a re-execution: */
 				 */
 				if (cpos == 0)
 					{
-					cpos = strlen((char *) pat);
+					cpos = (int)strlen((char *) pat);
 					col = echostring((char *) pat, col, NPAT / 2);
 					}
 

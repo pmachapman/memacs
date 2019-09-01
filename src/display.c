@@ -190,7 +190,7 @@ int PASCAL NEAR vtinitscr(SCREEN *sp, int nrow, int ncol)
 /* vtfreescr:  delete a virtual terminal resource for a dying screen */
 /* =========														 */
 
-PASCAL NEAR vtfreescr(SCREEN *sp)
+void PASCAL NEAR vtfreescr(SCREEN *sp)
 {
 	vtscreen(sp);
 	vtfree();
@@ -250,7 +250,7 @@ int PASCAL NEAR vtsizescr(SCREEN *sp, int nrow, int ncol)
  * system prompt will be written in the line). Shut down the channel to the
  * terminal.
  */
-PASCAL NEAR vttidy()
+void PASCAL NEAR vttidy()
 {
     mlerase();
     movecursor(term.t_nrow, 0);
@@ -264,7 +264,7 @@ PASCAL NEAR vttidy()
  * screen. There is no checking for nonsense values; this might be a good
  * idea during the early stages.
  */
-PASCAL NEAR vtmove(row, col)
+void PASCAL NEAR vtmove(row, col)
 
 int row, col;
 
@@ -280,7 +280,7 @@ int row, col;
    terminal buffers. Only column overflow is checked.
 */
 
-PASCAL NEAR vtputc(c)
+void PASCAL NEAR vtputc(c)
 
 int c;
 
@@ -338,7 +338,7 @@ int c;
  * Erase from the end of the software cursor to the end of the line on which
  * the software cursor is located.
  */
-PASCAL NEAR vteeol()
+void PASCAL NEAR vteeol()
 {
     register VIDEO	*vp;
 

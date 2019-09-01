@@ -129,8 +129,8 @@
 
 /*	Windowing system style (pick one)				*/
 
-#define WINDOW_TEXT	1		/* [default] Text mode		*/
-#define WINDOW_MSWIN	0		/* MicroSoft Windows		*/
+#define WINDOW_TEXT	0		/* [default] Text mode		*/
+#define WINDOW_MSWIN	1		/* MicroSoft Windows		*/
 #define WINDOW_MSWIN32	0		/* MicroSoft Windows 32 bit API */
 #define WINDOW_X	0		/* X/Unix			*/
 

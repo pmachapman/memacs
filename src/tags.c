@@ -237,7 +237,7 @@ register char pattern[];
 	{
 	register int	i = 0;	/* EMACS pattern index	*/
 	register int	j = 1;	/* VI pattern -skip /or?*/
-	int		len = strlen(pattern) - 1;	/* pattern length - 1	*/
+	int		len = (int)strlen(pattern) - 1;	/* pattern length - 1	*/
 						/* i.e. drop '/' or '?'	*/
 
 	if (pattern[len - 1] == '$')
@@ -309,7 +309,7 @@ int  retag;
 	int	ok = 1;			/* Tag search flag	*/
 	int	result = FALSE;	/* Default return value */
 	int	oldbmode;		/* For preserving bmode	*/
-	int	taglen = strlen(curtp->t_wd);
+	int	taglen = (int)strlen(curtp->t_wd);
 	int	file_ok;		/* TRUE if file found	*/
 
 	/* Tell user what we are doing		*/

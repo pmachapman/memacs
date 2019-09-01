@@ -88,11 +88,11 @@ void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont)
     GetTextMetrics (hDC, &Metrics);
     SelectObject (hDC, hPrevFont);
     ReleaseDC (hFrameWnd, hDC);
-    cm->SizeX = Metrics.tmAveCharWidth;
+    cm->SizeX = (SHORT)Metrics.tmAveCharWidth;
     if (cm->SizeX == 0) cm->SizeX = 1;  /* ATM gives 0 sometimes !!! */
-    cm->SizeY = Metrics.tmHeight;
+    cm->SizeY = (SHORT)Metrics.tmHeight;
     if (cm->SizeY == 0) cm->SizeY = 1;
-    cm->HalfLeadingY = Metrics.tmExternalLeading / 2;
+    cm->HalfLeadingY = (SHORT)Metrics.tmExternalLeading / 2;
     cm->OffsetX = cm->SizeX / 4;
     if ((cm->OffsetY = (cm->SizeY / 8) - cm->HalfLeadingY) < 0) {
 	cm->OffsetY = 0;
@@ -567,7 +567,9 @@ void FAR PASCAL ScrPaint (HWND hWnd)
     } while (++Row <= BottomRow);
 
     SelectObject (ps.hdc, hPrevFont);
-EndScrPaint:
+
+/* EndScrPaint:  */
+
     EndPaint (hWnd, &ps);
 } /* ScrPaint */
 

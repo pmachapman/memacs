@@ -183,7 +183,7 @@ char *fname;		/* name of function to evaluate */
 		case UFIND:	return(strcpy(result, fixnull(getval(arg1))));
 		case UFISNUM:	return(ltos(is_num(arg1)));
 		case UFLEFT:	return(bytecopy(result, arg1, asc_int(arg2)));
-		case UFLENGTH:	return(int_asc(strlen(arg1)));
+		case UFLENGTH:	return(int_asc((int)strlen(arg1)));
 		case UFLESS:	return(ltos(asc_int(arg1) < asc_int(arg2)));
 		case UFLOWER:	return(mklower(arg1));
 		case UFMID:	arg = asc_int(arg2);
@@ -218,7 +218,7 @@ char *fname;		/* name of function to evaluate */
 		case UFREVERSE: return(strrev(bytecopy(result, arg1, NSTRING * 2)));
 		case UFRIGHT:	arg = asc_int(arg2);
 				if (arg > strlen(arg1))
-					arg = strlen(arg1);
+					arg = (int)strlen(arg1);
 				return(strcpy(result,
 					&arg1[strlen(arg1) - arg]));
 		case UFRND:	return(int_asc((int)(ernd() % (long)absv(asc_int(arg1))) + 1L));
@@ -237,6 +237,7 @@ char *fname;		/* name of function to evaluate */
 	}
 
 	meexit(-11);	/* never should get here */
+	return NULL;	/* keep the compiler happy. will never get here.*/
 }
 
 char *PASCAL NEAR gtusr(vname)	/* look up a user var's value */
@@ -453,6 +454,7 @@ char *vname;		/* name of environment variable to retrieve */
 		case EVYPOS:	return(int_asc(ypos));
 	}
 	meexit(-12);	/* again, we should never get here */
+	return NULL;	/* keep the compiler happy. will never get here.*/
 }
 
 char *PASCAL NEAR fixnull(s)	/* Don't return NULL pointers! */
@@ -842,7 +844,7 @@ char *value;	/* value to set to */
 	case TKVAR: /* set a user variable */
 		if (vut->uv[vnum].u_value != NULL)
 			free(vut->uv[vnum].u_value);
-		sp = room(strlen(value) + 1);
+		sp = room((int)strlen(value) + 1);
 		if (sp == NULL)
 			return(FALSE);
 		strcpy(sp, value);
@@ -1322,6 +1324,7 @@ char *token;		/* token to evaluate */
 		case TKSTR:	return(token+1);
 		case TKCMD:	return(token);
 	}
+	return("");	/* Keep the compiler happy. Should never get here */
 }
 
 int PASCAL NEAR stol(val)	/* convert a string to a numeric logical */
@@ -1645,7 +1648,7 @@ int f,n;	/* prefix flag and argument */
 		pad(outseq, 14);
 	        
 		/* add in the value */
-		olen = strlen(outseq);
+		olen = (int)strlen(outseq);
 		strncat(outseq, gtenv(envars[uindex]), NSTRING - olen - 1);
 		outseq[NSTRING - 1] = 0;
 
@@ -1698,7 +1701,7 @@ int f,n;	/* prefix flag and argument */
 			pad(outseq, 14);
 		        
 			/* add in the value */
-			olen = strlen(outseq);
+			olen = (int)strlen(outseq);
 			strncat(outseq, ut->uv[uindex].u_value, NSTRING - olen - 1);
 			outseq[NSTRING - 1] = 0;
 	

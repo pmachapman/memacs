@@ -81,17 +81,17 @@ static void PASCAL UpdateSample (HWND hDlg, HFONT hFont,
     char    c;
 
     strcpy (SampleText, FaceName);
-    i = strlen (SampleText);
+    i = (int)strlen (SampleText);
     strcpy (&SampleText[i], " (Height=");
-    i += strlen (&SampleText[i]);
+    i += (int)strlen (&SampleText[i]);
     itoa (m->tmHeight, &SampleText[i], 10);
-    i += strlen (&SampleText[i]);
+    i += (int)strlen (&SampleText[i]);
     strcpy (&SampleText[i], ", Width=");
-    i += strlen (&SampleText[i]);
+    i += (int)strlen (&SampleText[i]);
     itoa (m->tmAveCharWidth, &SampleText[i], 10);
-    i += strlen (&SampleText[i]);
+    i += (int)strlen (&SampleText[i]);
     strcpy (&SampleText[i], ") sample:");
-    i += strlen (&SampleText[i]);
+    i += (int)strlen (&SampleText[i]);
     for (c = 'A'; c <= 'Z'; c++) {
 	SampleText[i++] = ' ';
 	SampleText[i++] = c;
@@ -111,8 +111,8 @@ static void PASCAL    NewFont (HWND hDlg, BOOL TrustSizeEdit)
    function is called for a size list-selection change, at which time
    the edit box has not been updated yet) */
 {
-    DWORD   d;
-    int     i;
+    DWORD_PTR   d;
+    INT_PTR     i;
     BOOL    FontSizeOK;
     LOGFONT lf;
     HFONT   hOldFont;
@@ -129,7 +129,7 @@ static void PASCAL    NewFont (HWND hDlg, BOOL TrustSizeEdit)
     }
     else FontSizeOK = FALSE;
     if (FontSizeOK) {
-	lf.lfHeight = i;
+	lf.lfHeight = (LONG)i;
 	lf.lfWidth = 0;
     }
     else {
@@ -165,7 +165,7 @@ static void PASCAL    NewFont (HWND hDlg, BOOL TrustSizeEdit)
 static void PASCAL AddSize (HWND hDlg, short int Height, short int Width)
 {
     char    ItemText[17];
-    int     i;
+    INT_PTR     i;
 
     itoa (Height, ItemText, 10);
     i = SendDlgItemMessage (hDlg, ID_FONTSIZE, CB_ADDSTRING, 0,
@@ -177,8 +177,8 @@ static void PASCAL AddSize (HWND hDlg, short int Height, short int Width)
 
 /* EnumSizesProc:   font enumeration function used by BuildSizeList */
 /* =============                                                    */
-int EXPORT FAR PASCAL EnumSizesProc (LPLOGFONT lf, LPTEXTMETRIC tm,
-                                     short FontType, LPSTR Data)
+int EXPORT FAR PASCAL EnumSizesProc (CONST LOGFONT *lf, CONST TEXTMETRIC *tm,
+	DWORD FontType, LPARAM Data)
 
 /* Data should point to a handle to the dialog box */
 {
@@ -190,10 +190,10 @@ int EXPORT FAR PASCAL EnumSizesProc (LPLOGFONT lf, LPTEXTMETRIC tm,
     if (FontType & TRUETYPE_FONTTYPE) {
 #endif
         /* make a size list up */
-        short int h;
+        long h;
         
         for (h = lf->lfHeight / 4; h <= (3 * lf->lfHeight) / 2; h += 2) {
-            AddSize (*(HWND FAR *)Data, h, 0);
+            AddSize (*(HWND FAR *)Data, (short)h, 0);
         }
         return 0;   /* no need to list this one further */
     }
@@ -231,7 +231,7 @@ static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
     SendDlgItemMessage (hDlg, ID_FONTSIZE, CB_RESETCONTENT, 0, 0L);
     {
 	HDC     hDC;
-	FARPROC ProcInstance;
+	FONTENUMPROC ProcInstance;
 	char    FaceName[LF_FACESIZE];
 
 	SendDlgItemMessage (hDlg, ID_FONT, LB_GETTEXT,
@@ -240,7 +240,7 @@ static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
 			    (LPARAM)(LPSTR)&FaceName[0]);
 	    /* FaceName now contains the currently selected face name */
 	hDC = GetDC (hDlg);
-	ProcInstance = MakeProcInstance ((FARPROC)EnumSizesProc,
+	ProcInstance = MakeProcInstance (EnumSizesProc,
 					 hEmacsInstance);
 	EnumFonts (hDC, FaceName, ProcInstance, LPDATA(&hDlg));
 	FreeProcInstance (ProcInstance);
@@ -261,7 +261,7 @@ static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
 	int     i;
 	int     BestIndex = 0;
 	short int h, w, BestHeight = 0, BestWidth = 0;
-	DWORD   ItemData;
+	DWORD_PTR   ItemData;
 
 	for (i = 0;; i++) {
 	    ItemData = SendDlgItemMessage (hDlg, ID_FONTSIZE,
@@ -289,7 +289,7 @@ static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
 static void PASCAL AddFace (HWND hDlg, char *CandidateFace)
 {
     BYTE    CharSet;
-    int     From, At;   /* indexes for list box searches */
+    LRESULT     From, At;   /* indexes for list box searches */
     HFONT   hFixedFont;
     char    FaceName [LF_FACESIZE];
     TEXTMETRIC tm;
@@ -336,8 +336,8 @@ static void PASCAL AddFace (HWND hDlg, char *CandidateFace)
 
 /* EnumFacesProc:   face enumeration function used by BuildFaceList */
 /* =============                                                    */
-int EXPORT FAR PASCAL EnumFacesProc (LPLOGFONT lf, LPTEXTMETRIC tm,
-                                     short FontType, LPSTR Data)
+int EXPORT FAR PASCAL EnumFacesProc (CONST LOGFONT *lf, CONST TEXTMETRIC *tm,
+                                     DWORD FontType, LPARAM Data)
 
 /* Data should point to a handle to the dialog box */
 /* lists only fixed pitch fonts that match the selected charset */
@@ -358,10 +358,10 @@ static void PASCAL BuildFaceList (HWND hDlg, char *FaceName)
     SendDlgItemMessage (hDlg, ID_FONT, LB_RESETCONTENT, 0, 0L);
     {
 	HDC     hDC;
-	FARPROC ProcInstance;
+	FONTENUMPROC ProcInstance;
 
 	hDC = GetDC (hDlg);
-	ProcInstance = MakeProcInstance ((FARPROC)EnumFacesProc,
+	ProcInstance = MakeProcInstance (EnumFacesProc,
 					 hEmacsInstance);
 	EnumFonts (hDC, NULL, ProcInstance, LPDATA(&hDlg));
 	FreeProcInstance (ProcInstance);
@@ -379,7 +379,7 @@ static void PASCAL BuildFaceList (HWND hDlg, char *FaceName)
 
 /* FontDlgProc: Emacs Font dialog box function */
 /* ===========                                 */
-int EXPORT FAR PASCAL  FontDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+INT_PTR EXPORT FAR PASCAL  FontDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 				    LPARAM lParam)
 {
     switch (wMsg) {
@@ -404,7 +404,7 @@ int EXPORT FAR PASCAL  FontDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 	    id = (Metrics.tmCharSet == ANSI_CHARSET ? ID_ANSI : ID_OEM);
 	    SendMessage (hDlg, WM_COMMAND,
 #if WINDOW_MSWIN32
-                         MAKELONG(id, BN_CLICKED), (long)GetDlgItem (hDlg, id));
+                         MAKELONG(id, BN_CLICKED), (LONG_PTR)GetDlgItem (hDlg, id));
 #else
                          id, MAKELONG(GetDlgItem (hDlg, id), BN_CLICKED));
 #endif
@@ -555,11 +555,11 @@ BOOL FAR PASCAL PickEmacsFont (void)
 /* returns TRUE is a new font has been picked */
 {
     BOOL    FontChanged;
-    FARPROC ProcInstance;
+    DLGPROC ProcInstance;
 
-    ProcInstance = MakeProcInstance ((FARPROC)FontDlgProc,
+    ProcInstance = MakeProcInstance (FontDlgProc,
 				     hEmacsInstance);
-    FontChanged = DialogBox (hEmacsInstance, "FONTS",
+    FontChanged = (BOOL)DialogBox (hEmacsInstance, "FONTS",
 			     hFrameWnd, ProcInstance);
     FreeProcInstance (ProcInstance);
 

@@ -225,7 +225,7 @@ void FAR PASCAL GenerateMenuSeq (UINT ID)
 
 /* AboutDlgProc:  About box dialog function */
 /* ============                             */
-int EXPORT FAR PASCAL  AboutDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+INT_PTR EXPORT FAR PASCAL  AboutDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                      LPARAM lParam)
 {
     char    s [50];
@@ -295,7 +295,7 @@ BOOL  PASCAL    GetCheck (HWND hDlg, int BoxID)
 /* must be invoked through DialogBoxParam, with LOWORD(dwInitParam) set
    to TRUE for global modes and FALSE for current buffer modes */
 
-int EXPORT FAR PASCAL  ModeDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+INT_PTR EXPORT FAR PASCAL  ModeDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                     LPARAM lParam)
 {
     char    s[40+NBUFN];
@@ -788,7 +788,7 @@ static void PASCAL  SimulateExtendedKey (int ec)
 
 BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam)
 {
-    FARPROC     ProcInstance;
+    DLGPROC     ProcInstance;
 #if WINXP
     char        HelpTopic[NFILEN + NFILEN + 2];
 #else
@@ -800,7 +800,7 @@ BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam)
            valid even in the not-quiescent case */
 
     case IDM_ABOUT:
-	ProcInstance = MakeProcInstance ((FARPROC)AboutDlgProc,
+	ProcInstance = MakeProcInstance (AboutDlgProc,
 					 hEmacsInstance);
 	DialogBox (hEmacsInstance, "ABOUT", hFrameWnd, ProcInstance);
 	FreeProcInstance (ProcInstance);
@@ -839,7 +839,7 @@ BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam)
 		strcpy(HelpTopic, MainHelpFile);
 		strcat(HelpTopic, "::/html/help8f1v.htm");
 InvokeHelp:
-	HtmlHelp(hFrameWnd, HelpTopic, HH_HELP_FINDER, NULL);
+	HtmlHelp(hFrameWnd, HelpTopic, HH_HELP_FINDER, 0);
 #else
     case IDM_WHELPINDEX:
 	HelpContext = 0;
@@ -867,7 +867,7 @@ InvokeHelp:
 
 	case IDM_GLOBMODE:
 	case IDM_MODE:
-	    ProcInstance = MakeProcInstance ((FARPROC)ModeDlgProc,
+	    ProcInstance = MakeProcInstance (ModeDlgProc,
 					     hEmacsInstance);
 	    DialogBoxParam (hEmacsInstance, "MODES",
 			    hFrameWnd, ProcInstance,
@@ -1138,7 +1138,7 @@ static BOOL PASCAL  AddMenuEntry (char *Name, UINT ID, CURMENU *CM,
     }
     Result = InsertMenu (hMenu, Pos + MenuEntryOffset (hMenu),
                          MenuFlags | MF_BYPOSITION,
-                         Name ? (UINT)hPopup : ID,
+                         Name ? (UINT_PTR)hPopup : ID,
                          (LPSTR)&EntryName[0]);
     if (!Result) {
         mlwrite (TEXT302);  /* "[lack of resources]" */
@@ -1295,7 +1295,7 @@ static BOOL PASCAL  DeleteMenuBinding (HMENU hMenu, int Pos)
 /* returns TRUE except when an attempt is made to delete the 'Screen'
    menu */
 {
-    BOOL    Result;
+/*    BOOL    Result;  */
     UINT    ID;
     HMENU   hPopup;
 

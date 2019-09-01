@@ -448,6 +448,7 @@ nextbuf:	bp = getoldb();
 		lp->next = (UNDO_OBJ *)NULL;
 		bp->undo_count--;
 	}
+	return NULL;
 }
 
 /*	RE-ROOM: Allocate memory using realloc()
@@ -511,5 +512,6 @@ nxtbuf:		bp = getoldb();
 		lp->next = (UNDO_OBJ *)NULL;
 		bp->undo_count--;
 	}
+	return NULL;
 }
 

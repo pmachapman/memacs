@@ -157,9 +157,9 @@ void in_put (int event);
 int  in_get (void);
 
 /* Windows-implementation specific functions */
-LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				   LPARAM lParam);
-LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LRESULT EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				     LPARAM lParam);
 int FAR PASCAL GetInput (void);
 int FAR PASCAL TakeANap (int t);

@@ -416,7 +416,7 @@ char *mstring;	/* match string if a partial list */
 
 		/* add in the command name */
 		strcpy(outseq, nptr->n_name);
-		cpos = strlen(outseq);
+		cpos = (int)strlen(outseq);
 
 		/* if we are executing an apropos command..... */
 		if (type == FALSE &&
@@ -467,7 +467,7 @@ fail:		/* and on to the next name */
 
 		/* add in the command name */
 		strcpy(outseq, bp->b_bname);
-		cpos = strlen(outseq);
+		cpos = (int)strlen(outseq);
 
 		/* if we are executing an apropos command..... */
 		if (type == FALSE &&

@@ -224,7 +224,7 @@ int PASCAL helpengine (int f, int n)
 	    /* "Help key: " */
 #if WINXP
 	if (HelpKey[0] == '\0') {
-	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_HELP_FINDER, NULL);
+	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_HELP_FINDER, 0);
 	}
 	else {
 		HH_AKLINK link;
@@ -285,7 +285,7 @@ static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 PASCAL  maximizescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIMAXIMIZE,
-                  (UINT)first_screen->s_drvhandle, 0L);
+                  (WPARAM)first_screen->s_drvhandle, 0L);
     return TRUE;
 } /* maximizescreen */
 
@@ -295,7 +295,7 @@ PASCAL  maximizescreen (int f, int n)
 PASCAL  restorescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIRESTORE,
-                  (UINT)first_screen->s_drvhandle, 0L);
+                  (WPARAM)first_screen->s_drvhandle, 0L);
     return TRUE;
 } /* restorescreen */
 
@@ -444,7 +444,7 @@ void FAR PASCAL ScrollBars (void)
 
 /* updscrollbars:      updates the scroll bars for a screen */
 /* =============                                            */
-PASCAL  updscrollbars (SCREEN *sp, char w_flag)
+void PASCAL  updscrollbars (SCREEN *sp, char w_flag)
 
 /* the w_flag is used to determine what needs updating: if the WFHARD
    bit is set, both scroll bars need an update. If the WFMOVE bit

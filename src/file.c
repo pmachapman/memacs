@@ -150,11 +150,11 @@ PASCAL NEAR resetkey()	/* reset the encryption key if needed */
 		/* and set up the key to be used! */
 		/* de-encrypt it */
 		ecrypt((char *)NULL, 0);
-		ecrypt(curbp->b_key, strlen(curbp->b_key));
+		ecrypt(curbp->b_key, (unsigned int)strlen(curbp->b_key));
 
 		/* re-encrypt it...seeding it to start */
 		ecrypt((char *)NULL, 0);
-		ecrypt(curbp->b_key, strlen(curbp->b_key));
+		ecrypt(curbp->b_key, (unsigned int)strlen(curbp->b_key));
 	}
 
 	return(TRUE);
