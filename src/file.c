@@ -53,7 +53,7 @@ int f,n;	/* prefix flag and argument */
 {
 	register int	s;
 	char *fname;	/* file name */
-	LINE *curline;
+	LINE *curline=NULL;
 
 	if (restflag)		/* don't allow this command if restricted */
 		return(resterr());

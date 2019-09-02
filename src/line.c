@@ -1063,7 +1063,7 @@ int f,n;	/* prefix flag and argument */
 	register int counter;	/* counter into kill buffer data */
 	register char *sp;	/* pointer into string to insert */
 	short int curoff;	/* storage for line before yanking */
-	LINE *curline;
+	LINE *curline=NULL;
 	KILL *kptr;		/* pointer into kill buffer */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/

@@ -1095,7 +1095,7 @@ static BOOL PASCAL  AddMenuEntry (char *Name, UINT ID, CURMENU *CM,
    MT_DUMMY indicates that the menu item is a mere separator, MT_MENUBAR
    indicates that the menu bar has been modified */
 {
-    HMENU   hMenu, hPopup;
+    HMENU   hMenu=NULL, hPopup=NULL;
     int     Pos;
     BOOL    Result;
     char    EntryName[MAXMENUTITLE];

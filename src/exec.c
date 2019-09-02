@@ -454,11 +454,11 @@ BUFFER *bp;	/* buffer to execute */
 	WHBLOCK *whlist;	/* ptr to !WHILE list */
 	WHBLOCK *scanner;	/* ptr during scan */
 	WHBLOCK *whtemp;	/* temporary ptr to a WHBLOCK */
-	char *einit;		/* initial value of eline */
+	char *einit=NULL;		/* initial value of eline */
 	char *eline;		/* text of line to execute */
 	char tkn[NSTRING];	/* buffer to evaluate an expresion in */
 	int num_locals;		/* number of local variables used in procedure */
-	UTABLE *ut;		/* new local user variable table */
+	UTABLE *ut=NULL;		/* new local user variable table */
 #if	LOGFLG
 	FILE *fp;		/* file handle for log file */
 #endif

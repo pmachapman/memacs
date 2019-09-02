@@ -19,7 +19,7 @@ int f,n;	/* prefix flag and argument */
 
 {
 	register BUFFER *bp;	/* buffer pointer to help */
-	char *fname;		/* file name of help file */
+	char *fname=NULL;		/* file name of help file */
 
 	/* first check if we are already here */
 	bp = bfind("emacs.hlp", FALSE, BFINVS);

@@ -138,7 +138,7 @@ int PASCAL insertclip (int f, int n)
     BOOL    Result = TRUE;
     char    *Text, *TextHead;
     short int curoff;
-    LINE    *curline;
+    LINE    *curline=NULL;
 
     /*-don't allow command if read-only mode */
     if (curbp->b_mode & MDVIEW) return rdonly();
