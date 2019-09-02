@@ -274,7 +274,7 @@ int terminator;		/* terminating char to be used on interactive fetch */
 		else
 			movecursor(term.t_nrow, 0);
 
-		return(getstring(buffer, size, terminator));
+		return(getstring((unsigned char *)buffer, size, terminator));
 	}
 
 	/* grab token and advance past */
@@ -1062,7 +1062,7 @@ dinput:	outline[term.t_ncol - 1] = 0;
 			oldinp = disinp;
 			disinp = TRUE;
 			mlwrite("Exp:");
-			getstring(&temp[11], NSTRING, ctoec(RETCHAR));
+			getstring((unsigned char *)(&temp[11]), NSTRING, ctoec(RETCHAR));
 			disinp = oldinp;
 			oldstatus = cmdstatus;
 			docmd(temp);
@@ -1078,7 +1078,7 @@ dinput:	outline[term.t_ncol - 1] = 0;
 			oldinp = disinp;
 			disinp = TRUE;
 			mlwrite("Exp: ");
-			getstring(temp, NSTRING, ctoec(RETCHAR));
+			getstring((unsigned char *)temp, NSTRING, ctoec(RETCHAR));
 			disinp = oldinp;
 			strcpy(track, "set %track ");
 			strcat(track, temp);

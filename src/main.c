@@ -116,7 +116,10 @@ char *argv[];			/* argument strings */
 #endif
 
 	if (eexitflag)
+	{
+		status = eexitval;
 		goto abortrun;
+	}
 	edinit(mainbuf);	/* Buffers, windows, screens */
 	ab_init();		/* initialize the abbreviation behavior */
 	varinit();		/* user variables */
@@ -241,7 +244,7 @@ int firstflag;			/* is this the first time in? */
 #endif
 
 #if	CRYPT
-	int cryptflag;		/* encrypting on the way in? */
+	int lcryptflag;		/* encrypting on the way in? */
 	char ekey[NPAT];	/* startup encryption key */
 #endif
 	NOSHARE CONST extern char *pathname[];	/* startup file path/name array */
@@ -256,7 +259,7 @@ int firstflag;			/* is this the first time in? */
 	errflag = FALSE;	/* not doing C error parsing */
 	exec_error = FALSE;	/* no macro error pending */
 #if	CRYPT
-	cryptflag = FALSE;	/* no encryption by default */
+	lcryptflag = FALSE;	/* no encryption by default */
 #endif
 	disphigh = FALSE;	/* don't escape high bit characters */
 	lterm[0] = 0;		/* standard line terminators */
@@ -300,7 +303,7 @@ int firstflag;			/* is this the first time in? */
 #if	CRYPT
 			case 'k':	/* -k<key> for code key */
 			case 'K':
-				cryptflag = TRUE;
+				lcryptflag = TRUE;
 				strcpy(ekey, &argv[carg][2]);
 				break;
 #endif
@@ -378,7 +381,7 @@ int firstflag;			/* is this the first time in? */
 			if (viewflag)
 				bp->b_mode |= MDVIEW;
 #if	CRYPT
-			if (cryptflag) {
+			if (lcryptflag) {
 				bp->b_mode |= MDCRYPT;
 				ecrypt((char *) NULL, 0);
 				ecrypt(ekey, (unsigned int)strlen(ekey));
@@ -722,7 +725,7 @@ int f;					/* prefix argument flag */
 int n;					/* prefix value */
 
 {
-	register int status;
+	register int status=0;
 	KEYTAB *key;		/* key entry to execute */
 #if	DBCS
 	int schar;		/* second key in 2 byte sequence */
@@ -760,7 +763,7 @@ int n;					/* prefix value */
 	/* since the keystroke is not a command, */
 	if (isinword(c))
 		/* in a word, we save it */
-		ab_save(c);
+		ab_save((char)c);
 	else
 		/* not in a word, we attempt an expansion */
 		ab_expand();
@@ -812,7 +815,7 @@ int n;					/* prefix value */
 				else if (c == '#' && (curbp->b_mode & MDCMOD) != 0)
 					status = inspound();
 				else {
-					status = linsert(1, c);
+					status = linsert(1, (char)c);
 #if	DBCS
 					/* Insert the second half of a double-byte character.*/
 					if (is2char(c))
@@ -840,7 +843,7 @@ int n;					/* prefix value */
 			}
 #endif	
 			else
-				status = linsert(n, c);
+				status = linsert(n, (char)c);
 		}
 
 		/* In ABBREV mode, if we are doing aggressive expansion and
@@ -852,7 +855,7 @@ int n;					/* prefix value */
 		/* check for CMODE fence matching */
 		if ((c == '}' || c == ')' || c == ']') &&
 			(curbp->b_mode & MDCMOD) != 0)
-			fmatch(c);
+			fmatch((char)c);
 
 		/* check auto-save mode */
 		if (curbp->b_mode & MDASAVE)

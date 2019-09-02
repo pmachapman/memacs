@@ -22,7 +22,7 @@ int f, n;	/* prefix flag and argument */
 {
     if (f == FALSE)	/* default to 0 to center screen */
 	n = 0;
-    curwp->w_force = n;
+    curwp->w_force = (char)n;
     curwp->w_flag |= WFFORCE;
     return(TRUE);
     }
@@ -242,7 +242,7 @@ int f,n;	/* prefix flag and argument */
 		lp = lback(lp);
 	}
 	curwp->w_toprow = 0;
-	curwp->w_ntrows = term.t_nrow-1;
+	curwp->w_ntrows = (char)(term.t_nrow-1);
 	curwp->w_linep	= lp;
 	curwp->w_flag  |= WFMODE|WFHARD;
 	return(TRUE);
@@ -293,7 +293,7 @@ int f, n;	/* arguments are ignored for this command */
 		if (wp == NULL)
 			return(FALSE);
 		wp->w_toprow = 0;
-		wp->w_ntrows += target;
+		wp->w_ntrows += (char)target;
 	} else {
 		/* find the next window up */
 		target = curwp->w_toprow - 1;
@@ -378,8 +378,8 @@ int f, n;	/* default flag and numeric argument */
 	wp->w_force = 0;
 #if	COLOR
 	/* set the colors of the new window */
-	wp->w_fcolor = gfcolor;
-	wp->w_bcolor = gbcolor;
+	wp->w_fcolor = (char)gfcolor;
+	wp->w_bcolor = (char)gbcolor;
 #endif
 	ntru = (curwp->w_ntrows-1) / 2; 	/* Upper size		*/
 	ntrl = (curwp->w_ntrows-1) - ntru;	/* Lower size		*/
@@ -394,11 +394,11 @@ int f, n;	/* default flag and numeric argument */
 		/* Old is upper window. */
 		if (ntrd == ntru)		/* Hit mode line.	*/
 			lp = lforw(lp);
-		curwp->w_ntrows = ntru;
+		curwp->w_ntrows = (char)ntru;
 		wp->w_wndp = curwp->w_wndp;
 		curwp->w_wndp = wp;
-		wp->w_toprow = curwp->w_toprow+ntru+1;
-		wp->w_ntrows = ntrl;
+		wp->w_toprow = (char)(curwp->w_toprow+ntru+1);
+		wp->w_ntrows = (char)ntrl;
 	} else {				/* Old is lower window	*/
 		wp1 = NULL;
 		wp2 = wheadp;
@@ -412,10 +412,10 @@ int f, n;	/* default flag and numeric argument */
 			wp1->w_wndp = wp;
 		wp->w_wndp   = curwp;
 		wp->w_toprow = curwp->w_toprow;
-		wp->w_ntrows = ntru;
+		wp->w_ntrows = (char)ntru;
 		++ntru; 			/* Mode line.		*/
-		curwp->w_toprow += ntru;
-		curwp->w_ntrows  = ntrl;
+		curwp->w_toprow += (char)ntru;
+		curwp->w_ntrows  = (char)ntrl;
 		while (ntru--)
 			lp = lforw(lp);
 	}
@@ -463,16 +463,16 @@ int f,n;	/* prefix flag and argument */
 		for (i=0; i<n && lp!=adjwp->w_bufp->b_linep; ++i)
 			lp = lforw(lp);
 		adjwp->w_linep	= lp;
-		adjwp->w_toprow += n;
+		adjwp->w_toprow += (char)n;
 	} else {				/* Shrink above.	*/
 		lp = curwp->w_linep;
 		for (i=0; i<n && lback(lp)!=curbp->b_linep; ++i)
 			lp = lback(lp);
 		curwp->w_linep	= lp;
-		curwp->w_toprow -= n;
+		curwp->w_toprow -= (char)n;
 	}
-	curwp->w_ntrows += n;
-	adjwp->w_ntrows -= n;
+	curwp->w_ntrows += (char)n;
+	adjwp->w_ntrows -= (char)n;
 	curwp->w_flag |= WFMODE|WFHARD;
 	adjwp->w_flag |= WFMODE|WFHARD;
 	return(TRUE);
@@ -514,16 +514,16 @@ int f,n;	/* prefix flag and argument */
 		for (i=0; i<n && lback(lp)!=adjwp->w_bufp->b_linep; ++i)
 			lp = lback(lp);
 		adjwp->w_linep	= lp;
-		adjwp->w_toprow -= n;
+		adjwp->w_toprow -= (char)n;
 	} else {				/* Grow above.		*/
 		lp = curwp->w_linep;
 		for (i=0; i<n && lp!=curbp->b_linep; ++i)
 			lp = lforw(lp);
 		curwp->w_linep	= lp;
-		curwp->w_toprow += n;
+		curwp->w_toprow += (char)n;
 	}
-	curwp->w_ntrows -= n;
-	adjwp->w_ntrows += n;
+	curwp->w_ntrows -= (char)n;
+	adjwp->w_ntrows += (char)n;
 	curwp->w_flag |= WFMODE|WFHARD;
 	adjwp->w_flag |= WFMODE|WFHARD;
 	return(TRUE);
@@ -722,7 +722,7 @@ int n;	/* numeric argument */
 			wp = wp->w_wndp;
 
 		/* and enlarge it as needed */
-		wp->w_ntrows = n - wp->w_toprow - 2;
+		wp->w_ntrows = (char)(n - wp->w_toprow - 2);
 		wp->w_flag |= WFHARD|WFMODE;
 
 	} else {
@@ -764,7 +764,7 @@ int n;	/* numeric argument */
 				/* need to change this window size? */
 				lastline = wp->w_toprow + wp->w_ntrows - 1;
 				if (lastline >= n - 2) {
-					wp->w_ntrows = n - wp->w_toprow - 2;
+					wp->w_ntrows = (char)(n - wp->w_toprow - 2);
 					wp->w_flag |= WFHARD|WFMODE;
 				}
 			}
@@ -819,8 +819,8 @@ int n;	/* numeric argument */
 #else
 	term.t_ncol = n;
 #endif
-	term.t_margin = n / 10;
-	term.t_scrsiz = n - (term.t_margin * 2);
+	term.t_margin = (short)(n / 10);
+	term.t_scrsiz = (short)(n - (term.t_margin * 2));
 
 	/* force all windows to redraw */
 	wp = wheadp;

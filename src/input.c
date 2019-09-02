@@ -481,7 +481,7 @@ clist:			/* make a completion list! */
 
 		} else {
 			if (cpos < maxlen && c > ' ') {
-				buf[cpos++] = c;
+				buf[cpos++] = (char)c;
 				mlout(c);
 				++ttcol;
 				TTflush();
@@ -892,7 +892,7 @@ int PASCAL NEAR tgetc()
 
 	/* save it if we need to */
 	if (kbdmode == RECORD) {
-		*kbdptr++ = c;
+		*kbdptr++ = (short)c;
 		kbdend = kbdptr;
 
 		/* don't overrun the buffer */
@@ -1118,7 +1118,7 @@ int eolchar;
 		/* insert the character in the string! */
 		if (cpos < nbuf-1) {
 
-			buf[cpos++] = c;
+			buf[cpos++] = (unsigned char)c;
 
 			if ((c < ' ') && (c != '\r')) {
 				outstring("^");

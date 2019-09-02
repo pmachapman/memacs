@@ -101,7 +101,7 @@ void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont)
     }
     cm->LeadingY = 2 * cm->HalfLeadingY;
     cm->MLHeight = cm->SizeY + cm->LeadingY + (2 * cm->OffsetY) +
-                   GetSystemMetrics(SM_CYBORDER);
+                   (short)GetSystemMetrics(SM_CYBORDER);
 } /* BuildCellMetrics */
 
 /* InvalidateCells: marks character cells for repaint */
@@ -145,7 +145,7 @@ void FAR PASCAL InvalidateCells (HWND hWnd, int leftcol, int toprow,
 /* =================                                         */
 
 void FAR PASCAL MinimumClientSize (HWND hWnd, int NCols, int NRows,
-				   int *Width, int *Height)
+	long *Width, long *Height)
 
 /* The values pointed by Height and Width are set to the smallest value
    that allows displaying NRows rows and NCols columns. A NULL pointer
@@ -250,7 +250,7 @@ void FAR PASCAL EmacsCaret (BOOL Show)
 		    }
 
 		    if (hCaretWnd == hFrameWnd) {
-		    	xsize = GetSystemMetrics (SM_CXBORDER);
+		    	xsize = (short)GetSystemMetrics (SM_CXBORDER);
 		    	ysize = EmacsCM.SizeY;
 		    }
 		    else {
@@ -387,7 +387,7 @@ void FAR PASCAL GetMinMaxInfo (HWND hWnd, LPPOINT rgpt)
 	rgpt[4] = rgpt[1];
     }
     else {                  /* compute minimum tracking size */
-        int     X, Y;
+        long     X, Y;
 
         /* minimum displayed text width = 3 */
         /* minimum displayed text  height = 10 */

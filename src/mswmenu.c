@@ -453,7 +453,7 @@ int  PASCAL GetKeyText (int Key, char *Text, int TextLength)
 	if (*prefix_key_ptr == 0) {
 	    KEYTAB  *KTp;
 
-	    KTp = FindKeyBinding ((Key & CTLX) ? cex : meta);
+	    KTp = FindKeyBinding ( (void *)((Key & CTLX) ? cex : meta) );
 	    if (KTp->k_type == BINDNUL) return 0;
 	    *prefix_key_ptr = KTp->k_code;
 	}
@@ -762,14 +762,14 @@ void FAR PASCAL InitMenuPopup (HMENU hMenu, LPARAM lParam)
 
 static void PASCAL  SimulateExtendedKey (int ec)
 {
-    char    prefix;
+    char    lprefix;
 
     if (in_room(5)) {
-	prefix = ec >> 8;
-	if (prefix != 0) {
+		lprefix = (char)(ec >> 8);
+	if (lprefix != 0) {
 	    in_put (0);
-	    in_put (prefix);
-	    if (prefix & (MOUS >> 8)) {
+	    in_put (lprefix);
+	    if (lprefix & (MOUS >> 8)) {
 		/* in case the key is a mouse action, supply
 		   dummy mouse position info */
 		in_put (1);
@@ -873,7 +873,7 @@ InvokeHelp:
 			    hFrameWnd, ProcInstance,
 			    (DWORD)(wParam == IDM_GLOBMODE));
 	    FreeProcInstance (ProcInstance);
-	    if (wParam = IDM_MODE) {
+	    if ( 0 != (wParam = IDM_MODE) ) {
 		upmode ();
 		update (FALSE);
 	    }
@@ -1009,7 +1009,7 @@ static BOOL PASCAL  ParseMenu (char *Name, char *Title, int *Posp)
             unsigned char *s;
 
             *Posp = 0;
-            for (s = &Name[i+1]; (*s != '>') && (*s != '\0'); s++) {
+            for (s = (unsigned char *)(&Name[i+1]); (*s != '>') && (*s != '\0'); s++) {
                 if ((*s >= '0') && (*s <= '9')) {
                     *Posp = (*Posp * 10) + (*s - '0');
                 }
@@ -1057,7 +1057,7 @@ static BOOL PASCAL  LocateMenu (char *Name, CURMENU *CM)
     else hMenu = CM->cm_parent[CM->cm_x];
     PosOffset = MenuEntryOffset (hMenu);
     ItemCount = GetMenuItemCount (hMenu);
-    if (DoScan = (Pos < 0)) Pos = CM->cm_pos;
+    if ( 0 != (DoScan = (Pos < 0)) ) Pos = CM->cm_pos;
     if (Pos < 0) Pos = 0;
     Pos += PosOffset;
     StartPos = Pos;

@@ -46,7 +46,7 @@ int PASCAL NEAR nextbuffer(f, n)	/* switch to the next buffer in the buffer list
 int f, n;	/* default flag, numeric argument */
 {
 	register BUFFER *bp;	/* current eligable buffer */
-	register int status;
+	register int status=0;
 
 	/* make sure the arg is legit */
 	if (f == FALSE)
@@ -473,7 +473,7 @@ long   num;
 		buf[--width] = (int)(num%10L) + '0';
 		num /= 10L;
 	}
-	buf[--width] = (int)num + '0';		/* Always 1 digit.	*/
+	buf[--width] = (char)((int)num + '0');		/* Always 1 digit.	*/
 	while (width != 0)			/* Pad with blanks.	*/
 		buf[--width] = ' ';
 }
@@ -570,7 +570,7 @@ int bflag;		/* bit settings for a new buffer */
 			bp->b_marko[cmark] = 0;
 		}
 		bp->b_fcol  = 0;
-		bp->b_flag  = bflag;
+		bp->b_flag  = (char)bflag;
 		bp->b_mode  = gmode;
 		bp->b_nwnd  = 0;
 		bp->b_exec  = 0;

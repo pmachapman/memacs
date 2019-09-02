@@ -199,7 +199,7 @@ int f,n;	/* argument flag and num */
 
 	/* reseting the current position */
         curwp->w_dotp  = dlp;
-        curwp->w_doto  = getgoal(dlp);
+        curwp->w_doto  = (short)getgoal(dlp);
         curwp->w_flag |= WFMOVE;
 #if	DBCS
 	return(stopback());
@@ -244,7 +244,7 @@ int f,n;	/* argument flag and num */
 
 	/* reseting the current position */
         curwp->w_dotp  = dlp;
-        curwp->w_doto  = getgoal(dlp);
+        curwp->w_doto  = (short)getgoal(dlp);
         curwp->w_flag |= WFMOVE;
 #if	DBCS
 	return(stopback());
@@ -565,7 +565,7 @@ int f,n;	/* argument flag and num */
         curwp->w_dotp  = curwp->w_markp[n];
         curwp->w_doto  = curwp->w_marko[n];
         curwp->w_markp[n] = odotp;
-        curwp->w_marko[n] = odoto;
+        curwp->w_marko[n] = (short)odoto;
         curwp->w_flag |= WFMOVE;
         return(TRUE);
 }

@@ -140,7 +140,7 @@ char *fname;		/* name of function to evaluate */
 				result[NSTRING - 1] = 0;
 				return(result);
 
-		case UFCHR:	result[0] = asc_int(arg1);
+		case UFCHR:	result[0] = (char)asc_int(arg1);
 				result[1] = 0;
 				return(result);
 		case UFDIV:	if ((arg = asc_int(arg2)) != 0)
@@ -177,7 +177,7 @@ char *fname;		/* name of function to evaluate */
 				return(result);
 #endif
 		case UFGTCMD:	return(cmdstr(getcmd(), result));
-		case UFGTKEY:	result[0] = tgetc();
+		case UFGTKEY:	result[0] = (char)tgetc();
 				result[1] = 0;
 				return(result);
 		case UFIND:	return(strcpy(result, fixnull(getval(arg1))));
@@ -754,8 +754,8 @@ int size;	/* size of var array */
 int scope;	/* intended scope of any created user variables */
 
 {
-	register int vnum;	/* subscript in varable arrays */
-	register int vtype;	/* type to return */
+	register int vnum=0;	/* subscript in varable arrays */
+	register int vtype=0;	/* type to return */
 	register UTABLE *vut;	/* user var table to search */
 
 fvar:	vtype = -1;
@@ -981,7 +981,7 @@ char *value;	/* value to set to */
 		case EVHSCROLL: hscroll = stol(value);
 				lbound = 0;
 				break;
-		case EVISTERM:	isterm = stock(value);
+		case EVISTERM:	isterm = stock((unsigned char *)value);
 				break;
 		case EVKILL:	break;
 		case EVLANG:	break;
@@ -1068,7 +1068,7 @@ char *value;	/* value to set to */
 				break;
 		case EVSTATUS:	cmdstatus = stol(value);
 				break;
-		case EVSTERM:	sterm = stock(value);
+		case EVSTERM:	sterm = stock((unsigned char *)value);
 				break;
 		case EVTARGET:	curgoal = asc_int(value);
 				thisflag = saveflag;
@@ -1174,7 +1174,7 @@ int i;	/* integer to translate to a string */
 	*sp = 0;
 	do {
 		digit = i % 10;
-		*(--sp) = '0' + digit;	/* and install the new digit */
+		*(--sp) = (char)('0' + digit);	/* and install the new digit */
 		i = i / 10;
 	} while (i);
 
@@ -1211,7 +1211,7 @@ long num;	/* integer to translate to a string */
 	*sp = 0;
 	do {
 		digit = num % 10;
-		*(--sp) = '0' + digit;	/* and install the new digit */
+		*(--sp) = (char)('0' + digit);	/* and install the new digit */
 		num = num / 10L;
 	} while (num);
 
@@ -1272,7 +1272,7 @@ char *token;		/* token to evaluate */
 		case TKARG:	/* interactive argument */
 				strcpy(token, fixnull(getval(&token[1])));
 				mlwrite("%s", token);
-				status = getstring(buf, NSTRING, ctoec(RETCHAR));
+				status = getstring((unsigned char *)buf, NSTRING, ctoec(RETCHAR));
 				if (status == ABORT)
 					return(NULL);
 				return(buf);
@@ -1526,7 +1526,7 @@ char *buf;	/* buffer to place list of characters */
 	sp = buf;
 	for (index = 0; index < 256; index++)
 		if (wordlist[index])
-			*sp++ = index;
+			*sp++ = (char)index;
 	*sp = 0;
 	return(buf);
 }

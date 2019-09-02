@@ -197,7 +197,7 @@ register unsigned len;	/* number of characters in the buffer */
 
 			key = key + key + (cc ^ *bptr) + salt;
 		}
-		*bptr++ = cc;	/* put character back into buffer */
+		*bptr++ = (char)cc;	/* put character back into buffer */
 	}
 	return;
 }

@@ -48,12 +48,12 @@ int	n;					/* # of repetitions wanted */
 	long numsub;			/* number of substitutions */
 	int nlflag;			/* last char of search string a <NL>? */
 	int nlrepl;			/* was a replace done on the last line? */
-	char c;				/* input char for query */
+	char c = '\0';				/* input char for query */
 	LINE *origline;		/* original "." position */
 	int origoff;		/* and offset (for . query option) */
 	LINE *lastline;		/* position of last replace and */
-	int lastoff;		/* offset (for 'u' query option) */
-	int oldmatchlen;	/* Closure may alter the match length.*/
+	int lastoff=0;		/* offset (for 'u' query option) */
+	int oldmatchlen=0;	/* Closure may alter the match length.*/
 
 	/*
 	 * Don't allow this command if we are
@@ -83,7 +83,7 @@ int	n;					/* # of repetitions wanted */
 	/* Set up flags so we can make sure not to do a recursive
 	 * replace on the last line.
 	 */
-	nlflag = (pat[strlen(pat) - 1] == '\r');
+	nlflag = (pat[strlen((char *)pat) - 1] == '\r');
 	nlrepl = FALSE;
 
 	/* Save original . position, reset the number of matches and
@@ -140,7 +140,7 @@ qprompt:
 			if (posflag)
 				upmode();
 			update(TRUE);
-			c = tgetc();	/* and input */
+			c = (char)tgetc();	/* and input */
 			mlerase();	/* and clear it */
 
 			/* And respond appropriately.
@@ -177,7 +177,7 @@ qprompt:
 					goto pprompt;
 				}
 				curwp->w_dotp = lastline;
-				curwp->w_doto = lastoff;
+				curwp->w_doto = (short)lastoff;
 				lastline = NULL;
 				lastoff = 0;
 
@@ -205,7 +205,7 @@ qprompt:
 			case '.':	/* abort! and return */
 				/* restore old position */
 				curwp->w_dotp = origline;
-				curwp->w_doto = origoff;
+				curwp->w_doto = (short)origoff;
 				curwp->w_flag |= WFMOVE;
 
 			case BELL:	/* abort! and stay */
@@ -465,7 +465,7 @@ int PASCAL NEAR rmcstr()
 				 * character with it.
 				 */
 				if (pchr != '\0') {
-					*((rmcptr->u.rstr) + mj) = pchr;
+					*((rmcptr->u.rstr) + mj) = (char)pchr;
 					patptr++;
 				}
 				mj = 0;

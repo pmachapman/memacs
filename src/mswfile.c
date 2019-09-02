@@ -151,8 +151,8 @@ int PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
     Parameters.Prompt = prompt;
     Par = &Parameters;
     ProcInstance = MakeProcInstance (FileDlgProc, hEmacsInstance);
-    if (Result = (DialogBox (hEmacsInstance, "FILE", hFrameWnd,
-                             ProcInstance) >= 0)) {
+    if ( 0 != (Result = (DialogBox (hEmacsInstance, "FILE", hFrameWnd,
+                             ProcInstance) >= 0)) ) {
         CompletePath (buf, Parameters.Name);
     }
     FreeProcInstance (ProcInstance);
@@ -253,7 +253,7 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
 			   completion so we do not attempt anything */
     }
     i = SendDlgItemMessage (hDlg, ID_FILES, LB_SELECTSTRING,
-                            -1, (LPARAM)(LPSTR)&s[0]);
+                            (WPARAM)-1, (LPARAM)(LPSTR)&s[0]);
     if (i == LB_ERR) {
         /* no match, give up! */
         return FALSE;
@@ -339,7 +339,7 @@ INT_PTR EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 	    default:
 	        if ((c > 0x1F) && (c < 0x7F)) {
 	            /* regular ASCII char, stuff it into the filename */
-	            s[i++] = c;
+	            s[i++] = (char)c;
 	        }
 	        /* else, discard it */
 	        break;

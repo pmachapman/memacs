@@ -174,9 +174,9 @@ int f,n;	/* prefix flag and argument */
 		while (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_lower(c)) {
-				obj.obj_char = c;
+				obj.obj_char = (char)c;
 				c = upperc(c);
-				lputc(curwp->w_dotp, curwp->w_doto, c);
+				lputc(curwp->w_dotp, curwp->w_doto, (char)c);
 				undo_insert(OP_REPC, 1L, obj);
 				lchange(WFHARD);
 			}
@@ -211,9 +211,9 @@ int f,n;	/* prefix flag and argument */
 		while (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_upper(c)) {
-				obj.obj_char = c;
+				obj.obj_char = (char)c;
 				c = lowerc(c);
-				lputc(curwp->w_dotp, curwp->w_doto, c);
+				lputc(curwp->w_dotp, curwp->w_doto, (char)c);
 				undo_insert(OP_REPC, 1L, obj);
 				lchange(WFHARD);
 			}
@@ -249,9 +249,9 @@ int f,n;	/* prefix flag and argument */
 		if (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_lower(c)) {
-				obj.obj_char = c;
+				obj.obj_char = (char)c;
 				c = upperc(c);
-				lputc(curwp->w_dotp, curwp->w_doto, c);
+				lputc(curwp->w_dotp, curwp->w_doto, (char)c);
 				undo_insert(OP_REPC, 1L, obj);
 				lchange(WFHARD);
 			}
@@ -260,9 +260,9 @@ int f,n;	/* prefix flag and argument */
 			while (inword() != FALSE) {
 				c = lgetc(curwp->w_dotp, curwp->w_doto);
 				if (is_upper(c)) {
-					obj.obj_char = c;
+					obj.obj_char = (char)c;
 					c = lowerc(c);
-					lputc(curwp->w_dotp, curwp->w_doto, c);
+					lputc(curwp->w_dotp, curwp->w_doto, (char)c);
 					undo_insert(OP_REPC, 1L, obj);
 					lchange(WFHARD);
 				}
@@ -363,7 +363,7 @@ int f,n;	/* prefix flag and argument */
 
 	/* restore the original position and delete the words */
 	curwp->w_dotp = dotp;
-	curwp->w_doto = doto;
+	curwp->w_doto = (short)doto;
 	return(ldelete(size, TRUE));
 }
 
@@ -437,7 +437,7 @@ int PASCAL NEAR inword()
 
 int PASCAL NEAR isinword(c)
 
-char c;
+unsigned c;
 
 {
 	/* if we are using the table.... */

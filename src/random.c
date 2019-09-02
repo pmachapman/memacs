@@ -22,11 +22,11 @@ int PASCAL NEAR showcpos(f, n)
 int f, n;				/* prefix flag and argument */
 
 {
-	register LINE *lp;		/* current line */
-	register long numchars;		/* # of chars in file */
-	register long numlines;		/* # of lines in file */
-	register long predchars;	/* # chars preceding point */
-	register long predlines;	/* # lines preceding point */
+	register LINE *lp=NULL;		/* current line */
+	register long numchars=0;		/* # of chars in file */
+	register long numlines=0;		/* # of lines in file */
+	register long predchars=0;	/* # chars preceding point */
+	register long predlines=0;	/* # lines preceding point */
 	register int curchar;		/* character under cursor */
 	int ratio;
 	int col;
@@ -69,7 +69,7 @@ int f, n;				/* prefix flag and argument */
 	savepos = curwp->w_doto;
 	curwp->w_doto = lused(curwp->w_dotp);
 	ecol = getccol(FALSE);
-	curwp->w_doto = savepos;
+	curwp->w_doto = (short)savepos;
 
 	ratio = 0;			/* Ratio before dot. */
 	if (numchars != 0)
@@ -216,7 +216,7 @@ int pos;				/* position to set cursor */
 	}
 
 	/* set us at the new position */
-	curwp->w_doto = i;
+	curwp->w_doto = (short)i;
 
 	/* and tell whether we made it */
 	return(col >= pos);
@@ -251,28 +251,28 @@ int f, n;				/* prefix flag and argument */
 
 	/* get the 2 chars to swap */
 	if (curwp->w_doto == lused(dotp) && --curwp->w_doto < 0) {
-		curwp->w_doto = saved_doto;
+		curwp->w_doto = (short)saved_doto;
 		return(FALSE);
 	}
 	cr = lgetc(dotp, curwp->w_doto);
 	if (--curwp->w_doto < 0) {
-		curwp->w_doto = saved_doto;
+		curwp->w_doto = (short)saved_doto;
 		return(FALSE);
 	}
 	cl = lgetc(dotp, curwp->w_doto);
 
 	/* swap the characters */
-	obj.obj_char = cl;
-	lputc(dotp, curwp->w_doto, cr);
+	obj.obj_char = (char)cl;
+	lputc(dotp, curwp->w_doto, (char)cr);
 	undo_insert(OP_REPC, 1L, obj);
 
 	curwp->w_doto++;
-	obj.obj_char = cr;
-	lputc(dotp, curwp->w_doto, cl);
+	obj.obj_char = (char)cr;
+	lputc(dotp, curwp->w_doto, (char)cl);
 	undo_insert(OP_REPC, 1L, obj);
 
 	/* restore the cursor position */
-	curwp->w_doto = saved_doto;
+	curwp->w_doto = (short)saved_doto;
 
 	/* flag the change */
 	lchange(WFEDIT);
@@ -323,7 +323,7 @@ int f, n;				/* prefix flag and argument */
 
 	/* otherwise, just insert the raw character */
 	c = ectoc(ec);
-	return(linsert(n, c));
+	return(linsert(n, (char)c));
 }
 
 /*
@@ -503,7 +503,7 @@ int f, n;				/* default flag and numeric repeat count */
 				break;
 			length--;
 			}
-		lp->l_used = length;
+		lp->l_used = (short)length;
 
 		/* advance/or back to the next line */
 		forwline(TRUE, inc);
@@ -665,7 +665,7 @@ int c;					/* brace to insert (always } for now) */
 			{
 			ch = lgetc(curwp->w_dotp, i);
 			if (ch != ' ' && ch != '\t')
-				return(linsert(n, c));
+				return(linsert(n, (char)c));
 			}
 
 	/* chercher le caractere oppose correspondant */
@@ -710,8 +710,8 @@ int c;					/* brace to insert (always } for now) */
 	if (count != 0)
 		{				/* no match */
 		curwp->w_dotp = oldlp;
-		curwp->w_doto = oldoff;
-		return(linsert(n, c));
+		curwp->w_doto = (short)oldoff;
+		return(linsert(n, (char)c));
 		}
 
 	curwp->w_doto = 0;	/* debut de ligne */
@@ -722,7 +722,7 @@ int c;					/* brace to insert (always } for now) */
 	/* delete back first */
 	target = getccol(FALSE);	/* c'est l'indent que l'on doit avoir */
 	curwp->w_dotp = oldlp;
-	curwp->w_doto = oldoff;
+	curwp->w_doto = (short)oldoff;
 
 	while (target != getccol(FALSE))
 		{
@@ -738,7 +738,7 @@ int c;					/* brace to insert (always } for now) */
 		}
 
 	/* and insert the required brace(s) */
-	return(linsert(n, c));
+	return(linsert(n, (char)c));
 	}
 
 int PASCAL NEAR inspound()	/* insert a # into the text here...we are in CMODE */
@@ -931,8 +931,8 @@ int PASCAL NEAR killtext(f, n)
 int f, n;	/* prefix flag and argument */
 
 {
-	register LINE *nextp;
-	long chunk;
+	register LINE *nextp=NULL;
+	long chunk=0;
 
 	/* Don't do this command in read-only mode */
 	if (curbp->b_mode & MDVIEW)
@@ -1064,9 +1064,9 @@ int global;				/* true = global flag,	false = current buffer flag */
 			}
 		else
 			if (uflag)
-				curwp->w_fcolor = i;
+				curwp->w_fcolor = (char)i;
 			else
-				curwp->w_bcolor = i;
+				curwp->w_bcolor = (char)i;
 
 		curwp->w_flag |= WFCOLR;
 #endif
@@ -1258,7 +1258,7 @@ int f, n;				/* not used */
 
 	/* restore the current position */
 	curwp->w_dotp = oldlp;
-	curwp->w_doto = oldoff;
+	curwp->w_doto = (short)oldoff;
 	TTbeep();
 	return(FALSE);
 	}
@@ -1362,7 +1362,7 @@ char ch;	/* fence type to match against */
 
 	/* restore the current position */
 	curwp->w_dotp = oldlp;
-	curwp->w_doto = oldoff;
+	curwp->w_doto = (short)oldoff;
 	return(TRUE);
 }
 
@@ -1390,7 +1390,7 @@ int f, n;				/* ignored arguments */
 		n = -n;
 
 	/* insert it */
-	while (n-- && (status = linstr(tstring)))
+	while (n-- && ((status = linstr(tstring)) !=0 ) )
 		;
 	return(status);
 	}
@@ -1416,7 +1416,7 @@ int f, n;				/* ignored arguments */
 		n = -n;
 
 	/* insert it */
-	while (n-- && (status = lover(tstring)))
+	while (n-- && (0 != (status = lover(tstring))))
 		;
 	return(status);
 	}

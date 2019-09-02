@@ -75,7 +75,7 @@ int f,n;	/* prefix flag and argument */
 	/* if we aren't off the end of the text, move the point to the mouse */
 	if ((lp=mouseline(wp, ypos)) != NULL) {
 		curwp->w_dotp = lp;
-		curwp->w_doto = mouseoffset(wp, lp, xpos);
+		curwp->w_doto = (short)mouseoffset(wp, lp, xpos);
 	}
 
 	return(TRUE);
@@ -129,7 +129,7 @@ int f,n;	/* prefix flag and argument */
 	/* if we aren't off the end of the text, set mark $hilight+1 */
 	if ((lp=mouseline(wp, ypos)) != NULL) {
 		wp->w_markp[hilite+1] = lp;
-		wp->w_marko[hilite+1] = mouseoffset(wp, lp, xpos);
+		wp->w_marko[hilite+1] = (short)mouseoffset(wp, lp, xpos);
 	}
 
 	return(TRUE);		
@@ -223,7 +223,7 @@ int f,n;	/* prefix flag and argument */
 	/* if we aren't off the end of the text, move the point to the mouse */
 	if ((lp=mouseline(wp, ypos)) != NULL) {
 		curwp->w_dotp = lp;
-		curwp->w_doto = mouseoffset(wp, lp, xpos);
+		curwp->w_doto = (short)mouseoffset(wp, lp, xpos);
 	}
 
 	/* perform the region function */
@@ -346,7 +346,7 @@ int f,n;	/* prefix flag and argument */
 	/* if we aren't off the end of the text, move the point to the mouse */
 	if ((lp=mouseline(wp, ypos)) != NULL && nclicks < 3) {
 		curwp->w_dotp = lp;
-		curwp->w_doto = mouseoffset(wp, lp, xpos);
+		curwp->w_doto = (short)mouseoffset(wp, lp, xpos);
 	}
 
 	/* if we changed windows, update the modelines, abort the new op */
@@ -579,14 +579,14 @@ register int	col;
 {
 	register int	c;
 	register int	offset;
-	register int	curcol;
+	register int	lcurcol;
 	register int	newcol;
 
 	offset = 0;
-	curcol = 0;
+	lcurcol = 0;
 	col += wp->w_fcol;	/* adjust for extended lines */
 	while (offset != lused(lp)) {
-		newcol = curcol;
+		newcol = lcurcol;
 		if ((c=lgetc(lp, offset)) == '\t' && tabsize > 0)
 			newcol += -(newcol % tabsize) + (tabsize - 1);
 		else {
@@ -600,7 +600,7 @@ register int	col;
 		++newcol;
 		if (newcol > col)
 			break;
-		curcol = newcol;
+		lcurcol = newcol;
 		++offset;
 	}
 	return(offset);

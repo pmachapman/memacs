@@ -171,9 +171,9 @@ int f,n;	/* prefix flag and argument */
 			/* lowercase this character */
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_upper(c)) {
-				obj.obj_char = c;
+				obj.obj_char = (char)c;
 				c = lowerc(c);
-				lputc(curwp->w_dotp, curwp->w_doto, c);
+				lputc(curwp->w_dotp, curwp->w_doto, (char)c);
 				undo_insert(OP_REPC, 1L, obj);
 			}
 			++curwp->w_doto;
@@ -182,7 +182,7 @@ int f,n;	/* prefix flag and argument */
 
 	/* restore the dot position */
 	curwp->w_dotp = save_dotp;
-	curwp->w_doto = save_doto;
+	curwp->w_doto = (short)save_doto;
 	return(TRUE);
 }
 
@@ -236,9 +236,9 @@ int f,n;	/* prefix flag and argument */
 			/* uppercase this character */
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_lower(c)) {
-				obj.obj_char = c;
+				obj.obj_char = (char)c;
 				c = upperc(c);
-				lputc(curwp->w_dotp, curwp->w_doto, c);
+				lputc(curwp->w_dotp, curwp->w_doto, (char)c);
 				undo_insert(OP_REPC, 1L, obj);
 			}
 			++curwp->w_doto;
@@ -247,7 +247,7 @@ int f,n;	/* prefix flag and argument */
 
 	/* restore the dot position */
 	curwp->w_dotp = save_dotp;
-	curwp->w_doto = save_doto;
+	curwp->w_doto = (short)save_doto;
 	return(TRUE);
 }
 

@@ -159,7 +159,7 @@ int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
 
             i = SendDlgItemMessage (hDlg, ID_HIST, LB_GETCOUNT, 0, 0L);
             SendDlgItemMessage (hDlg, ID_HIST, LB_SETCURSEL, i - 1, 0L);
-            SendDlgItemMessage (hDlg, ID_HIST, LB_SETCURSEL, -1, 0L);
+            SendDlgItemMessage (hDlg, ID_HIST, LB_SETCURSEL, (WPARAM)-1, 0L);
         }
 	return TRUE;
 	
@@ -274,7 +274,7 @@ int     c;  /* character to write (or 0 for dummy write) */
 	    else {
 	        if (c == '\n') PushMLHist();
 	        else {
-		    MLBuf[CurrentCol] = c;
+		    MLBuf[CurrentCol] = (char)c;
 		    if (CurrentCol < MLSIZE - 1) ++CurrentCol;
 		}
 	    } 

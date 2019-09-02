@@ -266,12 +266,12 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 	wp->w_toprow = 0;
 #if	COLOR
 	/* initalize colors to global defaults */
-	wp->w_fcolor = gfcolor;
-	wp->w_bcolor = gbcolor;
+	wp->w_fcolor = (char)gfcolor;
+	wp->w_bcolor = (char)gbcolor;
 #endif
 	wp->w_fcol = 0;
 #if WINDOW_MSWIN
-	wp->w_ntrows = sp->s_nrow-1;
+	wp->w_ntrows = (char)(sp->s_nrow-1);
 #else
 	wp->w_ntrows = term.t_nrow-1;		/* "-1" for mode line.	*/
 #endif

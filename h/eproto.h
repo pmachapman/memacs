@@ -114,9 +114,9 @@ extern char *PASCAL NEAR trimstr(char *s);
 extern char *PASCAL NEAR xlat(char *source, char *lookup, char *trans);
 extern char *undolock(char *fname);
 extern char *PASCAL NEAR regtostr(char *buf, REGION *region);
-extern int PASCAL NEAR lowerc(char ch);
+extern int PASCAL NEAR lowerc(unsigned ch);
 extern int PASCAL NEAR cycle_ring(int f, int n);
-extern int PASCAL NEAR upperc(char ch);
+extern int PASCAL NEAR upperc(unsigned ch);
 #if	ZTC || TURBO || IC
 extern int (PASCAL NEAR *PASCAL NEAR fncmatch(char *fname))(int, int);
 extern int (PASCAL NEAR *PASCAL NEAR getname(char *prompt))(int, int);
@@ -179,11 +179,11 @@ extern int PASCAL NEAR global_var(int f, int n);
 #if	DBCS
 extern int PASCAL NEAR is2byte(char *sp, char *cp);
 #endif
-extern int PASCAL NEAR is_letter(char ch);
-extern int PASCAL NEAR is_lower(char ch);
+extern int PASCAL NEAR is_letter(unsigned ch);
+extern int PASCAL NEAR is_lower(unsigned ch);
 extern int PASCAL NEAR is_num(char *st);
 extern int PASCAL NEAR isearch(int dir);
-extern int PASCAL NEAR is_upper(char ch);
+extern int PASCAL NEAR is_upper(unsigned ch);
 extern int PASCAL NEAR kinsert(int back, char c);
 extern int PASCAL NEAR ldelnewline(VOID);
 extern int PASCAL NEAR linstr(char *instr);
@@ -341,7 +341,7 @@ extern int PASCAL NEAR insfile(int f, int n);
 extern int PASCAL NEAR inspound(VOID);
 extern int PASCAL NEAR insspace(int f, int n);
 extern int PASCAL NEAR inword(VOID);
-extern int PASCAL NEAR isinword(char c);
+extern int PASCAL NEAR isinword(unsigned c);
 extern int PASCAL NEAR ismodeline(EWINDOW *wp, int row);
 extern int PASCAL NEAR istring(int f, int n);
 extern int PASCAL NEAR killbuffer(int f, int n);

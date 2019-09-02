@@ -253,7 +253,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 
     /*-Register the frame window class */
     wc.style        = 0;
-    wc.lpfnWndProc  = (void*)&FrameWndProc;
+    wc.lpfnWndProc  = FrameWndProc;
     wc.cbClsExtra   = 0;
     wc.cbWndExtra   = FRMWNDEXTRA;
     wc.hInstance    = hEmacsInstance;
@@ -269,7 +269,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
     strcat (text, "_screen");
     ScreenClassName = copystr(text);
     wc.style        = 0;
-    wc.lpfnWndProc  = (void*)&ScrWndProc;
+    wc.lpfnWndProc  = ScrWndProc;
     wc.cbClsExtra   = 0;
     wc.cbWndExtra   = SCRWNDEXTRA;
     wc.hInstance    = hEmacsInstance;

@@ -193,7 +193,7 @@ int  lmax;
 
 	str[i] = 0;			/* Terminate word		*/
 	curwp->w_dotp = dotp;	/* Restore '.' 			*/
-	curwp->w_doto = doto;
+	curwp->w_doto = (short)doto;
 
 	return (TRUE);
 	}
@@ -430,7 +430,7 @@ int f, n;
 	fix_index();
 
 	curwp->w_dotp = pretagdotp;	/* Restore '.'	*/
-	curwp->w_doto = pretagdoto;
+	curwp->w_doto = (short)pretagdoto;
 
 	/* Ok, set file offset according to  curtp->t_wd (if any)	*/
 	if ((i = INDEX(*curtp->t_wd)) == -1 || curtp->t_dotos[i] == -1L)

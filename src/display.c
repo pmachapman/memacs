@@ -167,15 +167,15 @@ int PASCAL NEAR vtinitscr(SCREEN *sp, int nrow, int ncol)
 	int 	result;
 
 	if (nrow < 2) nrow = 2;
-	term.t_nrow = nrow;
-	term.t_ncol = ncol;
+	term.t_nrow = (short)nrow;
+	term.t_ncol = (short)ncol;
 	term.t_roworg = 0;
 	term.t_colorg = 0;
 	if ((result = vtinit()) == TRUE) {
 		sp->s_virtual = vscreen;
 		sp->s_physical = pscreen;
-		sp->s_nrow = nrow;
-		sp->s_ncol = ncol;
+		sp->s_nrow = (short)nrow;
+		sp->s_ncol = (short)ncol;
 		sp->s_roworg = 0;
 		sp->s_colorg = 0;
 	}
@@ -218,8 +218,8 @@ int PASCAL NEAR vtsizescr(SCREEN *sp, int nrow, int ncol)
 	    
 		vscreen = oldvvp;
 		pscreen = oldpvp;
-		term.t_nrow = oldnrow;
-		term.t_ncol = oldncol;
+		term.t_nrow = (short)oldnrow;
+		term.t_ncol = (short)oldncol;
 		vtfree();		/* get rid of the old VIDEOs (kept up to now in
 			   case the new allocation had failed) */
 		vtscreen(sp);	/* put the new VIDEOs into active duty */
@@ -234,8 +234,8 @@ int PASCAL NEAR vtsizescr(SCREEN *sp, int nrow, int ncol)
 	else {
 		/* failure! we still need some kind of VIDEO structures, so we
 			reuse the old ones */
-		term.t_nrow = oldnrow;
-		term.t_ncol = oldncol;
+		term.t_nrow = (short)oldnrow;
+		term.t_ncol = (short)oldncol;
 		sp->s_virtual = vscreen = oldvvp;
 		sp->s_physical = pscreen = oldpvp;
 		mlabort(TEXT94);	/* "out of memory" */
@@ -329,7 +329,7 @@ int c;
 
 		/* it's normal, just put it in the screen map */
 		if (vtcol >= 0)
-			vp->v_text[vtcol] = c;
+			vp->v_text[vtcol] = (char)c;
 		++vtcol;
 	}
 }
@@ -615,10 +615,10 @@ EWINDOW *wp;
 VOID PASCAL NEAR update_hilite()
 
 {
-	int first_line;		/* first screen line to highlight */
-	short first_pos;	/* position in that line */
-	int last_line;		/* last screen line to highlight */
-	short last_pos;		/* position in that line */
+	int first_line=0;		/* first screen line to highlight */
+	int first_pos;	/* position in that line */
+	int last_line=0;		/* last screen line to highlight */
+	int last_pos;		/* position in that line */
 	LINE *forptr, *bckptr;	/* line pointers searching in current buffer */
 	int forline, bckline;	/* screen lines of for/bck ptrs */
 	int nlines;		/* number of text lines in current window */
@@ -700,7 +700,7 @@ VOID PASCAL NEAR update_hilite()
 		temp_line = first_line;
 		first_line = last_line;
 		last_line = temp_line;
-		temp_pos = first_pos;
+		temp_pos = (short)first_pos;
 		first_pos = last_pos;
 		last_pos = temp_pos;
 	}
@@ -1773,7 +1773,7 @@ int c;	/* character to write */
 		TTputc(c);
 	}
 	if (c != '\b')
-		*lastptr++ = c;
+		*lastptr++ = (char)c;
 	else if (lastptr > &lastmesg[0])
 		--lastptr;
 }

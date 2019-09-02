@@ -55,8 +55,8 @@ static BOOL PASCAL CopyToClipboard (REGION *Region)
     if (Size == 0L) return TRUE;
 
     /*-copy the buffer data into a block of global memory */
-    if (hData = GlobalAlloc (GMEM_MOVEABLE, Size + 1)) {
-        if (!(Data = GlobalLock (hData))) goto NoClipboardMemory;
+    if ( NULL != (hData = GlobalAlloc (GMEM_MOVEABLE, Size + 1)) ) {
+        if ( NULL == (Data = GlobalLock (hData)) ) goto NoClipboardMemory;
 	lp = Region->r_linep;
 	Offset = Region->r_offset;
 	lcnt = 0;
@@ -137,7 +137,7 @@ int PASCAL insertclip (int f, int n)
 {
     BOOL    Result = TRUE;
     char    *Text, *TextHead;
-    short int curoff;
+    short int curoff=0;
     LINE    *curline=NULL;
 
     /*-don't allow command if read-only mode */
@@ -269,14 +269,16 @@ int PASCAL  minimizescreen (int f, int n)
 /* ForceMessage:    do a SendMessage, forcing quiescent mode */
 /* ============                                              */
 
-static int PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
+static LRESULT PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     BOOL    nq;
+	LRESULT		retVal = 0;
 
     nq = notquiescent;
     notquiescent = 0;
-    SendMessage (hWnd, wMsg, wParam, lParam);
+    retVal = SendMessage (hWnd, wMsg, wParam, lParam);
     notquiescent = nq;
+	return retVal;
 } /* ForceMessage */
 
 /* maximizescreen:  maximize the current screen */
@@ -388,11 +390,11 @@ void FAR PASCAL ScrollMessage (HWND hWnd, UINT wMsg, WORD ScrlCode, int Pos)
         if (curwp->w_fcol < 0) curwp->w_fcol = 0;
         if (curwp->w_doto < curwp->w_fcol) {
             /* reframe dot if it was left past the left of the screen */
-            curwp->w_doto = min(curwp->w_fcol,lused(curwp->w_dotp));
+            curwp->w_doto = (short)min(curwp->w_fcol,lused(curwp->w_dotp));
         }
         if (curwp->w_doto > (curwp->w_fcol + term.t_ncol - 2)) {
             /* reframe dot if it was left past the right of the screen */
-            curwp->w_doto = curwp->w_fcol + term.t_ncol - 2;
+            curwp->w_doto = (short)curwp->w_fcol + term.t_ncol - 2;
 	}
         curwp->w_flag |= WFMODE | WFHARD;
     }

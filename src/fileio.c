@@ -209,7 +209,7 @@ int *nbytes;
 	/* read the line in */
         i = 0;
         while ((c = getc(ffp)) != EOF && c != '\n') {
-                fline[i++] = c;
+                fline[i++] = (char)c;
 		/* if it's longer, get more room */
                 if (i >= flen) {
 #if	MSDOS

@@ -69,7 +69,7 @@ BOOL    in_check (void)
 
 void    in_put (int event)
 {
-    in_buf[in_last++] = event;
+    in_buf[in_last++] = (unsigned char)event;
     in_last &= (IBUFSIZE - 1);
     --in_free;
 } /* in_put */
@@ -107,7 +107,7 @@ BOOL FAR PASCAL EatKey (UINT MsgCode, WPARAM wParam, LPARAM lParam)
    be terminated */
 {
     int     evt = -1;       /* -1 means: key not for emacs */
-    WORD    prefix = 0;
+    WORD    lprefix = 0;
     WORD    Key;
 
     if (IsIconic (hFrameWnd)) return FALSE;   /* no input while fully
@@ -120,9 +120,9 @@ BOOL FAR PASCAL EatKey (UINT MsgCode, WPARAM wParam, LPARAM lParam)
 KeyDown:
         /*-process the non-ascii keys (Page-up, Page-down, End, Home,
 	   Arrows, Insert, Delete, function keys) */
-	prefix |= SPEC;
-	if (GetKeyState (VK_CONTROL) < 0) prefix |= CTRL;
-	if (GetKeyState (VK_SHIFT) < 0) prefix |= SHFT;
+	lprefix |= SPEC;
+	if (GetKeyState (VK_CONTROL) < 0) lprefix |= CTRL;
+	if (GetKeyState (VK_SHIFT) < 0) lprefix |= SHFT;
 	switch (Key) {
 
 	case VK_HOME:
@@ -161,9 +161,9 @@ KeyDown:
 		else evt = Key - VK_F1 + '1';
 	    }
 	    else if ((vk_at > 0) && (Key == LOBYTE(vk_at)) &&
-                     ((prefix & (SHFT | CTRL)) == CTRL)) {
+                     ((lprefix & (SHFT | CTRL)) == CTRL)) {
                 /* we assume a ^@ or A-^@ */
-                prefix &= ALTD;
+				lprefix &= ALTD;
                 evt = 0;
             }
 	    break;
@@ -176,7 +176,7 @@ KeyDown:
             /* for some reason, plain F10 arrives as a SYS message ! */
         if (Key == VK_F4) return FALSE; /* standard accelerator for
 					   Frame's SC_CLOSE */
-        prefix |= ALTD;
+		lprefix |= ALTD;
         goto KeyDown;
         
     case WM_CHAR:
@@ -187,7 +187,7 @@ KeyDown:
     case WM_SYSCHAR:
         if (lParam & 0x20000000) {  /*-process ALT'ed ASCII char */
 	    evt = upperc((char)Key);
-	    prefix = ALTD;
+		lprefix = ALTD;
 	    if (getbind(ALTD | evt) == NULL) {
 	        /* that key is not bound, let's ignore it to have
 		   Windows check for a menu-bar accelerator */
@@ -204,7 +204,7 @@ KeyDown:
 #endif
 	    /* it is an ALT'ed char that does not match any accelerator */
 	    evt = upperc((char)Key);
-	    prefix = ALTD;
+		lprefix = ALTD;
 	}
 	break;
     }
@@ -212,9 +212,9 @@ KeyDown:
     if (evt == -1) return FALSE; /* nothing of interest ! */
 
     if (in_room (3)) {
-	if ((prefix != 0) || (evt == 0)) {
+	if ((lprefix != 0) || (evt == 0)) {
 	    in_put (0);
-	    in_put (prefix >> 8);
+	    in_put (lprefix >> 8);
 	}
 	in_put (evt);
     }
@@ -228,7 +228,7 @@ void PASCAL    PutMouseMessage (UINT wMsg, WPARAM wParam, POINT Position)
 
 {
     char    c;
-    int     prefix;
+    int     lprefix;
 
     if (!mouseflag) return; /* mouse input is disabled */
     
@@ -262,13 +262,13 @@ void PASCAL    PutMouseMessage (UINT wMsg, WPARAM wParam, POINT Position)
     default:
 	return; /* should not happen, but let's be safe! */
     }
-    prefix = MOUS;
+	lprefix = MOUS;
     if (wParam & MK_SHIFT)
-	prefix |= SHFT;
+		lprefix |= SHFT;
     if (wParam & MK_CONTROL)
-	prefix |= CTRL;
+		lprefix |= CTRL;
     in_put (0);
-    in_put (prefix >> 8);
+    in_put (lprefix >> 8);
     in_put ((unsigned char)Position.x);
     in_put ((unsigned char)Position.y);
     in_put (c);
@@ -371,10 +371,10 @@ void FAR PASCAL DropMessage (HWND hWnd, HDROP hDrop)
         }
         {   /*-complete the DropBuf with the file name list */
             char    FileName [NFILEN];
-            WORD    Number;
+            UINT    Number;
             WORD    i;
 
-            Number = DragQueryFile (hDrop, -1, NULL, 0);
+            Number = DragQueryFile (hDrop, (UINT)-1, NULL, 0);
             for (i = 0; i < Number; i++) {
                 DragQueryFile (hDrop, i, FileName, NFILEN);
                 addline (DropBuf, FileName);

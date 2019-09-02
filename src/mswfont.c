@@ -37,10 +37,10 @@ HFONT FAR PASCAL SelectFont (HDC hDC, HFONT hFont)
 /* GetFontMetrics:  retrieves the TEXTMETRIC and face name of a given font */
 /* ==============                                                          */
 
-static void PASCAL GetFontMetrics (HFONT hFont, TEXTMETRIC *Metrics,
-                                        char *FaceName)
-/* If either Metrics of FaceName is NULL, the corresponding value is not
-   returned. If not NULL, FaceName must point to a string containing at
+static void PASCAL GetFontMetrics (HFONT hFont, TEXTMETRIC *metrics,
+                                        char *faceName)
+/* If either metrics or faceName is NULL, the corresponding value is not
+   returned. If not NULL, faceName must point to a string containing at
    least LF_FACESIZE characters */
 {
     HDC     hDC;
@@ -48,8 +48,8 @@ static void PASCAL GetFontMetrics (HFONT hFont, TEXTMETRIC *Metrics,
 
     hDC = GetDC (hFrameWnd);
     hPrevFont = SelectFont (hDC, hFont);
-    if (Metrics) GetTextMetrics (hDC, Metrics);
-    if (FaceName) GetTextFace (hDC, LF_FACESIZE, FaceName);
+    if (metrics) GetTextMetrics (hDC, metrics);
+    if (faceName) GetTextFace (hDC, LF_FACESIZE, faceName);
     SelectObject (hDC, hPrevFont);
     ReleaseDC (hFrameWnd, hDC);
 } /* GetFontMetrics */
@@ -73,14 +73,14 @@ static void PASCAL UpdateMaxRowCol (HWND hDlg, HFONT hFont)
 /* ============                                                        */
 
 static void PASCAL UpdateSample (HWND hDlg, HFONT hFont,
-                                      TEXTMETRIC *m, char *FaceName)
+                                      TEXTMETRIC *m, char *faceName)
 {
 #define FONTSAMPLESIZE  LF_FACESIZE+40+(26*3)
     char    SampleText[FONTSAMPLESIZE];
     int     i;
     char    c;
 
-    strcpy (SampleText, FaceName);
+    strcpy (SampleText, faceName);
     i = (int)strlen (SampleText);
     strcpy (&SampleText[i], " (Height=");
     i += (int)strlen (&SampleText[i]);
@@ -95,7 +95,7 @@ static void PASCAL UpdateSample (HWND hDlg, HFONT hFont,
     for (c = 'A'; c <= 'Z'; c++) {
 	SampleText[i++] = ' ';
 	SampleText[i++] = c;
-	SampleText[i++] = lowerc (c);
+	SampleText[i++] = (char)lowerc (c);
     }
     SampleText[i] = '\0';
     SendDlgItemMessage (hDlg, ID_SAMPLE, WM_SETFONT, (WPARAM)hFont, (LPARAM)FALSE);
@@ -201,14 +201,14 @@ int EXPORT FAR PASCAL EnumSizesProc (CONST LOGFONT *lf, CONST TEXTMETRIC *tm,
         /* list it only if it has a proper aspect ratio */
         HFONT   hFont;
         LOGFONT Font;
-        TEXTMETRIC Metrics; 
+        TEXTMETRIC metrics; 
 
 	Font = *lf;
 	Font.lfWidth = 0;
 	hFont = CreateFontIndirect (&Font);
-	GetFontMetrics (hFont, &Metrics, NULL);
+	GetFontMetrics (hFont, &metrics, NULL);
 	DeleteObject (hFont);
-	if (tm->tmAveCharWidth == Metrics.tmAveCharWidth) {
+	if (tm->tmAveCharWidth == metrics.tmAveCharWidth) {
 	    AddSize (*(HWND FAR *)Data,
                      (short int)lf->lfHeight, (short int)lf->lfWidth);
 	}
@@ -219,7 +219,7 @@ int EXPORT FAR PASCAL EnumSizesProc (CONST LOGFONT *lf, CONST TEXTMETRIC *tm,
 /* BuildSizeList:   initializes the FontSize list box */
 /* =============                                      */
 
-static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
+static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *metrics)
 
 /* This function initializes the FontSize list box with the sizes
    available for the face name currently selected in the Font list box.
@@ -232,17 +232,17 @@ static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
     {
 	HDC     hDC;
 	FONTENUMPROC ProcInstance;
-	char    FaceName[LF_FACESIZE];
+	char    faceName[LF_FACESIZE];
 
 	SendDlgItemMessage (hDlg, ID_FONT, LB_GETTEXT,
 			    (WPARAM)SendDlgItemMessage (hDlg, ID_FONT,
 						      LB_GETCURSEL, 0, 0L),
-			    (LPARAM)(LPSTR)&FaceName[0]);
-	    /* FaceName now contains the currently selected face name */
+			    (LPARAM)(LPSTR)&faceName[0]);
+	    /* faceName now contains the currently selected face name */
 	hDC = GetDC (hDlg);
 	ProcInstance = MakeProcInstance (EnumSizesProc,
 					 hEmacsInstance);
-	EnumFonts (hDC, FaceName, ProcInstance, LPDATA(&hDlg));
+	EnumFonts (hDC, faceName, ProcInstance, LPDATA(&hDlg));
 	FreeProcInstance (ProcInstance);
 	ReleaseDC (hDlg, hDC);
 	if (SendDlgItemMessage (hDlg, ID_FONTSIZE, CB_GETCOUNT, 0, 0L) == 0) {
@@ -256,7 +256,7 @@ static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
     SendDlgItemMessage (hDlg, ID_FONTSIZE, WM_SETREDRAW, TRUE, 0L);
     InvalidateRect (GetDlgItem (hDlg, ID_FONTSIZE), NULL, TRUE);
     {   /*-Select the larger height that is smaller or equal to the
-	   current Metrics (assumed to be the ones of the previous font)
+	   current metrics (assumed to be the ones of the previous font)
 	   */
 	int     i;
 	int     BestIndex = 0;
@@ -267,11 +267,11 @@ static void PASCAL BuildSizeList (HWND hDlg, TEXTMETRIC *Metrics)
 	    ItemData = SendDlgItemMessage (hDlg, ID_FONTSIZE,
 					   CB_GETITEMDATA, i, 0L);
 	    if (ItemData == CB_ERR) break;  /* end of list hit */
-	    if ((h = HIWORD(ItemData)) > Metrics->tmHeight) continue;
+	    if ((h = HIWORD(ItemData)) > metrics->tmHeight) continue;
 	    if (BestHeight > h) continue;
 	    w = LOWORD(ItemData);
 	    if (BestHeight == h) {  /* use the width to optimize */
-		if (w > Metrics->tmAveCharWidth) continue;
+		if (w > metrics->tmAveCharWidth) continue;
 		if (BestWidth > w) continue;
 	    }
 	    BestHeight = h;
@@ -291,7 +291,7 @@ static void PASCAL AddFace (HWND hDlg, char *CandidateFace)
     BYTE    CharSet;
     LRESULT     From, At;   /* indexes for list box searches */
     HFONT   hFixedFont;
-    char    FaceName [LF_FACESIZE];
+    char    faceName[LF_FACESIZE];
     TEXTMETRIC tm;
     
     CharSet = (IsDlgButtonChecked (hDlg, ID_ANSI) ?
@@ -303,11 +303,11 @@ static void PASCAL AddFace (HWND hDlg, char *CandidateFace)
 			     CLIP_DEFAULT_PRECIS, DRAFT_QUALITY,
 			     FF_DONTCARE+FIXED_PITCH,
 			     CandidateFace);
-    GetFontMetrics (hFixedFont, &tm, FaceName);
+    GetFontMetrics (hFixedFont, &tm, faceName);
     DeleteObject (hFixedFont);
     if ((tm.tmPitchAndFamily & 0x01) || /* =1 if variable pitch */
 	(tm.tmCharSet != CharSet) ||
-	(strcmp (FaceName, CandidateFace) != 0)) {
+	(strcmp (faceName, CandidateFace) != 0)) {
 	/* flunked the exam! */
 	return;     /* skip that face */
     }
@@ -321,7 +321,7 @@ static void PASCAL AddFace (HWND hDlg, char *CandidateFace)
                                  (LPARAM)CandidateFace);
         if (At == LB_ERR) break;    /* no match, implies not duplicate */
 	if (SendDlgItemMessage (hDlg, ID_FONT, LB_GETTEXTLEN, At, 0L) ==
-            strlen(CandidateFace)) {
+            (int)strlen(CandidateFace)) {
             /* the lengths match, that means the strings match so it is
 	       indeed a duplicate */
 	    return;
@@ -349,7 +349,7 @@ int EXPORT FAR PASCAL EnumFacesProc (CONST LOGFONT *lf, CONST TEXTMETRIC *tm,
 /* BuildFaceList:   initialize the FONT list box */
 /* =============                                 */
 
-static void PASCAL BuildFaceList (HWND hDlg, char *FaceName)
+static void PASCAL BuildFaceList (HWND hDlg, char *faceName)
 
 /* This function initializes the Font list box with fixed fonts matching
    the current charset selection and then selects an item */
@@ -370,8 +370,8 @@ static void PASCAL BuildFaceList (HWND hDlg, char *FaceName)
     SendDlgItemMessage (hDlg, ID_FONT, WM_SETREDRAW, TRUE, 0L);
     InvalidateRect (GetDlgItem (hDlg, ID_FONT), NULL, TRUE);
     /*-select the same facename as before or default to the first item */
-    if (SendDlgItemMessage (hDlg, ID_FONT, LB_SELECTSTRING, -1,
-                            (LPARAM)FaceName) == LB_ERR) {
+    if (SendDlgItemMessage (hDlg, ID_FONT, LB_SELECTSTRING, (WPARAM)-1,
+                            (LPARAM)faceName) == LB_ERR) {
 	SendDlgItemMessage (hDlg, ID_FONT, LB_SETCURSEL, 0, 0L);
     }
     BuildSizeList (hDlg, &Metrics);
@@ -582,7 +582,7 @@ void FAR PASCAL FontInit (void)
     if (GetPrivateProfileString (ProgName, "CharSet", "", text, 20, IniFile)) {
 
         if (isdigit(text[0])) { /* pure numeric value */
-            lf.lfCharSet = atoi (text);
+            lf.lfCharSet = (BYTE)atoi (text);
         }
         else {  /* menmonic value */
 	    if (strncmp (text, "OEM", 3) == 0) {

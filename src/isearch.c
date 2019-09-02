@@ -64,7 +64,7 @@ int f, n;				/* prefix flag and argument */
 	 */
 	backchar(TRUE, 1);
 
-	if (status = isearch(REVERSE))
+	if ( (status = isearch(REVERSE)) != 0)
 		mlerase();		/* If happy, just erase the cmd line  */
 	else
 		mlwrite(TEXT164);
@@ -79,7 +79,7 @@ int f, n;
 {
 	register int	 status;
 
-	if (status = isearch(FORWARD))
+	if ( (status = isearch(FORWARD)) != 0)
 		mlerase();		/* If happy, just erase the cmd line  */
 	else
 		mlwrite(TEXT164);
@@ -245,7 +245,7 @@ start_over:				/* This is a good place to start a re-execution: */
 				 * let it take care of itself.
 				 */
 				curwp->w_dotp = curline;
-				curwp->w_doto = curoff;
+				curwp->w_doto = (short)curoff;
 				dir = init_direction;
 				bytecopy((char *) pat, pat_save, NPAT);
 				setjtable();
@@ -267,7 +267,7 @@ start_over:				/* This is a good place to start a re-execution: */
 		 * I guess we got something to search for, so put the
 		 * character in the buffer and search for it.
 		 */
-		pat[cpos++] = c;
+		pat[cpos++] = (unsigned char)c;
 
 		/*
 		 * Too many characters in the string?  Yup.  Complain
@@ -291,7 +291,7 @@ start_over:				/* This is a good place to start a re-execution: */
 		TTbacg(gbcolor);
 #endif
 		movecursor(term.t_nrow, col);	/* Position the cursor	*/
-		col += echochar(c);	/* Echo the character		  */
+		col += echochar((unsigned char)c);	/* Echo the character		  */
 		if (!status)	/* If we lost last time 	  */
 			TTbeep();	/* Feep again		*/
 		else 			/* Otherwise, we must have won*/
@@ -299,7 +299,7 @@ start_over:				/* This is a good place to start a re-execution: */
 	}
 
 	curwp->w_dotp = curline;	/* Reset the line pointer		*/
-	curwp->w_doto = curoff;	/*   and the offset to original value	*/
+	curwp->w_doto = (short)curoff;	/*   and the offset to original value	*/
 	curwp->w_flag |= WFMOVE;	/* Say we've moved			*/
 	update(FALSE);		/* And force an update			*/
 	mmove_flag = TRUE;
@@ -355,7 +355,7 @@ int dir;				/* Search direction 		*/
 	LINE *curline;		/* current line during scan	*/
 	int curoff;			/* position within current line	*/
 	register char *patrn;	/* The entire search string (incl chr) */
-	register int sts;	/* how well things go		*/
+	register int sts=0;	/* how well things go		*/
 
 	/* setup the local scan pointer to current "." */
 
@@ -364,15 +364,15 @@ int dir;				/* Search direction 		*/
 
 	if (dir == FORWARD)
 		{				/* If searching forward		*/
-		if (sts = !boundry(curline, curoff, FORWARD))
+		if ( (sts = !boundry(curline, curoff, FORWARD)) != 0)
 			{
 			/* If it's what we're looking for, set the point
 			 * and say that we've moved.
 			 */
-			if (sts = eq(nextch(&curline, &curoff, FORWARD), chr))
+			if ( (sts = eq((unsigned char)nextch(&curline, &curoff, FORWARD), (unsigned char)chr)) != 0 )
 				{
 				curwp->w_dotp = curline;
-				curwp->w_doto = curoff;
+				curwp->w_doto = (short)curoff;
 				curwp->w_flag |= WFMOVE;
 				}
 			}
@@ -382,7 +382,7 @@ int dir;				/* Search direction 		*/
 		while (*patrn)
 			{			/* Loop for all characters in patrn   */
 			if ((sts = !boundry(curline, curoff, FORWARD)) == FALSE ||
-				(sts = eq(nextch(&curline, &curoff, FORWARD), *patrn)) == FALSE)
+				(sts = eq((unsigned char)nextch(&curline, &curoff, FORWARD), (unsigned char)(*patrn))) == FALSE)
 				break;	/* Nope, just punt it then */
 			patrn++;
 			}

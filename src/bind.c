@@ -141,7 +141,7 @@ int f, n;	/* command arguments [IGNORED] */
 	ktp = &keytab[0];
 	found = FALSE;
 	while (ktp->k_type != BINDNUL) {
-		if (ktp->k_code == c) {
+		if (ktp->k_code == (short)c) {
 			found = TRUE;
 			break;
 		}
@@ -159,7 +159,7 @@ int f, n;	/* command arguments [IGNORED] */
 			return(FALSE);
 		}
 
-		ktp->k_code = c;	/* add keycode */
+		ktp->k_code = (short)c;	/* add keycode */
 		ktp->k_ptr.fp = kfunc;	/* and the function pointer */
 		ktp->k_type = BINDFNC;	/* and the binding type */
 		++ktp;			/* and make sure the next is null */
@@ -226,7 +226,7 @@ int f, n;	/* command arguments [IGNORED] */
 	ktp = &keytab[0];
 	found = FALSE;
 	while (ktp->k_type != BINDNUL) {
-		if (ktp->k_code == c) {
+		if (ktp->k_code == (short)c) {
 			found = TRUE;
 			break;
 		}
@@ -244,7 +244,7 @@ int f, n;	/* command arguments [IGNORED] */
 			return(FALSE);
 		}
 
-		ktp->k_code = c;	/* add keycode */
+		ktp->k_code = (short)c;	/* add keycode */
 		ktp->k_ptr.buf = kmacro;	/* and the function pointer */
 		ktp->k_type = BINDBUF;	/* and the binding type */
 		++ktp;			/* and make sure the next is null */
@@ -566,7 +566,7 @@ int mflag;	/* going for a meta sequence? */
 	/* check to see if we are executing a command line */
 	if (clexec) {
 		macarg(tok);	/* get the next token */
-		return(stock(tok));
+		return(stock((unsigned char *)tok));
 	}
 
 	/* or the normal way */
@@ -802,7 +802,7 @@ char *seq;	/* destination string for sequence */
 	c = c & 255;	/* strip the prefixes */
 
 	/* and output the final sequence */
-	*ptr++ = c;
+	*ptr++ = (char)c;
 	*ptr = 0;	/* terminate the string */
 	return (seq);
 }
@@ -1006,7 +1006,7 @@ char *skey;	/* name of key to get binding for */
 {
 	char *bindname;
 
-	bindname = getfname(getbind(stock(skey)));
+	bindname = getfname(getbind(stock((unsigned char *)skey)));
 	if (bindname == NULL)
 		bindname = errorm;
 

@@ -129,7 +129,7 @@ int undo_op()
 
 	/* restore the buffer position */
 	gotoline(TRUE, up->line_num);
-	curwp->w_doto = up->offset;
+	curwp->w_doto = (short)(up->offset);
 	op_type = up->type;
 
 	/* undo the actual operation */
