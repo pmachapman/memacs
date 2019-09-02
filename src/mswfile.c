@@ -9,6 +9,7 @@
 #include    <stdio.h>
 #include    "eproto.h"
 #include    "edef.h"
+#include	"elang.h"
 
 #if WINNT || WINXP
 #define FNAMELEN NFILEN
@@ -131,6 +132,53 @@ char * PASCAL   fullpathname (char *PathName, int Nbuf)
     return PathName;
 } /* fullpathname */
 
+static
+int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
+{
+	BOOL success = FALSE;
+	int i = 0;
+	OPENFILENAME ofn = { 0 };
+	char fileName[NFILEN] = { '\0' };
+	char    DlgTitle[sizeof(PROGNAME) + 3 + 30];
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = hFrameWnd;
+	ofn.hInstance = hEmacsInstance;
+	ofn.lpstrFilter = "All Files\0*.*\0\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = NFILEN;
+
+	strcpy(DlgTitle, ProgName);
+	strcat(DlgTitle, " - ");
+	strncat(DlgTitle, prompt, 30); /* hopefully, the prompt is under 30 char! */
+	i = (int)strlen(DlgTitle) - 1;
+	while (DlgTitle[i] == ' ')
+	{
+		i--;
+	}
+	if (DlgTitle[i] == ':')
+	{
+		DlgTitle[i] = 0;
+	}
+	ofn.lpstrTitle = DlgTitle;
+	ofn.Flags = OFN_ENABLESIZING | OFN_NOCHANGEDIR;
+
+	if (0 == strcmp(TEXT144, prompt))
+	{
+		success = GetSaveFileName(&ofn);
+	}
+	else
+	{
+		success = GetOpenFileName(&ofn);
+	}
+
+	if (success)
+	{
+		strcpy(buf, ofn.lpstrFile);
+	}
+	return success;
+}
+
 /* filenamedlg: equivalent of mlreply, but specifically to get a filename */
 /* ===========                                                            */
 
@@ -148,6 +196,12 @@ int PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
         }
         return Result;
     }
+#if WINVER >= _WIN32_WINNT_WIN2K
+	((void)ProcInstance);
+	((void)Parameters);
+	/* Use GetOpenFileName() if available. */
+	return filenamedlg_ofn(prompt, buf, nbuf, fullpath);
+#else
     Parameters.Prompt = prompt;
     Par = &Parameters;
     ProcInstance = MakeProcInstance (FileDlgProc, hEmacsInstance);
@@ -158,6 +212,7 @@ int PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
     FreeProcInstance (ProcInstance);
     SetWorkingDir ();
     return Result;
+#endif
 } /* filenamedlg */
 
 /* FileDlgOK:   process OK in File Dialog */
