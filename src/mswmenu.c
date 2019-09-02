@@ -912,7 +912,7 @@ InvokeHelp:
 	    
 	default:
 	    if (wParam >= IDM_FIRSTCHILD) return FALSE;
-	    GenerateMenuSeq (wParam);
+	    GenerateMenuSeq ((UINT)wParam);
 	    return TRUE;
 	}
     }

@@ -336,6 +336,7 @@ int announce;	/* announce the selection? */
 
 	/* deselect the current window */
 #if     WINDOW_MSWIN
+		((void)temp_wp);	/* unreferenced local variable warning */
         curwp->w_flag |= WFMODE;
 #else
 	temp_wp = curwp;

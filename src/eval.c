@@ -79,7 +79,7 @@ char *fname;		/* name of function to evaluate */
 	char arg1[NSTRING];		/* value of first argument */
 	char arg2[NSTRING];		/* value of second argument */
 	char arg3[NSTRING];		/* value of third argument */
-	static char result[2 * NSTRING];	/* string result */
+	static char result[2 * NSTRING+1];	/* string result */
 
 	/* look the function up in the function table */
 	mklower(fname); /* and let it be upper or lower case */
@@ -185,7 +185,8 @@ char *fname;		/* name of function to evaluate */
 		case UFLEFT:	return(bytecopy(result, arg1, asc_int(arg2)));
 		case UFLENGTH:	return(int_asc((int)strlen(arg1)));
 		case UFLESS:	return(ltos(asc_int(arg1) < asc_int(arg2)));
-		case UFLOWER:	return(mklower(arg1));
+		case UFLOWER:	strncpy(result, arg1, 2 * NSTRING);
+						return(mklower(result));
 		case UFMID:	arg = asc_int(arg2);
 				if (arg > strlen(arg1))
 					return(strcpy(result, ""));
@@ -230,9 +231,11 @@ char *fname;		/* name of function to evaluate */
 		case UFSUB:	return(int_asc(asc_int(arg1) - asc_int(arg2)));
 		case UFSUPPER:	return(setupper(arg1, arg2), "");
 		case UFTIMES:	return(int_asc(asc_int(arg1) * asc_int(arg2)));
-		case UFTRIM:	return(trimstr(arg1));
+		case UFTRIM:	strncpy(result, arg1, 2 * NSTRING);
+						return(trimstr(result));
 		case UFTRUTH:	return(ltos(asc_int(arg1) == 42));
-		case UFUPPER:	return(mkupper(arg1));
+		case UFUPPER:	strncpy(result, arg1, 2 * NSTRING);
+						return(mkupper(result));
 		case UFXLATE:	return(xlat(arg1, arg2, arg3));
 	}
 

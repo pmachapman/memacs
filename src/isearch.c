@@ -40,7 +40,7 @@
 
 /* A couple of "own" variables for re-eat */
 /* Hey, BLISS user, these were "GLOBAL", I made them "OWN". */
-static int	(PASCAL NEAR *saved_get_char)();	/* Get character routine */
+static int	(PASCAL NEAR *saved_get_char)(void);	/* Get character routine */
 static int	eaten_char = -1;	/* Re-eaten char */
 
 /* A couple more "own" variables for the command string */
@@ -461,7 +461,7 @@ int PASCAL NEAR get_char()
  * Come here on the next term.t_getchar call:
  */
 
-int PASCAL NEAR uneat()
+int PASCAL NEAR uneat(void)
 {
 	int c;
 

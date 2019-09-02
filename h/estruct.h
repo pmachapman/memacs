@@ -554,7 +554,7 @@ union REGS {
 #define MOUS	0x1000		/* alternative input device (mouse)	*/
 #define SHFT	0x2000		/* shifted (for function keys)		*/
 #define ALTD	0x4000		/* ALT key...				*/
-#define MENU	MOUS+SPEC	/* menu selection (WINDOW_MSWIN)	*/
+#define MENU	(MOUS+SPEC)	/* menu selection (WINDOW_MSWIN)	*/
 
 #define BINDNUL 0		/* not bound to anything		*/
 #define BINDFNC 1		/* key bound to a function		*/

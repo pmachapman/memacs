@@ -46,7 +46,7 @@ static CATCHBUF ExitCatchBuf;
 #endif
 
 static int  Sleeping = 0;           /* flag for TakeANap() */
-static int  TimeSlice;
+static unsigned  TimeSlice;
 static BOOL LongOperation = FALSE;  /* for longop() and GetCharacter() */
 static BOOL HourglassOn = FALSE;    /* between SetHourglass & UpdateCursor */
 static BOOL SystemModal = FALSE;    /* indicates that the Yes/No message
@@ -164,7 +164,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 /* returns FALSE if failed init */
 {
     WNDCLASS    wc;
-    HMENU       hSysMenu;
+    /* HMENU       hSysMenu; */
     char        text [TXTSIZ];
     POINT       InitPos;
     int         Colors;
@@ -176,6 +176,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 #if WINDOW_MSWIN32
     Win386Enhanced = FALSE;
     Win31API = TRUE;
+	((void)w);	/* unreferenced local variable warning */
 #else
     Win386Enhanced = GetWinFlags () & WF_ENHANCED;
     w = LOWORD(GetVersion());
@@ -212,7 +213,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 			       MicroEMACS executable directory */
     }
 
-    TimeSlice = GetPrivateProfileInt (ProgName, "TimeSlice", 100, IniFile);
+    TimeSlice = (unsigned)GetPrivateProfileInt (ProgName, "TimeSlice", 100, IniFile);
 
     Colors = GetPrivateProfileInt (ProgName, "Colors", 0, IniFile);
 

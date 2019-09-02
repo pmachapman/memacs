@@ -1353,6 +1353,7 @@ char ch;	/* fence type to match against */
 #if	WINDOW_MSWIN
 		update(FALSE);
 		term.t_sleep (term.t_pause);
+		((void)i);	/* unreferenced local variable warning */
 #else
 		for (i = 0;  i < term.t_pause;  i++)
 			update(FALSE);

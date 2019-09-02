@@ -876,20 +876,29 @@ KEYTAB *key;	/* key binding to return a name of */
 		any match or NULL if none */
 
 #if	MSC
-int (PASCAL NEAR *PASCAL NEAR fncmatch(char *fname))(void)
+typedef int (PASCAL NEAR *MatchFcnPtr)(void);
+/* int (PASCAL NEAR *PASCAL NEAR fncmatch(char *fname))(void) */
 #else
-int (PASCAL NEAR *PASCAL NEAR fncmatch(fname))()
+typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr(fname))();
 
-char *fname;	/* name to attempt to match */
+/* int (PASCAL NEAR *PASCAL NEAR fncmatch(fname))() */
+
+/* char *fname;	name to attempt to match */
 #endif
 
+#if	MSC
+MatchFcnPtr fncmatch(char *fname)
+#else
+MatchFcnPtr fncmatch()
+char *fname;
+#endif
 {
 	int nval;
 
 	if ((nval = binary(fname, namval, numfunc, NSTRING)) == -1)
 		return(NULL);
 	else
-		return(names[nval].n_func);
+		return(MatchFcnPtr)(names[nval].n_func);
 }
 
 char *PASCAL NEAR namval(index)
