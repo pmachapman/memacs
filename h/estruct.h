@@ -130,8 +130,8 @@
 /*	Windowing system style (pick one)				*/
 
 #define WINDOW_TEXT	0		/* [default] Text mode		*/
-#define WINDOW_MSWIN	1		/* MicroSoft Windows		*/
-#define WINDOW_MSWIN32	0		/* MicroSoft Windows 32 bit API */
+#define WINDOW_MSWIN	0		/* MicroSoft Windows		*/
+#define WINDOW_MSWIN32	1		/* MicroSoft Windows 32 bit API */
 #define WINDOW_X	0		/* X/Unix			*/
 
 /*	Language text options	(pick one)				*/
@@ -527,7 +527,11 @@ union REGS {
 
 #define NBINDS	300			/* max # of bound keys		*/
 #if	AOSVS | VMS | WINNT | WINXP | SUN | BSD | FREEBSD | USG | ZENIX | HPUX8 | HPUX9 | OS2
+#if WINNT | WINXP
+#define NFILEN	MAX_PATH
+#else
 #define NFILEN	256
+#endif
 #else
 #define NFILEN	80			/* # of bytes, file name	*/
 #endif

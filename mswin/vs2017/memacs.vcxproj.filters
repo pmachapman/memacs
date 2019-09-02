@@ -81,6 +81,9 @@
     <ClInclude Include="..\..\h\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\abbrev.c">
@@ -217,5 +220,48 @@
     <ResourceCompile Include="..\mewin.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\mswcur.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswnot.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswgrin1.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswgrin2.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswgrin3.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswgrin4.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswgrin5.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswgrin6.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswgrin7.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\mswgrin8.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\mswapp.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\mswscr.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\mswwait.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

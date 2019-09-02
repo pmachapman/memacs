@@ -140,6 +140,11 @@ int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
 	OPENFILENAME ofn = { 0 };
 	char fileName[NFILEN] = { '\0' };
 	char    DlgTitle[sizeof(PROGNAME) + 3 + 30];
+	BOOL isSaveFile = (0 == strcmp(TEXT144, prompt));
+
+
+	SetWorkingDir();
+
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = hFrameWnd;
 	ofn.hInstance = hEmacsInstance;
@@ -147,6 +152,7 @@ int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = NFILEN;
+	ofn.lpstrInitialDir = Path;
 
 	strcpy(DlgTitle, ProgName);
 	strcat(DlgTitle, " - ");
@@ -161,19 +167,14 @@ int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
 		DlgTitle[i] = 0;
 	}
 	ofn.lpstrTitle = DlgTitle;
-	ofn.Flags = OFN_ENABLESIZING | OFN_NOCHANGEDIR;
+	ofn.Flags = OFN_ENABLESIZING ;
 
-	if (0 == strcmp(TEXT144, prompt))
-	{
-		success = GetSaveFileName(&ofn);
-	}
-	else
-	{
-		success = GetOpenFileName(&ofn);
-	}
+	success = isSaveFile ? GetSaveFileName(&ofn) : GetOpenFileName(&ofn);
 
 	if (success)
 	{
+		/* Update the current directory. */
+		getcwd(Path, NFILEN);
 		strcpy(buf, ofn.lpstrFile);
 	}
 	return success;

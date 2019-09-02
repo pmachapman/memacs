@@ -94,7 +94,7 @@
       <DisableSpecificWarnings>4996;4090;4131;4100</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir)..\..\h;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir)..\..\h;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -129,6 +129,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir)..\..\h;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -142,6 +145,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir)..\..\h;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\h\dutch.h" />
@@ -166,6 +172,7 @@
     <ClInclude Include="..\..\h\platin.h" />
     <ClInclude Include="..\..\h\resource.h" />
     <ClInclude Include="..\..\h\spanish.h" />
+    <ClInclude Include="..\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\abbrev.c" />
@@ -214,6 +221,23 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\mewin.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\mswcur.cur" />
+    <None Include="..\mswgrin1.cur" />
+    <None Include="..\mswgrin2.cur" />
+    <None Include="..\mswgrin3.cur" />
+    <None Include="..\mswgrin4.cur" />
+    <None Include="..\mswgrin5.cur" />
+    <None Include="..\mswgrin6.cur" />
+    <None Include="..\mswgrin7.cur" />
+    <None Include="..\mswgrin8.cur" />
+    <None Include="..\mswnot.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\mswapp.ico" />
+    <Image Include="..\mswscr.ico" />
+    <Image Include="..\mswwait.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

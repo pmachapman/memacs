@@ -1,25 +1,487 @@
-#include    <windows.h>
-#include    "mswrid.h"
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
 
-ScreenCursor        CURSOR  "mswcur.cur"
-NotQuiescentCursor  CURSOR  "mswnot.cur"
-Grinder1            CURSOR  "mswgrin1.cur"
-Grinder2            CURSOR  "mswgrin2.cur"
-Grinder3            CURSOR  "mswgrin3.cur"
-Grinder4            CURSOR  "mswgrin4.cur"
-Grinder5            CURSOR  "mswgrin5.cur"
-Grinder6            CURSOR  "mswgrin6.cur"
-Grinder7            CURSOR  "mswgrin7.cur"
-Grinder8            CURSOR  "mswgrin8.cur"
-AppIcon             ICON    "mswapp.ico"
-ScreenIcon          ICON    "mswscr.ico"
-WaitIcon            ICON    "mswwait.ico"
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 
-#include    "mswmenu.h"
-#include    "mswmenu.rc"
-#include    "mswfile.dlg"
-#include    "mswabout.dlg"
-#include    "mswfonts.dlg"
-#include    "mswmodes.dlg"
-#include    "mswprg.dlg"
-#include    "mswmlh.dlg"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+SCREENCURSOR            CURSOR                  "mswcur.cur"
+
+NOTQUIESCENTCURSOR      CURSOR                  "mswnot.cur"
+
+GRINDER1                CURSOR                  "mswgrin1.cur"
+
+GRINDER2                CURSOR                  "mswgrin2.cur"
+
+GRINDER3                CURSOR                  "mswgrin3.cur"
+
+GRINDER4                CURSOR                  "mswgrin4.cur"
+
+GRINDER5                CURSOR                  "mswgrin5.cur"
+
+GRINDER6                CURSOR                  "mswgrin6.cur"
+
+GRINDER7                CURSOR                  "mswgrin7.cur"
+
+GRINDER8                CURSOR                  "mswgrin8.cur"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+APPICON                 ICON                    "mswapp.ico"
+
+SCREENICON              ICON                    "mswscr.ico"
+
+WAITICON                ICON                    "mswwait.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+MENU MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open...",                    IDM_FILEFIND
+        MENUITEM "&View...",                    IDM_VIEWFILE
+        MENUITEM "&Insert...",                  IDM_INSFILE
+        MENUITEM "&Read over...",               IDM_FILEREAD
+        MENUITEM "Re&name...",                  IDM_FILENAME
+        MENUITEM SEPARATOR
+        MENUITEM "&Save",                       IDM_FILESAVE
+        MENUITEM "Save &As...",                 IDM_FILEWRITE
+        MENUITEM "A&ppend...",                  IDM_FILEAPP
+        MENUITEM SEPARATOR
+        MENUITEM "Encr&yption key :",           IDM_SETEKEY
+        MENUITEM SEPARATOR
+        POPUP "&Buffer"
+        BEGIN
+            MENUITEM "&Next",                       IDM_NEXTBUFFER
+            MENUITEM "&Select :",                   IDM_USEBUFFER
+            MENUITEM "&Unmark",                     IDM_UNMARK
+            MENUITEM "&Rename :",                   IDM_NAMEBUFFER
+            MENUITEM "&Delete :",                   IDM_KILLBUFFER
+            MENUITEM SEPARATOR
+            MENUITEM "Narrow to &region",           IDM_NARROW
+            MENUITEM "&Widen from region",          IDM_WIDEN
+            MENUITEM SEPARATOR
+            MENUITEM "&List",                       IDM_LISTBUFFERS
+        END
+        POPUP "&Window"
+        BEGIN
+            MENUITEM "&Split",                      IDM_SPLITWIND
+            MENUITEM "&Delete",                     IDM_DELWIND
+            MENUITEM "Delete &others",              IDM_ONLYWIND
+            MENUITEM "&Next",                       IDM_NEXTWIND
+            MENUITEM "&Previous",                   IDM_PREVWIND
+            POPUP "Scrol&l"
+            BEGIN
+                MENUITEM "= &Up",                       IDM_MVUPWIND
+                MENUITEM "= &Down",                     IDM_MVDNWIND
+                MENUITEM "= Next u&p",                  IDM_NEXTUP
+                MENUITEM "= Next d&own",                IDM_NEXTDOWN
+            END
+            POPUP "Si&ze"
+            BEGIN
+                MENUITEM "= &Grow",                     IDM_ENLARGEWIND
+                MENUITEM "= &Shrink",                   IDM_SHRINKWIND
+                MENUITEM "= &Height",                   IDM_RESIZE
+            END
+        END
+        MENUITEM "&Mode...",                    IDM_MODE
+        MENUITEM "&Global mode...",             IDM_GLOBMODE
+        MENUITEM SEPARATOR
+        MENUITEM "Save + &exit",                IDM_QUICKEXIT
+        MENUITEM "E&xit",                       IDM_QUIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        POPUP "&Clipboard"
+        BEGIN
+            MENUITEM "Cu&t region",                 IDM_CUTREGION
+            MENUITEM "&Copy region",                IDM_CLIPREGION
+            MENUITEM "&Paste",                      IDM_INSERTCLIP
+        END
+        POPUP "&Mark"
+        BEGIN
+            MENUITEM "&Set",                        IDM_SETMARK
+            MENUITEM "&Remove",                     IDM_REMMARK
+            MENUITEM "&Exchange",                   IDM_SWAPMARK
+        END
+        MENUITEM "&Yank",                       IDM_YANK
+        MENUITEM SEPARATOR
+        POPUP "&Region"
+        BEGIN
+            MENUITEM "&Kill",                       IDM_KILLREGION
+            MENUITEM "&Copy",                       IDM_COPYREGION
+            MENUITEM SEPARATOR
+            MENUITEM "&Upper case",                 IDM_UPPERREGION
+            MENUITEM "&Lower case",                 IDM_LOWERREGION
+            MENUITEM SEPARATOR
+            MENUITEM "&Entab",                      IDM_ENTAB
+            MENUITEM "&Detab",                      IDM_DETAB
+            MENUITEM "&Trim",                       IDM_TRIM
+            MENUITEM "&Indent",                     IDM_INDENT_REGION
+            MENUITEM "&Undent",                     IDM_UNDENT_REGION
+            MENUITEM SEPARATOR
+            MENUITEM "Count &words",                IDM_WORDCOUNT
+        END
+        POPUP "Paragrap&h"
+        BEGIN
+            MENUITEM "&Kill",                       IDM_KILLPARA
+            MENUITEM "&Fill",                       IDM_FILLPARA
+        END
+        POPUP "&Line"
+        BEGIN
+            MENUITEM "&Kill to end",                IDM_KILLTEXT
+            MENUITEM "&Open",                       IDM_OPENLINE
+        END
+        POPUP "&Word"
+        BEGIN
+            MENUITEM "Kill &next",                  IDM_DELFWORD
+            MENUITEM "Kill &previous",              IDM_DELBWORD
+            MENUITEM SEPARATOR
+            MENUITEM "&Capitalize",                 IDM_CAPWORD
+            MENUITEM "&Lower case",                 IDM_LOWERWORD
+            MENUITEM "&Upper case",                 IDM_UPPERWORD
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Delete &blank lines",         IDM_DEBLANK
+        MENUITEM "&Transpose characters",       IDM_TWIDDLE
+        MENUITEM "T&ab",                        IDM_TAB
+        MENUITEM "&Quote",                      IDM_QUOTE
+    END
+    POPUP "&Search"
+    BEGIN
+        MENUITEM "Search &forward :",           IDM_FORWSEARCH
+        MENUITEM "Search &backward :",          IDM_BACKSEARCH
+        MENUITEM "Hunt f&orward",               IDM_FORWHUNT
+        MENUITEM "Hunt b&ackward",              IDM_BACKHUNT
+        MENUITEM "&Incremental search :",       IDM_FISEARCH
+        MENUITEM "Re&verse incremental :",      IDM_RISEARCH
+        MENUITEM SEPARATOR
+        MENUITEM "&Replace :",                  IDM_SREPLACE
+        MENUITEM "&Query Replace :",            IDM_QREPLACE
+        MENUITEM SEPARATOR
+        POPUP "&Goto"
+        BEGIN
+            MENUITEM "&Mark",                       IDM_GOTOMARK
+            MENUITEM "&Line",                       IDM_GOTOLINE
+            MENUITEM "Matching &Fence",             IDM_GETFENCE
+            MENUITEM "&Beginning of file",          IDM_GOTOBOB
+            MENUITEM "&End of file",                IDM_GOTOEOB
+        END
+        POPUP "&Page"
+        BEGIN
+            MENUITEM "&Next",                       IDM_FORWPAGE
+            MENUITEM "&Previous",                   IDM_BACKPAGE
+        END
+        POPUP "Paragrap&h"
+        BEGIN
+            MENUITEM "&Next",                       IDM_GOTOEOP
+            MENUITEM "&Previous",                   IDM_GOTOBOP
+        END
+        POPUP "&Line"
+        BEGIN
+            MENUITEM "&Next",                       IDM_FORWLINE
+            MENUITEM "&Previous",                   IDM_BACKLINE
+            MENUITEM "&Beginning of",               IDM_GOTOBOL
+            MENUITEM "&End of",                     IDM_GOTOEOL
+        END
+        POPUP "&Word"
+        BEGIN
+            MENUITEM "&Next",                       IDM_FORWWORD
+            MENUITEM "&Previous",                   IDM_BACKWORD
+            MENUITEM "&End of",                     IDM_ENDWORD
+        END
+    END
+    POPUP "E&xecute"
+    BEGIN
+        MENUITEM "&Windows program :",          IDM_EXECPRG
+        MENUITEM "Shell &program :",            IDM_SPAWN
+        MENUITEM "Pipe-&in :",                  IDM_PIPECMD
+        MENUITEM "&Filter :",                   IDM_FILTER
+        MENUITEM "&Shell",                      IDM_SPAWNCLI
+        MENUITEM SEPARATOR
+        POPUP "&EMACS command"
+        BEGIN
+            MENUITEM "&Named command :",            IDM_NAMEDCMD
+            MENUITEM "&Command line :",             IDM_EXECCMD
+            MENUITEM "&Procedure :",                IDM_EXECPROC
+            MENUITEM "&Buffer :",                   IDM_EXECBUF
+            MENUITEM "&File...",                    IDM_EXECFILE
+        END
+        POPUP "&Keyboard macro"
+        BEGIN
+            MENUITEM "&Play",                       IDM_CTLXE
+            MENUITEM "&Start recording",            IDM_CTLXLP
+            MENUITEM "&End recording",              IDM_CTLXRP
+        END
+        MENUITEM "&Abort command",              IDM_CTRLG
+    END
+    POPUP "&Miscellaneous"
+    BEGIN
+        POPUP "&Key bindings"
+        BEGIN
+            MENUITEM "Bind to &Command :",          IDM_BINDTOKEY
+            MENUITEM "Bind to &Macro :",            IDM_MACROTOKEY
+            MENUITEM "&Unbind :",                   IDM_UNBINDKEY
+            MENUITEM SEPARATOR
+            MENUITEM "&Describe key :",             IDM_DESKEY
+            MENUITEM "&List",                       IDM_DESBIND
+        END
+        POPUP "&Menu bindings"
+        BEGIN
+            MENUITEM "Bind to &Command :",          IDM_BINDTOMENU
+            MENUITEM "Bind to &Macro :",            IDM_MACROTOMENU
+            MENUITEM "&Unbind :",                   IDM_UNBINDMENU
+        END
+        POPUP "&Variable"
+        BEGIN
+            MENUITEM "&Set :",                      IDM_SETVAR
+            MENUITEM "&Display :",                  IDM_DISPVAR
+            MENUITEM SEPARATOR
+            MENUITEM "&List",                       IDM_DESVARS
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Show &position",              IDM_SHOWCPOS
+    END
+    POPUP "S&creen"
+    BEGIN
+        MENUITEM "&Cascade",                    IDM_CASCADE
+        POPUP "&Tile"
+        BEGIN
+            MENUITEM "&Horizontally",               IDM_TILE_HORIZONTALLY
+            MENUITEM "&Vertically",                 IDM_TILE_VERTICALLY
+        END
+        MENUITEM "&Arrange Icons",              IDM_ARRANGEICONS
+        MENUITEM SEPARATOR
+        MENUITEM "&Open :",                     IDM_FIND_SCREEN
+        MENUITEM "Re&name :",                   IDM_RENAME_SCREEN
+        POPUP "Si&ze"
+        BEGIN
+            MENUITEM "= &Height",                   IDM_NEWSIZE
+            MENUITEM "= &Width",                    IDM_NEWWIDTH
+            MENUITEM "&Normalize",                  IDM_NORMALIZE
+        END
+        MENUITEM "&Font...",                    IDM_FONT
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Index",                      IDM_WHELPINDEX
+        MENUITEM "&Keyboard",                   IDM_WHELPKEYBOARD
+        MENUITEM "&Commands",                   IDM_WHELPCOMMANDS
+        MENUITEM "&Procedures",                 IDM_WHELPPROCEDURES
+        MENUITEM SEPARATOR
+        POPUP "&List"
+        BEGIN
+            MENUITEM "&Key bindings",               IDM_DESBIND
+            MENUITEM "&Functions",                  IDM_DESFUNC
+            MENUITEM "&Variables",                  IDM_DESVARS
+            MENUITEM "&Buffers",                    IDM_LISTBUFFERS
+        END
+        MENUITEM "Apr&opos :",                  IDM_APRO
+        MENUITEM "&Describe key :",             IDM_DESKEY
+        MENUITEM "Display &variable :",         IDM_DISPVAR
+        MENUITEM SEPARATOR
+        MENUITEM "&About...",                   IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+FILE DIALOG 44, 65, 198, 152
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "Helv"
+BEGIN
+    RTEXT           "File&name:",-1,8,10,36,8,NOT WS_GROUP
+    EDITTEXT        ID_FILENAME,47,8,142,12,ES_AUTOHSCROLL
+    RTEXT           "Directory:",-1,8,24,36,8,NOT WS_GROUP
+    LTEXT           "",ID_PATH,47,24,142,8,NOT WS_GROUP
+    LTEXT           "&Files",-1,8,40,66,8,NOT WS_GROUP
+    LISTBOX         ID_FILES,8,49,66,100,LBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Directories",-1,81,40,66,8,NOT WS_GROUP
+    LISTBOX         ID_DIRECTORIES,81,49,66,100,LBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",1,156,65,36,20,WS_GROUP
+    PUSHBUTTON      "Cancel",2,156,98,36,20,WS_GROUP
+END
+
+ABOUT DIALOGEX 19, 76, 285, 184
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "About MicroEMACS"
+FONT 8, "Helv", 0, 0, 0x0
+BEGIN
+    CTEXT           "",ID_PROGVER,46,9,96,8,NOT WS_GROUP
+    CTEXT           "for Microsoft Windows",-1,46,19,96,8,NOT WS_GROUP
+    ICON            "AppIcon",-1,12,11,21,20
+    CTEXT           "Text Editor and Corrector",-1,46,32,96,8,NOT WS_GROUP
+    CTEXT           "Written by Daniel M. Lawrence",-1,5,45,135,8,NOT WS_GROUP
+    CTEXT           "[based on code by Dave Conroy]",-1,5,53,135,8,NOT WS_GROUP
+    GROUPBOX        "Send inquiries and donations to:",-1,5,63,132,35
+    CTEXT           "617 New York St",-1,9,75,124,8,NOT WS_GROUP
+    CTEXT           "Lafayette, IN 47901",-1,9,84,124,8,NOT WS_GROUP
+    GROUPBOX        "BBS:",-1,5,100,132,53
+    CTEXT           "The Programmer's Room",-1,11,110,120,9
+    CTEXT           "317-742-5533",-1,14,120,120,9
+    CTEXT           "24 hours, 300 - 19200 bps (US Robotics)",-1,11,131,123,17
+    DEFPUSHBUTTON   "OK",1,13,161,48,15,WS_GROUP
+    PUSHBUTTON      "&More >>",ID_MOREABOUT,79,161,48,15,WS_GROUP
+    CONTROL         "",ID_ABOUTBAR,"Static",SS_BLACKRECT,143,0,1,184
+    CTEXT           "Ported to the Microsoft Windows environment by Pierre Perret",-1,151,10,128,16,NOT WS_GROUP
+    CTEXT           "Comments about the specific features of this port can be addessed to:",-1,159,37,126,32,NOT WS_GROUP
+    GROUPBOX        "US mail:",-1,149,72,131,34
+    CTEXT           "4326 W Michigan ave",-1,161,83,124,8,NOT WS_GROUP
+    CTEXT           "Glendale, AZ 85308",-1,161,91,124,8,NOT WS_GROUP
+    CTEXT           "CompuServe: 73757,2337",-1,159,123,126,8,NOT WS_GROUP
+    GROUPBOX        "Internet:",-1,149,145,131,26
+    CTEXT           "P.Perret@az05.bull.com",-1,152,157,124,8,NOT WS_GROUP
+END
+
+FONTS DIALOG 8, 47, 181, 154
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "Helv"
+BEGIN
+    GROUPBOX        "&Characters",-1,4,9,54,58
+    RADIOBUTTON     "&ANSI",ID_ANSI,12,25,40,12,WS_GROUP | WS_TABSTOP
+    RADIOBUTTON     "&OEM",ID_OEM,12,44,40,12
+    LTEXT           "&Face:",-1,63,2,63,8
+    LISTBOX         ID_FONT,63,12,71,61,WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "Si&ze:",-1,141,2,35,8,NOT WS_GROUP
+    COMBOBOX        ID_FONTSIZE,141,12,35,61,CBS_SIMPLE | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "&Bold",ID_BOLD,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,8,79,46,12
+    RTEXT           "Maximum: ",-1,60,81,59,9
+    LTEXT           "columns",-1,133,78,41,8,NOT WS_GROUP
+    LTEXT           "rows",-1,133,85,40,8,NOT WS_GROUP
+    RTEXT           "80",ID_MAXCOLUMNS,115,78,16,8,NOT WS_GROUP
+    RTEXT           "25",ID_MAXROWS,115,85,16,8,NOT WS_GROUP
+    DEFPUSHBUTTON   "OK",1,4,134,50,16,WS_GROUP
+    PUSHBUTTON      "&Save",ID_SAVEFONT,64,134,50,16,WS_GROUP
+    PUSHBUTTON      "Cancel",2,126,134,50,16,WS_GROUP
+    EDITTEXT        ID_SAMPLE,4,99,172,32,ES_MULTILINE | ES_AUTOVSCROLL | WS_DISABLED | NOT WS_TABSTOP
+END
+
+MODES DIALOG 65, 39, 160, 111
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "Helv"
+BEGIN
+    GROUPBOX        "",-1,6,2,150,78
+    CONTROL         "&Auto-save",ID_ASAVE,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,15,12,71,12
+    CONTROL         "&View only",ID_VIEW,"Button",BS_AUTOCHECKBOX,89,12,60,12
+    CONTROL         "&C indentation",ID_CMODE,"Button",BS_AUTOCHECKBOX,15,25,71,12
+    CONTROL         "Word &wrap",ID_WRAP,"Button",BS_AUTOCHECKBOX,89,25,60,12
+    CONTROL         "&Overwrite",ID_OVER,"Button",BS_AUTOCHECKBOX,15,38,71,12
+    CONTROL         "&Replace",ID_REP,"Button",BS_AUTOCHECKBOX,89,38,60,12
+    CONTROL         "&Magic searches",ID_MAGIC,"Button",BS_AUTOCHECKBOX,15,51,71,12
+    CONTROL         "Encr&ypt",ID_CRYPT,"Button",BS_AUTOCHECKBOX,89,51,60,12
+    CONTROL         "&Exact case searches",ID_EXACT,"Button",BS_AUTOCHECKBOX,37,64,96,12
+    DEFPUSHBUTTON   "OK",1,19,86,46,18,WS_GROUP
+    PUSHBUTTON      "Cancel",2,94,86,46,18,WS_GROUP
+END
+
+WAITFORPRG DIALOG 10, 35, 141, 61
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "Helv"
+BEGIN
+    ICON            "WaitIcon",-1,9,9,16,16
+    CTEXT           "Waiting for other program to terminate...",102,42,8,93,21,NOT WS_GROUP
+    PUSHBUTTON      "Cancel",2,45,37,50,16
+END
+
+MLHIST DIALOG 18, 18, 311, 94
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "Helv"
+BEGIN
+    DEFPUSHBUTTON   "OK",1,132,72,46,16,WS_GROUP
+    LISTBOX         ID_HIST,4,4,303,62,NOT LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | WS_VSCROLL
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    "FILE", DIALOG
+    BEGIN
+    END
+
+    "ABOUT", DIALOG
+    BEGIN
+        RIGHTMARGIN, 284
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
