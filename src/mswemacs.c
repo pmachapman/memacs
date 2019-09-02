@@ -55,8 +55,8 @@ static BOOL PASCAL CopyToClipboard (REGION *Region)
     if (Size == 0L) return TRUE;
 
     /*-copy the buffer data into a block of global memory */
-    if (hData = GlobalAlloc (GMEM_MOVEABLE, Size + 1)) {
-        if (!(Data = GlobalLock (hData))) goto NoClipboardMemory;
+    if ( NULL != (hData = GlobalAlloc (GMEM_MOVEABLE, Size + 1)) ) {
+        if ( NULL == (Data = GlobalLock (hData)) ) goto NoClipboardMemory;
 	lp = Region->r_linep;
 	Offset = Region->r_offset;
 	lcnt = 0;
@@ -137,8 +137,8 @@ int PASCAL insertclip (int f, int n)
 {
     BOOL    Result = TRUE;
     char    *Text, *TextHead;
-    short int curoff;
-    LINE    *curline;
+    short int curoff=0;
+    LINE    *curline=NULL;
 
     /*-don't allow command if read-only mode */
     if (curbp->b_mode & MDVIEW) return rdonly();
@@ -224,7 +224,7 @@ int PASCAL helpengine (int f, int n)
 	    /* "Help key: " */
 #if WINXP
 	if (HelpKey[0] == '\0') {
-	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_HELP_FINDER, NULL);
+	    HtmlHelp (hFrameWnd, HelpEngineFile, HH_HELP_FINDER, 0);
 	}
 	else {
 		HH_AKLINK link;
@@ -255,7 +255,7 @@ int PASCAL helpengine (int f, int n)
 /* minimizescreen:  turn the current screen into an icon */
 /* ==============                                        */
 
-PASCAL  minimizescreen (int f, int n)
+int PASCAL  minimizescreen (int f, int n)
 {
     BOOL    nq;
 
@@ -269,40 +269,42 @@ PASCAL  minimizescreen (int f, int n)
 /* ForceMessage:    do a SendMessage, forcing quiescent mode */
 /* ============                                              */
 
-static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
+static LRESULT PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     BOOL    nq;
+	LRESULT		retVal = 0;
 
     nq = notquiescent;
     notquiescent = 0;
-    SendMessage (hWnd, wMsg, wParam, lParam);
+    retVal = SendMessage (hWnd, wMsg, wParam, lParam);
     notquiescent = nq;
+	return retVal;
 } /* ForceMessage */
 
 /* maximizescreen:  maximize the current screen */
 /* ==============                               */
 
-PASCAL  maximizescreen (int f, int n)
+int PASCAL  maximizescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIMAXIMIZE,
-                  (UINT)first_screen->s_drvhandle, 0L);
+                  (WPARAM)first_screen->s_drvhandle, 0L);
     return TRUE;
 } /* maximizescreen */
 
 /* restorescreen:   restore the current screen from maximized/minimized state */
 /* =============                                                              */
 
-PASCAL  restorescreen (int f, int n)
+int PASCAL  restorescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIRESTORE,
-                  (UINT)first_screen->s_drvhandle, 0L);
+                  (WPARAM)first_screen->s_drvhandle, 0L);
     return TRUE;
 } /* restorescreen */
 
 /* tilescreens: tile the non-iconized screens */
 /* ===========                                */
 
-PASCAL  tilescreens (int f, int n)
+int PASCAL  tilescreens (int f, int n)
 
 /* without a numeric argument, tile horizontally. With a numeric argument
    of 1, tile vertically */
@@ -317,7 +319,7 @@ PASCAL  tilescreens (int f, int n)
 /* cascadescreens:  position the non-iconized screens in cascade */
 /* ==============                                                */
 
-PASCAL  cascadescreens (int f, int n)
+int PASCAL  cascadescreens (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDICASCADE, 0, 0L);
     return TRUE;
@@ -388,11 +390,11 @@ void FAR PASCAL ScrollMessage (HWND hWnd, UINT wMsg, WORD ScrlCode, int Pos)
         if (curwp->w_fcol < 0) curwp->w_fcol = 0;
         if (curwp->w_doto < curwp->w_fcol) {
             /* reframe dot if it was left past the left of the screen */
-            curwp->w_doto = min(curwp->w_fcol,lused(curwp->w_dotp));
+            curwp->w_doto = (short)min(curwp->w_fcol,lused(curwp->w_dotp));
         }
         if (curwp->w_doto > (curwp->w_fcol + term.t_ncol - 2)) {
             /* reframe dot if it was left past the right of the screen */
-            curwp->w_doto = curwp->w_fcol + term.t_ncol - 2;
+            curwp->w_doto = (short)curwp->w_fcol + term.t_ncol - 2;
 	}
         curwp->w_flag |= WFMODE | WFHARD;
     }
@@ -444,7 +446,7 @@ void FAR PASCAL ScrollBars (void)
 
 /* updscrollbars:      updates the scroll bars for a screen */
 /* =============                                            */
-PASCAL  updscrollbars (SCREEN *sp, char w_flag)
+void PASCAL  updscrollbars (SCREEN *sp, char w_flag)
 
 /* the w_flag is used to determine what needs updating: if the WFHARD
    bit is set, both scroll bars need an update. If the WFMOVE bit

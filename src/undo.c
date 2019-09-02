@@ -129,7 +129,7 @@ int undo_op()
 
 	/* restore the buffer position */
 	gotoline(TRUE, up->line_num);
-	curwp->w_doto = up->offset;
+	curwp->w_doto = (short)(up->offset);
 	op_type = up->type;
 
 	/* undo the actual operation */
@@ -263,7 +263,7 @@ int f,n;	/* prefix flag and argument */
 	return(wpopup(ulistp));
 }
 
-PASCAL NEAR undolist()
+int PASCAL NEAR undolist()
 
 {
 	register char *cp1;	/* scanning pointer into line to build */
@@ -448,6 +448,7 @@ nextbuf:	bp = getoldb();
 		lp->next = (UNDO_OBJ *)NULL;
 		bp->undo_count--;
 	}
+	return NULL;
 }
 
 /*	RE-ROOM: Allocate memory using realloc()
@@ -511,5 +512,6 @@ nxtbuf:		bp = getoldb();
 		lp->next = (UNDO_OBJ *)NULL;
 		bp->undo_count--;
 	}
+	return NULL;
 }
 

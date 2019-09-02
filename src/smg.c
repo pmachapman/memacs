@@ -78,7 +78,7 @@
 	Empty routine make some compilers happy when SMG is not defined,
 	and is also used as a noop routine in the terminal dispatch table.
 */
-smg_noop()
+void smg_noop()
 {
 }
 

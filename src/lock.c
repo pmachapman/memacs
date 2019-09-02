@@ -172,7 +172,7 @@ char *errstr;		/* lock error string to print out */
 	update(TRUE);
 }
 #else
-lckhello()	/* dummy function */
+void lckhello()	/* dummy function */
 {
 }
 #endif

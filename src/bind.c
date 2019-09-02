@@ -11,7 +11,7 @@
 #include	"elang.h"
 #include	"epath.h"
 
-PASCAL NEAR help(f, n)	/* give me some help!!!!!
+int PASCAL NEAR help(f, n)	/* give me some help!!!!!
 		   bring up a fake buffer and read the help file
 		   into it with view mode			*/
 
@@ -19,7 +19,7 @@ int f,n;	/* prefix flag and argument */
 
 {
 	register BUFFER *bp;	/* buffer pointer to help */
-	char *fname;		/* file name of help file */
+	char *fname=NULL;		/* file name of help file */
 
 	/* first check if we are already here */
 	bp = bfind("emacs.hlp", FALSE, BFINVS);
@@ -51,7 +51,7 @@ int f,n;	/* prefix flag and argument */
 	return(TRUE);
 }
 
-PASCAL NEAR deskey(f, n)	/* describe the command for a certain key */
+int PASCAL NEAR deskey(f, n)	/* describe the command for a certain key */
 
 int f,n;	/* prefix flag and argument */
 
@@ -81,7 +81,7 @@ int f,n;	/* prefix flag and argument */
 
 /* bindtokey:	add a new key to the key binding table		*/
 
-PASCAL NEAR bindtokey(f, n)
+int PASCAL NEAR bindtokey(f, n)
 
 int f, n;	/* command arguments [IGNORED] */
 
@@ -141,7 +141,7 @@ int f, n;	/* command arguments [IGNORED] */
 	ktp = &keytab[0];
 	found = FALSE;
 	while (ktp->k_type != BINDNUL) {
-		if (ktp->k_code == c) {
+		if (ktp->k_code == (short)c) {
 			found = TRUE;
 			break;
 		}
@@ -159,7 +159,7 @@ int f, n;	/* command arguments [IGNORED] */
 			return(FALSE);
 		}
 
-		ktp->k_code = c;	/* add keycode */
+		ktp->k_code = (short)c;	/* add keycode */
 		ktp->k_ptr.fp = kfunc;	/* and the function pointer */
 		ktp->k_type = BINDFNC;	/* and the binding type */
 		++ktp;			/* and make sure the next is null */
@@ -180,7 +180,7 @@ int f, n;	/* command arguments [IGNORED] */
 
 /* macrotokey:	Bind a key to a macro in the key binding table */
 
-PASCAL NEAR macrotokey(f, n)
+int PASCAL NEAR macrotokey(f, n)
 
 int f, n;	/* command arguments [IGNORED] */
 
@@ -226,7 +226,7 @@ int f, n;	/* command arguments [IGNORED] */
 	ktp = &keytab[0];
 	found = FALSE;
 	while (ktp->k_type != BINDNUL) {
-		if (ktp->k_code == c) {
+		if (ktp->k_code == (short)c) {
 			found = TRUE;
 			break;
 		}
@@ -244,7 +244,7 @@ int f, n;	/* command arguments [IGNORED] */
 			return(FALSE);
 		}
 
-		ktp->k_code = c;	/* add keycode */
+		ktp->k_code = (short)c;	/* add keycode */
 		ktp->k_ptr.buf = kmacro;	/* and the function pointer */
 		ktp->k_type = BINDBUF;	/* and the binding type */
 		++ktp;			/* and make sure the next is null */
@@ -258,7 +258,7 @@ int f, n;	/* command arguments [IGNORED] */
 
 /* unbindkey:	delete a key from the key binding table */
 
-PASCAL NEAR unbindkey(f, n)
+int PASCAL NEAR unbindkey(f, n)
 
 int f, n;	/* command arguments [IGNORED] */
 
@@ -286,7 +286,7 @@ int f, n;	/* command arguments [IGNORED] */
 	return(TRUE);
 }
 
-PASCAL NEAR unbindchar(c)
+int PASCAL NEAR unbindchar(c)
 
 int c;		/* command key to unbind */
 
@@ -359,7 +359,7 @@ BUFFER *bp;	/* buffer to unbind all keys connected to */
 	   into it with view mode
 */
 
-PASCAL NEAR desbind(f, n)
+int PASCAL NEAR desbind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -367,7 +367,7 @@ int f,n;	/* prefix flag and argument */
 	return(buildlist(TRUE, ""));
 }
 
-PASCAL NEAR apro(f, n)	/* Apropos (List functions that match a substring) */
+int PASCAL NEAR apro(f, n)	/* Apropos (List functions that match a substring) */
 
 int f,n;	/* prefix flag and argument */
 
@@ -383,7 +383,7 @@ int f,n;	/* prefix flag and argument */
 	return(buildlist(FALSE, mstring));
 }
 
-PASCAL NEAR buildlist(type, mstring)  /* build a binding list (limited or full) */
+int PASCAL NEAR buildlist(type, mstring)  /* build a binding list (limited or full) */
 
 int type;	/* true = full list,   false = partial list */
 char *mstring;	/* match string if a partial list */
@@ -416,7 +416,7 @@ char *mstring;	/* match string if a partial list */
 
 		/* add in the command name */
 		strcpy(outseq, nptr->n_name);
-		cpos = strlen(outseq);
+		cpos = (int)strlen(outseq);
 
 		/* if we are executing an apropos command..... */
 		if (type == FALSE &&
@@ -467,7 +467,7 @@ fail:		/* and on to the next name */
 
 		/* add in the command name */
 		strcpy(outseq, bp->b_bname);
-		cpos = strlen(outseq);
+		cpos = (int)strlen(outseq);
 
 		/* if we are executing an apropos command..... */
 		if (type == FALSE &&
@@ -519,7 +519,7 @@ bfail:		/* and on to the next buffer */
 	return(TRUE);
 }
 
-PASCAL NEAR strinc(source, sub) /* does source include sub? */
+int PASCAL NEAR strinc(source, sub) /* does source include sub? */
 
 char *source;	/* string to search in */
 char *sub;	/* substring to look for */
@@ -566,7 +566,7 @@ int mflag;	/* going for a meta sequence? */
 	/* check to see if we are executing a command line */
 	if (clexec) {
 		macarg(tok);	/* get the next token */
-		return(stock(tok));
+		return(stock((unsigned char *)tok));
 	}
 
 	/* or the normal way */
@@ -579,7 +579,7 @@ int mflag;	/* going for a meta sequence? */
 
 /* execute the startup file */
 
-PASCAL NEAR startup(sfname)
+int PASCAL NEAR startup(sfname)
 
 char *sfname;	/* name of startup file (null if default) */
 
@@ -802,7 +802,7 @@ char *seq;	/* destination string for sequence */
 	c = c & 255;	/* strip the prefixes */
 
 	/* and output the final sequence */
-	*ptr++ = c;
+	*ptr++ = (char)c;
 	*ptr = 0;	/* terminate the string */
 	return (seq);
 }
@@ -876,20 +876,29 @@ KEYTAB *key;	/* key binding to return a name of */
 		any match or NULL if none */
 
 #if	MSC
-int (PASCAL NEAR *PASCAL NEAR fncmatch(char *fname))(void)
+typedef int (PASCAL NEAR *MatchFcnPtr)(void);
+/* int (PASCAL NEAR *PASCAL NEAR fncmatch(char *fname))(void) */
 #else
-int (PASCAL NEAR *PASCAL NEAR fncmatch(fname))()
+typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr(fname))();
 
-char *fname;	/* name to attempt to match */
+/* int (PASCAL NEAR *PASCAL NEAR fncmatch(fname))() */
+
+/* char *fname;	name to attempt to match */
 #endif
 
+#if	MSC
+MatchFcnPtr fncmatch(char *fname)
+#else
+MatchFcnPtr fncmatch()
+char *fname;
+#endif
 {
 	int nval;
 
 	if ((nval = binary(fname, namval, numfunc, NSTRING)) == -1)
 		return(NULL);
 	else
-		return(names[nval].n_func);
+		return(MatchFcnPtr)(names[nval].n_func);
 }
 
 char *PASCAL NEAR namval(index)
@@ -997,7 +1006,7 @@ char *skey;	/* name of key to get binding for */
 {
 	char *bindname;
 
-	bindname = getfname(getbind(stock(skey)));
+	bindname = getfname(getbind(stock((unsigned char *)skey)));
 	if (bindname == NULL)
 		bindname = errorm;
 

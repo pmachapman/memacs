@@ -123,7 +123,7 @@ NOSHARE TERM term    = {
 };
 
 #if	COLOR
-PASCAL NEAR ansifcol(color)		/* set the current output color */
+int PASCAL NEAR ansifcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -155,7 +155,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-PASCAL NEAR ansibcol(color)		/* set the current background color */
+int PASCAL NEAR ansibcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -174,7 +174,7 @@ int color;	/* color to set */
 }
 #endif
 
-PASCAL NEAR ansimove(row, col)
+int PASCAL NEAR ansimove(row, col)
 {
         ttputc(ESC);
         ttputc('[');
@@ -184,14 +184,14 @@ PASCAL NEAR ansimove(row, col)
         ttputc('H');
 }
 
-PASCAL NEAR ansieeol()
+int PASCAL NEAR ansieeol()
 {
         ttputc(ESC);
         ttputc('[');
         ttputc('K');
 }
 
-PASCAL NEAR ansieeop()
+int PASCAL NEAR ansieeop()
 {
 #if	COLOR
 	ansifcol(gfcolor);
@@ -203,7 +203,7 @@ PASCAL NEAR ansieeop()
         ttputc('J');
 }
 
-PASCAL NEAR ansirev(state)		/* change reverse video state */
+int PASCAL NEAR ansirev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -228,16 +228,16 @@ int state;	/* TRUE = reverse, FALSE = normal */
 #endif
 }
 
-PASCAL NEAR ansicres()	/* change screen resolution */
+int PASCAL NEAR ansicres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
 #if	PROTO
-PASCAL NEAR spal(char *dummy)		/* change pallette settings */
+int PASCAL NEAR spal(char *dummy)		/* change pallette settings */
 #else
-PASCAL NEAR spal(dummy)		/* change pallette settings */
+int PASCAL NEAR spal(dummy)		/* change pallette settings */
 
 char *dummy;
 #endif
@@ -246,13 +246,13 @@ char *dummy;
 	/* none for now */
 }
 
-PASCAL NEAR ansibeep()
+int PASCAL NEAR ansibeep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-PASCAL NEAR ansiparm(n)
+int PASCAL NEAR ansiparm(n)
 register int    n;
 {
         register int q,r;
@@ -268,7 +268,7 @@ register int    n;
         ttputc((n%10) + '0');
 }
 
-PASCAL NEAR ansiopen()
+int PASCAL NEAR ansiopen()
 {
 #if     USG | AIX | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX
         register char *cp;
@@ -312,7 +312,7 @@ PASCAL NEAR ansiopen()
 #endif
 }
 
-PASCAL NEAR ansiclose()
+int PASCAL NEAR ansiclose()
 
 {
 #if	COLOR
@@ -342,12 +342,12 @@ PASCAL NEAR ansiclose()
 	ttclose();
 }
 
-PASCAL NEAR ansikopen()	/* open the keyboard (a noop here) */
+int PASCAL NEAR ansikopen()	/* open the keyboard (a noop here) */
 
 {
 }
 
-PASCAL NEAR ansikclose()	/* close the keyboard (a noop here) */
+int PASCAL NEAR ansikclose()	/* close the keyboard (a noop here) */
 
 {
 }
@@ -535,7 +535,7 @@ void PASCAL NEAR dobbnmouse()
  *	that come from function keys, mouse reports, and cursor location
  *	reports, and return them using Emacs's coding of these events.
  */
-PASCAL NEAR ansigetc()
+int PASCAL NEAR ansigetc()
 {
     int ch;
 
@@ -572,7 +572,7 @@ PASCAL NEAR ansigetc()
     }
 }
 #else
-PASCAL NEAR  ansigetc() {return( ttgetc());}
+int PASCAL NEAR  ansigetc() {return( ttgetc());}
 #endif
 
 #if	FLABEL
@@ -586,7 +586,7 @@ int f,n;	/* default flag, numeric argument [unused] */
 }
 #endif
 #else
-ansihello()
+void ansihello()
 {
 }
 #endif

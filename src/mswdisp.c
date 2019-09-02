@@ -88,11 +88,11 @@ void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont)
     GetTextMetrics (hDC, &Metrics);
     SelectObject (hDC, hPrevFont);
     ReleaseDC (hFrameWnd, hDC);
-    cm->SizeX = Metrics.tmAveCharWidth;
+    cm->SizeX = (SHORT)Metrics.tmAveCharWidth;
     if (cm->SizeX == 0) cm->SizeX = 1;  /* ATM gives 0 sometimes !!! */
-    cm->SizeY = Metrics.tmHeight;
+    cm->SizeY = (SHORT)Metrics.tmHeight;
     if (cm->SizeY == 0) cm->SizeY = 1;
-    cm->HalfLeadingY = Metrics.tmExternalLeading / 2;
+    cm->HalfLeadingY = (SHORT)Metrics.tmExternalLeading / 2;
     cm->OffsetX = cm->SizeX / 4;
     if ((cm->OffsetY = (cm->SizeY / 8) - cm->HalfLeadingY) < 0) {
 	cm->OffsetY = 0;
@@ -101,7 +101,7 @@ void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont)
     }
     cm->LeadingY = 2 * cm->HalfLeadingY;
     cm->MLHeight = cm->SizeY + cm->LeadingY + (2 * cm->OffsetY) +
-                   GetSystemMetrics(SM_CYBORDER);
+                   (short)GetSystemMetrics(SM_CYBORDER);
 } /* BuildCellMetrics */
 
 /* InvalidateCells: marks character cells for repaint */
@@ -145,7 +145,7 @@ void FAR PASCAL InvalidateCells (HWND hWnd, int leftcol, int toprow,
 /* =================                                         */
 
 void FAR PASCAL MinimumClientSize (HWND hWnd, int NCols, int NRows,
-				   int *Width, int *Height)
+	long *Width, long *Height)
 
 /* The values pointed by Height and Width are set to the smallest value
    that allows displaying NRows rows and NCols columns. A NULL pointer
@@ -250,7 +250,7 @@ void FAR PASCAL EmacsCaret (BOOL Show)
 		    }
 
 		    if (hCaretWnd == hFrameWnd) {
-		    	xsize = GetSystemMetrics (SM_CXBORDER);
+		    	xsize = (short)GetSystemMetrics (SM_CXBORDER);
 		    	ysize = EmacsCM.SizeY;
 		    }
 		    else {
@@ -387,7 +387,7 @@ void FAR PASCAL GetMinMaxInfo (HWND hWnd, LPPOINT rgpt)
 	rgpt[4] = rgpt[1];
     }
     else {                  /* compute minimum tracking size */
-        int     X, Y;
+        long     X, Y;
 
         /* minimum displayed text width = 3 */
         /* minimum displayed text  height = 10 */
@@ -567,7 +567,9 @@ void FAR PASCAL ScrPaint (HWND hWnd)
     } while (++Row <= BottomRow);
 
     SelectObject (ps.hdc, hPrevFont);
-EndScrPaint:
+
+/* EndScrPaint:  */
+
     EndPaint (hWnd, &ps);
 } /* ScrPaint */
 
@@ -615,7 +617,7 @@ void FAR PASCAL MLPaint (void)
 /* spal:    set palette from $palette string */
 /* ====                                      */
 
-PASCAL spal (char *pstr)
+int PASCAL spal (char *pstr)
 {
 #if     COLOR
     int     pal;	/* current palette position */

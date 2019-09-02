@@ -455,7 +455,7 @@ char *filespec;		/* filespec to unlock */
 }
 
 #else
-dolhello()
+void dolhello()
 {
 }
 #endif

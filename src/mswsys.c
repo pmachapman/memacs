@@ -46,7 +46,7 @@ static CATCHBUF ExitCatchBuf;
 #endif
 
 static int  Sleeping = 0;           /* flag for TakeANap() */
-static int  TimeSlice;
+static unsigned  TimeSlice;
 static BOOL LongOperation = FALSE;  /* for longop() and GetCharacter() */
 static BOOL HourglassOn = FALSE;    /* between SetHourglass & UpdateCursor */
 static BOOL SystemModal = FALSE;    /* indicates that the Yes/No message
@@ -83,7 +83,7 @@ char *PASCAL timeset()
 /* longop:    to be called regularly while a long operation is in progress */
 /* ========                                                                */
 
-PASCAL longop (int f)
+void PASCAL longop (int f)
 
 /* f is TRUE to set long operation status and FALSE to reset that status */
 /* when a long operation is signaled at least twice, the hourglass
@@ -125,7 +125,7 @@ PASCAL longop (int f)
 /* mlyesno: ask a yes/no question */
 /* =======                        */
 
-PASCAL mlyesno (char *prompt)
+int PASCAL mlyesno (char *prompt)
 
 /* This function replaces the mlyesno from input.c. Instead of asking a
    question on the message line, it pops up a message box */
@@ -164,7 +164,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 /* returns FALSE if failed init */
 {
     WNDCLASS    wc;
-    HMENU       hSysMenu;
+    /* HMENU       hSysMenu; */
     char        text [TXTSIZ];
     POINT       InitPos;
     int         Colors;
@@ -176,6 +176,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 #if WINDOW_MSWIN32
     Win386Enhanced = FALSE;
     Win31API = TRUE;
+	((void)w);	/* unreferenced local variable warning */
 #else
     Win386Enhanced = GetWinFlags () & WF_ENHANCED;
     w = LOWORD(GetVersion());
@@ -212,7 +213,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 			       MicroEMACS executable directory */
     }
 
-    TimeSlice = GetPrivateProfileInt (ProgName, "TimeSlice", 100, IniFile);
+    TimeSlice = (unsigned)GetPrivateProfileInt (ProgName, "TimeSlice", 100, IniFile);
 
     Colors = GetPrivateProfileInt (ProgName, "Colors", 0, IniFile);
 
@@ -252,7 +253,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 
     /*-Register the frame window class */
     wc.style        = 0;
-    wc.lpfnWndProc  = (void*)&FrameWndProc;
+    wc.lpfnWndProc  = FrameWndProc;
     wc.cbClsExtra   = 0;
     wc.cbWndExtra   = FRMWNDEXTRA;
     wc.hInstance    = hEmacsInstance;
@@ -268,7 +269,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
     strcat (text, "_screen");
     ScreenClassName = copystr(text);
     wc.style        = 0;
-    wc.lpfnWndProc  = (void*)&ScrWndProc;
+    wc.lpfnWndProc  = ScrWndProc;
     wc.cbClsExtra   = 0;
     wc.cbWndExtra   = SCRWNDEXTRA;
     wc.hInstance    = hEmacsInstance;
@@ -372,7 +373,7 @@ static void PASCAL  SetFrameCaption (void)
 BOOL EXPORT FAR PASCAL BroadcastEnumProc (HWND hWnd, LPARAM lParam)
 {
     char    ClassName [sizeof(FrameClassName)+1];
-    UINT    RetVal;
+    UINT_PTR    RetVal;
     
     if (hWnd != hFrameWnd) {
         ClassName[0] = '\0';
@@ -383,7 +384,7 @@ BOOL EXPORT FAR PASCAL BroadcastEnumProc (HWND hWnd, LPARAM lParam)
                 /*-compute max of all returned values */
                 RetVal = SendMessage (hWnd, EmacsBroadcastMsg,
                                       (WPARAM)hFrameWnd, lParam);
-		BroadcastVal = max(BroadcastVal, RetVal);
+		BroadcastVal = max(BroadcastVal, (DWORD)RetVal);
 	    }
 	    else {
 		/*-compute number of applications */
@@ -410,9 +411,9 @@ static DWORD PASCAL   EmacsBroadcast (DWORD MsgParam)
 
 */
 {
-    FARPROC ProcInstance;
+	WNDENUMPROC ProcInstance;
 
-    ProcInstance = MakeProcInstance ((FARPROC)BroadcastEnumProc,
+    ProcInstance = MakeProcInstance (BroadcastEnumProc,
 				     hEmacsInstance);
     BroadcastVal = 0;
     EnumWindows (ProcInstance, MsgParam);
@@ -423,7 +424,7 @@ static DWORD PASCAL   EmacsBroadcast (DWORD MsgParam)
 /* MDIClientSubProc:    Subclassing window proc for the MDI Client window */
 /* ================                                                       */
 
-LONG EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LRESULT EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				         LPARAM lParam)
 {
     switch (wMsg) {
@@ -510,7 +511,7 @@ void FAR PASCAL FrameInit (CREATESTRUCT *cs)
 				  (LPSTR) (LPCLIENTCREATESTRUCT) &ccs);
     if (hMDIClientWnd) {
         /* we subclass the MDIClient */
-        FARPROC ProcInstance;
+		WNDPROC ProcInstance;
 #if WINXP
 		MDIClientProc = (WNDPROC)GetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC);
 		ProcInstance = MakeProcInstance(MDIClientSubProc, hEmacsInstance);
@@ -558,7 +559,7 @@ static BOOL  PASCAL CloseEmacs (UINT wMsg)
 
 /* ScrWndProc:  MDI child (screen) window function */
 /* ==========                                      */
-LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				   LPARAM lParam)
 {
     switch (wMsg) {
@@ -746,7 +747,7 @@ DefaultProc:
 
 /* FrameWndProc:    frame window function */
 /* ============                           */
-LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LRESULT EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				     LPARAM lParam)
 {
     switch (wMsg) {
@@ -761,7 +762,7 @@ LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 
     case WM_MENUCHAR:
 	{
-	    LONG    Code;
+	    LRESULT    Code;
 	    
 	    Code = DefFrameProc (hWnd, hMDIClientWnd, wMsg, wParam, lParam);
 	    if (HIWORD(Code) != 0) return Code; /* matches a menu command */
@@ -887,9 +888,9 @@ LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	
     case WM_DESTROY:
 #if WINXP
-	if (MainHelpUsed) HtmlHelp (hFrameWnd, MainHelpFile, HH_CLOSE_ALL, NULL);
+	if (MainHelpUsed) HtmlHelp (hFrameWnd, MainHelpFile, HH_CLOSE_ALL, 0);
 	if (HelpEngineFile[0] != '\0') HtmlHelp (hFrameWnd, HelpEngineFile,
-                                                HH_CLOSE_ALL, NULL);
+                                                HH_CLOSE_ALL, 0);
 #else
 	if (MainHelpUsed) WinHelp(hFrameWnd, MainHelpFile, HELP_QUIT, NULL);
 	if (HelpEngineFile[0] != '\0') WinHelp(hFrameWnd, HelpEngineFile,

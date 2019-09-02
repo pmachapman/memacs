@@ -129,8 +129,8 @@
 
 /*	Windowing system style (pick one)				*/
 
-#define WINDOW_TEXT	1		/* [default] Text mode		*/
-#define WINDOW_MSWIN	0		/* MicroSoft Windows		*/
+#define WINDOW_TEXT	0		/* [default] Text mode		*/
+#define WINDOW_MSWIN	1		/* MicroSoft Windows		*/
 #define WINDOW_MSWIN32	0		/* MicroSoft Windows 32 bit API */
 #define WINDOW_X	0		/* X/Unix			*/
 
@@ -554,7 +554,7 @@ union REGS {
 #define MOUS	0x1000		/* alternative input device (mouse)	*/
 #define SHFT	0x2000		/* shifted (for function keys)		*/
 #define ALTD	0x4000		/* ALT key...				*/
-#define MENU	MOUS+SPEC	/* menu selection (WINDOW_MSWIN)	*/
+#define MENU	(MOUS+SPEC)	/* menu selection (WINDOW_MSWIN)	*/
 
 #define BINDNUL 0		/* not bound to anything		*/
 #define BINDFNC 1		/* key bound to a function		*/

@@ -224,7 +224,7 @@ int f,n;	/* prefix flag and argument */
 {
 	register BUFFER *bp;	/* ptr to buffer to dump */
 	register LINE *lp;	/* ptr to current line in our buffer */
-	register llength;	/* length of the current line being examined */
+	register int llength;	/* length of the current line being examined */
 	char cur_sym[MAXSYM+1];	/* current symbol being defined */
 	char cur_exp[NSTRING];	/* current expansion */
 	
@@ -264,6 +264,7 @@ int f,n;	/* prefix flag and argument */
 		/* on to the next pair */
 		lp = lforw(lp);
 	}
+	return(TRUE);
 }
 
 VOID PASCAL NEAR ab_init()
@@ -299,7 +300,7 @@ char *expansion;	/* string to expand to */
 		ab_delete(sym);
 
 	/* allocate a new node to hold abbreviation */
-	new_node = (ABBREV *)room(sizeof(ABBREV)+strlen(expansion)+1);
+	new_node = (ABBREV *)room(sizeof(ABBREV)+(int)strlen(expansion)+1);
 	if (new_node == NULL)
 		return(FALSE);
 

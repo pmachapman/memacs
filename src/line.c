@@ -40,8 +40,8 @@ register int used;
 /*                      "%%Out of memory" */
 		return(NULL);
 	}
-	lp->l_size = used;
-	lp->l_used = used;
+	lp->l_size = (short)used;
+	lp->l_used = (short)used;
 #if	WINDOW_MSWIN
 	{
 		static int o = 0;
@@ -60,7 +60,7 @@ register int used;
  * might be in. Release the memory. The buffers are updated too; the magic
  * conditions described in the above comments don't hold here.
  */
-PASCAL NEAR lfree(lp)
+void PASCAL NEAR lfree(lp)
 register LINE	*lp;
 {
 	register BUFFER *bp;
@@ -129,7 +129,7 @@ register LINE	*lp;
  * displayed in more than 1 window we change EDIT t HARD. Set MODE if the
  * mode line needs to be updated (the "*" has to be set).
  */
-PASCAL NEAR lchange(flag)
+void PASCAL NEAR lchange(flag)
 register int	flag;
 {
 	register EWINDOW *wp;
@@ -158,7 +158,7 @@ register int	flag;
 	}
 }
 
-PASCAL NEAR insspace(f, n)	/* insert spaces forward into text */
+int PASCAL NEAR insspace(f, n)	/* insert spaces forward into text */
 
 int f, n;	/* default flag and numeric argument */
 
@@ -220,9 +220,9 @@ char *instr;
  */
 
 #if	PROTO
-PASCAL NEAR linsert(int n, char c)
+int PASCAL NEAR linsert(int n, char c)
 #else
-PASCAL NEAR linsert(n, c)
+int PASCAL NEAR linsert(n, c)
 
 int	n;
 char	c;
@@ -267,7 +267,7 @@ char	c;
 		}
 		if ((lp2=lalloc(BSIZE(n))) == NULL)	/* Allocate new line	*/
 			return(FALSE);
-		lp2->l_used = n;
+		lp2->l_used = (short)n;
 		lp3 = lp1->l_bp;		/* Previous line	*/
 		lp3->l_fp = lp2;		/* Link in		*/
 		lp2->l_fp = lp1;
@@ -276,14 +276,14 @@ char	c;
 		for (i=0; i<n; ++i)
 			lp2->l_text[i] = c;
 		curwp->w_dotp = lp2;
-		curwp->w_doto = n;
+		curwp->w_doto = (short)n;
 		return(TRUE);
 	}
 	doto = curwp->w_doto;			/* Save for later.	*/
 	if (lp1->l_used+n > lp1->l_size) {	/* Hard: reallocate	*/
 		if ((lp2=lalloc(BSIZE(lp1->l_used+n))) == NULL)
 			return(FALSE);
-		lp2->l_used = lp1->l_used+n;
+		lp2->l_used = (short)(lp1->l_used+n);
 		cp1 = &lp1->l_text[0];
 		cp2 = &lp2->l_text[0];
 		while (cp1 != &lp1->l_text[doto])
@@ -298,7 +298,7 @@ char	c;
 		free((char *) lp1);
 	} else {				/* Easy: in place	*/
 		lp2 = lp1;			/* Pretend new line	*/
-		lp2->l_used += n;
+		lp2->l_used += (short)n;
 		cp2 = &lp1->l_text[lp1->l_used];
 		cp1 = cp2-n;
 		while (cp1 != &lp1->l_text[doto])
@@ -317,13 +317,13 @@ char	c;
 			if (wp->w_dotp == lp1) {
 				wp->w_dotp = lp2;
 				if (wp==curwp || wp->w_doto>doto)
-					wp->w_doto += n;
+					wp->w_doto += (short)n;
 			}
 			for (cmark = 0; cmark < NMARKS; cmark++) {
 				if (wp->w_markp[cmark] == lp1) {
 					wp->w_markp[cmark] = lp2;
 					if (wp->w_marko[cmark] > doto)
-						wp->w_marko[cmark] += n;
+						wp->w_marko[cmark] += (short)n;
 				}
 			}
 			wp = wp->w_wndp;
@@ -341,9 +341,9 @@ char	c;
  */
 
 #if	PROTO
-PASCAL NEAR lowrite(char c)
+int PASCAL NEAR lowrite(char c)
 #else
-PASCAL NEAR lowrite(c)
+int PASCAL NEAR lowrite(c)
 
 char c;		/* character to overwrite on current position */
 #endif
@@ -420,7 +420,7 @@ int PASCAL NEAR lnewline()
 	cp2 = &lp1->l_text[0];
 	while (cp1 != &lp1->l_text[lp1->l_used])
 		*cp2++ = *cp1++;
-	lp1->l_used -= doto;
+	lp1->l_used -= (short)doto;
 	lp2->l_bp = lp1->l_bp;
 	lp1->l_bp = lp2;
 	lp2->l_bp->l_fp = lp2;
@@ -438,14 +438,14 @@ int PASCAL NEAR lnewline()
 				if (wp->w_doto < doto)
 					wp->w_dotp = lp2;
 				else
-					wp->w_doto -= doto;
+					wp->w_doto -= (short)doto;
 			}
 			for (cmark = 0; cmark < NMARKS; cmark++) {
 				if (wp->w_markp[cmark] == lp1) {
 					if (wp->w_marko[cmark] < doto)
 						wp->w_markp[cmark] = lp2;
 					else
-						wp->w_marko[cmark] -= doto;
+						wp->w_marko[cmark] -= (short)doto;
 				}
 			}
 			wp = wp->w_wndp;
@@ -470,7 +470,7 @@ should be put in the kill buffer.
 
 */
 
-PASCAL NEAR ldelete(n, kflag)
+int PASCAL NEAR ldelete(n, kflag)
 
 long n; 	/* # of chars to delete */
 int kflag;	/* put killed text in kill buffer flag */
@@ -559,7 +559,7 @@ int kflag;	/* put killed text in kill buffer flag */
 			/* copy what is left of the line upward */
 			while (cp2 != &dotp->l_text[dotp->l_used])
 				*cp1++ = *cp2++;
-			dotp->l_used -= chunk;
+			dotp->l_used -= (short)chunk;
 	
 			/* fix any other windows with the same text displayed */
 			wp = wheadp;
@@ -567,17 +567,17 @@ int kflag;	/* put killed text in kill buffer flag */
 	
 				/* reset the dot if needed */
 				if (wp->w_dotp==dotp && wp->w_doto>=doto) {
-					wp->w_doto -= chunk;
+					wp->w_doto -= (short)chunk;
 					if (wp->w_doto < doto)
-						wp->w_doto = doto;
+						wp->w_doto = (short)doto;
 				}
 	
 				/* reset any marks if needed */
 				for (cmark = 0; cmark < NMARKS; cmark++) {
 					if (wp->w_markp[cmark]==dotp && wp->w_marko[cmark]>=doto) {
-						wp->w_marko[cmark] -= chunk;
+						wp->w_marko[cmark] -= (short)chunk;
 						if (wp->w_marko[cmark] < doto)
-							wp->w_marko[cmark] = doto;
+							wp->w_marko[cmark] = (short)doto;
 					}
 				}
 	
@@ -642,10 +642,10 @@ int kflag;	/* put killed text in kill buffer flag */
 	
 			/* save deleted characters for an undo... */
 			if (undoflag == TRUE) {
-				curwp->w_doto -= chunk;
+				curwp->w_doto -= (short)chunk;
 				obj.obj_sptr = cp2;
 				undo_insert(OP_DSTR, (long)chunk, obj);
-				curwp->w_doto += chunk;
+				curwp->w_doto += (short)chunk;
 			}
 
 			/* save the text to the kill buffer */
@@ -660,8 +660,8 @@ int kflag;	/* put killed text in kill buffer flag */
 			/* copy what is left of the line downward */
 			while (cp1 != &dotp->l_text[dotp->l_used])
 				*cp2++ = *cp1++;
-			dotp->l_used -= chunk;
-			curwp->w_doto -= chunk;
+			dotp->l_used -= (short)chunk;
+			curwp->w_doto -= (short)chunk;
 	
 			/* fix any other windows with the same text displayed */
 			wp = wheadp;
@@ -669,17 +669,17 @@ int kflag;	/* put killed text in kill buffer flag */
 	
 				/* reset the dot if needed */
 				if (wp->w_dotp==dotp && wp->w_doto>=doto) {
-					wp->w_doto -= chunk;
+					wp->w_doto -= (short)chunk;
 					if (wp->w_doto < doto)
-						wp->w_doto = doto;
+						wp->w_doto = (short)doto;
 				}
 	
 				/* reset any marks if needed */
 				for (cmark = 0; cmark < NMARKS; cmark++) {
 					if (wp->w_markp[cmark]==dotp && wp->w_marko[cmark]>=doto) {
-						wp->w_marko[cmark] -= chunk;
+						wp->w_marko[cmark] -= (short)chunk;
 						if (wp->w_marko[cmark] < doto)
-							wp->w_marko[cmark] = doto;
+							wp->w_marko[cmark] = (short)doto;
 					}
 				}
 	
@@ -728,7 +728,7 @@ char *rline;
 
 /* putctext:	replace the current line with the passed in text	*/
 
-PASCAL NEAR putctext(iline)
+int PASCAL NEAR putctext(iline)
 
 char *iline;	/* contents of new line */
 
@@ -886,7 +886,7 @@ char *text;	/* line to add */
 	register int	ntext;
 
 	/* allocate the memory to hold the line */
-	ntext = strlen(text);
+	ntext = (int)strlen(text);
 	if ((lp=lalloc(ntext)) == NULL)
 		return(FALSE);
 
@@ -1062,8 +1062,8 @@ int f,n;	/* prefix flag and argument */
 {
 	register int counter;	/* counter into kill buffer data */
 	register char *sp;	/* pointer into string to insert */
-	short int curoff;	/* storage for line before yanking */
-	LINE *curline;
+	short int curoff=0;	/* storage for line before yanking */
+	LINE *curline=NULL;
 	KILL *kptr;		/* pointer into kill buffer */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/

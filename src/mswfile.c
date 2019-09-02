@@ -9,6 +9,7 @@
 #include    <stdio.h>
 #include    "eproto.h"
 #include    "edef.h"
+#include	"elang.h"
 
 #if WINNT || WINXP
 #define FNAMELEN NFILEN
@@ -55,7 +56,7 @@ static  char    StarName [FNAMELEN] = "*.*";    /* starname */
 static  PARAMS  *Par;
 
 /* function prototypes */
-int EXPORT FAR PASCAL FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+INT_PTR EXPORT FAR PASCAL FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                    LPARAM lParam);
 static void    CompletePath (char *s, char *FileName);
 static void    UpdateAll (HWND hDlg, char *s);
@@ -131,13 +132,60 @@ char * PASCAL   fullpathname (char *PathName, int Nbuf)
     return PathName;
 } /* fullpathname */
 
+static
+int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
+{
+	BOOL success = FALSE;
+	int i = 0;
+	OPENFILENAME ofn = { 0 };
+	char fileName[NFILEN] = { '\0' };
+	char    DlgTitle[sizeof(PROGNAME) + 3 + 30];
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = hFrameWnd;
+	ofn.hInstance = hEmacsInstance;
+	ofn.lpstrFilter = "All Files\0*.*\0\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = NFILEN;
+
+	strcpy(DlgTitle, ProgName);
+	strcat(DlgTitle, " - ");
+	strncat(DlgTitle, prompt, 30); /* hopefully, the prompt is under 30 char! */
+	i = (int)strlen(DlgTitle) - 1;
+	while (DlgTitle[i] == ' ')
+	{
+		i--;
+	}
+	if (DlgTitle[i] == ':')
+	{
+		DlgTitle[i] = 0;
+	}
+	ofn.lpstrTitle = DlgTitle;
+	ofn.Flags = OFN_ENABLESIZING | OFN_NOCHANGEDIR;
+
+	if (0 == strcmp(TEXT144, prompt))
+	{
+		success = GetSaveFileName(&ofn);
+	}
+	else
+	{
+		success = GetOpenFileName(&ofn);
+	}
+
+	if (success)
+	{
+		strcpy(buf, ofn.lpstrFile);
+	}
+	return success;
+}
+
 /* filenamedlg: equivalent of mlreply, but specifically to get a filename */
 /* ===========                                                            */
 
-PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
+int PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
 {
     PARAMS  Parameters;
-    FARPROC ProcInstance;
+	DLGPROC ProcInstance;
     BOOL    Result;
 
     SetWorkingDir ();
@@ -148,16 +196,23 @@ PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
         }
         return Result;
     }
+#if WINVER >= _WIN32_WINNT_WIN2K
+	((void)ProcInstance);
+	((void)Parameters);
+	/* Use GetOpenFileName() if available. */
+	return filenamedlg_ofn(prompt, buf, nbuf, fullpath);
+#else
     Parameters.Prompt = prompt;
     Par = &Parameters;
-    ProcInstance = MakeProcInstance ((FARPROC)FileDlgProc, hEmacsInstance);
-    if (Result = (DialogBox (hEmacsInstance, "FILE", hFrameWnd,
-                             ProcInstance) >= 0)) {
+    ProcInstance = MakeProcInstance (FileDlgProc, hEmacsInstance);
+    if ( 0 != (Result = (DialogBox (hEmacsInstance, "FILE", hFrameWnd,
+                             ProcInstance) >= 0)) ) {
         CompletePath (buf, Parameters.Name);
     }
     FreeProcInstance (ProcInstance);
     SetWorkingDir ();
     return Result;
+#endif
 } /* filenamedlg */
 
 /* FileDlgOK:   process OK in File Dialog */
@@ -181,7 +236,7 @@ static BOOL PASCAL FileDlgOK (HWND hDlg)
 	int     l;
 	char    *n;
 
-	l = strlen (s);
+	l = (int)strlen (s);
 	n = &s[l - 1];
 	if ((*n == '\\') || (*n == ':')) {
 	    /* it is a directory or drive */
@@ -202,11 +257,11 @@ static BOOL PASCAL FileDlgOK (HWND hDlg)
 	    return FALSE;
 ExtractedOK:
 	    strcpy (Par->Name, ++n);
-	    if (n - &s[0] < NFILEN - 1 - strlen(StarName)) {
+	    if (n - &s[0] < NFILEN - 1 - (int)strlen(StarName)) {
 		strcpy (n, StarName);
 		/* now, we use DlgDirList to generate the full directory
 		   path */
-		if (DlgDirList (hDlg, s, NULL, ID_PATH, ATTR_FIL)) {
+		if (DlgDirList (hDlg, s, 0, ID_PATH, ATTR_FIL)) {
 		    getcwd (Path, NFILEN);
 		    EndDialog (hDlg, 0);
 		    return TRUE;
@@ -227,7 +282,7 @@ ExtractedOK:
 static BOOL PASCAL FileNameCompletion (HWND hDlg)
 {
     char    s [NFILEN];
-    int     i;
+    LRESULT     i;
     BOOL    PleaseComplete = FALSE;
 
     i = GetDlgItemText (hDlg, ID_FILENAME, s, NFILEN);
@@ -236,7 +291,7 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
 	s[i] = '\0';
     }
     if (PleaseComplete) {
-	DWORD   LastSel;
+	LRESULT   LastSel;
 
 	LastSel = SendDlgItemMessage (hDlg, ID_FILENAME, EM_GETSEL, 0, 0L);
         SetDlgItemText (hDlg, ID_FILENAME, s);  /* remove the spaces */
@@ -253,7 +308,7 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
 			   completion so we do not attempt anything */
     }
     i = SendDlgItemMessage (hDlg, ID_FILES, LB_SELECTSTRING,
-                            -1, (LPARAM)(LPSTR)&s[0]);
+                            (WPARAM)-1, (LPARAM)(LPSTR)&s[0]);
     if (i == LB_ERR) {
         /* no match, give up! */
         return FALSE;
@@ -278,7 +333,7 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
 
 /* FileDlgProc: Open file dialog function */
 /* ===========                            */
-int EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+INT_PTR EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                     LPARAM lParam)
 {
     char    s [NFILEN];    /* all purpose */
@@ -294,7 +349,7 @@ int EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 	    strcat (DlgTitle, " - ");
 	    strcat (DlgTitle, Par->Prompt); /* hopefully, the prompt is
 					       under 30 char! */
-	    i = strlen (DlgTitle) - 1;
+	    i = (int)strlen (DlgTitle) - 1;
 	    while (DlgTitle[i] == ' ') i--;
 	    if (DlgTitle[i] == ':') DlgTitle[i] = 0;
 	        /* we remove the colon+spaces at the end of the prompt */
@@ -339,7 +394,7 @@ int EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 	    default:
 	        if ((c > 0x1F) && (c < 0x7F)) {
 	            /* regular ASCII char, stuff it into the filename */
-	            s[i++] = c;
+	            s[i++] = (char)c;
 	        }
 	        /* else, discard it */
 	        break;
@@ -372,7 +427,7 @@ NoMoreTypeAhead:
 	    switch (NOTIFICATION_CODE) {
 	    case LBN_SELCHANGE:
 #if WINDOW_MSWIN32
-		DlgDirSelectEx (hDlg, s, NFILEN -1 - strlen (StarName),
+		DlgDirSelectEx (hDlg, s, NFILEN -1 - (int)strlen (StarName),
                                 ID_DIRECTORIES);
 #else
 		DlgDirSelect (hDlg, s, ID_DIRECTORIES);
@@ -393,7 +448,7 @@ NoMoreTypeAhead:
 #else
 		DlgDirSelect (hDlg, s, ID_FILES);
 #endif
-		i = strlen (s) - 1;
+		i = (int)strlen (s) - 1;
 		if (s[i] == '.') s[i] = 0;  /* zap dot at end of file
 					       name */
 	        SetDlgItemText (hDlg, ID_FILENAME, s);
@@ -443,7 +498,7 @@ static void    UpdateAll (HWND hDlg, char *s)
     if (DlgDirList (hDlg, s, ID_DIRECTORIES, ID_PATH, ATTR_DIR)) {
         getcwd (Path, NFILEN);
         strcpy (StarName, s);
-	DlgDirList (hDlg, s, ID_FILES, NULL, ATTR_FIL);
+	DlgDirList (hDlg, s, ID_FILES, 0, ATTR_FIL);
         SetDlgItemText (hDlg, ID_FILENAME, StarName);
 #if WINDOW_MSWIN32
 	SendDlgItemMessage (hDlg, ID_FILENAME, EM_SETSEL, 0, -1);
@@ -552,14 +607,14 @@ char *fspec;	/* pattern to match */
 
 	/* first parse the file path off the file spec */
 	strcpy(path, fspec);
-	index = strlen(path) - 1;
+	index = (int)strlen(path) - 1;
 	while (index >= 0 && (path[index] != '/' &&
 				path[index] != '\\' && path[index] != ':'))
 		--index;
 	path[index+1] = 0;
 
 	/* check for an extension */
-	point = strlen(fspec) - 1;
+	point = (int)strlen(fspec) - 1;
 	extflag = FALSE;
 	while (point > index) {
 		if (fspec[point] == '.') {
@@ -603,10 +658,12 @@ char *fspec;	/* pattern to match */
 char *PASCAL getnfile()
 
 {
+#if 0
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
 	register int extflag;		/* does the file have an extention? */
 	char fname[NFILEN];		/* file/path for DOS call */
+#endif // 0
 
 	/* and call for the next file */
 #if WINDOW_MSWIN32

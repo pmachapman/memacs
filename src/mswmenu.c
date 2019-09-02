@@ -225,7 +225,7 @@ void FAR PASCAL GenerateMenuSeq (UINT ID)
 
 /* AboutDlgProc:  About box dialog function */
 /* ============                             */
-int EXPORT FAR PASCAL  AboutDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+INT_PTR EXPORT FAR PASCAL  AboutDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                      LPARAM lParam)
 {
     char    s [50];
@@ -295,7 +295,7 @@ BOOL  PASCAL    GetCheck (HWND hDlg, int BoxID)
 /* must be invoked through DialogBoxParam, with LOWORD(dwInitParam) set
    to TRUE for global modes and FALSE for current buffer modes */
 
-int EXPORT FAR PASCAL  ModeDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+INT_PTR EXPORT FAR PASCAL  ModeDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                     LPARAM lParam)
 {
     char    s[40+NBUFN];
@@ -453,7 +453,7 @@ int  PASCAL GetKeyText (int Key, char *Text, int TextLength)
 	if (*prefix_key_ptr == 0) {
 	    KEYTAB  *KTp;
 
-	    KTp = FindKeyBinding ((Key & CTLX) ? cex : meta);
+	    KTp = FindKeyBinding ( (void *)((Key & CTLX) ? cex : meta) );
 	    if (KTp->k_type == BINDNUL) return 0;
 	    *prefix_key_ptr = KTp->k_code;
 	}
@@ -762,14 +762,14 @@ void FAR PASCAL InitMenuPopup (HMENU hMenu, LPARAM lParam)
 
 static void PASCAL  SimulateExtendedKey (int ec)
 {
-    char    prefix;
+    char    lprefix;
 
     if (in_room(5)) {
-	prefix = ec >> 8;
-	if (prefix != 0) {
+		lprefix = (char)(ec >> 8);
+	if (lprefix != 0) {
 	    in_put (0);
-	    in_put (prefix);
-	    if (prefix & (MOUS >> 8)) {
+	    in_put (lprefix);
+	    if (lprefix & (MOUS >> 8)) {
 		/* in case the key is a mouse action, supply
 		   dummy mouse position info */
 		in_put (1);
@@ -788,7 +788,7 @@ static void PASCAL  SimulateExtendedKey (int ec)
 
 BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam)
 {
-    FARPROC     ProcInstance;
+    DLGPROC     ProcInstance;
 #if WINXP
     char        HelpTopic[NFILEN + NFILEN + 2];
 #else
@@ -800,7 +800,7 @@ BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam)
            valid even in the not-quiescent case */
 
     case IDM_ABOUT:
-	ProcInstance = MakeProcInstance ((FARPROC)AboutDlgProc,
+	ProcInstance = MakeProcInstance (AboutDlgProc,
 					 hEmacsInstance);
 	DialogBox (hEmacsInstance, "ABOUT", hFrameWnd, ProcInstance);
 	FreeProcInstance (ProcInstance);
@@ -839,7 +839,7 @@ BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam)
 		strcpy(HelpTopic, MainHelpFile);
 		strcat(HelpTopic, "::/html/help8f1v.htm");
 InvokeHelp:
-	HtmlHelp(hFrameWnd, HelpTopic, HH_HELP_FINDER, NULL);
+	HtmlHelp(hFrameWnd, HelpTopic, HH_HELP_FINDER, 0);
 #else
     case IDM_WHELPINDEX:
 	HelpContext = 0;
@@ -867,13 +867,13 @@ InvokeHelp:
 
 	case IDM_GLOBMODE:
 	case IDM_MODE:
-	    ProcInstance = MakeProcInstance ((FARPROC)ModeDlgProc,
+	    ProcInstance = MakeProcInstance (ModeDlgProc,
 					     hEmacsInstance);
 	    DialogBoxParam (hEmacsInstance, "MODES",
 			    hFrameWnd, ProcInstance,
 			    (DWORD)(wParam == IDM_GLOBMODE));
 	    FreeProcInstance (ProcInstance);
-	    if (wParam = IDM_MODE) {
+	    if ( 0 != (wParam = IDM_MODE) ) {
 		upmode ();
 		update (FALSE);
 	    }
@@ -912,7 +912,7 @@ InvokeHelp:
 	    
 	default:
 	    if (wParam >= IDM_FIRSTCHILD) return FALSE;
-	    GenerateMenuSeq (wParam);
+	    GenerateMenuSeq ((UINT)wParam);
 	    return TRUE;
 	}
     }
@@ -1009,7 +1009,7 @@ static BOOL PASCAL  ParseMenu (char *Name, char *Title, int *Posp)
             unsigned char *s;
 
             *Posp = 0;
-            for (s = &Name[i+1]; (*s != '>') && (*s != '\0'); s++) {
+            for (s = (unsigned char *)(&Name[i+1]); (*s != '>') && (*s != '\0'); s++) {
                 if ((*s >= '0') && (*s <= '9')) {
                     *Posp = (*Posp * 10) + (*s - '0');
                 }
@@ -1057,7 +1057,7 @@ static BOOL PASCAL  LocateMenu (char *Name, CURMENU *CM)
     else hMenu = CM->cm_parent[CM->cm_x];
     PosOffset = MenuEntryOffset (hMenu);
     ItemCount = GetMenuItemCount (hMenu);
-    if (DoScan = (Pos < 0)) Pos = CM->cm_pos;
+    if ( 0 != (DoScan = (Pos < 0)) ) Pos = CM->cm_pos;
     if (Pos < 0) Pos = 0;
     Pos += PosOffset;
     StartPos = Pos;
@@ -1095,7 +1095,7 @@ static BOOL PASCAL  AddMenuEntry (char *Name, UINT ID, CURMENU *CM,
    MT_DUMMY indicates that the menu item is a mere separator, MT_MENUBAR
    indicates that the menu bar has been modified */
 {
-    HMENU   hMenu, hPopup;
+    HMENU   hMenu=NULL, hPopup=NULL;
     int     Pos;
     BOOL    Result;
     char    EntryName[MAXMENUTITLE];
@@ -1138,7 +1138,7 @@ static BOOL PASCAL  AddMenuEntry (char *Name, UINT ID, CURMENU *CM,
     }
     Result = InsertMenu (hMenu, Pos + MenuEntryOffset (hMenu),
                          MenuFlags | MF_BYPOSITION,
-                         Name ? (UINT)hPopup : ID,
+                         Name ? (UINT_PTR)hPopup : ID,
                          (LPSTR)&EntryName[0]);
     if (!Result) {
         mlwrite (TEXT302);  /* "[lack of resources]" */
@@ -1251,7 +1251,7 @@ static BOOL PASCAL  AddMenuBinding (ETYPE EPOINTER eptr, WORD type)
 /* bindtomenu:  bind a menu item to an emacs function */
 /* ==========                                         */
 
-PASCAL bindtomenu (int f, int n)
+int PASCAL bindtomenu (int f, int n)
 /* command arguments IGNORED */
 {
     ETYPE EPOINTER  e;
@@ -1267,7 +1267,7 @@ PASCAL bindtomenu (int f, int n)
 /* macrotomenu: bind a menu item to a macro (i.e. a buffer) */
 /* ===========                                              */
 
-PASCAL macrotomenu (int f, int n)
+int PASCAL macrotomenu (int f, int n)
 /* command arguments IGNORED */
 {
     ETYPE EPOINTER  e;
@@ -1295,7 +1295,7 @@ static BOOL PASCAL  DeleteMenuBinding (HMENU hMenu, int Pos)
 /* returns TRUE except when an attempt is made to delete the 'Screen'
    menu */
 {
-    BOOL    Result;
+/*    BOOL    Result;  */
     UINT    ID;
     HMENU   hPopup;
 
@@ -1330,7 +1330,7 @@ static BOOL PASCAL  DeleteMenuBinding (HMENU hMenu, int Pos)
 /* unbindmenu:  remove a menu entry */
 /* ==========                       */
 
-PASCAL unbindmenu (int f, int n)
+int PASCAL unbindmenu (int f, int n)
 /* command arguments IGNORED */
 {
     BOOL    Result;

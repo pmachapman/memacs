@@ -51,7 +51,7 @@ int PASCAL NEAR reglines()
  * Move "." to the start, and kill the characters.
  * Bound to "C-W".
  */
-PASCAL NEAR killregion(f, n)
+int PASCAL NEAR killregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -87,7 +87,7 @@ int f,n;	/* prefix flag and argument */
  * at all. This is a bit like a kill region followed
  * by a yank. Bound to "M-W".
  */
-PASCAL NEAR copyregion(f, n)
+int PASCAL NEAR copyregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -129,7 +129,7 @@ int f,n;	/* prefix flag and argument */
  * redisplay is done in all buffers. Bound to
  * "C-X C-L".
  */
-PASCAL NEAR lowerregion(f, n)
+int PASCAL NEAR lowerregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -171,9 +171,9 @@ int f,n;	/* prefix flag and argument */
 			/* lowercase this character */
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_upper(c)) {
-				obj.obj_char = c;
+				obj.obj_char = (char)c;
 				c = lowerc(c);
-				lputc(curwp->w_dotp, curwp->w_doto, c);
+				lputc(curwp->w_dotp, curwp->w_doto, (char)c);
 				undo_insert(OP_REPC, 1L, obj);
 			}
 			++curwp->w_doto;
@@ -182,7 +182,7 @@ int f,n;	/* prefix flag and argument */
 
 	/* restore the dot position */
 	curwp->w_dotp = save_dotp;
-	curwp->w_doto = save_doto;
+	curwp->w_doto = (short)save_doto;
 	return(TRUE);
 }
 
@@ -194,7 +194,7 @@ int f,n;	/* prefix flag and argument */
  * redisplay is done in all buffers. Bound to
  * "C-X C-L".
  */
-PASCAL NEAR upperregion(f, n)
+int PASCAL NEAR upperregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -236,9 +236,9 @@ int f,n;	/* prefix flag and argument */
 			/* uppercase this character */
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 			if (is_lower(c)) {
-				obj.obj_char = c;
+				obj.obj_char = (char)c;
 				c = upperc(c);
-				lputc(curwp->w_dotp, curwp->w_doto, c);
+				lputc(curwp->w_dotp, curwp->w_doto, (char)c);
 				undo_insert(OP_REPC, 1L, obj);
 			}
 			++curwp->w_doto;
@@ -247,7 +247,7 @@ int f,n;	/* prefix flag and argument */
 
 	/* restore the dot position */
 	curwp->w_dotp = save_dotp;
-	curwp->w_doto = save_doto;
+	curwp->w_doto = (short)save_doto;
 	return(TRUE);
 }
 
@@ -255,7 +255,7 @@ int f,n;	/* prefix flag and argument */
 	the current buffer invisable and unchangable
 */
 
-PASCAL NEAR narrow(f, n)
+int PASCAL NEAR narrow(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -345,7 +345,7 @@ int f,n;	/* prefix flag and argument */
 
 /*	widen-from-region (^X->) restores a narrowed region	*/
 
-PASCAL NEAR widen(f, n)
+int PASCAL NEAR widen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -438,7 +438,7 @@ int f,n;	/* prefix flag and argument */
  * "ABORT" status; we might make this have the confirm thing later.
  */
 
-PASCAL NEAR getregion(rp)
+int PASCAL NEAR getregion(rp)
 
 register REGION *rp;
 
@@ -548,7 +548,7 @@ char *value;
 }
 
 
-PASCAL NEAR indent_region(f, n) /* indent a region n tab-stops */
+int PASCAL NEAR indent_region(f, n) /* indent a region n tab-stops */
 
 int f,n;	/* default flag and numeric repeat count */
 
@@ -587,7 +587,7 @@ int f,n;	/* default flag and numeric repeat count */
 	return(TRUE);
 }
 
-PASCAL NEAR undent_region(f, n) /* undent a region n tab-stops */
+int PASCAL NEAR undent_region(f, n) /* undent a region n tab-stops */
 
 int f,n;	/* default flag and numeric repeat count */
 

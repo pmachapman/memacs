@@ -67,7 +67,7 @@ static TAG *curtp = NULL;	/* Currently in-use 'tags'.	*/
  * return with TRUE only if we are succesfull.
  */
 
-newtags(path)
+int newtags(path)
 char path[NFILEN];
 	{
 	register TAG	*tnewp;
@@ -105,7 +105,7 @@ char path[NFILEN];
  * try it the hard way.  If we find the file we return TRUE.
  */
 
-lookup()
+int lookup()
 	{
 	TAG		*tmp = curtp;	/* Remember current 'tags'	*/
 	char		cpath[NFILEN];	/* Path of current file		*/
@@ -176,7 +176,7 @@ VOID fix_index()
  * str (but maximum lmax characters).  '.' is preserved.
  */
 
-restword(str, lmax)
+int restword(str, lmax)
 char *str;
 int  lmax;
 	{
@@ -193,7 +193,7 @@ int  lmax;
 
 	str[i] = 0;			/* Terminate word		*/
 	curwp->w_dotp = dotp;	/* Restore '.' 			*/
-	curwp->w_doto = doto;
+	curwp->w_doto = (short)doto;
 
 	return (TRUE);
 	}
@@ -207,7 +207,7 @@ int  lmax;
  * results from this code (I did).
  */
 
-backupword(f, n)
+int backupword(f, n)
 
 int f, n;
 
@@ -232,12 +232,12 @@ int f, n;
  * and search direction characters (? or /)
  */
 
-alterpattern(pattern)
+int alterpattern(pattern)
 register char pattern[];
 	{
 	register int	i = 0;	/* EMACS pattern index	*/
 	register int	j = 1;	/* VI pattern -skip /or?*/
-	int		len = strlen(pattern) - 1;	/* pattern length - 1	*/
+	int		len = (int)strlen(pattern) - 1;	/* pattern length - 1	*/
 						/* i.e. drop '/' or '?'	*/
 
 	if (pattern[len - 1] == '$')
@@ -298,7 +298,7 @@ char *filename;
  * so as to prevent loosing the return information.
  */
 
-tagger(errmsg, retag)
+int tagger(errmsg, retag)
 char *errmsg;
 int  retag;
 	{
@@ -309,7 +309,7 @@ int  retag;
 	int	ok = 1;			/* Tag search flag	*/
 	int	result = FALSE;	/* Default return value */
 	int	oldbmode;		/* For preserving bmode	*/
-	int	taglen = strlen(curtp->t_wd);
+	int	taglen = (int)strlen(curtp->t_wd);
 	int	file_ok;		/* TRUE if file found	*/
 
 	/* Tell user what we are doing		*/
@@ -430,7 +430,7 @@ int f, n;
 	fix_index();
 
 	curwp->w_dotp = pretagdotp;	/* Restore '.'	*/
-	curwp->w_doto = pretagdoto;
+	curwp->w_doto = (short)pretagdoto;
 
 	/* Ok, set file offset according to  curtp->t_wd (if any)	*/
 	if ((i = INDEX(*curtp->t_wd)) == -1 || curtp->t_dotos[i] == -1L)

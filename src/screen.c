@@ -66,7 +66,7 @@ SCREEN *sp;	/* screen image to refresh */
 	to A-N on machines with an ALT key
 */
 
-PASCAL NEAR cycle_screens(f, n)
+int PASCAL NEAR cycle_screens(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -82,7 +82,7 @@ int f,n;	/* prefix flag and argument */
 	return(select_screen(sp, TRUE));
 }
 
-PASCAL NEAR find_screen(f, n)
+int PASCAL NEAR find_screen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -113,7 +113,7 @@ int f,n;	/* prefix flag and argument */
 	return(select_screen(sp, TRUE));
 }
 
-PASCAL NEAR free_screen(sp)	/* free all resouces associated with a screen */
+void PASCAL NEAR free_screen(sp)	/* free all resouces associated with a screen */
 
 SCREEN *sp;	/* screen to dump */
 
@@ -149,7 +149,7 @@ SCREEN *sp;	/* screen to dump */
 	free((char *) sp);
 }
 
-int PASCAL NEAR unlist_screen(sp)
+void PASCAL NEAR unlist_screen(sp)
 
 SCREEN *sp;         /* screen to remove from the list */
 {
@@ -164,7 +164,7 @@ SCREEN *sp;         /* screen to remove from the list */
 	last_scr->s_next_screen = sp->s_next_screen;
 }
 
-PASCAL NEAR delete_screen(f, n)
+int PASCAL NEAR delete_screen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -266,12 +266,12 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 	wp->w_toprow = 0;
 #if	COLOR
 	/* initalize colors to global defaults */
-	wp->w_fcolor = gfcolor;
-	wp->w_bcolor = gbcolor;
+	wp->w_fcolor = (char)gfcolor;
+	wp->w_bcolor = (char)gbcolor;
 #endif
 	wp->w_fcol = 0;
 #if WINDOW_MSWIN
-	wp->w_ntrows = sp->s_nrow-1;
+	wp->w_ntrows = (char)(sp->s_nrow-1);
 #else
 	wp->w_ntrows = term.t_nrow-1;		/* "-1" for mode line.	*/
 #endif
@@ -336,6 +336,7 @@ int announce;	/* announce the selection? */
 
 	/* deselect the current window */
 #if     WINDOW_MSWIN
+		((void)temp_wp);	/* unreferenced local variable warning */
         curwp->w_flag |= WFMODE;
 #else
 	temp_wp = curwp;
@@ -396,7 +397,7 @@ int announce;	/* announce the selection? */
 	Bound to "A-B".
 */
 
-PASCAL NEAR list_screens(f, n)
+int PASCAL NEAR list_screens(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -418,7 +419,7 @@ int f,n;	/* prefix flag and argument */
  * is an error (if there is no memory). Iflag
  * indicates whether to list hidden screens.
  */
-PASCAL NEAR screenlist(iflag)
+int PASCAL NEAR screenlist(iflag)
 
 int iflag;	/* list hidden screen flag */
 

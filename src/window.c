@@ -15,14 +15,14 @@
  * bottom. If it is 0 the window is centered (this is what the standard
  * redisplay code does). With no argument it defaults to 0. Bound to M-!.
  */
-PASCAL NEAR reposition(f, n)
+int PASCAL NEAR reposition(f, n)
 
 int f, n;	/* prefix flag and argument */
 
 {
     if (f == FALSE)	/* default to 0 to center screen */
 	n = 0;
-    curwp->w_force = n;
+    curwp->w_force = (char)n;
     curwp->w_flag |= WFFORCE;
     return(TRUE);
     }
@@ -31,7 +31,7 @@ int f, n;	/* prefix flag and argument */
  * Refresh the screen. With no argument, it just does the refresh. With an
  * argument it recenters "." in the current window. Bound to "C-L".
  */
-PASCAL NEAR refresh(f, n)
+int PASCAL NEAR refresh(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -54,7 +54,7 @@ int f, n;	/* prefix flag and argument */
  * with an argument this command finds the <n>th window from the top
  *
  */
-PASCAL NEAR nextwind(f, n)
+int PASCAL NEAR nextwind(f, n)
 
 int f, n;	/* default flag and numeric argument */
 
@@ -101,7 +101,7 @@ int f, n;	/* default flag and numeric argument */
  * current window. There arn't any errors, although the command does not do a
  * lot if there is 1 window.
  */
-PASCAL NEAR prevwind(f, n)
+int PASCAL NEAR prevwind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -135,7 +135,7 @@ int f,n;	/* prefix flag and argument */
  * a new dot. We share the code by having "move down" just be an interface to
  * "move up". Magic. Bound to "C-X C-N".
  */
-PASCAL NEAR mvdnwind(f, n)
+int PASCAL NEAR mvdnwind(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -150,7 +150,7 @@ int f, n;	/* prefix flag and argument */
  * (this command does not really move "."; it moves the frame). Bound to
  * "C-X C-P".
  */
-PASCAL NEAR mvupwind(f, n)
+int PASCAL NEAR mvupwind(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -197,7 +197,7 @@ int f, n;	/* prefix flag and argument */
  * the buffer structures right if the distruction of a window makes a buffer
  * become undisplayed.
  */
-PASCAL NEAR onlywind(f, n)
+int PASCAL NEAR onlywind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -242,7 +242,7 @@ int f,n;	/* prefix flag and argument */
 		lp = lback(lp);
 	}
 	curwp->w_toprow = 0;
-	curwp->w_ntrows = term.t_nrow-1;
+	curwp->w_ntrows = (char)(term.t_nrow-1);
 	curwp->w_linep	= lp;
 	curwp->w_flag  |= WFMODE|WFHARD;
 	return(TRUE);
@@ -253,7 +253,7 @@ int f,n;	/* prefix flag and argument */
  * or, if it is the top window, the window below. Bound to C-X 0.
  */
 
-PASCAL NEAR delwind(f,n)
+int PASCAL NEAR delwind(f,n)
 
 int f, n;	/* arguments are ignored for this command */
 
@@ -293,7 +293,7 @@ int f, n;	/* arguments are ignored for this command */
 		if (wp == NULL)
 			return(FALSE);
 		wp->w_toprow = 0;
-		wp->w_ntrows += target;
+		wp->w_ntrows += (char)target;
 	} else {
 		/* find the next window up */
 		target = curwp->w_toprow - 1;
@@ -340,7 +340,7 @@ window.  Bound to "C-X 2".
 
 */
 
-PASCAL NEAR splitwind(f, n)
+int PASCAL NEAR splitwind(f, n)
 
 int f, n;	/* default flag and numeric argument */
 
@@ -378,8 +378,8 @@ int f, n;	/* default flag and numeric argument */
 	wp->w_force = 0;
 #if	COLOR
 	/* set the colors of the new window */
-	wp->w_fcolor = gfcolor;
-	wp->w_bcolor = gbcolor;
+	wp->w_fcolor = (char)gfcolor;
+	wp->w_bcolor = (char)gbcolor;
 #endif
 	ntru = (curwp->w_ntrows-1) / 2; 	/* Upper size		*/
 	ntrl = (curwp->w_ntrows-1) - ntru;	/* Lower size		*/
@@ -394,11 +394,11 @@ int f, n;	/* default flag and numeric argument */
 		/* Old is upper window. */
 		if (ntrd == ntru)		/* Hit mode line.	*/
 			lp = lforw(lp);
-		curwp->w_ntrows = ntru;
+		curwp->w_ntrows = (char)ntru;
 		wp->w_wndp = curwp->w_wndp;
 		curwp->w_wndp = wp;
-		wp->w_toprow = curwp->w_toprow+ntru+1;
-		wp->w_ntrows = ntrl;
+		wp->w_toprow = (char)(curwp->w_toprow+ntru+1);
+		wp->w_ntrows = (char)ntrl;
 	} else {				/* Old is lower window	*/
 		wp1 = NULL;
 		wp2 = wheadp;
@@ -412,10 +412,10 @@ int f, n;	/* default flag and numeric argument */
 			wp1->w_wndp = wp;
 		wp->w_wndp   = curwp;
 		wp->w_toprow = curwp->w_toprow;
-		wp->w_ntrows = ntru;
+		wp->w_ntrows = (char)ntru;
 		++ntru; 			/* Mode line.		*/
-		curwp->w_toprow += ntru;
-		curwp->w_ntrows  = ntrl;
+		curwp->w_toprow += (char)ntru;
+		curwp->w_ntrows  = (char)ntrl;
 		while (ntru--)
 			lp = lforw(lp);
 	}
@@ -432,7 +432,7 @@ int f, n;	/* default flag and numeric argument */
  * all the hard work. You don't just set "force reframe" because dot would
  * move. Bound to "C-X Z".
  */
-PASCAL NEAR enlargewind(f, n)
+int PASCAL NEAR enlargewind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -463,16 +463,16 @@ int f,n;	/* prefix flag and argument */
 		for (i=0; i<n && lp!=adjwp->w_bufp->b_linep; ++i)
 			lp = lforw(lp);
 		adjwp->w_linep	= lp;
-		adjwp->w_toprow += n;
+		adjwp->w_toprow += (char)n;
 	} else {				/* Shrink above.	*/
 		lp = curwp->w_linep;
 		for (i=0; i<n && lback(lp)!=curbp->b_linep; ++i)
 			lp = lback(lp);
 		curwp->w_linep	= lp;
-		curwp->w_toprow -= n;
+		curwp->w_toprow -= (char)n;
 	}
-	curwp->w_ntrows += n;
-	adjwp->w_ntrows -= n;
+	curwp->w_ntrows += (char)n;
+	adjwp->w_ntrows -= (char)n;
 	curwp->w_flag |= WFMODE|WFHARD;
 	adjwp->w_flag |= WFMODE|WFHARD;
 	return(TRUE);
@@ -483,7 +483,7 @@ int f,n;	/* prefix flag and argument */
  * window descriptions. Ask the redisplay to do all the hard work. Bound to
  * "C-X C-Z".
  */
-PASCAL NEAR shrinkwind(f, n)
+int PASCAL NEAR shrinkwind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -514,16 +514,16 @@ int f,n;	/* prefix flag and argument */
 		for (i=0; i<n && lback(lp)!=adjwp->w_bufp->b_linep; ++i)
 			lp = lback(lp);
 		adjwp->w_linep	= lp;
-		adjwp->w_toprow -= n;
+		adjwp->w_toprow -= (char)n;
 	} else {				/* Grow above.		*/
 		lp = curwp->w_linep;
 		for (i=0; i<n && lp!=curbp->b_linep; ++i)
 			lp = lforw(lp);
 		curwp->w_linep	= lp;
-		curwp->w_toprow += n;
+		curwp->w_toprow += (char)n;
 	}
-	curwp->w_ntrows -= n;
-	adjwp->w_ntrows += n;
+	curwp->w_ntrows -= (char)n;
+	adjwp->w_ntrows += (char)n;
 	curwp->w_flag |= WFMODE|WFHARD;
 	adjwp->w_flag |= WFMODE|WFHARD;
 	return(TRUE);
@@ -531,7 +531,7 @@ int f,n;	/* prefix flag and argument */
 
 /*	Resize the current window to the requested size */
 
-PASCAL NEAR resize(f, n)
+int PASCAL NEAR resize(f, n)
 
 int f, n;	/* default flag and numeric argument */
 
@@ -617,7 +617,7 @@ setwin: wp = wheadp;
 	return(TRUE);
 }
 
-PASCAL NEAR nextup(f, n)	/* scroll the next window up (back) a page */
+int PASCAL NEAR nextup(f, n)	/* scroll the next window up (back) a page */
 
 int f, n;	/* prefix flag and argument */
 
@@ -625,9 +625,10 @@ int f, n;	/* prefix flag and argument */
 	nextwind(FALSE, 1);
 	backpage(f, n);
 	prevwind(FALSE, 1);
+	return 0;
 }
 
-PASCAL NEAR nextdown(f, n)	/* scroll the next window down (forward) a page */
+int PASCAL NEAR nextdown(f, n)	/* scroll the next window down (forward) a page */
 
 int f, n;	/* prefix flag and argument */
 
@@ -635,9 +636,10 @@ int f, n;	/* prefix flag and argument */
 	nextwind(FALSE, 1);
 	forwpage(f, n);
 	prevwind(FALSE, 1);
+	return 0;
 }
 
-PASCAL NEAR savewnd(f, n)	/* save ptr to current window */
+int PASCAL NEAR savewnd(f, n)	/* save ptr to current window */
 
 int f, n;	/* prefix flag and argument */
 
@@ -646,7 +648,7 @@ int f, n;	/* prefix flag and argument */
 	return(TRUE);
 }
 
-PASCAL NEAR restwnd(f, n)	/* restore the saved screen */
+int PASCAL NEAR restwnd(f, n)	/* restore the saved screen */
 
 int f, n;	/* prefix flag and argument */
 
@@ -670,7 +672,7 @@ int f, n;	/* prefix flag and argument */
 	return(FALSE);
 }
 
-PASCAL NEAR newsize(f, n)	/* resize the screen, re-writing the screen */
+int PASCAL NEAR newsize(f, n)	/* resize the screen, re-writing the screen */
 
 int f;	/* default flag */
 int n;	/* numeric argument */
@@ -720,7 +722,7 @@ int n;	/* numeric argument */
 			wp = wp->w_wndp;
 
 		/* and enlarge it as needed */
-		wp->w_ntrows = n - wp->w_toprow - 2;
+		wp->w_ntrows = (char)(n - wp->w_toprow - 2);
 		wp->w_flag |= WFHARD|WFMODE;
 
 	} else {
@@ -762,7 +764,7 @@ int n;	/* numeric argument */
 				/* need to change this window size? */
 				lastline = wp->w_toprow + wp->w_ntrows - 1;
 				if (lastline >= n - 2) {
-					wp->w_ntrows = n - wp->w_toprow - 2;
+					wp->w_ntrows = (char)(n - wp->w_toprow - 2);
 					wp->w_flag |= WFHARD|WFMODE;
 				}
 			}
@@ -781,7 +783,7 @@ int n;	/* numeric argument */
 	return(TRUE);
 }
 
-PASCAL NEAR newwidth(f, n)	/* resize the screen, re-writing the screen */
+int PASCAL NEAR newwidth(f, n)	/* resize the screen, re-writing the screen */
 
 int f;	/* default flag */
 int n;	/* numeric argument */
@@ -817,8 +819,8 @@ int n;	/* numeric argument */
 #else
 	term.t_ncol = n;
 #endif
-	term.t_margin = n / 10;
-	term.t_scrsiz = n - (term.t_margin * 2);
+	term.t_margin = (short)(n / 10);
+	term.t_scrsiz = (short)(n - (term.t_margin * 2));
 
 	/* force all windows to redraw */
 	wp = wheadp;
@@ -831,7 +833,7 @@ int n;	/* numeric argument */
 	return(TRUE);
 }
 
-PASCAL NEAR new_col_org(f, n)	/* reposition the screen, re-writing the screen */
+int PASCAL NEAR new_col_org(f, n)	/* reposition the screen, re-writing the screen */
 
 int f;	/* default flag */
 int n;	/* numeric argument */
@@ -858,7 +860,7 @@ int n;	/* numeric argument */
 	return(TRUE);
 }
 
-PASCAL NEAR new_row_org(f, n)	/* reposition the screen, re-writing the screen */
+int PASCAL NEAR new_row_org(f, n)	/* reposition the screen, re-writing the screen */
 
 int f;	/* default flag */
 int n;	/* numeric argument */

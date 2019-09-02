@@ -20,7 +20,7 @@
 
 int PASCAL NEAR is_letter(ch)
 
-register char ch;
+register unsigned ch;
 
 {
 	return(is_upper(ch) || is_lower(ch));
@@ -33,7 +33,7 @@ register char ch;
 
 int PASCAL NEAR is_lower(ch)
 
-register char ch;
+register unsigned ch;
 
 {
 	return(lowcase[ch & 255] != 0);
@@ -46,7 +46,7 @@ register char ch;
 
 int PASCAL NEAR is_upper(ch)
 
-register char ch;
+register unsigned ch;
 
 {
 	return(upcase[ch & 255] != 0);
@@ -99,11 +99,11 @@ unsigned char *cp;	/* ptr to character to lowercase */
 }
 
 #if	PROTO
-int PASCAL NEAR upperc(char ch) /* return the upper case equivalant of a character */
+int PASCAL NEAR upperc(unsigned ch) /* return the upper case equivalant of a character */
 #else
 int PASCAL NEAR upperc(ch)	/* return the upper case equivalant of a character */
 
-unsigned char ch;	/* character to get uppercase euivalant of */
+unsigned ch;	/* character to get uppercase euivalant of */
 #endif
 {
 	if (is_lower(ch))
@@ -113,11 +113,11 @@ unsigned char ch;	/* character to get uppercase euivalant of */
 }
 
 #if	PROTO
-int PASCAL NEAR lowerc(char ch) /* return the lower case equivalant of a character */
+int PASCAL NEAR lowerc(unsigned ch) /* return the lower case equivalant of a character */
 #else
 int PASCAL NEAR lowerc(ch)	/* return the lower case equivalant of a character */
 
-unsigned char ch;	/* character to get lowercase equivalant of */
+unsigned ch;	/* character to get lowercase equivalant of */
 #endif
 {
 	if (is_upper(ch))
@@ -139,8 +139,8 @@ VOID PASCAL NEAR initchars()	/* initialize the character upper/lower case tables
 
 	/* lower to upper, upper to lower */
 	for (index = 'a'; index <= 'z'; index++) {
-		lowcase[index] = index ^ DIFCASE;
-		upcase[index ^ DIFCASE] = index;
+		lowcase[index] = (char)(index ^ DIFCASE);
+		upcase[index ^ DIFCASE] = (char)index;
 	}
 #if BSD || FREEBSD || USG || AIX || AUX || SMOS || HPUX8 || HPUX9 || SUN || XENIX || AVIION
 	/* and for those international characters! */

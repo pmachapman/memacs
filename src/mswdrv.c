@@ -23,28 +23,28 @@
 
 /* terminal interface table entries */
 
-static int   PASCAL mswnop();
-static int   PASCAL mswopen();
-static int   PASCAL mswgetc();
-static int   PASCAL mswputc();
-static int   PASCAL mswflush();
-static int   PASCAL mswbeep();
-static int   PASCAL mswmove();
-static int   PASCAL msweeol();
-static int   PASCAL msweeop();
-static int   PASCAL mswbeep();
-static int   PASCAL mswrev();
-static int   PASCAL mswrez();
+static int   PASCAL mswnop(void);
+static int   PASCAL mswopen(void);
+static int   PASCAL mswgetc(void);
+static int   PASCAL mswputc(int);
+static int   PASCAL mswflush(void);
+
+static int   PASCAL mswmove(int newrow, int newcol);
+static int   PASCAL msweeol(void);
+static int   PASCAL msweeop(void);
+static int   PASCAL mswbeep(void);
+static int   PASCAL mswrev(int);
+static int   PASCAL mswrez(char *);
 #if COLOR
-static int   PASCAL mswsetfor();
-static int   PASCAL mswsetback();
+static int   PASCAL mswsetfor(int);
+static int   PASCAL mswsetback(int);
 #endif
-static int   PASCAL mswsleep();
-static int   PASCAL mswnewscr();
-static int   PASCAL mswdelscr();
-static int   PASCAL mswselscr();
-static int   PASCAL mswsizscr();
-static int   PASCAL mswtopscr();
+static int   PASCAL mswsleep(int);
+static int   PASCAL mswnewscr(SCREEN *);
+static int   PASCAL mswdelscr(SCREEN *);
+static int   PASCAL mswselscr(SCREEN *);
+static int   PASCAL mswsizscr(SCREEN *);
+static int   PASCAL mswtopscr(SCREEN *);
 
 /* Standard terminal interface dispatch table.
 */
@@ -155,11 +155,11 @@ int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
         }
 	/*-scroll the last message into view */
         {
-            int     i;
+            LRESULT     i;
 
             i = SendDlgItemMessage (hDlg, ID_HIST, LB_GETCOUNT, 0, 0L);
             SendDlgItemMessage (hDlg, ID_HIST, LB_SETCURSEL, i - 1, 0L);
-            SendDlgItemMessage (hDlg, ID_HIST, LB_SETCURSEL, -1, 0L);
+            SendDlgItemMessage (hDlg, ID_HIST, LB_SETCURSEL, (WPARAM)-1, 0L);
         }
 	return TRUE;
 	
@@ -183,13 +183,13 @@ int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
    core editor loop will pop up a dialog box showing up to MAXMLHIST-1
    past messages */
 
-PASCAL mlhistory (void)
+void PASCAL mlhistory (void)
 {
-    FARPROC     ProcInstance;
+	DLGPROC     ProcInstance;
 
     PushMLHist ();
     mlferase ();
-    ProcInstance = MakeProcInstance ((FARPROC)MLHistDlgProc,
+    ProcInstance = MakeProcInstance ((DLGPROC)MLHistDlgProc,
 			             hEmacsInstance);
     DialogBox (hEmacsInstance, "MLHIST", hFrameWnd, ProcInstance);
     FreeProcInstance (ProcInstance);
@@ -210,7 +210,7 @@ static void PASCAL ChangeUpdateRow (int newrow)
 /* mswopen: initialize windows interface */
 /* =======                               */
 
-static int PASCAL mswopen ()
+static int PASCAL mswopen (void)
 {
     static BOOL FirstTime = TRUE;
 
@@ -235,7 +235,7 @@ static int PASCAL mswopen ()
 /* mswgetc: get character from keyboard (or mouse) */
 /* =======                                         */
 
-static int PASCAL mswgetc ()
+static int PASCAL mswgetc (void)
 {
     return GetInput ();
 } /* mswgetc */
@@ -274,7 +274,7 @@ int     c;  /* character to write (or 0 for dummy write) */
 	    else {
 	        if (c == '\n') PushMLHist();
 	        else {
-		    MLBuf[CurrentCol] = c;
+		    MLBuf[CurrentCol] = (char)c;
 		    if (CurrentCol < MLSIZE - 1) ++CurrentCol;
 		}
 	    } 
@@ -288,7 +288,7 @@ int     c;  /* character to write (or 0 for dummy write) */
 /* mswflush:    update display from output buffer */
 /* ========                                       */
 
-static int PASCAL mswflush ()
+static int PASCAL mswflush (void)
 {
     ChangeUpdateRow (-1);
     if (!InternalRequest && (hIOWnd == hFrameWnd)) UpdateWindow (hIOWnd);
@@ -333,7 +333,7 @@ static int PASCAL mswmove (int newrow, int newcol)
 /* msweeol: erase to end of line */
 /* =======                       */
 
-static int PASCAL msweeol ()
+static int PASCAL msweeol (void)
 {
     mswputc (0);    /* ensure change of row is properly handled */
     UpdateCol.leftmost = min(UpdateCol.leftmost,CurrentCol);
@@ -354,7 +354,7 @@ static int PASCAL msweeol ()
 /* msweeop: erase to end of page */
 /* =======                       */
 
-static int PASCAL msweeop ()
+static int PASCAL msweeop (void)
 {
     if (hIOWnd == hFrameWnd) {          /* message line */
 	msweeol ();     /* only one line here */
@@ -386,7 +386,7 @@ static int PASCAL msweeop ()
 /* mswbeep: sound a beep */
 /* =======               */
 
-static int PASCAL mswbeep ()
+static int PASCAL mswbeep (void)
 {
     MessageBeep (0);
     return 0;
@@ -508,6 +508,7 @@ static int PASCAL mswdelscr (SCREEN *sp)
     if (sp == IOScr) mswselscr (first_screen);
         /* hopefully, at this time, sp!=first_screen */ 
     SendMessage (hMDIClientWnd, WM_MDIDESTROY, (WPARAM)sp->s_drvhandle, 0);
+	return 0;
 } /* mswdelscr */
 
 /* mswselscr:   select a window/screen combination for the next IOs */
@@ -517,6 +518,7 @@ static int PASCAL mswselscr (SCREEN *sp)
 {
     hIOWnd = sp->s_drvhandle;
     IOScr = sp;
+	return 0;
 } /* mswselscr */
 
 /* mswsizscr:   resize an MDI window to fit the associated screen */
@@ -535,7 +537,7 @@ static int PASCAL mswsizscr (SCREEN *sp)
 
     WINDOWPLACEMENT WindowPlacement;
 
-    if (InternalRequest) return;
+    if (InternalRequest) return 0;
     InternalRequest = TRUE;
     hScrWnd = sp->s_drvhandle;
 
@@ -646,6 +648,7 @@ static int PASCAL mswsizscr (SCREEN *sp)
 			       us from getting the expected client size
 			       */
     InternalRequest = FALSE;
+	return 0;
 } /* mswsizscr */
 
 /* mswtopscr:   bring a screen's window to top. */
@@ -674,13 +677,14 @@ static int PASCAL mswtopscr (SCREEN *sp)
 	}
 	InternalRequest = FALSE;
     }
+	return 0;
 } /* mswtopscr */
 
 /*************************/
 /* mswnop:  No Operation */
 /* ======                */
 
-static int PASCAL mswnop ()
+static int PASCAL mswnop (void)
 {
     return 0;
 }

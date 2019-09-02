@@ -59,7 +59,7 @@ extern struct passwd *getpwnam();
  */
 
 #if	!WINDOW_MSWIN	/* for MS Windows, mlyesno is defined in mswsys.c */
-PASCAL NEAR mlyesno(prompt)
+int PASCAL NEAR mlyesno(prompt)
 
 char *prompt;
 
@@ -106,7 +106,7 @@ char *prompt;
  * return. Handle erase, kill, and abort keys.
  */
 
-PASCAL NEAR mlreply(prompt, buf, nbuf)
+int PASCAL NEAR mlreply(prompt, buf, nbuf)
 
 char *prompt;
 char *buf;
@@ -119,7 +119,7 @@ int nbuf;
 /*	ectoc:	expanded character to character
 		collapse the CTRL and SPEC flags back into an ascii code   */
 
-PASCAL NEAR ectoc(c)
+int PASCAL NEAR ectoc(c)
 
 int c;
 
@@ -136,7 +136,7 @@ int c;
 /*	ctoec:	character to extended character
 		pull out the CTRL and SPEC prefixes (if possible)	*/
 
-PASCAL NEAR ctoec(c)
+int PASCAL NEAR ctoec(c)
 
 int c;
 
@@ -481,7 +481,7 @@ clist:			/* make a completion list! */
 
 		} else {
 			if (cpos < maxlen && c > ' ') {
-				buf[cpos++] = c;
+				buf[cpos++] = (char)c;
 				mlout(c);
 				++ttcol;
 				TTflush();
@@ -892,7 +892,7 @@ int PASCAL NEAR tgetc()
 
 	/* save it if we need to */
 	if (kbdmode == RECORD) {
-		*kbdptr++ = c;
+		*kbdptr++ = (short)c;
 		kbdend = kbdptr;
 
 		/* don't overrun the buffer */
@@ -1118,7 +1118,7 @@ int eolchar;
 		/* insert the character in the string! */
 		if (cpos < nbuf-1) {
 
-			buf[cpos++] = c;
+			buf[cpos++] = (unsigned char)c;
 
 			if ((c < ' ') && (c != '\r')) {
 				outstring("^");
@@ -1139,7 +1139,7 @@ int eolchar;
 	}
 }
 
-PASCAL NEAR outstring(s) /* output a string of input characters */
+void PASCAL NEAR outstring(s) /* output a string of input characters */
 
 char *s;	/* string to output */
 
@@ -1149,7 +1149,7 @@ char *s;	/* string to output */
 			mlout(*s++);
 }
 
-PASCAL NEAR ostring(s)	/* output a string of output characters */
+void PASCAL NEAR ostring(s)	/* output a string of output characters */
 
 char *s;	/* string to output */
 
@@ -1177,7 +1177,7 @@ int iterm;
 
 	/* show the passed in prompt */
 	mlwrite(prompt);
-	tcol = strlen(prompt);
+	tcol = (int)strlen(prompt);
 
 	/* If there's a default, put it in brackets and show it. */
 	if (dflt != NULL && *dflt != '\0') {
@@ -1195,7 +1195,7 @@ int iterm;
 			mlputs("NL"); tcol += 6; break;
 		default:
 			mlputs(cmdstr(iterm, buf));
-			tcol += strlen(buf) + 4;
+			tcol += (int)strlen(buf) + 4;
 	}
 	mlputs(">: ");
 	movecursor(term.t_nrow, tcol);	/* Position the cursor	*/

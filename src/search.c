@@ -252,8 +252,8 @@ int repeats;
 	LINE	*curline;	/* current line during scan */
 	int	curoff;		/* position within current line */
 	DELTA	*tbl;		/* structure with jump info */
-	int	patlenadd;
-	int	jump;
+	int	patlenadd=0;
+	int	jump=0;
 
 	/* If we are going in reverse, then the 'end' is actually
 	 * the beginning of the pattern.  Toggle it.
@@ -329,20 +329,20 @@ int repeats;
 			 * reset the global "." pointers.
 			 */
 			curwp->w_markp[SEARCH_HIGHLIGHT] = matchline;
-			curwp->w_marko[SEARCH_HIGHLIGHT] = matchoff;
+			curwp->w_marko[SEARCH_HIGHLIGHT] = (short)matchoff;
 			curwp->w_markp[SEARCH_HIGHLIGHT+1] = curline;
-			curwp->w_marko[SEARCH_HIGHLIGHT+1] = curoff;
+			curwp->w_marko[SEARCH_HIGHLIGHT+1] = (short)curoff;
 
 			curwp->w_flag |= WFMOVE;
 			if (beg_or_end == PTEND)	/* at end of string */
 			{
 				curwp->w_dotp = curline;
-				curwp->w_doto = curoff;
+				curwp->w_doto = (short)curoff;
 			}
 			else		/* at beginning of string */
 			{
 				curwp->w_dotp = matchline;
-				curwp->w_doto = matchoff;
+				curwp->w_doto = (short)matchoff;
 			}
 
 			/* If we're heading in reverse, set the "match"
@@ -410,7 +410,7 @@ int *pcwoff;
 		/* Is the current meta-character modified
 		 * by a closure?
 		 */
-		if (cl_type = (mcptr->mc_type & ALLCLOS)) {
+		if ( (cl_type = (mcptr->mc_type & ALLCLOS)) != 0 ) {
 
 			/* Minimum number of characters that may
 			 * match is 0 or 1.
@@ -419,7 +419,7 @@ int *pcwoff;
 
 			if (cl_type == ZEROONE)
 			{
-				if (mceq(nextch(&curline, &curoff, direct), mcptr))
+				if (mceq((unsigned char)nextch(&curline, &curoff, direct), mcptr))
 				{
 					nextch(&curline, &curoff, direct);
 					cl_matchlen++;
@@ -430,7 +430,7 @@ int *pcwoff;
 				/* Match as many characters as possible
 				 * against the current meta-character.
 				 */
-				while (mceq(nextch(&curline, &curoff, direct), mcptr))
+				while (mceq((unsigned char)nextch(&curline, &curoff, direct), mcptr))
 					cl_matchlen++;
 			}
 
@@ -457,7 +457,7 @@ int *pcwoff;
 			}
 		}
 		else if (mcptr->mc_type == GRPBEG) {
-			group_reg[mcptr->u.group_no].r_offset = curoff;
+			group_reg[mcptr->u.group_no].r_offset = (short)curoff;
 			group_reg[mcptr->u.group_no].r_linep = curline;
 			group_reg[mcptr->u.group_no].r_size = (direct == FORWARD)? -matchlen: matchlen;
 		}
@@ -499,7 +499,7 @@ int *pcwoff;
 			 * the meta-character equal function.
 			 * If we still match, increment the length.
 			 */
-			if (!mceq(nextch(&curline, &curoff, direct), mcptr))
+			if (!mceq((unsigned char)nextch(&curline, &curoff, direct), mcptr))
 				return FALSE;
 
 			matchlen++;
@@ -767,7 +767,7 @@ DELTA *tbl;
 
 	strcpy(tbl->patrn, pstring);
 
-	jump_by = strlen(pstring);
+	jump_by = (int)strlen(pstring);
 
 	for (j = 0; j < HICHAR; j++)
 		tbl->delta[j] = jump_by;
@@ -807,7 +807,7 @@ DELTA *tbl;
  */
 VOID PASCAL NEAR setjtable()
 {
-	make_delta(pat, &deltapat);
+	make_delta((char *)pat, &deltapat);
 	make_delta(strrev(strcpy((char *)tap, (char *)pat)), &tapatled);
 }
 
@@ -821,10 +821,10 @@ register unsigned char pc;
 {
 	if ((curwp->w_bufp->b_mode & MDEXACT) == 0) {
 		if (is_lower(bc))
-			bc = chcase(bc);
+			bc = (unsigned char)chcase(bc);
 
 		if (is_lower(pc))
-			pc = chcase(pc);
+			pc = (unsigned char)chcase(pc);
 	}
 
 	return (bc == pc);
@@ -901,7 +901,7 @@ int PASCAL NEAR savematch()
 		return ABORT;
 	}
 
-	tmpreg.r_offset = matchoff;
+	tmpreg.r_offset = (short)matchoff;
 	tmpreg.r_linep = matchline;
 	tmpreg.r_size = matchlen;
 
@@ -1024,11 +1024,11 @@ char *lstring;
 {
 	LINE	*scanline = *curline;
 	int	scanpos = *curpos;
-	register int	c;
+	register unsigned char	c;
 	register int	count = 0;
 
 	while ((c = (unsigned char)(*lstring++)) != '\0') {
-		if (!eq(c, nextch(&scanline, &scanpos, direct)))
+		if (!eq(c, (unsigned char)nextch(&scanline, &scanpos, direct)))
 			return 0;
 		count++;
 	}
@@ -1074,7 +1074,7 @@ int PASCAL NEAR mcstr()
 	mcptr = &mcpat[0];
 	patptr = (char *)&pat[0];
 
-	while ((pchr = *patptr) && status) {
+	while (( (pchr = *patptr) != 0) && status) {
 		switch (pchr) {
 			case MC_CCL:
 				status = cclmake(&patptr, mcptr);
@@ -1348,7 +1348,7 @@ MC *mt;
 			break;
 
 		case CCL:
-			if (!(result = biteq(bc, mt->u.cclmap))) {
+			if ( (result = biteq(bc, mt->u.cclmap)) == 0) {
 				if ((curwp->w_bufp->b_mode & MDEXACT) == 0 &&
 				    (is_letter(bc)))
 					result = biteq(chcase(bc), mt->u.cclmap);
@@ -1500,7 +1500,7 @@ MC *mcptr;
 	 * Now loop through the pattern, collecting characters until
 	 * we run into a meta-character.
 	 */
-	while (pchr = *++patptr)
+	while ( (pchr = *++patptr) != 0)
 	{
 		/*
 		 * If the current character is a closure character,

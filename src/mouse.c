@@ -29,7 +29,7 @@ NOSHARE int	lastmcmd = MNONE;	/* Last mouse command.		*/
  * of the text). If the mouse points at text then dot is
  * moved to that location.
  */
-PASCAL NEAR movemd(f, n)
+int PASCAL NEAR movemd(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -75,7 +75,7 @@ int f,n;	/* prefix flag and argument */
 	/* if we aren't off the end of the text, move the point to the mouse */
 	if ((lp=mouseline(wp, ypos)) != NULL) {
 		curwp->w_dotp = lp;
-		curwp->w_doto = mouseoffset(wp, lp, xpos);
+		curwp->w_doto = (short)mouseoffset(wp, lp, xpos);
 	}
 
 	return(TRUE);
@@ -86,7 +86,7 @@ int f,n;	/* prefix flag and argument */
 			only if we are holding down the proper button
 */
 
-PASCAL NEAR mmove(f, n)
+int PASCAL NEAR mmove(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -129,7 +129,7 @@ int f,n;	/* prefix flag and argument */
 	/* if we aren't off the end of the text, set mark $hilight+1 */
 	if ((lp=mouseline(wp, ypos)) != NULL) {
 		wp->w_markp[hilite+1] = lp;
-		wp->w_marko[hilite+1] = mouseoffset(wp, lp, xpos);
+		wp->w_marko[hilite+1] = (short)mouseoffset(wp, lp, xpos);
 	}
 
 	return(TRUE);		
@@ -146,7 +146,7 @@ int f,n;	/* prefix flag and argument */
 			kill-region
 */
 
-PASCAL NEAR mregdown(f, n)
+int PASCAL NEAR mregdown(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -154,8 +154,10 @@ int f,n;	/* prefix flag and argument */
 	register EWINDOW *wp;
 	register EWINDOW *lastwp;
 	register LINE	*lp;
+#if	!WINDOW_MSWIN
 	SCREEN *sp;
 	char scr_name[12];		/* constructed temp screen name */
+#endif
 	static int temp_count = 0;	/* next temp screen number! */
 
 	/* make sure we are on the proper screen */
@@ -221,7 +223,7 @@ int f,n;	/* prefix flag and argument */
 	/* if we aren't off the end of the text, move the point to the mouse */
 	if ((lp=mouseline(wp, ypos)) != NULL) {
 		curwp->w_dotp = lp;
-		curwp->w_doto = mouseoffset(wp, lp, xpos);
+		curwp->w_doto = (short)mouseoffset(wp, lp, xpos);
 	}
 
 	/* perform the region function */
@@ -254,7 +256,7 @@ int f,n;	/* prefix flag and argument */
 		  3:	reset nclicks to 0
 */
 
-PASCAL NEAR mregup(f, n)
+int PASCAL NEAR mregup(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -344,7 +346,7 @@ int f,n;	/* prefix flag and argument */
 	/* if we aren't off the end of the text, move the point to the mouse */
 	if ((lp=mouseline(wp, ypos)) != NULL && nclicks < 3) {
 		curwp->w_dotp = lp;
-		curwp->w_doto = mouseoffset(wp, lp, xpos);
+		curwp->w_doto = (short)mouseoffset(wp, lp, xpos);
 	}
 
 	/* if we changed windows, update the modelines, abort the new op */
@@ -372,7 +374,7 @@ int f,n;	/* prefix flag and argument */
  * window scrolls. The code in this function is just
  * too complex!
  */
-PASCAL NEAR movemu(f, n)
+int PASCAL NEAR movemu(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -568,7 +570,7 @@ register int	row;
  * LINE structure is pointed to by "lp".
  */
 
-PASCAL NEAR mouseoffset(wp, lp, col)
+int PASCAL NEAR mouseoffset(wp, lp, col)
 
 register EWINDOW *wp;
 register LINE	*lp;
@@ -577,14 +579,14 @@ register int	col;
 {
 	register int	c;
 	register int	offset;
-	register int	curcol;
+	register int	lcurcol;
 	register int	newcol;
 
 	offset = 0;
-	curcol = 0;
+	lcurcol = 0;
 	col += wp->w_fcol;	/* adjust for extended lines */
 	while (offset != lused(lp)) {
-		newcol = curcol;
+		newcol = lcurcol;
 		if ((c=lgetc(lp, offset)) == '\t' && tabsize > 0)
 			newcol += -(newcol % tabsize) + (tabsize - 1);
 		else {
@@ -598,13 +600,13 @@ register int	col;
 		++newcol;
 		if (newcol > col)
 			break;
-		curcol = newcol;
+		lcurcol = newcol;
 		++offset;
 	}
 	return(offset);
 }
 
-PASCAL NEAR mouse_screen()
+void PASCAL NEAR mouse_screen()
 
 {
 	register SCREEN *screen_ptr;	/* screen to test mouse in */
@@ -637,7 +639,7 @@ PASCAL NEAR mouse_screen()
 	}
 }
 
-PASCAL NEAR ismodeline(wp, row)
+int PASCAL NEAR ismodeline(wp, row)
 
 EWINDOW *wp;
 int row;
@@ -659,7 +661,7 @@ int row;
    let emacs know about the newsize, and have him force a re-draw
 */
 
-PASCAL NEAR resizm(f, n)
+int PASCAL NEAR resizm(f, n)
 
 int f, n;	/* these are ignored... we get the new size info from
 		   the mouse driver */
@@ -694,7 +696,7 @@ int f, n;	/* these are ignored... we get the new size info from
 	return(TRUE);
 }
 
-PASCAL NEAR resizm2(f, n)
+int PASCAL NEAR resizm2(f, n)
 
 int f, n;	/* these are ignored... we get the new size info from
 		   the mouse driver */

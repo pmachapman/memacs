@@ -157,9 +157,9 @@ void in_put (int event);
 int  in_get (void);
 
 /* Windows-implementation specific functions */
-LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				   LPARAM lParam);
-LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LRESULT EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				     LPARAM lParam);
 int FAR PASCAL GetInput (void);
 int FAR PASCAL TakeANap (int t);
@@ -178,7 +178,7 @@ void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont);
 void FAR PASCAL InvalidateCells (HWND hWnd, int leftcol, int toprow,
                                  int rightcol, int bottomrow);
 void FAR PASCAL MinimumClientSize (HWND hWnd, int NCols, int NRows,
-				   int *Width, int *Height);
+				   long *Width, long *Height);
 int FAR PASCAL DisplayableRows (HWND hWnd, int Height, CellMetrics *cm);
 int FAR PASCAL DisplayableColumns (HWND hWnd, int Width, CellMetrics *cm);
 void FAR PASCAL EmacsCaret (BOOL Show);

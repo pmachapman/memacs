@@ -79,7 +79,7 @@ char *fname;		/* name of function to evaluate */
 	char arg1[NSTRING];		/* value of first argument */
 	char arg2[NSTRING];		/* value of second argument */
 	char arg3[NSTRING];		/* value of third argument */
-	static char result[2 * NSTRING];	/* string result */
+	static char result[2 * NSTRING+1];	/* string result */
 
 	/* look the function up in the function table */
 	mklower(fname); /* and let it be upper or lower case */
@@ -140,7 +140,7 @@ char *fname;		/* name of function to evaluate */
 				result[NSTRING - 1] = 0;
 				return(result);
 
-		case UFCHR:	result[0] = asc_int(arg1);
+		case UFCHR:	result[0] = (char)asc_int(arg1);
 				result[1] = 0;
 				return(result);
 		case UFDIV:	if ((arg = asc_int(arg2)) != 0)
@@ -177,15 +177,16 @@ char *fname;		/* name of function to evaluate */
 				return(result);
 #endif
 		case UFGTCMD:	return(cmdstr(getcmd(), result));
-		case UFGTKEY:	result[0] = tgetc();
+		case UFGTKEY:	result[0] = (char)tgetc();
 				result[1] = 0;
 				return(result);
 		case UFIND:	return(strcpy(result, fixnull(getval(arg1))));
 		case UFISNUM:	return(ltos(is_num(arg1)));
 		case UFLEFT:	return(bytecopy(result, arg1, asc_int(arg2)));
-		case UFLENGTH:	return(int_asc(strlen(arg1)));
+		case UFLENGTH:	return(int_asc((int)strlen(arg1)));
 		case UFLESS:	return(ltos(asc_int(arg1) < asc_int(arg2)));
-		case UFLOWER:	return(mklower(arg1));
+		case UFLOWER:	strncpy(result, arg1, 2 * NSTRING);
+						return(mklower(result));
 		case UFMID:	arg = asc_int(arg2);
 				if (arg > strlen(arg1))
 					return(strcpy(result, ""));
@@ -218,7 +219,7 @@ char *fname;		/* name of function to evaluate */
 		case UFREVERSE: return(strrev(bytecopy(result, arg1, NSTRING * 2)));
 		case UFRIGHT:	arg = asc_int(arg2);
 				if (arg > strlen(arg1))
-					arg = strlen(arg1);
+					arg = (int)strlen(arg1);
 				return(strcpy(result,
 					&arg1[strlen(arg1) - arg]));
 		case UFRND:	return(int_asc((int)(ernd() % (long)absv(asc_int(arg1))) + 1L));
@@ -230,13 +231,16 @@ char *fname;		/* name of function to evaluate */
 		case UFSUB:	return(int_asc(asc_int(arg1) - asc_int(arg2)));
 		case UFSUPPER:	return(setupper(arg1, arg2), "");
 		case UFTIMES:	return(int_asc(asc_int(arg1) * asc_int(arg2)));
-		case UFTRIM:	return(trimstr(arg1));
+		case UFTRIM:	strncpy(result, arg1, 2 * NSTRING);
+						return(trimstr(result));
 		case UFTRUTH:	return(ltos(asc_int(arg1) == 42));
-		case UFUPPER:	return(mkupper(arg1));
+		case UFUPPER:	strncpy(result, arg1, 2 * NSTRING);
+						return(mkupper(result));
 		case UFXLATE:	return(xlat(arg1, arg2, arg3));
 	}
 
 	meexit(-11);	/* never should get here */
+	return NULL;	/* keep the compiler happy. will never get here.*/
 }
 
 char *PASCAL NEAR gtusr(vname)	/* look up a user var's value */
@@ -299,7 +303,7 @@ int i;
 	return(envars[i]);
 }
 
-PASCAL NEAR binary(key, tval, tlength, klength)
+int PASCAL NEAR binary(key, tval, tlength, klength)
 
 char *key;		/* key string to look for */
 char *(PASCAL NEAR *tval)();	/* ptr to function to fetch table value with */
@@ -453,6 +457,7 @@ char *vname;		/* name of environment variable to retrieve */
 		case EVYPOS:	return(int_asc(ypos));
 	}
 	meexit(-12);	/* again, we should never get here */
+	return NULL;	/* keep the compiler happy. will never get here.*/
 }
 
 char *PASCAL NEAR fixnull(s)	/* Don't return NULL pointers! */
@@ -749,8 +754,8 @@ int size;	/* size of var array */
 int scope;	/* intended scope of any created user variables */
 
 {
-	register int vnum;	/* subscript in varable arrays */
-	register int vtype;	/* type to return */
+	register int vnum=0;	/* subscript in varable arrays */
+	register int vtype=0;	/* type to return */
 	register UTABLE *vut;	/* user var table to search */
 
 fvar:	vtype = -1;
@@ -842,7 +847,7 @@ char *value;	/* value to set to */
 	case TKVAR: /* set a user variable */
 		if (vut->uv[vnum].u_value != NULL)
 			free(vut->uv[vnum].u_value);
-		sp = room(strlen(value) + 1);
+		sp = room((int)strlen(value) + 1);
 		if (sp == NULL)
 			return(FALSE);
 		strcpy(sp, value);
@@ -976,7 +981,7 @@ char *value;	/* value to set to */
 		case EVHSCROLL: hscroll = stol(value);
 				lbound = 0;
 				break;
-		case EVISTERM:	isterm = stock(value);
+		case EVISTERM:	isterm = stock((unsigned char *)value);
 				break;
 		case EVKILL:	break;
 		case EVLANG:	break;
@@ -1063,7 +1068,7 @@ char *value;	/* value to set to */
 				break;
 		case EVSTATUS:	cmdstatus = stol(value);
 				break;
-		case EVSTERM:	sterm = stock(value);
+		case EVSTERM:	sterm = stock((unsigned char *)value);
 				break;
 		case EVTARGET:	curgoal = asc_int(value);
 				thisflag = saveflag;
@@ -1169,7 +1174,7 @@ int i;	/* integer to translate to a string */
 	*sp = 0;
 	do {
 		digit = i % 10;
-		*(--sp) = '0' + digit;	/* and install the new digit */
+		*(--sp) = (char)('0' + digit);	/* and install the new digit */
 		i = i / 10;
 	} while (i);
 
@@ -1206,7 +1211,7 @@ long num;	/* integer to translate to a string */
 	*sp = 0;
 	do {
 		digit = num % 10;
-		*(--sp) = '0' + digit;	/* and install the new digit */
+		*(--sp) = (char)('0' + digit);	/* and install the new digit */
 		num = num / 10L;
 	} while (num);
 
@@ -1267,7 +1272,7 @@ char *token;		/* token to evaluate */
 		case TKARG:	/* interactive argument */
 				strcpy(token, fixnull(getval(&token[1])));
 				mlwrite("%s", token);
-				status = getstring(buf, NSTRING, ctoec(RETCHAR));
+				status = getstring((unsigned char *)buf, NSTRING, ctoec(RETCHAR));
 				if (status == ABORT)
 					return(NULL);
 				return(buf);
@@ -1322,6 +1327,7 @@ char *token;		/* token to evaluate */
 		case TKSTR:	return(token+1);
 		case TKCMD:	return(token);
 	}
+	return("");	/* Keep the compiler happy. Should never get here */
 }
 
 int PASCAL NEAR stol(val)	/* convert a string to a numeric logical */
@@ -1476,7 +1482,7 @@ xnext:		++sp;
 /*	setwlist:	Set an alternative list of character to be
 			considered "in a word */
 
-PASCAL NEAR setwlist(wclist)
+int PASCAL NEAR setwlist(wclist)
 
 char *wclist;	/* list of characters to consider "in a word" */
 
@@ -1520,7 +1526,7 @@ char *buf;	/* buffer to place list of characters */
 	sp = buf;
 	for (index = 0; index < 256; index++)
 		if (wordlist[index])
-			*sp++ = index;
+			*sp++ = (char)index;
 	*sp = 0;
 	return(buf);
 }
@@ -1611,7 +1617,7 @@ int n;		/* numeric arg (can overide prompted value) */
 				of all the environment variables
 */
 
-PASCAL NEAR desvars(f, n)
+int PASCAL NEAR desvars(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -1645,7 +1651,7 @@ int f,n;	/* prefix flag and argument */
 		pad(outseq, 14);
 	        
 		/* add in the value */
-		olen = strlen(outseq);
+		olen = (int)strlen(outseq);
 		strncat(outseq, gtenv(envars[uindex]), NSTRING - olen - 1);
 		outseq[NSTRING - 1] = 0;
 
@@ -1698,7 +1704,7 @@ int f,n;	/* prefix flag and argument */
 			pad(outseq, 14);
 		        
 			/* add in the value */
-			olen = strlen(outseq);
+			olen = (int)strlen(outseq);
 			strncat(outseq, ut->uv[uindex].u_value, NSTRING - olen - 1);
 			outseq[NSTRING - 1] = 0;
 	
