@@ -3,6 +3,7 @@
 *.ko
 *.obj
 *.elf
+*.pdb
 
 # Borland C++ 5.5 files
 *.cfg
