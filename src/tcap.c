@@ -584,7 +584,7 @@ int f,n;	/* default flag, numeric argument [unused] */
 #endif
 #else
 
-hello()
+void hello()
 {
 }
 

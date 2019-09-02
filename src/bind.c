@@ -11,7 +11,7 @@
 #include	"elang.h"
 #include	"epath.h"
 
-PASCAL NEAR help(f, n)	/* give me some help!!!!!
+int PASCAL NEAR help(f, n)	/* give me some help!!!!!
 		   bring up a fake buffer and read the help file
 		   into it with view mode			*/
 
@@ -51,7 +51,7 @@ int f,n;	/* prefix flag and argument */
 	return(TRUE);
 }
 
-PASCAL NEAR deskey(f, n)	/* describe the command for a certain key */
+int PASCAL NEAR deskey(f, n)	/* describe the command for a certain key */
 
 int f,n;	/* prefix flag and argument */
 
@@ -81,7 +81,7 @@ int f,n;	/* prefix flag and argument */
 
 /* bindtokey:	add a new key to the key binding table		*/
 
-PASCAL NEAR bindtokey(f, n)
+int PASCAL NEAR bindtokey(f, n)
 
 int f, n;	/* command arguments [IGNORED] */
 
@@ -180,7 +180,7 @@ int f, n;	/* command arguments [IGNORED] */
 
 /* macrotokey:	Bind a key to a macro in the key binding table */
 
-PASCAL NEAR macrotokey(f, n)
+int PASCAL NEAR macrotokey(f, n)
 
 int f, n;	/* command arguments [IGNORED] */
 
@@ -258,7 +258,7 @@ int f, n;	/* command arguments [IGNORED] */
 
 /* unbindkey:	delete a key from the key binding table */
 
-PASCAL NEAR unbindkey(f, n)
+int PASCAL NEAR unbindkey(f, n)
 
 int f, n;	/* command arguments [IGNORED] */
 
@@ -286,7 +286,7 @@ int f, n;	/* command arguments [IGNORED] */
 	return(TRUE);
 }
 
-PASCAL NEAR unbindchar(c)
+int PASCAL NEAR unbindchar(c)
 
 int c;		/* command key to unbind */
 
@@ -359,7 +359,7 @@ BUFFER *bp;	/* buffer to unbind all keys connected to */
 	   into it with view mode
 */
 
-PASCAL NEAR desbind(f, n)
+int PASCAL NEAR desbind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -367,7 +367,7 @@ int f,n;	/* prefix flag and argument */
 	return(buildlist(TRUE, ""));
 }
 
-PASCAL NEAR apro(f, n)	/* Apropos (List functions that match a substring) */
+int PASCAL NEAR apro(f, n)	/* Apropos (List functions that match a substring) */
 
 int f,n;	/* prefix flag and argument */
 
@@ -383,7 +383,7 @@ int f,n;	/* prefix flag and argument */
 	return(buildlist(FALSE, mstring));
 }
 
-PASCAL NEAR buildlist(type, mstring)  /* build a binding list (limited or full) */
+int PASCAL NEAR buildlist(type, mstring)  /* build a binding list (limited or full) */
 
 int type;	/* true = full list,   false = partial list */
 char *mstring;	/* match string if a partial list */
@@ -519,7 +519,7 @@ bfail:		/* and on to the next buffer */
 	return(TRUE);
 }
 
-PASCAL NEAR strinc(source, sub) /* does source include sub? */
+int PASCAL NEAR strinc(source, sub) /* does source include sub? */
 
 char *source;	/* string to search in */
 char *sub;	/* substring to look for */
@@ -579,7 +579,7 @@ int mflag;	/* going for a meta sequence? */
 
 /* execute the startup file */
 
-PASCAL NEAR startup(sfname)
+int PASCAL NEAR startup(sfname)
 
 char *sfname;	/* name of startup file (null if default) */
 

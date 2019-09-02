@@ -16,7 +16,7 @@ static int PASCAL NEAR mod95(int);
 static int PASCAL NEAR mod95();
 #endif
 
-PASCAL NEAR setekey(f, n)	/* reset encryption key of current buffer */
+int PASCAL NEAR setekey(f, n)	/* reset encryption key of current buffer */
 
 int f;		/* default flag */
 int n;		/* numeric argument */

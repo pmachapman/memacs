@@ -11,7 +11,7 @@
 
 /* namedcmd:	execute a named command even if it is not bound */
 
-PASCAL NEAR namedcmd(f, n)
+int PASCAL NEAR namedcmd(f, n)
 
 int f, n;	/* command arguments [passed through to command executed] */
 
@@ -61,7 +61,7 @@ int f, n;	/* command arguments [passed through to command executed] */
 /*	execcmd:	Execute a command line command to be typed in
 			by the user					*/
 
-PASCAL NEAR execcmd(f, n)
+int PASCAL NEAR execcmd(f, n)
 
 int f, n;	/* default Flag and Numeric argument */
 
@@ -88,7 +88,7 @@ int f, n;	/* default Flag and Numeric argument */
 
 */
 
-PASCAL NEAR docmd(cline)
+int PASCAL NEAR docmd(cline)
 
 char *cline;	/* command line to execute */
 
@@ -238,7 +238,7 @@ int size;		/* maximum size of token */
 	return(src);
 }
 
-PASCAL NEAR macarg(tok)	/* get a macro line argument */
+int PASCAL NEAR macarg(tok)	/* get a macro line argument */
 
 char *tok;	/* buffer to place argument */
 
@@ -255,7 +255,7 @@ char *tok;	/* buffer to place argument */
 
 /*	nextarg:	get the next argument	*/
 
-PASCAL NEAR nextarg(prompt, buffer, size, terminator)
+int PASCAL NEAR nextarg(prompt, buffer, size, terminator)
 
 char *prompt;		/* prompt to use if we must be interactive */
 char *buffer;		/* buffer to put token into */
@@ -290,7 +290,7 @@ int terminator;		/* terminating char to be used on interactive fetch */
 /*	storeproc:	Set up a procedure buffer and flag to store all
 			executed command lines there			*/
 
-PASCAL NEAR storeproc(f, n)
+int PASCAL NEAR storeproc(f, n)
 
 int f;		/* default flag */
 int n;		/* macro number to use */
@@ -361,7 +361,7 @@ int n;		/* macro number to use */
 
 /*	execproc:	Execute a procedure				*/
 
-PASCAL NEAR execproc(f, n)
+int PASCAL NEAR execproc(f, n)
 
 int f, n;	/* default flag and numeric arg */
 
@@ -395,7 +395,7 @@ int f, n;	/* default flag and numeric arg */
 
 /*	execbuf:	Execute the contents of a buffer of commands	*/
 
-PASCAL NEAR execbuf(f, n)
+int PASCAL NEAR execbuf(f, n)
 
 int f, n;	/* default flag and numeric arg */
 
@@ -436,7 +436,7 @@ int f, n;	/* default flag and numeric arg */
 	*LBL01
 */
 
-PASCAL NEAR dobuf(bp)
+int PASCAL NEAR dobuf(bp)
 
 BUFFER *bp;	/* buffer to execute */
 
@@ -971,7 +971,7 @@ LINE *lp;	/* line " */
 		if $debug == TRUE, The interactive debugger is invoked
 		commands are listed out with the ? key			*/
 
-PASCAL NEAR debug(bp, eline, skipflag)
+int PASCAL NEAR debug(bp, eline, skipflag)
 
 BUFFER *bp;	/* buffer to execute */
 char *eline;	/* text of line to debug */
@@ -1110,7 +1110,7 @@ WHBLOCK *wp;	/* head of structure to free */
 	}
 }
 
-PASCAL NEAR execfile(f, n)	/* execute a series of commands in a file */
+int PASCAL NEAR execfile(f, n)	/* execute a series of commands in a file */
 
 int f, n;	/* default flag and numeric arg to pass on to file */
 
@@ -1161,7 +1161,7 @@ exec1:	/* otherwise, execute it */
 /*	dofile:	yank a file into a buffer and execute it
 		if there are no errors, delete the buffer on exit */
 
-PASCAL NEAR dofile(fname)
+int PASCAL NEAR dofile(fname)
 
 char *fname;	/* file name to execute */
 

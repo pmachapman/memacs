@@ -224,7 +224,7 @@ int f,n;	/* prefix flag and argument */
 {
 	register BUFFER *bp;	/* ptr to buffer to dump */
 	register LINE *lp;	/* ptr to current line in our buffer */
-	register llength;	/* length of the current line being examined */
+	register int llength;	/* length of the current line being examined */
 	char cur_sym[MAXSYM+1];	/* current symbol being defined */
 	char cur_exp[NSTRING];	/* current expansion */
 	

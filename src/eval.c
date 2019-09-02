@@ -303,7 +303,7 @@ int i;
 	return(envars[i]);
 }
 
-PASCAL NEAR binary(key, tval, tlength, klength)
+int PASCAL NEAR binary(key, tval, tlength, klength)
 
 char *key;		/* key string to look for */
 char *(PASCAL NEAR *tval)();	/* ptr to function to fetch table value with */
@@ -1482,7 +1482,7 @@ xnext:		++sp;
 /*	setwlist:	Set an alternative list of character to be
 			considered "in a word */
 
-PASCAL NEAR setwlist(wclist)
+int PASCAL NEAR setwlist(wclist)
 
 char *wclist;	/* list of characters to consider "in a word" */
 
@@ -1617,7 +1617,7 @@ int n;		/* numeric arg (can overide prompted value) */
 				of all the environment variables
 */
 
-PASCAL NEAR desvars(f, n)
+int PASCAL NEAR desvars(f, n)
 
 int f,n;	/* prefix flag and argument */
 

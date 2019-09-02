@@ -134,7 +134,7 @@ char * PASCAL   fullpathname (char *PathName, int Nbuf)
 /* filenamedlg: equivalent of mlreply, but specifically to get a filename */
 /* ===========                                                            */
 
-PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
+int PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
 {
     PARAMS  Parameters;
 	DLGPROC ProcInstance;

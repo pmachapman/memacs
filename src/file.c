@@ -23,7 +23,7 @@
  * "read a file into the current buffer" code.
  * Bound to "C-X C-R".
  */
-PASCAL NEAR fileread(f, n)
+int PASCAL NEAR fileread(f, n)
 
 int f, n;	/* defualt and numeric arguments (unused) */
 
@@ -46,7 +46,7 @@ int f, n;	/* defualt and numeric arguments (unused) */
  * "insert a file into the current buffer" code.
  * Bound to "C-X C-I".
  */
-PASCAL NEAR insfile(f, n)
+int PASCAL NEAR insfile(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -89,7 +89,7 @@ int f,n;	/* prefix flag and argument */
  * text, and switch to the new buffer.
  * Bound to C-X C-F.
  */
-PASCAL NEAR filefind(f, n)
+int PASCAL NEAR filefind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -105,7 +105,7 @@ int f,n;	/* prefix flag and argument */
 	return(getfile(fname, TRUE));
 }
 
-PASCAL NEAR viewfile(f, n)	/* visit a file in VIEW mode */
+int PASCAL NEAR viewfile(f, n)	/* visit a file in VIEW mode */
 
 int f,n;	/* prefix flag and argument */
 
@@ -128,7 +128,7 @@ int f,n;	/* prefix flag and argument */
 }
 
 #if	CRYPT
-PASCAL NEAR resetkey()	/* reset the encryption key if needed */
+int PASCAL NEAR resetkey()	/* reset the encryption key if needed */
 
 {
 	register int s; /* return status */
@@ -161,7 +161,7 @@ PASCAL NEAR resetkey()	/* reset the encryption key if needed */
 }
 #endif
 
-PASCAL NEAR getfile(fname, lockfl)
+int PASCAL NEAR getfile(fname, lockfl)
 
 char fname[];		/* file name to find */
 int lockfl;		/* check the file for locks? */
@@ -252,7 +252,7 @@ int lockfl;		/* check the file for locks? */
 	and before it is read. 
 */
 
-PASCAL NEAR readin(fname, lockfl)
+int PASCAL NEAR readin(fname, lockfl)
 
 char	fname[];	/* name of file to read */
 int	lockfl;		/* check for file locks? */
@@ -480,7 +480,7 @@ char *name;	/* name to check on */
  * and ^X^A for appending.
  */
 
-PASCAL NEAR filewrite(f, n)
+int PASCAL NEAR filewrite(f, n)
 
 int f, n;	/* emacs arguments */
 
@@ -503,7 +503,7 @@ int f, n;	/* emacs arguments */
 	return(s);
 }
 
-PASCAL NEAR fileapp(f, n)	/* append file */
+int PASCAL NEAR fileapp(f, n)	/* append file */
 
 int f, n;	/* emacs arguments */
 
@@ -532,7 +532,7 @@ int f, n;	/* emacs arguments */
  * name for the buffer. Bound to "C-X C-S". May
  * get called by "C-Z".
  */
-PASCAL NEAR filesave(f, n)
+int PASCAL NEAR filesave(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -588,7 +588,7 @@ int f,n;	/* prefix flag and argument */
  * a user specifyable routine (in $writehook) can be run.
  */
 
-PASCAL NEAR writeout(fn, mode)
+int PASCAL NEAR writeout(fn, mode)
 
 char *fn;	/* name of file to write current buffer to */
 char *mode;	/* mode to open file (w = write a = append) */
@@ -719,7 +719,7 @@ char *mode;	/* mode to open file (w = write a = append) */
  * prompt if you wish.
  */
 
-PASCAL NEAR filename(f, n)
+int PASCAL NEAR filename(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -747,7 +747,7 @@ int f,n;	/* prefix flag and argument */
  * buffer, Called by insert file command. Return the final
  * status of the read.
  */
-PASCAL NEAR ifile(fname)
+int PASCAL NEAR ifile(fname)
 char	fname[];
 {
 	register LINE *lp0;
@@ -859,7 +859,7 @@ out:
 			names of all the files in a given directory
 */
 
-PASCAL NEAR showfiles(f, n)
+int PASCAL NEAR showfiles(f, n)
 
 int f,n;	/* prefix flag and argument */
 

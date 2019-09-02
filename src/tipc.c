@@ -190,25 +190,25 @@
 #define WHITE   7+CHAR_ENABLE           /* TI attribute for White       */
 
 
-PASCAL NEAR ttopen();               /* Forward references.          */
-PASCAL NEAR ttgetc();
-PASCAL NEAR ttputc();
-PASCAL NEAR ttflush();
-PASCAL NEAR ttclose();
-PASCAL NEAR timove();
-PASCAL NEAR tieeol();
-PASCAL NEAR tieeop();
-PASCAL NEAR tibeep();
-PASCAL NEAR tiopen();
-PASCAL NEAR tikopen();
-PASCAL NEAR tirev();
-PASCAL NEAR ticres();
-PASCAL NEAR ticlose();
-PASCAL NEAR tikclose();
-PASCAL NEAR tiputc();
-PASCAL NEAR tifcol();
-PASCAL NEAR tibcol();
-PASCAL NEAR scinit();
+int PASCAL NEAR ttopen();               /* Forward references.          */
+int PASCAL NEAR ttgetc();
+int PASCAL NEAR ttputc();
+int PASCAL NEAR ttflush();
+int PASCAL NEAR ttclose();
+int PASCAL NEAR timove();
+int PASCAL NEAR tieeol();
+int PASCAL NEAR tieeop();
+int PASCAL NEAR tibeep();
+int PASCAL NEAR tiopen();
+int PASCAL NEAR tikopen();
+int PASCAL NEAR tirev();
+int PASCAL NEAR ticres();
+int PASCAL NEAR ticlose();
+int PASCAL NEAR tikclose();
+int PASCAL NEAR tiputc();
+int PASCAL NEAR tifcol();
+int PASCAL NEAR tibcol();
+int PASCAL NEAR scinit();
 
 int     revflag = FALSE;        /* are we currently in rev video?       */
 int     cfcolor = -1;           /* current forground color              */
@@ -277,7 +277,7 @@ TERM    term    = {
 extern union REGS rg;
 
 
-PASCAL NEAR tifcol(color)           /* set the current output color */
+int PASCAL NEAR tifcol(color)           /* set the current output color */
 
 int color;                          /* color to set */
 {
@@ -285,7 +285,7 @@ int color;                          /* color to set */
 }
 
 
-PASCAL NEAR tibcol(color)           /* set the current background color */
+int PASCAL NEAR tibcol(color)           /* set the current background color */
                                     /* color to set */
 int color;
 {
@@ -293,7 +293,7 @@ int color;
 }
 
 
-PASCAL NEAR timove(row, col)
+int PASCAL NEAR timove(row, col)
 
 int row;
 int col;
@@ -305,7 +305,7 @@ int col;
 }
 
 
-PASCAL NEAR tieeol()        /* erase to the end of the line */
+int PASCAL NEAR tieeol()        /* erase to the end of the line */
 
 {
     int i;                  /* loop variable                    */
@@ -329,7 +329,7 @@ PASCAL NEAR tieeol()        /* erase to the end of the line */
 }
 
 
-PASCAL NEAR tiputc(ch)      /* put a character at the current position */
+int PASCAL NEAR tiputc(ch)      /* put a character at the current position */
                             /* in the current colors */
 int ch;
 {
@@ -340,7 +340,7 @@ int ch;
 }
 
 
-PASCAL NEAR tieeop()        /* Actually a clear screen */
+int PASCAL NEAR tieeop()        /* Actually a clear screen */
 
 {
     rg.h.ah = 0x13;         /* Clear Text Screen, Home Cursor and */
@@ -348,7 +348,7 @@ PASCAL NEAR tieeop()        /* Actually a clear screen */
 }
 
 
-PASCAL NEAR tirev(state)    /* change reverse video state */
+int PASCAL NEAR tirev(state)    /* change reverse video state */
 
 int state;          /* TRUE = reverse, FALSE = normal */
 {
@@ -356,7 +356,7 @@ int state;          /* TRUE = reverse, FALSE = normal */
 }
 
 
-PASCAL NEAR ticres()    /* Change screen resolution. Should we add the  */
+int PASCAL NEAR ticres()    /* Change screen resolution. Should we add the  */
                         /* the 720x350 mode besides the normal 720x300  */
                         /* mode for those who can handle it?  It really */
                         /* gains us nothing since we don't gain lines   */
@@ -367,14 +367,14 @@ PASCAL NEAR ticres()    /* Change screen resolution. Should we add the  */
 }
 
 
-PASCAL NEAR tibeep()
+int PASCAL NEAR tibeep()
 
 {
     bdos(6, BEL, 0);
 }
 
 
-PASCAL NEAR tiopen()
+int PASCAL NEAR tiopen()
 
 {
     strcpy(sres, "NORMAL");
@@ -385,14 +385,14 @@ PASCAL NEAR tiopen()
 }
 
 
-PASCAL NEAR tikopen()
+int PASCAL NEAR tikopen()
 
 {
     /* Does nothing */
 }
 
 
-PASCAL NEAR ticlose()
+int PASCAL NEAR ticlose()
 
 {
     _fmemset(attradd, WHITE, 1);  /* write normal attrbute to latch      */
@@ -404,7 +404,7 @@ PASCAL NEAR ticlose()
 }
 
 
-PASCAL NEAR tikclose()
+int PASCAL NEAR tikclose()
 
 {
     _fmemset(attradd, WHITE, 1);  /* write normal attrbute to latch         */
@@ -416,7 +416,7 @@ PASCAL NEAR tikclose()
 }
 
 
-PASCAL NEAR scinit()    /* initialize the screen head pointers to */
+int PASCAL NEAR scinit()    /* initialize the screen head pointers to */
                         /* logical screen */
 {
     union {
@@ -435,7 +435,7 @@ PASCAL NEAR scinit()    /* initialize the screen head pointers to */
 }
 
 
-PASCAL NEAR scwrite(int row, char *outstr, int forg, int bacg, int revleft, int
+int PASCAL NEAR scwrite(int row, char *outstr, int forg, int bacg, int revleft, int
 /* write a line out */
 {
     char    *lnptr;         /* Pointer to the destination line */
@@ -465,7 +465,7 @@ PASCAL NEAR scwrite(int row, char *outstr, int forg, int bacg, int revleft, int
 }
 
 
-PASCAL NEAR spal(palette)      /* change palette string */
+int PASCAL NEAR spal(palette)      /* change palette string */
 
 char *palette;
 {
@@ -524,7 +524,7 @@ char *palette;
 
 
 #if     FLABEL
-PASCAL NEAR fnclabel(f, n)      /* label a function key */
+int PASCAL NEAR fnclabel(f, n)      /* label a function key */
 
 int f,n;        /* default flag, numeric argument [unused] */
 
@@ -537,7 +537,7 @@ int f,n;        /* default flag, numeric argument [unused] */
 
 
 #else
-tihello()
+void tihello()
 {
 }
 #endif

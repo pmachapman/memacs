@@ -158,7 +158,7 @@ register int	flag;
 	}
 }
 
-PASCAL NEAR insspace(f, n)	/* insert spaces forward into text */
+int PASCAL NEAR insspace(f, n)	/* insert spaces forward into text */
 
 int f, n;	/* default flag and numeric argument */
 
@@ -220,9 +220,9 @@ char *instr;
  */
 
 #if	PROTO
-PASCAL NEAR linsert(int n, char c)
+int PASCAL NEAR linsert(int n, char c)
 #else
-PASCAL NEAR linsert(n, c)
+int PASCAL NEAR linsert(n, c)
 
 int	n;
 char	c;
@@ -341,9 +341,9 @@ char	c;
  */
 
 #if	PROTO
-PASCAL NEAR lowrite(char c)
+int PASCAL NEAR lowrite(char c)
 #else
-PASCAL NEAR lowrite(c)
+int PASCAL NEAR lowrite(c)
 
 char c;		/* character to overwrite on current position */
 #endif
@@ -470,7 +470,7 @@ should be put in the kill buffer.
 
 */
 
-PASCAL NEAR ldelete(n, kflag)
+int PASCAL NEAR ldelete(n, kflag)
 
 long n; 	/* # of chars to delete */
 int kflag;	/* put killed text in kill buffer flag */
@@ -728,7 +728,7 @@ char *rline;
 
 /* putctext:	replace the current line with the passed in text	*/
 
-PASCAL NEAR putctext(iline)
+int PASCAL NEAR putctext(iline)
 
 char *iline;	/* contents of new line */
 

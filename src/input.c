@@ -59,7 +59,7 @@ extern struct passwd *getpwnam();
  */
 
 #if	!WINDOW_MSWIN	/* for MS Windows, mlyesno is defined in mswsys.c */
-PASCAL NEAR mlyesno(prompt)
+int PASCAL NEAR mlyesno(prompt)
 
 char *prompt;
 
@@ -106,7 +106,7 @@ char *prompt;
  * return. Handle erase, kill, and abort keys.
  */
 
-PASCAL NEAR mlreply(prompt, buf, nbuf)
+int PASCAL NEAR mlreply(prompt, buf, nbuf)
 
 char *prompt;
 char *buf;
@@ -119,7 +119,7 @@ int nbuf;
 /*	ectoc:	expanded character to character
 		collapse the CTRL and SPEC flags back into an ascii code   */
 
-PASCAL NEAR ectoc(c)
+int PASCAL NEAR ectoc(c)
 
 int c;
 
@@ -136,7 +136,7 @@ int c;
 /*	ctoec:	character to extended character
 		pull out the CTRL and SPEC prefixes (if possible)	*/
 
-PASCAL NEAR ctoec(c)
+int PASCAL NEAR ctoec(c)
 
 int c;
 

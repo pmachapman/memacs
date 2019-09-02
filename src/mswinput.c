@@ -90,7 +90,7 @@ int in_get (void)
 /* typahead:    TRUE if there are typeahead characters in the input stream */
 /* ========                                                                */
 
-PASCAL typahead (void)
+int PASCAL typahead (void)
 {
     if (in_check()) return TRUE;
     else return FALSE;

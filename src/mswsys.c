@@ -125,7 +125,7 @@ void PASCAL longop (int f)
 /* mlyesno: ask a yes/no question */
 /* =======                        */
 
-PASCAL mlyesno (char *prompt)
+int PASCAL mlyesno (char *prompt)
 
 /* This function replaces the mlyesno from input.c. Instead of asking a
    question on the message line, it pops up a message box */

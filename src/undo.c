@@ -263,7 +263,7 @@ int f,n;	/* prefix flag and argument */
 	return(wpopup(ulistp));
 }
 
-PASCAL NEAR undolist()
+int PASCAL NEAR undolist()
 
 {
 	register char *cp1;	/* scanning pointer into line to build */

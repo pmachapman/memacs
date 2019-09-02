@@ -255,7 +255,7 @@ int PASCAL helpengine (int f, int n)
 /* minimizescreen:  turn the current screen into an icon */
 /* ==============                                        */
 
-PASCAL  minimizescreen (int f, int n)
+int PASCAL  minimizescreen (int f, int n)
 {
     BOOL    nq;
 
@@ -269,7 +269,7 @@ PASCAL  minimizescreen (int f, int n)
 /* ForceMessage:    do a SendMessage, forcing quiescent mode */
 /* ============                                              */
 
-static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
+static int PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     BOOL    nq;
 
@@ -282,7 +282,7 @@ static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 /* maximizescreen:  maximize the current screen */
 /* ==============                               */
 
-PASCAL  maximizescreen (int f, int n)
+int PASCAL  maximizescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIMAXIMIZE,
                   (WPARAM)first_screen->s_drvhandle, 0L);
@@ -292,7 +292,7 @@ PASCAL  maximizescreen (int f, int n)
 /* restorescreen:   restore the current screen from maximized/minimized state */
 /* =============                                                              */
 
-PASCAL  restorescreen (int f, int n)
+int PASCAL  restorescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIRESTORE,
                   (WPARAM)first_screen->s_drvhandle, 0L);
@@ -302,7 +302,7 @@ PASCAL  restorescreen (int f, int n)
 /* tilescreens: tile the non-iconized screens */
 /* ===========                                */
 
-PASCAL  tilescreens (int f, int n)
+int PASCAL  tilescreens (int f, int n)
 
 /* without a numeric argument, tile horizontally. With a numeric argument
    of 1, tile vertically */
@@ -317,7 +317,7 @@ PASCAL  tilescreens (int f, int n)
 /* cascadescreens:  position the non-iconized screens in cascade */
 /* ==============                                                */
 
-PASCAL  cascadescreens (int f, int n)
+int PASCAL  cascadescreens (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDICASCADE, 0, 0L);
     return TRUE;

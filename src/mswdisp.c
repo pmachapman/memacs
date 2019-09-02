@@ -617,7 +617,7 @@ void FAR PASCAL MLPaint (void)
 /* spal:    set palette from $palette string */
 /* ====                                      */
 
-PASCAL spal (char *pstr)
+int PASCAL spal (char *pstr)
 {
 #if     COLOR
     int     pal;	/* current palette position */

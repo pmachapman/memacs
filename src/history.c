@@ -2576,7 +2576,7 @@
  *	  [0 MOUS #col #row 2] as MS2 and bound it to mouse-resize2-window
  */
 
-history()
+int history()
 
 {
 	/* this is here to keep compilers from complaining... it's not needed */

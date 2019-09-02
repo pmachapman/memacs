@@ -1251,7 +1251,7 @@ static BOOL PASCAL  AddMenuBinding (ETYPE EPOINTER eptr, WORD type)
 /* bindtomenu:  bind a menu item to an emacs function */
 /* ==========                                         */
 
-PASCAL bindtomenu (int f, int n)
+int PASCAL bindtomenu (int f, int n)
 /* command arguments IGNORED */
 {
     ETYPE EPOINTER  e;
@@ -1267,7 +1267,7 @@ PASCAL bindtomenu (int f, int n)
 /* macrotomenu: bind a menu item to a macro (i.e. a buffer) */
 /* ===========                                              */
 
-PASCAL macrotomenu (int f, int n)
+int PASCAL macrotomenu (int f, int n)
 /* command arguments IGNORED */
 {
     ETYPE EPOINTER  e;
@@ -1330,7 +1330,7 @@ static BOOL PASCAL  DeleteMenuBinding (HMENU hMenu, int Pos)
 /* unbindmenu:  remove a menu entry */
 /* ==========                       */
 
-PASCAL unbindmenu (int f, int n)
+int PASCAL unbindmenu (int f, int n)
 /* command arguments IGNORED */
 {
     BOOL    Result;

@@ -166,7 +166,7 @@ abortrun:
 	own used memory, otherwise we just exit.
 */
 
-PASCAL NEAR clean()
+int PASCAL NEAR clean()
 
 {
 	register BUFFER *bp;	/* buffer list pointer */
@@ -461,7 +461,7 @@ static int PASCAL NEAR getbasekey()
 	invented the "recursive-edit" function.
 */
 
-PASCAL NEAR editloop()
+int PASCAL NEAR editloop()
 
 {
 	register int c;		/* command character */
@@ -715,7 +715,7 @@ char bname[];			/* name of buffer to initialize */
  * look at it. Return the status of command.
  */
 
-PASCAL NEAR execute(c, f, n)
+int PASCAL NEAR execute(c, f, n)
 
 int c;					/* key to execute */
 int f;					/* prefix argument flag */
@@ -881,7 +881,7 @@ has changed do a write on that buffer and exit emacs, otherwise simply
 exit.
 */
 
-PASCAL NEAR quickexit(f, n)
+int PASCAL NEAR quickexit(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -920,7 +920,7 @@ int f, n;				/* prefix flag and argument */
  * has been changed and not written out. Normally bound to "C-X C-C".
  */
 
-PASCAL NEAR quit(f, n)
+int PASCAL NEAR quit(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
@@ -948,7 +948,7 @@ int f, n;				/* prefix flag and argument */
 	return(status);
 	}
 
-PASCAL NEAR meexit(status)
+int PASCAL NEAR meexit(status)
 int status;				/* return status of emacs */
 	{
 	eexitflag = TRUE;	/* flag a program exit */
@@ -965,7 +965,7 @@ int status;				/* return status of emacs */
  * return.
  */
 
-PASCAL NEAR ctlxlp(f, n)
+int PASCAL NEAR ctlxlp(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -988,7 +988,7 @@ int f, n;				/* prefix flag and argument */
  * routine. Set up the variables and return to the caller.
  */
 
-PASCAL NEAR ctlxrp(f, n)
+int PASCAL NEAR ctlxrp(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1012,7 +1012,7 @@ int f, n;				/* prefix flag and argument */
  * command gets an error. Return TRUE if all ok, else FALSE.
  */
 
-PASCAL NEAR ctlxe(f, n)
+int PASCAL NEAR ctlxe(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1036,7 +1036,7 @@ int f, n;				/* prefix flag and argument */
  * Sometimes called as a routine, to do general aborting of stuff.
  */
 
-PASCAL NEAR ctrlg(f, n)
+int PASCAL NEAR ctrlg(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1051,7 +1051,7 @@ int f, n;				/* prefix flag and argument */
 /* tell the user that this command is illegal while we are in
    VIEW (read-only) mode				*/
 
-PASCAL NEAR rdonly()
+int PASCAL NEAR rdonly()
 
 {
 	TTbeep();
@@ -1060,7 +1060,7 @@ PASCAL NEAR rdonly()
 	return(FALSE);
 }
 
-PASCAL NEAR resterr()
+int PASCAL NEAR resterr()
 
 {
 	TTbeep();
@@ -1077,7 +1077,7 @@ int n, f;	/* yes, these are default and never used.. but MUST be here */
 	return(TRUE);
 }
 
-PASCAL NEAR meta(f, n)	/* set META prefixing pending */
+int PASCAL NEAR meta(f, n)	/* set META prefixing pending */
 
 int f, n;				/* prefix flag and argument */
 
@@ -1088,7 +1088,7 @@ int f, n;				/* prefix flag and argument */
 	return(TRUE);
 }
 
-PASCAL NEAR cex(f, n)	/* set ^X prefixing pending */
+int PASCAL NEAR cex(f, n)	/* set ^X prefixing pending */
 
 int f, n;				/* prefix flag and argument */
 

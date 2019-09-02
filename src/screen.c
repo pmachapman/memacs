@@ -66,7 +66,7 @@ SCREEN *sp;	/* screen image to refresh */
 	to A-N on machines with an ALT key
 */
 
-PASCAL NEAR cycle_screens(f, n)
+int PASCAL NEAR cycle_screens(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -82,7 +82,7 @@ int f,n;	/* prefix flag and argument */
 	return(select_screen(sp, TRUE));
 }
 
-PASCAL NEAR find_screen(f, n)
+int PASCAL NEAR find_screen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -164,7 +164,7 @@ SCREEN *sp;         /* screen to remove from the list */
 	last_scr->s_next_screen = sp->s_next_screen;
 }
 
-PASCAL NEAR delete_screen(f, n)
+int PASCAL NEAR delete_screen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -397,7 +397,7 @@ int announce;	/* announce the selection? */
 	Bound to "A-B".
 */
 
-PASCAL NEAR list_screens(f, n)
+int PASCAL NEAR list_screens(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -419,7 +419,7 @@ int f,n;	/* prefix flag and argument */
  * is an error (if there is no memory). Iflag
  * indicates whether to list hidden screens.
  */
-PASCAL NEAR screenlist(iflag)
+int PASCAL NEAR screenlist(iflag)
 
 int iflag;	/* list hidden screen flag */
 
