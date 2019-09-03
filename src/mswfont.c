@@ -172,7 +172,7 @@ static void PASCAL AddSize (HWND hDlg, short int Height, short int Width)
 			    (LPARAM)(LPSTR)ItemText);
     SendDlgItemMessage (hDlg, ID_FONTSIZE, CB_SETITEMDATA, i,
 			(LPARAM)MAKELONG(Width,Height));
-    
+
 } /* AddSize */
 
 /* EnumSizesProc:   font enumeration function used by BuildSizeList */
@@ -191,7 +191,7 @@ int EXPORT FAR PASCAL EnumSizesProc (CONST LOGFONT *lf, CONST TEXTMETRIC *tm,
 #endif
         /* make a size list up */
         long h;
-        
+
         for (h = lf->lfHeight / 4; h <= (3 * lf->lfHeight) / 2; h += 2) {
             AddSize (*(HWND FAR *)Data, (short)h, 0);
         }
@@ -201,7 +201,7 @@ int EXPORT FAR PASCAL EnumSizesProc (CONST LOGFONT *lf, CONST TEXTMETRIC *tm,
         /* list it only if it has a proper aspect ratio */
         HFONT   hFont;
         LOGFONT Font;
-        TEXTMETRIC metrics; 
+        TEXTMETRIC metrics;
 
 	Font = *lf;
 	Font.lfWidth = 0;
@@ -293,7 +293,7 @@ static void PASCAL AddFace (HWND hDlg, char *CandidateFace)
     HFONT   hFixedFont;
     char    faceName[LF_FACESIZE];
     TEXTMETRIC tm;
-    
+
     CharSet = (IsDlgButtonChecked (hDlg, ID_ANSI) ?
                ANSI_CHARSET : OEM_CHARSET);
     /*-try to identify a fixed-pitch font of set CharSet, with the
@@ -383,7 +383,7 @@ INT_PTR EXPORT FAR PASCAL  FontDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 				    LPARAM lParam)
 {
     switch (wMsg) {
-        
+
     case WM_INITDIALOG:
         hNewFont = NULL;
 	{   /*-setup the dialog box's caption */
@@ -400,7 +400,7 @@ INT_PTR EXPORT FAR PASCAL  FontDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 	       radiobutton. This will initialize all the other controls
 	       */
 	    WORD    id;
-	    
+
 	    id = (Metrics.tmCharSet == ANSI_CHARSET ? ID_ANSI : ID_OEM);
 	    SendMessage (hDlg, WM_COMMAND,
 #if WINDOW_MSWIN32
@@ -432,7 +432,7 @@ AcceptFont:
 		/*-save the facename, bold status and size into EMACS.INI,
 		   then perform as the OK button */
 		char    NumText[17];
-		    
+
 		GetFontMetrics (hNewFont, &Metrics, FaceName);
 
 		WritePrivateProfileString (ProgName, "FontName", FaceName, IniFile);
@@ -547,6 +547,37 @@ static void PASCAL ChangeFont (void)
                 TRUE);
 } /* ChangeFont */
 
+static
+BOOL choose_font()
+{
+	LOGFONT lf = {0};
+	CHOOSEFONT cf = { 0 };
+	BOOL success = FALSE;
+
+	GetObject(hEmacsFont, sizeof(LOGFONT), &lf);
+
+	cf.lStructSize = sizeof(CHOOSEFONT);
+	cf.hwndOwner = hFrameWnd;
+	cf.hInstance = hEmacsInstance;
+	cf.lpLogFont = &lf;
+	cf.Flags = CF_INITTOLOGFONTSTRUCT |  CF_FIXEDPITCHONLY;
+
+	success = ChooseFont(&cf);
+
+	if(success)
+	{
+		HANDLE hOldFont = hNewFont;
+		hNewFont = CreateFontIndirect(cf.lpLogFont);
+		GetFontMetrics(hNewFont, &Metrics, FaceName);
+		if(hOldFont) DeleteObject(hOldFont);
+		BuildCellMetrics(&EmacsCM, hEmacsFont);
+		ChangeFont();
+		if(hEmacsFont) DeleteObject(hEmacsFont);
+		hEmacsFont = hNewFont;
+	}
+	return success;
+}
+
 /* PickEmacsFont:   calls-up the FONTS dialog box */
 /* =============                                  */
 
@@ -554,6 +585,13 @@ BOOL FAR PASCAL PickEmacsFont (void)
 
 /* returns TRUE is a new font has been picked */
 {
+#if WINVER >= _WIN32_WINNT_WIN2K
+	static int newway = 0;
+	if(newway)
+	{
+		return choose_font();
+	}
+#endif
     BOOL    FontChanged;
     DLGPROC ProcInstance;
 
@@ -569,6 +607,7 @@ BOOL FAR PASCAL PickEmacsFont (void)
 	return TRUE;
     }
     else return FALSE;
+
 } /* PickEmacsFont */
 
 /* FontInit:    initialize a font description from WIN.INI */
