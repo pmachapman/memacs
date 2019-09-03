@@ -173,6 +173,7 @@
     <ClInclude Include="..\..\h\resource.h" />
     <ClInclude Include="..\..\h\spanish.h" />
     <ClInclude Include="..\resource.h" />
+    <ClInclude Include="..\targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\abbrev.c" />

@@ -660,6 +660,20 @@ LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	MouseMessage (hWnd, wMsg, wParam, lParam);
 	break;
 
+	case WM_MOUSEWHEEL:
+		if ((short)HIWORD(wParam) > 0)
+		{
+			ScrollMessage(hWnd, WM_VSCROLL, SB_LINEUP, 0);
+			/* SendMessage(hWnd, WM_VSCROLL, SB_LINEUP, 0); 
+			SendMessage(hWnd, WM_VSCROLL, SB_LINEUP, 0); */
+		}
+		else
+		{
+			ScrollMessage(hWnd, WM_VSCROLL, SB_LINEDOWN, 0);
+			/* SendMessage(hWnd, WM_VSCROLL, SB_LINEDOWN, 0); 
+			SendMessage(hWnd, WM_VSCROLL, SB_LINEDOWN, 0); */
+		}
+		break;
     case WM_VSCROLL:
     case WM_HSCROLL:
         ScrollMessage (hWnd, wMsg, LOWORD(wParam),
@@ -811,6 +825,18 @@ LRESULT EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	}
 	break;
 	
+	case WM_MOUSEWHEEL:
+		if ((short)HIWORD(wParam) > 0)
+		{
+			SendMessage(hWnd, WM_VSCROLL, SB_LINEUP, 0);
+		}
+		else
+		{
+			SendMessage(hWnd, WM_VSCROLL, SB_LINEDOWN, 0);
+		}
+		break;
+
+
     case WM_SETCURSOR:
 	if (UpdateCursor (hWnd, wParam, lParam)) return TRUE;
 	goto DefaultProc;

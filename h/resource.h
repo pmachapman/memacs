@@ -343,6 +343,7 @@
 #define SORT_CHINESE_BOPOMOFO           0x3
 #define __drv_typeExpr                  3
 #define WINAPI_FAMILY_SYSTEM            4
+#define ISOLATIONPOLICY_MANIFEST_RESOURCE_ID 4
 #define SW_SHOWNOACTIVATE               4
 #define SHOW_OPENNOACTIVATE             4
 #define SW_OTHERUNZOOM                  4
@@ -823,6 +824,8 @@
 #define VK_NUMPAD5                      0x65
 #define LANG_DIVEHI                     0x65
 #define VK_NUMPAD6                      0x66
+#define IDD_DIALOG1                     102
+#define IDD_FONTSAVE                    102
 #define VK_NUMPAD7                      0x67
 #define LANG_FULAH                      0x67
 #define LANG_PULAR                      0x67
@@ -1328,6 +1331,9 @@
 #define WM_TABLET_FIRST                 0x02c0
 #define WM_TABLET_LAST                  0x02df
 #define WM_DPICHANGED                   0x02E0
+#define WM_DPICHANGED_BEFOREPARENT      0x02E2
+#define WM_DPICHANGED_AFTERPARENT       0x02E3
+#define WM_GETDPISCALEDSIZE             0x02E4
 #define CF_PRIVATELAST                  0x02FF
 #define _WIN32_IE_IE30                  0x0300
 #define WM_CUT                          0x0300
@@ -1755,16 +1761,13 @@
 #define SC_CONTEXTHELP                  0xF180
 #define LVS_TYPESTYLEMASK               0xfc00
 #define SPVERSION_MASK                  0x0000FF00
-#define HTERROR                         -2
-#define PWR_FAIL                        -1
 #define UNICODE_NOCHAR                  0xFFFF
-#define HTTRANSPARENT                   -1
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        101
+#define _APS_NEXT_RESOURCE_VALUE        104
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101

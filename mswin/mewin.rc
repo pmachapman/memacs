@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include <windows.h>
 /////////////////////////////////////////////////////////////////////////////
 // English (United States) resources
 
@@ -414,6 +415,13 @@ BEGIN
     LISTBOX         ID_HIST,4,4,303,62,NOT LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | WS_VSCROLL
 END
 
+IDD_FONTSAVE DIALOGEX 0, 0, 273, 25
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPSIBLINGS
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "&Save",IDC_BUTTON1,223,1,50,14
+END
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -456,6 +464,12 @@ BEGIN
     BEGIN
         RIGHTMARGIN, 284
     END
+
+    IDD_FONTSAVE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 150
+        BOTTOMMARGIN, 24
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -466,6 +480,11 @@ END
 //
 
 ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_FONTSAVE AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

@@ -10,6 +10,7 @@
 #include    "eproto.h"
 #include    "edef.h"
 #include	"elang.h"
+#include	"resource.h"
 
 #if WINNT || WINXP
 #define FNAMELEN NFILEN
@@ -140,7 +141,7 @@ int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
 	OPENFILENAME ofn = { 0 };
 	char fileName[NFILEN] = { '\0' };
 	char    DlgTitle[sizeof(PROGNAME) + 3 + 30];
-	BOOL isSaveFile = (0 == strcmp(TEXT144, prompt));
+	BOOL isSaveFile = ((0 == strcmp(TEXT144, prompt)) || (0 == strcmp(TEXT218,prompt)) );
 
 
 	SetWorkingDir();
@@ -167,7 +168,7 @@ int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
 		DlgTitle[i] = 0;
 	}
 	ofn.lpstrTitle = DlgTitle;
-	ofn.Flags = OFN_ENABLESIZING ;
+	ofn.Flags = OFN_ENABLESIZING | OFN_EXPLORER;
 
 	success = isSaveFile ? GetSaveFileName(&ofn) : GetOpenFileName(&ofn);
 

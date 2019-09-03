@@ -2,9 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by mewin.rc
 //
-
-#include <windows.h>
-
 #define SW_HIDE                         0
 #define HIDE_WINDOW                     0
 #define WM_NULL                         0x0000
@@ -827,6 +824,8 @@
 #define VK_NUMPAD5                      0x65
 #define LANG_DIVEHI                     0x65
 #define VK_NUMPAD6                      0x66
+#define IDD_DIALOG1                     102
+#define IDD_FONTSAVE                    102
 #define VK_NUMPAD7                      0x67
 #define LANG_FULAH                      0x67
 #define LANG_PULAR                      0x67
@@ -1377,6 +1376,7 @@
 #define WM_PENWINFIRST                  0x0380
 #define WM_PENWINLAST                   0x038F
 #define WM_DDE_FIRST                    0x03E0
+#define IDC_BUTTON1                     1000
 #define CF_GDIOBJLAST                   0x03FF
 #define IDM_NULLPROC                    0x03FF
 #define _WIN32_WINNT_NT4                0x0400
@@ -1762,18 +1762,15 @@
 #define SC_CONTEXTHELP                  0xF180
 #define LVS_TYPESTYLEMASK               0xfc00
 #define SPVERSION_MASK                  0x0000FF00
-/* #define HTERROR                         -2 */
-/* #define PWR_FAIL                        -1 */
 #define UNICODE_NOCHAR                  0xFFFF
-/* #define HTTRANSPARENT                   -1 */
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        102
+#define _APS_NEXT_RESOURCE_VALUE        104
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
