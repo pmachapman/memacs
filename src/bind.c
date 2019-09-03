@@ -879,7 +879,7 @@ KEYTAB *key;	/* key binding to return a name of */
 typedef int (PASCAL NEAR *MatchFcnPtr)(void);
 /* int (PASCAL NEAR *PASCAL NEAR fncmatch(char *fname))(void) */
 #else
-typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr(fname))();
+typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr)(void);
 
 /* int (PASCAL NEAR *PASCAL NEAR fncmatch(fname))() */
 
@@ -889,7 +889,7 @@ typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr(fname))();
 #if	MSC
 MatchFcnPtr fncmatch(char *fname)
 #else
-MatchFcnPtr fncmatch()
+MatchFcnPtr fncmatch(fname)
 char *fname;
 #endif
 {

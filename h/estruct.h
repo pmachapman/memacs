@@ -47,13 +47,13 @@
 #define AVIION	0			/* Data General AViiON		*/
 #define BSD	0			/* UNIX BSD 4.2 and ULTRIX	*/
 #define FINDER	0			/* Macintosh OS 		*/
-#define	FREEBSD	0			/* FREEBSD 386 version 2 or +	*/
+#define	FREEBSD	1			/* FREEBSD 386 version 2 or +	*/
 #define HPUX8	0			/* HPUX HP 9000 ver 8 or less	*/
 #define HPUX9	0			/* HPUX HP 9000 ver 9           */
 #define MPE	0			/* HP MPE/XL			*/
 #define MSDOS	0			/* MS-DOS			*/
 #define WINNT	0			/* MS-Win NT			*/
-#define	WINXP	1			/* Windows XP/Visual studio 2008*/
+#define	WINXP	0			/* Windows XP/Visual studio 2008*/
 #define OS2	0			/* Microsoft or IBM OS/2	*/
 #define SMOS	0			/* Supermax UNIX System V	*/
 #define SUN	0			/* SUN v4.0			*/
@@ -68,10 +68,10 @@
 #define ALCYON	0	/* ALCYON Atari ST compiler */ 
 #define AZTEC	0	/* Aztec C 4.00e ONLY for the amiga now... */
 #define DGC	0	/* Data General AOS/VS C... */
-#define GCC	0	/* the GNU C compiler */
+#define GCC	1	/* the GNU C compiler */
 #define IC	0	/* Rational Systems Instant C */
 #define LATTICE 0	/* Lattice 2.14 through 3.0 compilers */
-#define MSC	1	/* MicroSoft C compile version 3 and up */
+#define MSC	0	/* MicroSoft C compile version 3 and up */
 #define MWC	0	/* Mark Williams C */
 #define TURBO	0	/* Turbo C and Borland C++ under MSDOS */
 #define UNIX	0	/* a standard UNIX compiler (cc) */
@@ -119,11 +119,11 @@
 #define OS2NPM	0			/* OS/2 non-Presentation Mgr.	*/
 #define SMG	0			/* SMG library on VMS		*/
 #define ST52	0			/* Atari 520/1040ST screen	*/
-#define TERMCAP 0			/* Use TERMCAP			*/
+#define TERMCAP 1			/* Use TERMCAP			*/
 #define TIPC	0			/* TI Profesional PC driver	*/
 #define VT52	0			/* VT52 terminal (Zenith).	*/
 #define NTCON	0			/* Windows NT console		*/
-#define	XPCON	1			/* windows XP console app	*/
+#define	XPCON	0			/* windows XP console app	*/
 #define	XVT	0			/* XVT windowing system		*/
 #define Z309	0			/* Zenith 100 PC family driver	*/
 
@@ -131,8 +131,8 @@
 
 #define WINDOW_TEXT	0		/* [default] Text mode		*/
 #define WINDOW_MSWIN	0		/* MicroSoft Windows		*/
-#define WINDOW_MSWIN32	1		/* MicroSoft Windows 32 bit API */
-#define WINDOW_X	0		/* X/Unix			*/
+#define WINDOW_MSWIN32	0		/* MicroSoft Windows 32 bit API */
+#define WINDOW_X	1		/* X/Unix			*/
 
 /*	Language text options	(pick one)				*/
 

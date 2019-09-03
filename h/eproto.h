@@ -118,10 +118,12 @@ extern int PASCAL NEAR lowerc(unsigned ch);
 extern int PASCAL NEAR cycle_ring(int f, int n);
 extern int PASCAL NEAR upperc(unsigned ch);
 #if	ZTC || TURBO || IC
-extern int (PASCAL NEAR *PASCAL NEAR fncmatch(char *fname))(int, int);
+typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr)(void);
+extern MatchFcnPtr fncmatch(char *fname);
 extern int (PASCAL NEAR *PASCAL NEAR getname(char *prompt))(int, int);
 #else	/* Sun (and others?) screwed up the prototyping.*/
-extern int (PASCAL NEAR *PASCAL NEAR fncmatch(char *fname))(VOID);
+typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr)(void);
+extern MatchFcnPtr fncmatch(char *fname);
 extern int (PASCAL NEAR *PASCAL NEAR getname(char *prompt))(VOID);
 #endif
 extern int PASCAL NEAR asc_int(char *st);
