@@ -122,7 +122,7 @@ typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr)(void);
 extern MatchFcnPtr fncmatch(char *fname);
 extern int (PASCAL NEAR *PASCAL NEAR getname(char *prompt))(int, int);
 #else	/* Sun (and others?) screwed up the prototyping.*/
-typedef int (PASCAL NEAR *PASCAL NEAR MatchFcnPtr)(void);
+typedef int (PASCAL NEAR * MatchFcnPtr)(void);
 extern MatchFcnPtr fncmatch(char *fname);
 extern int (PASCAL NEAR *PASCAL NEAR getname(char *prompt))(VOID);
 #endif
