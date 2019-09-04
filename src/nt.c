@@ -19,13 +19,17 @@
 
 #include        "estruct.h"
 #include        "eproto.h"
+#include <time.h>
 
-#if     WINNT
+#if     WINNT || WINXP
 
 #include "elang.h"
 #include "edef.h"
 #include <process.h>
 #include <io.h>
+
+intptr_t shell(void);
+int execprog(char *cmd);
 
 /*
  * Create a subjob with a copy of the command intrepreter in it. When the
@@ -33,7 +37,7 @@
  * repaint. Bound to "^X C". The message at the start in VMS puts out a newline.
  * Under some (unknown) condition, you don't get one free when DCL starts up.
  */
-PASCAL NEAR spawncli(f, n)
+int PASCAL NEAR spawncli(f, n)
 {
         /* don't allow this command if restricted */
         if (restflag)
@@ -54,7 +58,7 @@ PASCAL NEAR spawncli(f, n)
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X !".
  */
-PASCAL NEAR spawn(f, n)
+int PASCAL NEAR spawn(f, n)
 {
         register int s;
         char line[NLINE];
@@ -86,7 +90,7 @@ PASCAL NEAR spawn(f, n)
  * done. Bound to "C-X $".
  */
 
-PASCAL NEAR execprg(f, n)
+int PASCAL NEAR execprg(f, n)
 {
         register int s;
         char line[NLINE];
@@ -117,7 +121,7 @@ PASCAL NEAR execprg(f, n)
  * We use a unique temporary file name so that multiple instances of
  * MicroEMACS don't try to use the same file.
  */
-PASCAL NEAR pipecmd(f, n)
+int PASCAL NEAR pipecmd(f, n)
 {
         register EWINDOW *wp;    /* pointer to new window */
         register BUFFER *bp;    /* pointer to buffer to zot */
@@ -206,7 +210,7 @@ PASCAL NEAR pipecmd(f, n)
  * We use unique temporary file names so that multiple instances of
  * MicroEMACS don't try to use the same file.
  */
-PASCAL NEAR filter(f, n)
+int PASCAL NEAR filter(f, n)
 
 {
         register int    s;      /* return status from CLI */
@@ -293,7 +297,7 @@ PASCAL NEAR filter(f, n)
 
 
 /*      SHELL: Bring up a shell. */
-
+intptr_t
 shell(void)
 {
         char *shell;            /* Name of system command processor */
@@ -308,7 +312,7 @@ shell(void)
 }
 
 
-
+int
 execprog( char *cmd)
 {
         char             args[NSTRING];         /* args passed to program */
@@ -355,7 +359,7 @@ execprog( char *cmd)
 /*      FILE Directory routines         */
 
 struct _finddata_t pBuf; /* buffer to hold file information */
-long lDir;              /* directory handle */
+intptr_t lDir;              /* directory handle */
 int num_found;          /* number of directory entries found/to find */
 
 char path[NFILEN];      /* path of file to find */
@@ -368,8 +372,8 @@ char *PASCAL NEAR getffile(fspec)
 char *fspec;    /* pattern to match */
 
 {
-        register int index;             /* index into various strings */
-        register int point;             /* index into other strings */
+        register intptr_t index;             /* index into various strings */
+        register intptr_t point;             /* index into other strings */
         register int extflag;           /* does the file have an extention? */
         char fname[NFILEN];             /* file/path for DOS call */
 
@@ -435,11 +439,11 @@ char *PASCAL NEAR timeset()
 
 {
         register char *sp;      /* temp string pointer */
-        char buf[16];           /* time data buffer */
+		time_t buf;           /* time data buffer */
         extern char *ctime();
 
-        time(buf);
-        sp = ctime(buf);
+        time(&buf);
+        sp = ctime(&buf);
         sp[strlen(sp)-1] = 0;
         return(sp);
 }

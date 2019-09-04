@@ -32,7 +32,8 @@ cvtomfdebug = -g
 cc = cl
 
 #First clags is for debugging, second one is for not
-cflags	= -c -G3d -W3 -D_X86_=1 $(cdebug) -D_MT /J /I. /I$(HDIR) /I$(INCD)
+# cflags	= -c -G3d -W3 -D_X86_=1 $(cdebug) -DBUILD_NTCONSOLE -MD /J /I. /I$(HDIR) /I$(INCD)
+cflags	= -c -W3 -D_X86_=1 $(cdebug) -DBUILD_NTCONSOLE -MD /J /I. /I$(HDIR) /I$(INCD)
 #cflags	= -c -G3d -W3 -D_X86_=1 -D_MT /J /I. /I$(HDIR) /I$(INCD)
 
 #cvtobj = cvtomf $(cvtomfdebug)
@@ -77,7 +78,7 @@ guiflags =  -subsystem:windows -entry:WinMainCRTStartup
 # note : $(LIB) is set in environment variables
 
 
-conlibs = libcmt.lib kernel32.lib
+conlibs = msvcrt.lib kernel32.lib
 
 guilibs    = libc.lib ntdll.lib kernel32.lib \
 	     user32.lib gdi32.lib winspool.lib \

@@ -272,7 +272,7 @@ int maxlen;		/* maximum length of input field */
 
 		/* get the keystroke and decode it */
 		ec = get_key();
-		c = ectoc(ec);		
+		c = ectoc(ec);
 
 		/* if it is from the mouse, or is a function key, blow it off */
 		if ((ec & MOUS) || (ec & SPEC))
@@ -312,7 +312,7 @@ int maxlen;		/* maximum length of input field */
 			}
 			TTflush();
 
-		} else if ((c == ' ') || (ec == sterm) || (c == '\t')) {	
+		} else if ((c == ' ') || (ec == sterm) || (c == '\t')) {
 			/* attempt a completion */
 			switch (type) {
 				case CMP_BUFFER:
@@ -737,7 +737,7 @@ int *cpos;	/* ptr to position of next character to insert */
 
 	register int matches;	/* number of matches for name */
 	char longestmatch[NSTRING]; /* temp buffer for longest match */
-	int longestlen; 	/* length of longest match (always > *cpos) */
+	int longestlen=0; 	/* length of longest match (always > *cpos) */
 
 	/* everything (or nothing) matches an empty string */
 	if (*cpos == 0)
@@ -758,7 +758,7 @@ int *cpos;	/* ptr to position of next character to insert */
 			/* if this is the first match, simply record it */
 			if (matches == 1) {
 				strcpy(longestmatch,fname);
-				longestlen = strlen(longestmatch);
+				longestlen = (int)strlen(longestmatch);
 			} else {
 
 				/* if there's a difference, stop here */
@@ -882,7 +882,7 @@ int PASCAL NEAR tgetc()
 		c = TTgetc();
 
 	} else {
-		
+
 		c = charpending;
 		cpending = FALSE;
 	}
@@ -1063,7 +1063,7 @@ int eolchar;
 
  			/* clear the buffer */
  			buf[0] = 0;
- 
+
  			/* clear the message line and return */
  			mlwrite("");
  			TTflush();

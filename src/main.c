@@ -88,9 +88,9 @@ extern unsigned int _stklen = 10000;
 int emacs(argc, argv)
 #else
 #if	XVT
-called_main(argc, argv)
+int called_main(argc, argv)
 #else
-main(argc, argv)
+int main(argc, argv)
 #endif
 #endif
 
@@ -841,7 +841,7 @@ int n;					/* prefix value */
 						status = FALSE;
 				}
 			}
-#endif	
+#endif
 			else
 				status = linsert(n, (char)c);
 		}

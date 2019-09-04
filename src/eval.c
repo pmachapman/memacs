@@ -166,7 +166,7 @@ char *fname;		/* name of function to evaluate */
 #if	MAGIC
 				if (arg < 0 || arg >= MAXGROUPS)
 					return(bytecopy(result, errorm, NSTRING * 2));
-				    
+
 				return(bytecopy(result, fixnull(grpmatch[arg]),
 					 NSTRING * 2));
 #else
@@ -255,7 +255,7 @@ char *vname;		/* name of user variable to fetch */
 	/* limit comparisons to significant length */
 	if (strlen(vname) >= NVSIZE)	/* "%" counts, but is not passed */
 		vname[NVSIZE] = '\0';
-	
+
 	/* scan through each user variable table starting with the
 	   most local and going to the global table */
 	ut = uv_head;
@@ -532,7 +532,7 @@ char *PASCAL NEAR getkill()
 			}
 		}
 	}
-        
+
 	/* and return the constructed value */
 	*vp = 0;
 	return(value);
@@ -576,7 +576,7 @@ int n;		/* numeric arg (can overide prompted value) */
 
 	/* check the legality and find the var */
 	findvar(var, &vd, NVSIZE + 1, VT_GLOBAL);
-        
+
 	/* if its not legal....bitch */
 	if (vd.v_type == -1) {
 		mlwrite(TEXT52, var);
@@ -599,7 +599,7 @@ int n;		/* numeric arg (can overide prompted value) */
 
 	/* if $debug == TRUE, every assignment will echo a statment to
 	   that effect here. */
-        
+
 	if (macbug && (strcmp(var, "%track") != 0)) {
 		strcpy(outline, "(((");
 
@@ -649,7 +649,7 @@ int n;		/* numeric arg (ignored here) */
 
 	/* check the legality and find the var */
 	findvar(var, &vd, NVSIZE + 1, VT_GLOBAL);
-        
+
 	/* if its not legal....bitch */
 	if (vd.v_type == -1) {
 		mlwrite(TEXT52, var);
@@ -662,7 +662,7 @@ int n;		/* numeric arg (ignored here) */
 
 	/* if $debug == TRUE, every assignment will echo a statment to
 	   that effect here. */
-        
+
 	if (macbug && (strcmp(var, "%track") != 0)) {
 		strcpy(outline, "(((Globally declare ");
 
@@ -708,7 +708,7 @@ int n;		/* numeric arg (ignored here) */
 
 	/* check the legality and find the var */
 	findvar(var, &vd, NVSIZE + 1, VT_LOCAL);
-        
+
 	/* if its not legal....bitch */
 	if (vd.v_type == -1) {
 		mlwrite(TEXT52, var);
@@ -721,7 +721,7 @@ int n;		/* numeric arg (ignored here) */
 
 	/* if $debug == TRUE, every assignment will echo a statment to
 	   that effect here. */
-        
+
 	if (macbug && (strcmp(var, "%track") != 0)) {
 		strcpy(outline, "(((Locally declare ");
 
@@ -1039,7 +1039,7 @@ char *value;	/* value to set to */
 		case EVREPLACE: strcpy((char *)rpat, value);
 #if	MAGIC
 				rmcclear();
-#endif 
+#endif
 				break;
 		case EVRVAL:	strcpy(rval, value);
 				break;
@@ -1134,7 +1134,7 @@ char *st;
 		++st;
 
 	/* scan digits, build value */
-	while ((c = *st++))
+	while ( 0 != (c = *st++) )
 		if (c >= '0' && c <= '9')
 			result = result * 10 + c - '0';
 		else
@@ -1284,7 +1284,7 @@ char *token;		/* token to evaluate */
 				bp = bfind(token, FALSE, 0);
 				if (bp == NULL)
 					return(NULL);
-	        
+
 				/* if the buffer is displayed, get the window
 				   vars instead of the buffer vars */
 				if (bp->b_nwnd > 0) {
@@ -1295,7 +1295,7 @@ char *token;		/* token to evaluate */
 				/* if we are at the end, return <END> */
 				if (bp->b_linep == bp->b_dotp)
 					return("<END>");
-	        
+
 				/* grab the line as an argument */
 				blen = lused(bp->b_dotp) - bp->b_doto;
 				if (blen > NSTRING)
@@ -1303,7 +1303,7 @@ char *token;		/* token to evaluate */
 				bytecopy(buf, ltext(bp->b_dotp) + bp->b_doto,
 					blen);
 				buf[blen] = 0;
-	        
+
 				/* and step the buffer's line ptr ahead a line */
 				bp->b_dotp = lforw(bp->b_dotp);
 				bp->b_doto = 0;
@@ -1316,7 +1316,7 @@ char *token;		/* token to evaluate */
 				}
 
 				/* and return the spoils */
-				return(buf);	        
+				return(buf);
 
 		case TKVAR:	return(gtusr(token+1));
 		case TKENV:	return(gtenv(token+1));
@@ -1533,22 +1533,22 @@ char *buf;	/* buffer to place list of characters */
 
 /*	is_num: ascii string is integer......This is too
 		inconsistant to use the system's	*/
- 
+
 int PASCAL NEAR is_num(st)
- 
+
 char *st;
- 
+
 {
 	int period_flag;	/* have we seen a period yet? */
 
 	/* skip preceding whitespace */
 	while (*st == ' ' || *st == '\t')
 		++st;
- 
+
 	/* check for sign */
 	if ((*st == '-') || (*st == '+'))
 		++st;
- 
+
 	/* scan digits */
 	period_flag = FALSE;
 	while ((*st >= '0') && (*st <= '9') ||
@@ -1557,7 +1557,7 @@ char *st;
 			period_flag = TRUE;
 		st++;
 	}
- 
+
 	/* scan rest of line for just white space */
 	while (*st) {
 		if ((*st != '\t') && (*st != ' '))
@@ -1590,7 +1590,7 @@ int n;		/* numeric arg (can overide prompted value) */
 
 	/* check the legality and find the var */
 	findvar(var, &vd, NVSIZE + 1, VT_NONE);
-        
+
 	/* if its not legal....bitch */
 	if (vd.v_type == -1) {
 		mlwrite(TEXT52, var);
@@ -1649,7 +1649,7 @@ int f,n;	/* prefix flag and argument */
 		strcpy(outseq, "$");
 		strcat(outseq, envars[uindex]);
 		pad(outseq, 14);
-	        
+
 		/* add in the value */
 		olen = (int)strlen(outseq);
 		strncat(outseq, gtenv(envars[uindex]), NSTRING - olen - 1);
@@ -1697,17 +1697,17 @@ int f,n;	/* prefix flag and argument */
 		for (uindex = 0; uindex < ut->size; uindex++) {
 			if (ut->uv[uindex].u_name[0] == 0)
 				break;
-	
+
 			/* add in the user variable name */
 			strcpy(outseq, "%");
 			strcat(outseq, ut->uv[uindex].u_name);
 			pad(outseq, 14);
-		        
+
 			/* add in the value */
 			olen = (int)strlen(outseq);
 			strncat(outseq, ut->uv[uindex].u_value, NSTRING - olen - 1);
 			outseq[NSTRING - 1] = 0;
-	
+
 			/* and add it as a line into the buffer */
 			if (addline(varbuf, outseq) != TRUE)
 				return(FALSE);

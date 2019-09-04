@@ -336,7 +336,7 @@ split.	(Two line windows can be split when mode lines are disabled) An
 argument of 1 forces the cursor into the upper window, an argument of
 two forces the cursor to the lower window.  The only other error that
 is possible is a "room" failure allocating the structure for the new
-window.  Bound to "C-X 2". 
+window.  Bound to "C-X 2".
 
 */
 
@@ -537,7 +537,7 @@ int f, n;	/* default flag and numeric argument */
 
 {
 	int clines;	/* current # of lines in window */
-        
+
 	/* must have a non-default argument, else ignore call */
 	if (f == FALSE)
 		return(TRUE);
@@ -734,7 +734,7 @@ int n;	/* numeric argument */
 		while (nextwp != NULL) {
 			wp = nextwp;
 			nextwp = wp->w_wndp;
-        
+
 			/* get rid of it if it is too low */
 			if (wp->w_toprow > n - 2) {
 
@@ -748,7 +748,7 @@ int n;	/* numeric argument */
 					}
 					wp->w_bufp->b_fcol = wp->w_fcol;
 				}
-        
+
 				/* update curwp and lastwp if needed */
 				if (wp == curwp)
 					curwp = wheadp;
@@ -768,7 +768,7 @@ int n;	/* numeric argument */
 					wp->w_flag |= WFHARD|WFMODE;
 				}
 			}
-        
+
 			lastwp = wp;
 		}
 	}
@@ -777,7 +777,7 @@ int n;	/* numeric argument */
 #if     WINDOW_MSWIN
         vtsizescr (first_screen, n - 1, first_screen->s_ncol);
 #else
-	term.t_nrow = n - 1;
+	term.t_nrow = (short)(n - 1);
 #endif
 	sgarbf = TRUE;
 	return(TRUE);
@@ -817,7 +817,7 @@ int n;	/* numeric argument */
 #if	WINDOW_MSWIN
 	vtsizescr (first_screen, first_screen->s_nrow, n);
 #else
-	term.t_ncol = n;
+	term.t_ncol = (short)n;
 #endif
 	term.t_margin = (short)(n / 10);
 	term.t_scrsiz = (short)(n - (term.t_margin * 2));
@@ -854,7 +854,7 @@ int n;	/* numeric argument */
 	}
 
 	/* otherwise, just re-width it (no big deal) */
-	term.t_colorg = n;
+	term.t_colorg = (short)n;
 	sgarbf = TRUE;
 #endif
 	return(TRUE);
@@ -881,7 +881,7 @@ int n;	/* numeric argument */
 	}
 
 	/* otherwise, just re-size it (no big deal) */
-	term.t_roworg = n;
+	term.t_roworg = (short)n;
 
 	sgarbf = TRUE;
 #endif

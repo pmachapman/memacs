@@ -29,29 +29,33 @@
 
 /* Forward references.          */
 
-PASCAL NEAR ntmove();
-PASCAL NEAR nteeol();
-PASCAL NEAR nteeop();
-PASCAL NEAR ntbeep();
-PASCAL NEAR ntopen();
-PASCAL NEAR ntclose();
-PASCAL NEAR ntgetc();
-PASCAL NEAR ntputc();
-PASCAL NEAR ntflush();
-PASCAL NEAR ntrev();
-PASCAL NEAR ntkclose();
-PASCAL NEAR ntkopen();
-PASCAL NEAR ntcres();
-PASCAL NEAR ntparm();
+int PASCAL NEAR ntmove(int row, int col);
+int PASCAL NEAR nteeol(void);
+int PASCAL NEAR nteeop(void);
+int PASCAL NEAR ntbeep(void);
+int PASCAL NEAR ntopen(void);
+int PASCAL NEAR ntclose(void);
+int PASCAL NEAR ntgetc(void);
+int PASCAL NEAR ntputc(int c);
+int PASCAL NEAR ntflush(void);
+int PASCAL NEAR ntrev(int state);
+int PASCAL NEAR ntkclose(void);
+int PASCAL NEAR ntkopen(void);
+int PASCAL NEAR ntcres(char *res);
+int PASCAL NEAR ntparm();
 #if     COLOR
-PASCAL NEAR ntfcol();
-PASCAL NEAR ntbcol();
+int PASCAL NEAR ntfcol(int color);
+int PASCAL NEAR ntbcol(int color);
 #endif
-PASCAL NEAR fnclabel();
+int PASCAL NEAR fnclabel();
 static WORD near ntAttribute(void);
 
 /* Screen buffer to write to. */
+#ifdef RESIZABLE_BUFFER
+static CHAR_INFO *ciScreenBuffer = NULL;
+#else
 static CHAR_INFO ciScreenBuffer[NROW * NCOL];
+#endif
 static int      cfcolor = 0;    /* current foreground color     */
 static int      cbcolor = 15;   /* current background color     */
 static int      ctrans[] =      /* ansi to ibm color translation table  */
@@ -71,7 +75,7 @@ int revflag = FALSE;                    /* are we currently in rev video? */
  */
 static HANDLE hInput, hOutput;
 static char chConsoleTitle[256];    // Preserve the title of the console.
-static long ConsoleMode, OldConsoleMode;
+static DWORD ConsoleMode, OldConsoleMode;
 
 static INPUT_RECORD ir;
 static WORD wKeyEvent;
@@ -110,7 +114,7 @@ TERM    term    = {
 
 /*	Mousing global variable	*/
 static int mexist;	/* is the mouse driver installed? */
-static int nbuttons;	/* number of buttons on the mouse */
+static DWORD nbuttons;	/* number of buttons on the mouse */
 static int oldbut;	/* Previous state of mouse buttons */
 static int oldcol;	/* previous x position of mouse */
 static int oldrow;	/* previous y position of mouse */
@@ -120,8 +124,8 @@ static int oldrow;	/* previous y position of mouse */
 #define	IBUFSIZE	64	/* this must be a power of 2 */
 
 unsigned char in_buf[IBUFSIZE];	/* input character buffer */
-int in_next = 0;		/* pos to retrieve next input character */
-int in_last = 0;		/* pos to place most recent input character */
+static int in_next = 0;		/* pos to retrieve next input character */
+static int in_last = 0;		/* pos to place most recent input character */
 
 void in_init()	/* initialize the input buffer */
 
@@ -138,12 +142,9 @@ int in_check()	/* is the input buffer non-empty? */
 		return(TRUE);
 }
 
-void in_put(event)
-
-int event;	/* event to enter into the input buffer */
-
+void in_put(int event)
 {
-	in_buf[in_last++] = event;
+	in_buf[in_last++] = (unsigned char)event;
 	in_last &= (IBUFSIZE - 1);
 }
 
@@ -163,10 +164,11 @@ int in_get()	/* get an event from the input buffer */
 /* Set the current foreground color.					*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntfcol(
+int PASCAL NEAR ntfcol(
 	int color)			/* color to set */
 {
 	cfcolor = ctrans[color];
+	return 0;
 }
 
 /*----------------------------------------------------------------------*/
@@ -174,10 +176,11 @@ PASCAL NEAR ntfcol(
 /* Set the current background color.					*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntbcol(
+int PASCAL NEAR ntbcol(
 	int color)		/* color to set */
 {
 	cbcolor = ctrans[color];
+	return 0;
 }
 #endif
 
@@ -200,15 +203,16 @@ static void near ntSetUpdateValues(void)
 /* Move the cursor. 						*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntmove(
+int PASCAL NEAR ntmove(
 	int row,
 	int col)
 {
 	COORD dwCursorPosition;
 
-	ntcol = dwCursorPosition.X = col;
-	ntrow = dwCursorPosition.Y = row;
+	ntcol = dwCursorPosition.X = (SHORT)col;
+	ntrow = dwCursorPosition.Y = (SHORT)row;
 	SetConsoleCursorPosition(hOutput, dwCursorPosition);
+	return 0;
 }
 
 
@@ -217,7 +221,7 @@ PASCAL NEAR ntmove(
 /* Update the physical video buffer from the logical video buffer.	*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntflush(void)
+int PASCAL NEAR ntflush(void)
 {
 	SMALL_RECT srWriteRegion;
 	COORD coordUpdateBegin, coordBufferSize;
@@ -255,7 +259,7 @@ PASCAL NEAR ntflush(void)
 	return(TRUE);
 }
 
-static void near MouseEvent(void)
+static int near MouseEvent(void)
 
 {
 	MOUSE_EVENT_RECORD *m_event;	/* mouse event to decode */
@@ -353,17 +357,17 @@ static void near KeyboardEvent()
 {
 	int c;		/* ascii character to examine */
 	int vscan;	/* virtual scan code */
-	int prefix;	/* character prefix */
+	int lprefix;	/* character lprefix */
 	int state;	/* control key state from console device */
 
 	/* ignore key up events */
 	if (ir.Event.KeyEvent.bKeyDown == FALSE)
-		return(FALSE);
+		return;
 
 	/* If this is an extended character, process it */
 	c = ir.Event.KeyEvent.uChar.AsciiChar;
 	state = ir.Event.KeyEvent.dwControlKeyState;
-	prefix = 0;
+	lprefix = 0;
 
 	if (c == 0) {
 
@@ -373,7 +377,7 @@ static void near KeyboardEvent()
 		/* function keys are special! */
 		if (vscan > 58 && vscan < 68) {
 			c = '1' + vscan - 59;
-			prefix = SPEC;
+			lprefix = SPEC;
 			goto pastothers;
 		}
 
@@ -388,52 +392,52 @@ static void near KeyboardEvent()
 				return;
 
 			case 68:	/* F10 */
-				prefix = SPEC; c = '0'; break;
+				lprefix = SPEC; c = '0'; break;
 
 			case 69:	/* PAUSE */
-				prefix = SPEC; c = ':'; break;
+				lprefix = SPEC; c = ':'; break;
 
 			case 70:	/* SCROLL LOCK */
 				return;
 
 			case 71:	/* HOME */
-				prefix = SPEC; c = '<'; break;
+				lprefix = SPEC; c = '<'; break;
 
 			case 72:	/* Cursor Up */
-				prefix = SPEC; c = 'P'; break;
+				lprefix = SPEC; c = 'P'; break;
 
 			case 73:	/* Page Up */
-				prefix = SPEC; c = 'Z'; break;
+				lprefix = SPEC; c = 'Z'; break;
 
 			case 75:	/* Cursor left */
-				prefix = SPEC; c = 'B'; break;
+				lprefix = SPEC; c = 'B'; break;
 
 			case 76:	/* keypad 5 */
-				prefix = SPEC; c = 'L'; break;
+				lprefix = SPEC; c = 'L'; break;
 
 			case 77:	/* Cursor Right */
-				prefix = SPEC; c = 'F'; break;
+				lprefix = SPEC; c = 'F'; break;
 
 			case 79:	/* END */
-				prefix = SPEC; c = '>'; break;
+				lprefix = SPEC; c = '>'; break;
 
 			case 80:	/* Cursor Down */
-				prefix = SPEC; c = 'N'; break;
+				lprefix = SPEC; c = 'N'; break;
 
 			case 81:	/* Page Down */
-				prefix = SPEC; c = 'V'; break;
+				lprefix = SPEC; c = 'V'; break;
 
 			case 82:	/* insert key */
-				prefix = SPEC; c = 'C'; break;
+				lprefix = SPEC; c = 'C'; break;
 
 			case 83:	/* delete key */
-				prefix = SPEC; c = 'D'; break;
+				lprefix = SPEC; c = 'D'; break;
 
 			case 87:	/* F11 */
-				prefix = SPEC; c = '-'; break;
+				lprefix = SPEC; c = '-'; break;
 
 			case 88:	/* F12 */
-				prefix = SPEC; c = '='; break;
+				lprefix = SPEC; c = '='; break;
 
 			default:
 #if	0
@@ -447,22 +451,22 @@ static void near KeyboardEvent()
 
 pastothers:	/* shifted special key? */
 		if (state & SHIFT_PRESSED)
-			prefix |= SHFT;
+			lprefix |= SHFT;
 	}
 
 	/* decode the various modifiers to the character */
 	if (state & (RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED)) {
-		prefix |= ALTD;
+		lprefix |= ALTD;
 		if (islower(c))
 			c = c - 'a' + 'A';
 	}
 	if ((state & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED)) && c > 31)
-		prefix |= CTRL;
+		lprefix |= CTRL;
 
-	/* if there is a prefix, insert it in the input stream */
-	if (prefix != 0) {
+	/* if there is a lprefix, insert it in the input stream */
+	if (lprefix != 0) {
 		in_put(0);
-		in_put(prefix >> 8);
+		in_put(lprefix >> 8);
 	}
 
 	/* place the ascii character in the input queue */
@@ -476,10 +480,10 @@ pastothers:	/* shifted special key? */
 /* Get a character from the keyboard.					*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntgetc()
+int PASCAL NEAR ntgetc(void)
 {
 
-	long dw;
+	DWORD dw;
 
 ttc:	ntflush();
 
@@ -517,7 +521,7 @@ ttc:	ntflush();
 /* Returns true if a key has been pressed.				*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR typahead()
+int PASCAL NEAR typahead()
 
 {
 	DWORD dwCount;		/* number of pending keyboard events */
@@ -565,7 +569,7 @@ printf("UNKNOWN event pending\n");
 
 static WORD near ntAttribute(void)
 {
-	return(revflag ? (cbcolor | (cfcolor << 4)) : ((cbcolor << 4) | cfcolor));
+	return(WORD) (revflag ? (cbcolor | (cfcolor << 4)) : ((cbcolor << 4) | cfcolor));
 }
 
 /*----------------------------------------------------------------------*/
@@ -580,31 +584,32 @@ static WORD near ntAttribute(void)
 /* a problem.								*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntputc(int c)
+int PASCAL NEAR ntputc(int c)
 {
 	WORD wScreenPos;
 
 	/* This is TEMPORARY  no characters before the screen!!! */
 	if (ntcol < 0 || ntcol > 32000)
-			return;
+			return TRUE;
 
 	if (c == '\n' || c == '\r') { 		/* returns and linefeeds */
 		ntrow++;
 		ntcol = 0;
-		return;
+		return TRUE;
 	}
 
 	if (c == '\b') {			/* backspace */
 		--ntcol;
 		ntputc(' ');
 		--ntcol;
-		return;
+		return TRUE;
 	}
 
 	wScreenPos = (ntrow * term.t_ncol) + ntcol++;
-	ciScreenBuffer[wScreenPos].Char.AsciiChar = c;
+	ciScreenBuffer[wScreenPos].Char.AsciiChar = (char)c;
 	ciScreenBuffer[wScreenPos].Attributes = ntAttribute();
 	ntSetUpdateValues();
+	return TRUE;
 }
 
 
@@ -613,7 +618,7 @@ PASCAL NEAR ntputc(int c)
 /* Erase to end of line.						*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR nteeol()
+int PASCAL NEAR nteeol(void)
 {
 	WORD wNum;
 	WORD wScreenPos;
@@ -621,7 +626,7 @@ PASCAL NEAR nteeol()
 
 	/* This is TEMPORARY  no characters before the screen!!! */
 	if (ntcol < 0 || ntcol > 32000)
-			return;
+			return TRUE;
 
 	wNum = term.t_ncol - ntcol;
 	wScreenPos = ntrow * term.t_ncol + ntcol;
@@ -632,6 +637,7 @@ PASCAL NEAR nteeol()
 		wScreenPos++, ntcol++;
 	}
 	ntSetUpdateValues();
+	return TRUE;
 }
 
 
@@ -640,7 +646,7 @@ PASCAL NEAR nteeol()
 /* Erase to end of page.						*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR nteeop()
+int PASCAL NEAR nteeop(void)
 {
 	WORD wNum;
 	WORD wScreenPos;
@@ -660,6 +666,7 @@ PASCAL NEAR nteeop()
 		wScreenPos++, ntcol++;
 	}
 	ntSetUpdateValues();
+	return 0;
 }
 
 /*----------------------------------------------------------------------*/
@@ -667,12 +674,10 @@ PASCAL NEAR nteeop()
 /* Change reverse video state.						*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntrev(state)
-
-int state;	/* TRUE = reverse, FALSE = normal */
-
+int PASCAL NEAR ntrev(int state)
 {
 	revflag = state;
+	return 0;
 }
 
 /*----------------------------------------------------------------------*/
@@ -680,7 +685,7 @@ int state;	/* TRUE = reverse, FALSE = normal */
 /* Change the screen resolution.					*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntcres(char *res)		/* name of desired video mode	*/
+int PASCAL NEAR ntcres(char *res)		/* name of desired video mode	*/
 {
 	return TRUE;
 }
@@ -691,7 +696,7 @@ PASCAL NEAR ntcres(char *res)		/* name of desired video mode	*/
 /* Change pallette settings.  (Does nothing.)				*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR spal(char *dummy)
+int PASCAL NEAR spal(char *dummy)
 {
 	return(TRUE);
 }
@@ -701,7 +706,7 @@ PASCAL NEAR spal(char *dummy)
 /*	ntbeep()							*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntbeep()
+int PASCAL NEAR ntbeep(void)
 {
 //	  _beep(1200, 80);
 	return(TRUE);
@@ -711,9 +716,11 @@ PASCAL NEAR ntbeep()
 /*	ntopen()							*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntopen()
+int PASCAL NEAR ntopen(void)
 {
-	CONSOLE_SCREEN_BUFFER_INFO Console;
+	BOOL success = FALSE;
+	CONSOLE_SCREEN_BUFFER_INFOEX Console = { 0 };
+	Console.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
 
 	/* initialize the input queue */
 	in_init();
@@ -725,29 +732,41 @@ PASCAL NEAR ntopen()
 
 	/* Save the titlebar of the window so we can
 	 * restore it when we leave. */
-	GetConsoleTitle(chConsoleTitle, sizeof(chConsoleTitle));
+	success = GetConsoleTitle(chConsoleTitle, sizeof(chConsoleTitle));
 
 	/* Set Window Title to MicroEMACS */
-	SetConsoleTitle(PROGNAME);
+	success = SetConsoleTitle(PROGNAME);
 
 	/* Get our standard handles */
 	hInput = GetStdHandle(STD_INPUT_HANDLE);
 	hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	/* get a ptr to the output screen buffer */
-	GetConsoleScreenBufferInfo(hOutput, &Console);
-	SetConsoleMode(hInput, ENABLE_WINDOW_INPUT);
+	success = GetConsoleScreenBufferInfoEx(hOutput, &Console);
+	success = SetConsoleMode(hInput, ENABLE_WINDOW_INPUT );
 
 	/* let MicroEMACS know our starting screen size */
-#if	0
-	term.t_nrow = Console.dwSize.Y - 1;
-	term.t_ncol = Console.dwSize.X;
+#if	RESIZABLE_BUFFER
+	term.t_nrow = (Console.srWindow.Bottom - Console.srWindow.Top) + 1; /* Console.dwSize.Y - 1; */
+	term.t_ncol = (Console.srWindow.Right - Console.srWindow.Left) + 1;
+
+	ciScreenBuffer = malloc((term.t_nrow*term.t_ncol) * sizeof(CHAR_INFO));
+
 #else
-	term.t_nrow = 24;
-	term.t_ncol = 80;
-	term.t_mrow = 24;
-	term.t_mcol = 80;
+	term.t_nrow = NROW;
+	term.t_ncol = NCOL;
 #endif
+	term.t_mrow = term.t_nrow;
+	term.t_mcol = term.t_ncol;
+/*
+	Console.dwSize.Y = term.t_nrow;
+	Console.dwSize.X = term.t_ncol;
+	Console.srWindow.Bottom = Console.srWindow.Top + term.t_nrow - 1;
+	Console.srWindow.Right = Console.srWindow.Left + term.t_ncol - 1;
+
+	success = SetConsoleScreenBufferInfoEx(hOutput, &Console);
+
+*/
 
 	ntColMin = ntMin = (WORD)-1;
 	ntColMax = ntMax = 0;
@@ -775,7 +794,7 @@ PASCAL NEAR ntopen()
 /* Restore the original video settings. 				*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntclose()
+int PASCAL NEAR ntclose(void)
 {
 	/* reset the title on the window */
 	SetConsoleTitle(chConsoleTitle);
@@ -789,7 +808,7 @@ PASCAL NEAR ntclose()
 /* Open the keyboard.							*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntkopen()
+int PASCAL NEAR ntkopen(void)
 {
 	/* save the original console mode to restore on exit */
 	GetConsoleMode(hInput, &OldConsoleMode);
@@ -810,7 +829,7 @@ PASCAL NEAR ntkopen()
 /* Close the keyboard.							*/
 /*----------------------------------------------------------------------*/
 
-PASCAL NEAR ntkclose()
+int PASCAL NEAR ntkclose(void)
 {
 	/* restore the console mode from entry */
 	SetConsoleMode(hInput, OldConsoleMode);
@@ -818,7 +837,7 @@ PASCAL NEAR ntkclose()
 }
 
 #if FLABEL
-PASCAL NEAR fnclabel(f, n)	/* label a function key */
+int PASCAL NEAR fnclabel(f, n)	/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

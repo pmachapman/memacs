@@ -177,7 +177,7 @@ int f,n;	/* prefix flag and argument */
 	if ((result = mlreply(TEXT243, scr_name, NSTRING)) != TRUE) {
 	    /* "Delete Screen: " */
             return result;
-	} 
+	}
 	sp = lookup_screen(scr_name);
 
 	/* make sure it exists... */
@@ -251,7 +251,7 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 	/* and setup the windows info */
 	wp->w_wndp = NULL;
 	wp->w_bufp = scr_buf;
-	scr_buf->b_nwnd += 1;	
+	scr_buf->b_nwnd += 1;
 	wp->w_linep = scr_buf->b_linep;
 
 	/* position us at the buffers dot */
@@ -273,7 +273,7 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 #if WINDOW_MSWIN
 	wp->w_ntrows = (char)(sp->s_nrow-1);
 #else
-	wp->w_ntrows = term.t_nrow-1;		/* "-1" for mode line.	*/
+	wp->w_ntrows = (char)(term.t_nrow-1);		/* "-1" for mode line.	*/
 #endif
 	wp->w_force = 0;
 	wp->w_flag  = WFMODE|WFHARD;		/* Full.		*/
@@ -505,7 +505,7 @@ int f, n;	/* default number and arguments */
 	if ((result = mlreply(TEXT335, scr_name, NSTRING)) != TRUE) {
 /*			      "Change screen name to: " */
 		return(result);
-	} 
+	}
 
 	if (lookup_screen(scr_name) != (SCREEN*)NULL) {
 		mlwrite(TEXT336);
