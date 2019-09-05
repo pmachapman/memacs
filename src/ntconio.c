@@ -21,7 +21,7 @@
 #include        "elang.h"
 
 #if     NTCON
-#define NROW    80             /* Screen size.                 */
+#define NROW    50             /* Screen size.                 */
 #define NCOL    132             /* Edit if you want to.         */
 #define MARGIN  8               /* size of minimim margin and   */
 #define SCRSIZ  64              /* scroll size for extended lines */
@@ -54,7 +54,7 @@ static WORD near ntAttribute(void);
 #ifdef RESIZABLE_BUFFER
 static CHAR_INFO *ciScreenBuffer = NULL;
 #else
-static CHAR_INFO ciScreenBuffer[NROW * NCOL];
+static CHAR_INFO ciScreenBuffer[(NROW+1) * NCOL];
 #endif
 static int      cfcolor = 0;    /* current foreground color     */
 static int      cbcolor = 15;   /* current background color     */
@@ -76,16 +76,16 @@ int revflag = FALSE;                    /* are we currently in rev video? */
 static HANDLE hInput, hOutput;
 static char chConsoleTitle[256];    // Preserve the title of the console.
 static DWORD ConsoleMode, OldConsoleMode;
+CONSOLE_SCREEN_BUFFER_INFOEX OldConsoleInfo = { 0 };
 
-static INPUT_RECORD ir;
 static WORD wKeyEvent;
 
 /*
  * Standard terminal interface dispatch table.
  */
 TERM    term    = {
-        NROW-1,
-        NROW-1,
+        NROW,
+        NROW,
         NCOL,
         NCOL,
         0, 0,
@@ -228,6 +228,14 @@ int PASCAL NEAR ntflush(void)
 
 	if (ntMin <= ntMax) {
 
+
+		srWriteRegion.Right = term.t_ncol - 1;
+		srWriteRegion.Left = 0;
+
+		coordUpdateBegin.X = 0;
+		coordUpdateBegin.Y = ntMin;
+
+#if 0
 		if (ntMin == ntMax) {
 
 			/* Fri Feb 14 1992 WaltW - Same fuckin' line bud. */
@@ -243,6 +251,7 @@ int PASCAL NEAR ntflush(void)
 			coordUpdateBegin.X = 0;
 			coordUpdateBegin.Y = ntMin;
 		}
+#endif // 0
 
 		srWriteRegion.Bottom = ntMax;
 		srWriteRegion.Top = ntMin;
@@ -259,7 +268,7 @@ int PASCAL NEAR ntflush(void)
 	return(TRUE);
 }
 
-static int near MouseEvent(void)
+static int near MouseEvent(INPUT_RECORD *pIr)
 
 {
 	MOUSE_EVENT_RECORD *m_event;	/* mouse event to decode */
@@ -271,7 +280,7 @@ static int near MouseEvent(void)
 	int sstate;		/* current shift key status */
 	int newbut;		/* new state of the mouse buttons */
 
-	m_event = &(ir.Event.MouseEvent);
+	m_event = &(pIr->Event.MouseEvent);
 
 	/* check to see if any mouse buttons are different */
 	newbut = m_event->dwButtonState;
@@ -342,17 +351,17 @@ static int near MouseEvent(void)
 	return(FALSE);
 }
 
-static void near WindowSizeEvent(void)
+static void near WindowSizeEvent(INPUT_RECORD *pIr)
 {
-	term.t_nrow = ir.Event.WindowBufferSizeEvent.dwSize.Y - 1;
-	term.t_ncol = ir.Event.WindowBufferSizeEvent.dwSize.X;
+	term.t_nrow = pIr->Event.WindowBufferSizeEvent.dwSize.Y - 1;
+	term.t_ncol = pIr->Event.WindowBufferSizeEvent.dwSize.X;
 	ntflush();
 	SetConsoleTitle("WindowSizeEvent");
 }
 
 /* handle the current keyboard event */
 
-static void near KeyboardEvent()
+static void near KeyboardEvent(INPUT_RECORD *pIr)
 
 {
 	int c;		/* ascii character to examine */
@@ -361,18 +370,18 @@ static void near KeyboardEvent()
 	int state;	/* control key state from console device */
 
 	/* ignore key up events */
-	if (ir.Event.KeyEvent.bKeyDown == FALSE)
+	if (pIr->Event.KeyEvent.bKeyDown == FALSE)
 		return;
 
 	/* If this is an extended character, process it */
-	c = ir.Event.KeyEvent.uChar.AsciiChar;
-	state = ir.Event.KeyEvent.dwControlKeyState;
+	c = pIr->Event.KeyEvent.uChar.AsciiChar;
+	state = pIr->Event.KeyEvent.dwControlKeyState;
 	lprefix = 0;
 
 	if (c == 0) {
 
 		/* grab the virtual scan code */
-		vscan = ir.Event.KeyEvent.wVirtualScanCode;
+		vscan = pIr->Event.KeyEvent.wVirtualScanCode;
 
 		/* function keys are special! */
 		if (vscan > 58 && vscan < 68) {
@@ -442,9 +451,9 @@ static void near KeyboardEvent()
 			default:
 #if	0
 				/* tell us about a key we do net yet map! */
-				printf("<%d:%d/%d> ", ir.EventType,
-					ir.Event.KeyEvent.uChar.AsciiChar,
-					  ir.Event.KeyEvent.wVirtualScanCode);
+				printf("<%d:%d/%d> ", pIr->EventType,
+					pIr->Event.KeyEvent.uChar.AsciiChar,
+					   pIr->Event.KeyEvent.wVirtualScanCode);
 #endif
 				return;
 		}
@@ -480,39 +489,62 @@ pastothers:	/* shifted special key? */
 /* Get a character from the keyboard.					*/
 /*----------------------------------------------------------------------*/
 
+#define MAX_INPUT_EVENTS 128
+
 int PASCAL NEAR ntgetc(void)
 {
 
 	DWORD dw;
+	INPUT_RECORD ir[MAX_INPUT_EVENTS];
+	BOOL success = FALSE;
+	DWORD i;
 
-ttc:	ntflush();
+	for(;;)
+	{
 
-	/* return any keystrokes waiting in the
-	   type ahead buffer */
-	if (in_check())
-		return(in_get());
+		ntflush();
 
-	/* get the next keyboard/mouse/resize event */
-	ReadConsoleInput(hInput, &ir, 1, &dw);
+		/* return any keystrokes waiting in the
+		   type ahead buffer */
+		if(in_check())
+			return(in_get());
 
-	/* let the proper event handler field this event */
-	switch (ir.EventType) {
+		/* get the next keyboard/mouse/resize event */
 
-		case KEY_EVENT:
-			KeyboardEvent();
-			goto ttc;
+		if(FALSE == (success = ReadConsoleInput(hInput, ir, MAX_INPUT_EVENTS, &dw)))
+		{
+			meexit(127);
+		}
 
-		case MOUSE_EVENT:
-			MouseEvent();
-			goto ttc;
+		for(i = 0; i < dw; ++i)
+		{
+			INPUT_RECORD *pIr = (ir + i);
+			/* let the proper event handler field this event */
+			switch(pIr->EventType)
+			{
 
-		case WINDOW_BUFFER_SIZE_EVENT:
-			WindowSizeEvent();
-			goto ttc;
+			case KEY_EVENT:
+				KeyboardEvent(pIr);
+				break;
+
+			case MOUSE_EVENT:
+				MouseEvent(pIr);
+				break;
+
+			case WINDOW_BUFFER_SIZE_EVENT:
+				WindowSizeEvent(pIr);
+				break;
+
+			case MENU_EVENT:
+				break;
+			case FOCUS_EVENT:
+				break;
+			default:
+				/* We should never get here */
+				break;
+			}
+		}
 	}
-
-	/* we should never arrive here, ignore this event */
-	goto ttc;
 }
 
 #if TYPEAH
@@ -525,7 +557,7 @@ int PASCAL NEAR typahead()
 
 {
 	DWORD dwCount;		/* number of pending keyboard events */
-
+	INPUT_RECORD ir = { 0 };
 #if	1
 return(FALSE); /* temp KLUGE */
 #endif
@@ -716,34 +748,41 @@ int PASCAL NEAR ntbeep(void)
 /*	ntopen()							*/
 /*----------------------------------------------------------------------*/
 
-int PASCAL NEAR ntopen(void)
+int PASCAL NEAR ntopen()
 {
 	BOOL success = FALSE;
 	CONSOLE_SCREEN_BUFFER_INFOEX Console = { 0 };
 	Console.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
+
+	/* Get our standard handles */
+	hInput = GetStdHandle(STD_INPUT_HANDLE);
+	hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	/* Store the original console info */
+	success = GetConsoleScreenBufferInfoEx(hOutput, &Console);
+
+	OldConsoleInfo = Console;
+
+	/* Save the titlebar of the window so we can
+		* restore it when we leave. */
+	success = GetConsoleTitle(chConsoleTitle, sizeof(chConsoleTitle));
+
 
 	/* initialize the input queue */
 	in_init();
 	strcpy(os, "WINNT");
 
 	/* This will allocate a console if started from
-	 * the windows NT program manager. */
-	AllocConsole();
+		* the windows NT program manager. */
+	/* AllocConsole(); */
 
-	/* Save the titlebar of the window so we can
-	 * restore it when we leave. */
-	success = GetConsoleTitle(chConsoleTitle, sizeof(chConsoleTitle));
+
 
 	/* Set Window Title to MicroEMACS */
 	success = SetConsoleTitle(PROGNAME);
 
-	/* Get our standard handles */
-	hInput = GetStdHandle(STD_INPUT_HANDLE);
-	hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-
 	/* get a ptr to the output screen buffer */
-	success = GetConsoleScreenBufferInfoEx(hOutput, &Console);
-	success = SetConsoleMode(hInput, ENABLE_WINDOW_INPUT );
+
+	/* success = SetConsoleMode(hInput, ENABLE_WINDOW_INPUT); */
 
 	/* let MicroEMACS know our starting screen size */
 #if	RESIZABLE_BUFFER
@@ -758,15 +797,20 @@ int PASCAL NEAR ntopen(void)
 #endif
 	term.t_mrow = term.t_nrow;
 	term.t_mcol = term.t_ncol;
-/*
+
 	Console.dwSize.Y = term.t_nrow;
 	Console.dwSize.X = term.t_ncol;
-	Console.srWindow.Bottom = Console.srWindow.Top + term.t_nrow - 1;
-	Console.srWindow.Right = Console.srWindow.Left + term.t_ncol - 1;
+	Console.srWindow.Bottom = Console.srWindow.Top + term.t_nrow;
+	Console.srWindow.Right = Console.srWindow.Left + term.t_ncol;
+	Console.dwMaximumWindowSize.X = Console.dwSize.X;
+	Console.dwMaximumWindowSize.Y = Console.dwSize.Y;
+	Console.bFullscreenSupported = TRUE;
+
+	Console.wAttributes = (FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
 
 	success = SetConsoleScreenBufferInfoEx(hOutput, &Console);
 
-*/
 
 	ntColMin = ntMin = (WORD)-1;
 	ntColMax = ntMax = 0;
@@ -781,8 +825,8 @@ int PASCAL NEAR ntopen(void)
 	revexist = TRUE;
 	revflag = FALSE;
 	eolexist = TRUE;
-/*	gfcolor = 15;
-	gbcolor = 0;*/
+	/*	gfcolor = 15;
+		gbcolor = 0;*/
 	cfcolor = 7;
 	cbcolor = 0;
 
@@ -799,7 +843,12 @@ int PASCAL NEAR ntclose(void)
 	/* reset the title on the window */
 	SetConsoleTitle(chConsoleTitle);
 
-	FreeConsole();
+	if(OldConsoleInfo.cbSize == sizeof(CONSOLE_SCREEN_BUFFER_INFOEX))
+	{
+		SetConsoleScreenBufferInfoEx(hOutput, &OldConsoleInfo);
+	}
+
+	/* FreeConsole(); */
 	return(TRUE);
 }
 
@@ -816,8 +865,8 @@ int PASCAL NEAR ntkopen(void)
 	/* and reset this to what MicroEMACS needs */
 	ConsoleMode = OldConsoleMode;
 	ConsoleMode &= ~(ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT |
-		ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT);
-	ConsoleMode |= ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+		ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT | ENABLE_QUICK_EDIT_MODE);
+	ConsoleMode |= (ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT);
 	SetConsoleMode(hInput, ConsoleMode);
 
 	return(TRUE);
