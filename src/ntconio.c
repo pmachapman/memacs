@@ -798,9 +798,9 @@ int PASCAL NEAR ntopen()
 	term.t_mrow = term.t_nrow;
 	term.t_mcol = term.t_ncol;
 
-	Console.dwSize.Y = term.t_nrow;
+	Console.dwSize.Y = term.t_nrow+1;
 	Console.dwSize.X = term.t_ncol;
-	Console.srWindow.Bottom = Console.srWindow.Top + term.t_nrow;
+	Console.srWindow.Bottom = Console.srWindow.Top + term.t_nrow+1;
 	Console.srWindow.Right = Console.srWindow.Left + term.t_ncol;
 	Console.dwMaximumWindowSize.X = Console.dwSize.X;
 	Console.dwMaximumWindowSize.Y = Console.dwSize.Y;
