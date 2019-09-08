@@ -51,9 +51,15 @@
 #define HPUX8	0			/* HPUX HP 9000 ver 8 or less	*/
 #define HPUX9	0			/* HPUX HP 9000 ver 9           */
 #define MPE	0			/* HP MPE/XL			*/
+#ifdef WIN32
 #define MSDOS	0			/* MS-DOS			*/
 #define WINNT	0			/* MS-Win NT			*/
 #define	WINXP	1			/* Windows XP/Visual studio 2008*/
+#else
+#define MSDOS	1			/* MS-DOS			*/
+#define WINNT	0			/* MS-Win NT			*/
+#define	WINXP	0			/* Windows XP/Visual studio 2008*/
+#endif
 #define OS2	0			/* Microsoft or IBM OS/2	*/
 #define SMOS	0			/* Supermax UNIX System V	*/
 #define SUN	0			/* SUN v4.0			*/
@@ -122,16 +128,26 @@
 #define TERMCAP 0			/* Use TERMCAP			*/
 #define TIPC	0			/* TI Profesional PC driver	*/
 #define VT52	0			/* VT52 terminal (Zenith).	*/
+#ifdef WIN32
 #define NTCON	0			/* Windows NT console		*/
 #define	XPCON	1			/* windows XP console app	*/
+#else
+#define NTCON	0			/* Windows NT console		*/
+#define	XPCON	0			/* windows XP console app	*/
+#endif
 #define	XVT	0			/* XVT windowing system		*/
 #define Z309	0			/* Zenith 100 PC family driver	*/
 
 /*	Windowing system style (pick one)				*/
 
 #define WINDOW_TEXT	0		/* [default] Text mode		*/
+#ifdef WIN32
 #define WINDOW_MSWIN	0		/* MicroSoft Windows		*/
 #define WINDOW_MSWIN32	1		/* MicroSoft Windows 32 bit API */
+#else
+#define WINDOW_MSWIN	1		/* MicroSoft Windows		*/
+#define WINDOW_MSWIN32	0		/* MicroSoft Windows 32 bit API */
+#endif
 #define WINDOW_X	0		/* X/Unix			*/
 
 /*	Language text options	(pick one)				*/
