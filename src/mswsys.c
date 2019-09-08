@@ -31,16 +31,27 @@
 #define EMACS_ENDING    2
 
 /* variables */
-static char     *argv[MAXPARAM];
+/* static char     *argv[MAXPARAM]; */
+static char     **argv = NULL;
 static int      argc;
 
 static char FrameClassName [] = PROGNAME ":frame";
 
 #if WINDOW_MSWIN32
+#define USE_SEH 1
+#ifdef USE_SEH
+
+#define EXCEPTION_MLABORT (0xE0000001)
+
+#else
+
 /* The Catch/Throw API is replaced by setjmp/longjmp */
 static jmp_buf ExitCatchBuf;
 #define Throw(buf,n) longjmp(buf,n)
 #define Catch(buf)   setjmp(buf)
+
+#endif
+
 #else
 static CATCHBUF ExitCatchBuf;
 #endif
@@ -152,10 +163,70 @@ VOID PASCAL NEAR mlabort (char *s)
                     MB_YESNO | MB_DEFBUTTON2 |
                     MB_ICONHAND | MB_APPLMODAL) == IDYES) {
         eexitval = -1;
+#ifdef USE_SEH
+		RaiseException(EXCEPTION_MLABORT, 0, 0, NULL);
+#else
         Throw (ExitCatchBuf, ABORT);
+#endif
      }
 } /* mlabort */
-
+
+
+/* parse the windows command line into argv style*/
+
+int parseCommandLine(LPSTR lpCmdLine)
+{
+	char   *s = NULL;
+	argc = 0;
+	size_t nMaxArgs = 10;
+	argv = (char **)malloc(nMaxArgs * sizeof(char *));
+	if (!argv)
+	{
+		return 0;
+	}
+	argv[0] = ProgName;
+	argc = 1;
+	s = copystr(lpCmdLine);
+	if (!s)
+	{
+		free(argv);
+		argv = NULL;
+		return 0;
+	}
+	while (*s != '\0') {
+		argv[argc] = s;
+		if (++argc >= nMaxArgs)
+		{
+			char **tmp = NULL;
+			nMaxArgs += 10;
+			tmp = (char **)realloc(argv, nMaxArgs * sizeof(char *));
+			if (tmp)
+			{
+				argv = tmp;
+			}
+			else
+			{
+				free(argv);
+				free(s);
+				argv = NULL;
+				s = NULL;
+				return 0;
+			}
+		}
+		while (*++s != ' ')
+		{
+			if (*s == '\0')
+			{
+				return argc;
+			}
+		}
+		*s = '\0';
+		while (*++s == ' ');
+	}
+	return argc;
+}
+
+
 /* WinInit: all the window initialization crap... */
 /* =======                                        */
 
@@ -328,6 +399,11 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 
     in_init ();                 /* sets up the input stream */
 
+	argc = parseCommandLine(lpCmdLine);
+	
+	return argc > 0 ? TRUE : FALSE;
+
+#if 0
     argv [0] = ProgName;        /* dummy program name */
     {
 	register char   *s;
@@ -344,6 +420,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
     }
 ParsingDone:
     return TRUE;
+#endif
 } /* WinInit */
 
 /* SetFrameCaption: sets the frame window's text according to the app Id */
@@ -453,7 +530,9 @@ LRESULT EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				       child (except on caption clicks!)
 				       */
         goto DefaultProc;
-        
+       
+	case WM_CLOSE:
+		return CallWindowProc(MDIClientProc, hWnd, wMsg, wParam, lParam);
     default:
 DefaultProc:
 	return CallWindowProc (MDIClientProc, hWnd, wMsg, wParam, lParam);
@@ -962,13 +1041,48 @@ DefaultProc:
 /* WinMain: Application entry point */
 /* =======                          */
 
+#ifdef USE_SEH
+
+int PASCAL  WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+	LPSTR lpCmdLine, int nCmdShow)
+{
+	hEmacsInstance = hInstance;
+	int retCode = -1;
+	if (WinInit(lpCmdLine, nCmdShow))
+	{
+		__try {
+			emacs(argc, argv);
+			retCode = eexitval;
+			if (argv)
+			{
+				free(argv);
+				argv = NULL;
+			}
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			eexitflag = TRUE;
+			retCode = ABORT;
+			longop(FALSE);
+			PostMessage(hFrameWnd, WM_CLOSE, 0, 0L);
+			for (;;) MessageLoop(TRUE);
+		}
+	}
+	return retCode;
+}
+
+#else
+
 int PASCAL  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                      LPSTR lpCmdLine, int nCmdShow)
 {
+	int code;
     hEmacsInstance = hInstance;
     if (!WinInit (lpCmdLine, nCmdShow)) return -1;
 
-    switch (Catch (ExitCatchBuf)) {
+	code = Catch(ExitCatchBuf);
+
+    switch (code)
+	{
     case 0:
 	emacs (argc, argv);
 	/* If we exit through an emacs command, we pass here. Otherwise
@@ -985,7 +1099,9 @@ int PASCAL  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
     return eexitval;
 } /* WinMain */
-
+
+#endif
+
 /* ModifyCursor:    forces a WM_SETCURSOR */
 /* ============                           */
 
@@ -1039,8 +1155,14 @@ static void  PASCAL MessageLoop (BOOL WaitMode)
 	    }
 	    if (Msg.message == WM_QUIT) {   /* time to leave... */
 	        JettisonFarStorage ();
-	        if (hEmacsFont) DeleteObject (hEmacsFont);
+			if (hEmacsFont) {
+				DeleteObject(hEmacsFont);
+			}
+#ifdef USE_SEH
+			return;
+#else
 	        Throw (ExitCatchBuf, TRUE);
+#endif
 	        /* we're gone out of business ! */
 	        /* **************************** */
 	    }
