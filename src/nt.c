@@ -444,7 +444,7 @@ char *PASCAL NEAR timeset()
 
         time(&buf);
         sp = ctime(&buf);
-        sp[strlen(sp)-1] = 0;
+        sp[strlen(sp)-1] = 0;	/* replace the terminating newline */
         return(sp);
 }
 

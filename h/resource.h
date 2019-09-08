@@ -36,8 +36,6 @@
 #define _USE_DECLSPECS_FOR_SAL          0
 #define _USE_ATTRIBUTES_FOR_SAL         0
 #define __drv_typeConst                 0
-#define CREATEPROCESS_MANIFEST_RESOURCE_ID 1
-#define MINIMUM_RESERVED_MANIFEST_RESOURCE_ID 1
 #define SW_SHOWNORMAL                   1
 #define SW_NORMAL                       1
 #define SHOW_OPENWINDOW                 1
@@ -220,7 +218,6 @@
 #define VFF_CURNEDEST                   0x0001
 #define VIFF_FORCEINSTALL               0x0001
 #define WINAPI_FAMILY_PC_APP            2
-#define ISOLATIONAWARE_MANIFEST_RESOURCE_ID 2
 #define SW_SHOWMINIMIZED                2
 #define SHOW_ICONWINDOW                 2
 #define SW_OTHERZOOM                    2
@@ -309,7 +306,6 @@
 #define VFF_FILEINUSE                   0x0002
 #define VIFF_DONTDELETEOLD              0x0002
 #define WINAPI_FAMILY_PHONE_APP         3
-#define ISOLATIONAWARE_NOSTATICIMPORT_MANIFEST_RESOURCE_ID 3
 #define SW_SHOWMAXIMIZED                3
 #define SW_MAXIMIZE                     3
 #define SHOW_FULLSCREEN                 3
@@ -343,7 +339,6 @@
 #define SORT_CHINESE_BOPOMOFO           0x3
 #define __drv_typeExpr                  3
 #define WINAPI_FAMILY_SYSTEM            4
-#define ISOLATIONPOLICY_MANIFEST_RESOURCE_ID 4
 #define SW_SHOWNOACTIVATE               4
 #define SHOW_OPENNOACTIVATE             4
 #define SW_OTHERUNZOOM                  4
@@ -538,7 +533,6 @@
 #define LANG_ICELANDIC                  0x0f
 #define SUBLANG_ARABIC_BAHRAIN          0x0f
 #define SUBLANG_SPANISH_PARAGUAY        0x0f
-#define MAXIMUM_RESERVED_MANIFEST_RESOURCE_ID 16
 #define VK_SHIFT                        0x10
 #define WM_CLOSE                        0x0010
 #define HTBOTTOMLEFT                    16
@@ -606,7 +600,6 @@
 #define VK_JUNJA                        0x17
 #define LANG_ROMANSH                    0x17
 #define IDM_FILESAVE                    0x017
-#define RT_MANIFEST                     24
 #define VK_FINAL                        0x18
 #define WM_SHOWWINDOW                   0x0018
 #define LANG_ROMANIAN                   0x18
@@ -1376,6 +1369,7 @@
 #define WM_PENWINFIRST                  0x0380
 #define WM_PENWINLAST                   0x038F
 #define WM_DDE_FIRST                    0x03E0
+#define IDC_SAVEFONT                     1000
 #define CF_GDIOBJLAST                   0x03FF
 #define IDM_NULLPROC                    0x03FF
 #define _WIN32_WINNT_NT4                0x0400
@@ -1669,23 +1663,16 @@
 #define IDTIMEOUT                       32000
 #define OCR_NORMAL                      32512
 #define OIC_SAMPLE                      32512
-#define IDI_APPLICATION                 32512
 #define OCR_IBEAM                       32513
 #define OIC_HAND                        32513
-#define IDI_HAND                        32513
 #define OCR_WAIT                        32514
 #define OIC_QUES                        32514
-#define IDI_QUESTION                    32514
 #define OCR_CROSS                       32515
 #define OIC_BANG                        32515
-#define IDI_EXCLAMATION                 32515
 #define OCR_UP                          32516
 #define OIC_NOTE                        32516
-#define IDI_ASTERISK                    32516
 #define OIC_WINLOGO                     32517
-#define IDI_WINLOGO                     32517
 #define OIC_SHIELD                      32518
-#define IDI_SHIELD                      32518
 #define OCR_SIZE                        32640
 #define OCR_ICON                        32641
 #define OCR_SIZENWSE                    32642

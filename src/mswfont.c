@@ -554,7 +554,18 @@ BOOL choose_font()
 	CHOOSEFONT cf = { 0 };
 	BOOL success = FALSE;
 
-	GetObject(hEmacsFont, sizeof(LOGFONT), &lf);
+	if (hEmacsFont != NULL)
+	{
+		GetObject(hEmacsFont, sizeof(LOGFONT), &lf);
+	}
+	else
+	{
+		HFONT hFont = (HFONT)GetStockObject(SYSTEM_FIXED_FONT);
+		if (hFont)
+		{
+			GetObject(hFont, sizeof(LOGFONT), &lf);
+		}
+	}
 
 	cf.lStructSize = sizeof(CHOOSEFONT);
 	cf.hwndOwner = hFrameWnd;
@@ -650,7 +661,7 @@ void FAR PASCAL FontInit (void)
         hEmacsFont = CreateFontIndirect (&lf);
     }
     else {  /* no CharSet entry, default to SYSTEM_FIXED_FONT */
-	hEmacsFont = 0;
+	hEmacsFont = (HFONT)GetStockObject(SYSTEM_FIXED_FONT);
     }
     BuildCellMetrics (&EmacsCM, hEmacsFont);
 } /* FontInit */

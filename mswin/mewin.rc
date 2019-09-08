@@ -1,7 +1,8 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
 #include <windows.h>
+#include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // English (United States) resources
 
@@ -419,7 +420,7 @@ IDD_FONTSAVE DIALOGEX 0, 0, 243, 25
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPSIBLINGS
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    PUSHBUTTON      "&Save",IDC_BUTTON1,223,1,50,14
+    PUSHBUTTON      "&Save", IDC_SAVEFONT,223,1,50,14
 END
 
 

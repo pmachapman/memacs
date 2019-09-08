@@ -17,11 +17,7 @@
 #include    "mswin.h"
 #include    "mswhelp.h"
 
-#if WINDOW_MSWIN32
-#include <setjmp.h>
-#endif
 
-#define MAXPARAM    10      /* max command line parameters */
 #define TXTSIZ      NFILEN  /* all purpose string length */
 #define T_SLEEP      1      /* Sleep timer ID */
 
@@ -31,7 +27,6 @@
 #define EMACS_ENDING    2
 
 /* variables */
-/* static char     *argv[MAXPARAM]; */
 static char     **argv = NULL;
 static int      argc;
 
@@ -40,7 +35,7 @@ static char FrameClassName [] = PROGNAME ":frame";
 #if WINDOW_MSWIN32
 #define USE_SEH 1
 #ifdef USE_SEH
-
+/* Raise an EXCEPTION_MLABORT instead of longjmp */
 #define EXCEPTION_MLABORT (0xE0000001)
 
 #else
@@ -87,7 +82,7 @@ char *PASCAL timeset()
 
     time(&buf);
     sp = ctime(&buf);
-    sp[strlen(sp)-1] = 0;
+    sp[strlen(sp)-1] = 0;	/* replace the terminating newline */
     return(sp);
 }
 
