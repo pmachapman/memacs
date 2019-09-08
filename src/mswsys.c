@@ -32,6 +32,12 @@ static int      argc;
 
 static char FrameClassName [] = PROGNAME ":frame";
 
+#if WINXP
+#define MEWIN_HELP_FILE "mewin.chm"
+#else
+#define MEWIN_HELP_FILE "mewin.hlp"
+#endif
+
 #if WINDOW_MSWIN32
 #define USE_SEH 1
 #ifdef USE_SEH
@@ -265,11 +271,7 @@ BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
     if (!MainHelpFile) {    /* default WinHelp file name */
         if (i > 0) text[i+1] = '\0';
         else text[0] = '\0';
-#if WINXP
-        strcat (text, "mewin.chm");
-#else
-        strcat(text, "mewin.hlp");
-#endif
+        strcat (text, MEWIN_HELP_FILE);
         MainHelpFile = copystr (text);
     }
     if (i > 0) {
@@ -586,15 +588,11 @@ void FAR PASCAL FrameInit (CREATESTRUCT *cs)
     if (hMDIClientWnd) {
         /* we subclass the MDIClient */
 		WNDPROC ProcInstance;
-#if WINXP
+
 		MDIClientProc = (WNDPROC)GetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC);
 		ProcInstance = MakeProcInstance(MDIClientSubProc, hEmacsInstance);
 		SetWindowLongPtr(hMDIClientWnd, GWLP_WNDPROC, (LONG_PTR)ProcInstance);
-#else
-		MDIClientProc = (WNDPROC)GetWindowLong (hMDIClientWnd, GWL_WNDPROC);
-		ProcInstance = MakeProcInstance ((FARPROC)MDIClientSubProc, hEmacsInstance);
-		SetWindowLong (hMDIClientWnd, GWL_WNDPROC, (DWORD)ProcInstance);
-#endif
+
     }
 } /* FrameInit */
 
@@ -654,21 +652,14 @@ LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 
 	    sp = (SCREEN*)(((MDICREATESTRUCT*)(((CREATESTRUCT*)lParam)->
 					       lpCreateParams))->lParam);
-#if WINXP
 		SetWindowLongPtr(hWnd, GWL_SCRPTR, (LONG_PTR)sp);
-#else
-		SetWindowLong (hWnd, GWL_SCRPTR, (LONG)sp);
-#endif
+
 	    sp->s_drvhandle = hWnd;
 	}
 	goto DefaultProc;
 	
     case WM_DESTROY:
-#if WINXP
 		vtfreescr((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR));
-#else
-		vtfreescr((SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR));
-#endif
 	break;
 	
     case WM_KILLFOCUS:
@@ -690,20 +681,13 @@ LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
             /* this one is becoming active */
 	    if (!InternalRequest) {
 	        InternalRequest = TRUE;
-#if WINXP
 			select_screen((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR), FALSE);
-#else
-			select_screen((SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR), FALSE);
-#endif
 		InternalRequest = FALSE;
 	    }
 	    else {
 		SCREEN  *sp;
-#if WINXP
 		sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
-#else
-		sp = (SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR);
-#endif
+
 		if (sp->s_virtual == NULL) {
 		    /* this is initialization time! */
 		    vtinitscr (sp, DisplayableRows (hWnd, 0, &EmacsCM),
@@ -798,11 +782,8 @@ LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 		SCREEN  *sp;
 
 		/* this must be done here, before any MDI mumbo-jumbo */
-#if WINXP
 		sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
-#else
-		sp = (SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR);
-#endif
+
 		if (sp == first_screen) {
 		    cycle_screens (FALSE, 0);
                 }

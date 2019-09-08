@@ -278,6 +278,18 @@
 #undef  MAC     /* Mac conflicts with a definition used by rpc.h */
 #undef  VOID    /* windows.h will wind up defining this when compiled as a console app */
 #include <windows.h>    /* --------- Huge include file here !!! ---------*/
+
+/* if SetWindowLongPtr isn't defined, then assume we're using an old compiler */
+/* That is either 32-bit or 16-bit. In either case, just define the new API names */
+/* to be the old API names instead of lettering the code with a bunch of ifdefs */
+#ifndef SetWindowLongPtr
+
+#define SetWindowLongPtr SetWindowLong
+#define GetWindowLongPtr GetWindowLong
+
+
+#endif
+
 #ifndef VOID
 #define VOID void /* Redefine, incase we are compiled as a Windows app */
 #endif
