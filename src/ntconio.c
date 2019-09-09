@@ -20,12 +20,15 @@
 #include        "edef.h"
 #include        "elang.h"
 
-#if     NTCON
-#define NROW    50             /* Screen size.                 */
-#define NCOL    132             /* Edit if you want to.         */
+#if     XPCON || NTCON
+#define NROW    256              /* Max Screen size.         */
+#define NCOL    256             /* Edit if you want to.         */
 #define MARGIN  8               /* size of minimim margin and   */
 #define SCRSIZ  64              /* scroll size for extended lines */
 #define NPAUSE  5               /* # times thru update to pause */
+
+int win_version = WINVER;
+int win32_winnt = _WIN32_WINNT;
 
 /* Forward references.          */
 
@@ -51,11 +54,7 @@ int PASCAL NEAR fnclabel();
 static WORD near ntAttribute(void);
 
 /* Screen buffer to write to. */
-#ifdef RESIZABLE_BUFFER
-static CHAR_INFO *ciScreenBuffer = NULL;
-#else
-static CHAR_INFO ciScreenBuffer[(NROW+1) * NCOL];
-#endif
+static CHAR_INFO ciScreenBuffer[NROW * NCOL];
 static int      cfcolor = 0;    /* current foreground color     */
 static int      cbcolor = 15;   /* current background color     */
 static int      ctrans[] =      /* ansi to ibm color translation table  */
@@ -67,6 +66,9 @@ static WORD ntMax = 0;
 static WORD ntMin = (WORD)-1;
 static WORD ntColMax = 0;
 static WORD ntColMin = (WORD)-1;
+
+static int lastwrow;		/* last window's row size */
+static int lastwcol;
 
 int revflag = FALSE;                    /* are we currently in rev video? */
 
@@ -84,8 +86,8 @@ static WORD wKeyEvent;
  * Standard terminal interface dispatch table.
  */
 TERM    term    = {
-        NROW,
-        NROW,
+        NROW-1,
+        NROW-1,
         NCOL,
         NCOL,
         0, 0,
@@ -351,12 +353,21 @@ static int near MouseEvent(INPUT_RECORD *pIr)
 	return(FALSE);
 }
 
-static void near WindowSizeEvent(INPUT_RECORD *pIr)
+static void near WindowSizeEvent()
 {
-	term.t_nrow = pIr->Event.WindowBufferSizeEvent.dwSize.Y - 1;
-	term.t_ncol = pIr->Event.WindowBufferSizeEvent.dwSize.X;
-	ntflush();
-	SetConsoleTitle("WindowSizeEvent");
+	CONSOLE_SCREEN_BUFFER_INFO Console;
+
+	GetConsoleScreenBufferInfo(hOutput, &Console);
+
+	in_put(0);
+	in_put(MOUS >> 8);
+	in_put(Console.srWindow.Right+1);
+	in_put(Console.srWindow.Bottom);
+	in_put('2');
+
+	/* remeber this size */
+	lastwrow = Console.srWindow.Bottom;
+	lastwcol = Console.srWindow.Right+1;
 }
 
 /* handle the current keyboard event */
@@ -484,20 +495,49 @@ pastothers:	/* shifted special key? */
 
 }
 
+int PendingScreenResize()
+
+{
+	CONSOLE_SCREEN_BUFFER_INFO Console;
+
+	GetConsoleScreenBufferInfo(hOutput, &Console);
+
+	if ((lastwrow != Console.srWindow.Bottom) || (lastwcol != Console.srWindow.Right + 1)) {
+		return(TRUE);
+	} else {
+		return(FALSE);
+	}
+}
 /*----------------------------------------------------------------------*/
 /*	ntgetc()							*/
 /* Get a character from the keyboard.					*/
 /*----------------------------------------------------------------------*/
-
 #define MAX_INPUT_EVENTS 128
+#define INPUT_WINDOW_SIZE 0
+#define INPUT_KEYBOARD_READY 1
 
-int PASCAL NEAR ntgetc(void)
+static
+int WaitForInput()
 {
+	/* wait for input for a short time */
+	while(WaitForSingleObject(hInput, 10) == WAIT_TIMEOUT)
+	{
+		/* check to see if the console window has been resized */
+		if(PendingScreenResize())
+		{
+			return INPUT_WINDOW_SIZE;
+		}
+	}
+	return INPUT_KEYBOARD_READY;
+}
 
-	DWORD dw;
+int PASCAL NEAR ntgetc()
+{
+	DWORD dw = 0;
 	INPUT_RECORD ir[MAX_INPUT_EVENTS];
 	BOOL success = FALSE;
 	DWORD i;
+
 
 	for(;;)
 	{
@@ -508,6 +548,12 @@ int PASCAL NEAR ntgetc(void)
 		   type ahead buffer */
 		if(in_check())
 			return(in_get());
+
+		if(INPUT_WINDOW_SIZE == WaitForInput())
+		{
+			WindowSizeEvent();
+			continue;
+		}
 
 		/* get the next keyboard/mouse/resize event */
 
@@ -532,7 +578,7 @@ int PASCAL NEAR ntgetc(void)
 				break;
 
 			case WINDOW_BUFFER_SIZE_EVENT:
-				WindowSizeEvent(pIr);
+				WindowSizeEvent();
 				break;
 
 			case MENU_EVENT:
@@ -620,7 +666,7 @@ int PASCAL NEAR ntputc(int c)
 {
 	WORD wScreenPos;
 
-	/* This is TEMPORARY  no characters before the screen!!! */
+	/* only characters on screen!!! */
 	if (ntcol < 0 || ntcol > 32000)
 			return TRUE;
 
@@ -656,7 +702,7 @@ int PASCAL NEAR nteeol(void)
 	WORD wScreenPos;
 	WORD wAttribute;
 
-	/* This is TEMPORARY  no characters before the screen!!! */
+	/* only characters on screen!!! */
 	if (ntcol < 0 || ntcol > 32000)
 			return TRUE;
 
@@ -740,7 +786,7 @@ int PASCAL NEAR spal(char *dummy)
 
 int PASCAL NEAR ntbeep(void)
 {
-//	  _beep(1200, 80);
+	Beep(750, 300);
 	return(TRUE);
 }
 
@@ -792,9 +838,16 @@ int PASCAL NEAR ntopen()
 	ciScreenBuffer = malloc((term.t_nrow*term.t_ncol) * sizeof(CHAR_INFO));
 
 #else
-	term.t_nrow = NROW;
-	term.t_ncol = NCOL;
+	term.t_nrow = Console.srWindow.Bottom;
+	term.t_ncol = Console.srWindow.Right + 1;
+	term.t_mrow = NROW - 1;
+	term.t_mcol = NCOL;
+	if (term.t_nrow > term.t_mrow)
+		term.t_nrow = term.t_mrow;
+	if (term.t_ncol > term.t_mcol)
+		term.t_ncol = term.t_mcol;
 #endif
+#if 0
 	term.t_mrow = term.t_nrow;
 	term.t_mcol = term.t_ncol;
 
@@ -804,13 +857,15 @@ int PASCAL NEAR ntopen()
 	Console.srWindow.Right = Console.srWindow.Left + term.t_ncol;
 	Console.dwMaximumWindowSize.X = Console.dwSize.X;
 	Console.dwMaximumWindowSize.Y = Console.dwSize.Y;
+#endif
 	Console.bFullscreenSupported = TRUE;
-
 	Console.wAttributes = (FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
 
 	success = SetConsoleScreenBufferInfoEx(hOutput, &Console);
-
+	/* remeber this size */
+	lastwrow = term.t_nrow;
+	lastwcol = term.t_ncol;
 
 	ntColMin = ntMin = (WORD)-1;
 	ntColMax = ntMax = 0;
@@ -825,10 +880,12 @@ int PASCAL NEAR ntopen()
 	revexist = TRUE;
 	revflag = FALSE;
 	eolexist = TRUE;
-	/*	gfcolor = 15;
-		gbcolor = 0;*/
+/*	gfcolor = 15;
+	gbcolor = 0;*/
 	cfcolor = 7;
 	cbcolor = 0;
+
+	SetConsoleOutputCP(437);	/* this does not seem to give me the old IBMPC character set.... */
 
 	return(TRUE);
 }
@@ -865,8 +922,8 @@ int PASCAL NEAR ntkopen(void)
 	/* and reset this to what MicroEMACS needs */
 	ConsoleMode = OldConsoleMode;
 	ConsoleMode &= ~(ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT |
-		ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT | ENABLE_QUICK_EDIT_MODE);
-	ConsoleMode |= (ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT);
+		ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT);
+	ConsoleMode |= ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
 	SetConsoleMode(hInput, ConsoleMode);
 
 	return(TRUE);

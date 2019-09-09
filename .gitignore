@@ -24,9 +24,9 @@
 *.user
 /.vs
 /mswin/vs2017/.vs
-/mswin/vs2017/Debug
-/mswin/vs2017/Release
-/mswin/vs2017/x64
+/mswin/vs2017/**/Debug
+/mswin/vs2017/**/Release
+/mswin/vs2017/**/x64
 /xp/vs2017/.vs
 /xp/vs2017/Debug
 /xp/vs2017/Release

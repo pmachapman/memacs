@@ -1372,8 +1372,6 @@
 #define IDC_SAVEFONT                     1000
 #define CF_GDIOBJLAST                   0x03FF
 #define IDM_NULLPROC                    0x03FF
-#define _WIN32_WINNT_NT4                0x0400
-#define _WIN32_IE_IE40                  0x0400
 #define WM_USER                         0x0400
 #define WVR_VALIDRECTS                  0x0400
 #define HDS_CHECKBOXES                  0x0400
@@ -1572,26 +1570,9 @@
 #define ctl1                            0x04A0
 #define IDM_FILTER                      1204
 #define ctlLast                         0x04ff
-#define _WIN32_WINNT_WIN2K              0x0500
-#define _WIN32_IE_IE50                  0x0500
-#define _WIN32_WINNT_WINXP              0x0501
-#define _WIN32_IE_IE501                 0x0501
-#define _WIN32_WINNT_WS03               0x0502
-#define _WIN32_IE_IE55                  0x0550
-#define _WIN32_WINNT_WIN6               0x0600
-#define _WIN32_WINNT_VISTA              0x0600
-#define _WIN32_WINNT_WS08               0x0600
-#define _WIN32_WINNT_LONGHORN           0x0600
-#define _WIN32_IE_IE60                  0x0600
 #define FILEOPENORD                     1536
-#define _WIN32_WINNT_WIN7               0x0601
-#define _WIN32_IE_IE60SP1               0x0601
 #define MULTIFILEOPENORD                1537
-#define _WIN32_WINNT_WIN8               0x0602
-#define _WIN32_IE_WS03                  0x0602
 #define PRINTDLGORD                     1538
-#define _WIN32_WINNT_WINBLUE            0x0603
-#define _WIN32_IE_IE60SP2               0x0603
 #define PRNSETUPDLGORD                  1539
 #define FINDDLGORD                      1540
 #define REPLACEDLGORD                   1541
@@ -1621,13 +1602,6 @@
 #define TVS_INFOTIP                     0x0800
 #define TCS_RAGGEDRIGHT                 0x0800
 #define IDM_DYNAMIC                     0x0800
-#define _WIN32_IE_IE90                  0x0900
-#define _WIN32_WINNT_WINTHRESHOLD       0x0A00
-#define _WIN32_WINNT_WIN10              0x0A00
-#define _WIN32_IE_IE100                 0x0A00
-#define _WIN32_IE_IE110                 0x0A00
-#define _WIN32_WINNT                    0x0A00
-#define _WIN32_IE                       0x0A00
 #define LVS_ALIGNMASK                   0x0c00
 #define CS_BYTEALIGNCLIENT              0x1000
 #define HDS_OVERFLOW                    0x1000
@@ -1751,7 +1725,7 @@
 #define UNICODE_NOCHAR                  0xFFFF
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        104
