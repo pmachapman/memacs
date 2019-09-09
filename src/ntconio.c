@@ -764,7 +764,7 @@ int PASCAL NEAR ntopen()
 
 	/* Save the titlebar of the window so we can
 		* restore it when we leave. */
-	success = GetConsoleTitle(chConsoleTitle, sizeof(chConsoleTitle));
+	success = GetConsoleTitle(chConsoleTitle, sizeof(chConsoleTitle)/sizeof(chConsoleTitle[0]));
 
 
 	/* initialize the input queue */
@@ -772,7 +772,7 @@ int PASCAL NEAR ntopen()
 	strcpy(os, "WINNT");
 
 	/* This will allocate a console if started from
-		* the windows NT program manager. */
+	/* the windows NT program manager. */
 	/* AllocConsole(); */
 
 

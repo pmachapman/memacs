@@ -122,8 +122,8 @@
 #define TERMCAP 0			/* Use TERMCAP			*/
 #define TIPC	0			/* TI Profesional PC driver	*/
 #define VT52	0			/* VT52 terminal (Zenith).	*/
-#define NTCON	1			/* Windows NT console		*/
-#define	XPCON	0			/* windows XP console app	*/
+#define NTCON	0			/* Windows NT console		*/
+#define	XPCON	1			/* windows XP console app	*/
 #define	XVT	0			/* XVT windowing system		*/
 #define Z309	0			/* Zenith 100 PC family driver	*/
 
@@ -282,7 +282,7 @@
 #define VOID void /* Redefine, incase we are compiled as a Windows app */
 #endif
 #endif
-#if     NTCON
+#if     XPCON
 #include <WinCon.h>
 #include <stdio.h>
 // #include <dos.h>
