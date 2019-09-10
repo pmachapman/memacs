@@ -302,7 +302,12 @@
 
 #define SetWindowLongPtr SetWindowLong
 #define GetWindowLongPtr GetWindowLong
-
+#define LRESULT LONG
+#define DWORD_PTR DWORD
+#define LONG_PTR LONG
+#define INT_PTR int
+#define UINT_PTR UINT
+#define GWLP_WNDPROC GWL_WNDPROC
 
 #endif
 

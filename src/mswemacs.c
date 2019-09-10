@@ -296,9 +296,13 @@ int PASCAL  maximizescreen (int f, int n)
 
 int PASCAL  restorescreen (int f, int n)
 {
-    ForceMessage (hMDIClientWnd, WM_MDIRESTORE,
-                  (WPARAM)first_screen->s_drvhandle, 0L);
-    return TRUE;
+	if(first_screen != NULL)
+	{
+    	ForceMessage (hMDIClientWnd, WM_MDIRESTORE,
+        	          (WPARAM)first_screen->s_drvhandle, 0L);
+    	return TRUE;
+    }
+    return FALSE;
 } /* restorescreen */
 
 /* tilescreens: tile the non-iconized screens */

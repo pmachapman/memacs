@@ -178,8 +178,8 @@ VOID PASCAL NEAR mlabort (char *s)
 int parseCommandLine(LPSTR lpCmdLine)
 {
 	char   *s = NULL;
+	size_t nMaxArgs = 10;      
 	argc = 0;
-	size_t nMaxArgs = 10;
 	argv = (char **)malloc(nMaxArgs * sizeof(char *));
 	if (!argv)
 	{
@@ -717,7 +717,7 @@ LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
     case WM_RBUTTONUP:
 	MouseMessage (hWnd, wMsg, wParam, lParam);
 	break;
-
+#ifdef WIN32
 	case WM_MOUSEWHEEL:
 		if ((short)HIWORD(wParam) > 0)
 		{
@@ -732,6 +732,7 @@ LRESULT EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 			SendMessage(hWnd, WM_VSCROLL, SB_LINEDOWN, 0); */
 		}
 		break;
+#endif
     case WM_VSCROLL:
     case WM_HSCROLL:
         ScrollMessage (hWnd, wMsg, LOWORD(wParam),
@@ -879,7 +880,7 @@ LRESULT EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	    goto DefaultProc;
 	}
 	break;
-	
+#ifdef WIN32	
 	case WM_MOUSEWHEEL:
 		if ((short)HIWORD(wParam) > 0)
 		{
@@ -891,6 +892,7 @@ LRESULT EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 		}
 		break;
 
+#endif
 
     case WM_SETCURSOR:
 	if (UpdateCursor (hWnd, wParam, lParam)) return TRUE;
