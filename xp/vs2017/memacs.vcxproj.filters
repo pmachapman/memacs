@@ -66,6 +66,9 @@
     <ClInclude Include="..\..\h\spanish.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\estruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\abbrev.c">
@@ -146,9 +149,6 @@
     <ClCompile Include="..\..\src\mouse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ntconio.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\random.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -200,10 +200,10 @@
     <ClCompile Include="..\..\src\word.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\xp.c">
+    <ClCompile Include="..\..\src\xpconio.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\xpconio.c">
+    <ClCompile Include="..\..\src\nt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -88,11 +88,11 @@ void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont)
     GetTextMetrics (hDC, &Metrics);
     SelectObject (hDC, hPrevFont);
     ReleaseDC (hFrameWnd, hDC);
-    cm->SizeX = (SHORT)Metrics.tmAveCharWidth;
+    cm->SizeX = (short)Metrics.tmAveCharWidth;
     if (cm->SizeX == 0) cm->SizeX = 1;  /* ATM gives 0 sometimes !!! */
-    cm->SizeY = (SHORT)Metrics.tmHeight;
+    cm->SizeY = (short)Metrics.tmHeight;
     if (cm->SizeY == 0) cm->SizeY = 1;
-    cm->HalfLeadingY = (SHORT)Metrics.tmExternalLeading / 2;
+    cm->HalfLeadingY = (short)Metrics.tmExternalLeading / 2;
     cm->OffsetX = cm->SizeX / 4;
     if ((cm->OffsetY = (cm->SizeY / 8) - cm->HalfLeadingY) < 0) {
 	cm->OffsetY = 0;
@@ -352,11 +352,7 @@ void FAR PASCAL ClientToCell (HWND hWnd, POINT Client, LPPOINT Cell)
     }
     else {                      /* screen case */
         register SCREEN *sp;
-#if WINXP
 		sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
-#else
-		sp = (SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR);
-#endif
         MaxCol = sp->s_ncol - 1;
         MaxRow = sp->s_nrow - 1;
     }
@@ -423,11 +419,8 @@ BOOL FAR PASCAL ScrReSize (HWND hWnd, WPARAM wParam, WORD cx, WORD cy)
 
         InternalRequest = TRUE;
         TopScreen = first_screen;
-#if WINXP
 		select_screen((SCREEN *)GetWindowLongPtr(hWnd, GWL_SCRPTR), FALSE);
-#else
-		select_screen((SCREEN *)GetWindowLong(hWnd, GWL_SCRPTR), FALSE);
-#endif
+
 	if (ChgWidth) {
             newwidth (TRUE, DisplayableColumns (hWnd, cx, &EmacsCM));
         }
@@ -459,12 +452,8 @@ void FAR PASCAL ScrPaint (HWND hWnd)
        attempt repainting while defferupdate is TRUE which means update
        has been deffered */
 
-    BeginPaint (hWnd, &ps);
-#if WINXP
+	BeginPaint(hWnd, &ps);
 	sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
-#else
-	sp = (SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR);
-#endif
 
     /*-calculate the row/col loop control variables and normalize the
        coordinates of the first line's rectangle into Rect */

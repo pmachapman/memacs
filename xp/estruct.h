@@ -122,8 +122,8 @@
 #define TERMCAP 0			/* Use TERMCAP			*/
 #define TIPC	0			/* TI Profesional PC driver	*/
 #define VT52	0			/* VT52 terminal (Zenith).	*/
-#define NTCON	1			/* Windows NT console		*/
-#define	XPCON	0			/* windows XP console app	*/
+#define NTCON	0			/* Windows NT console		*/
+#define	XPCON	1			/* windows XP console app	*/
 #define	XVT	0			/* XVT windowing system		*/
 #define Z309	0			/* Zenith 100 PC family driver	*/
 
@@ -278,29 +278,11 @@
 #undef  MAC     /* Mac conflicts with a definition used by rpc.h */
 #undef  VOID    /* windows.h will wind up defining this when compiled as a console app */
 #include <windows.h>    /* --------- Huge include file here !!! ---------*/
-/* if SetWindowLongPtr isn't defined, then assume we're using an old compiler */
-/* That is either 32-bit or 16-bit. In either case, just define the new API names */
-/* to be the old API names instead of lettering the code with a bunch of ifdefs */
-#ifndef SetWindowLongPtr
-
-#define SetWindowLongPtr SetWindowLong
-#define GetWindowLongPtr GetWindowLong
-#define LRESULT LONG
-#define DWORD_PTR DWORD
-#define LONG_PTR LONG
-#define INT_PTR int
-#define intptr_t int
-#define UINT_PTR UINT
-#define GWLP_WNDPROC GWL_WNDPROC
-
-#endif
-
-
 #ifndef VOID
 #define VOID void /* Redefine, incase we are compiled as a Windows app */
 #endif
 #endif
-#if     NTCON
+#if     XPCON
 #include <WinCon.h>
 #include <stdio.h>
 // #include <dos.h>

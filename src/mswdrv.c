@@ -456,17 +456,11 @@ static int PASCAL mswnewscr (SCREEN *sp)
     MDICREATESTRUCT cs;
     BOOL    Maximized;
 
-#if WINXP
+#if WINDOW_MSWIN32
 	Maximized = (GetWindowLongPtr((HWND)SendMessage(hMDIClientWnd,
 		WM_MDIGETACTIVE,
 		0, 0),
 		GWL_STYLE) & WS_MAXIMIZE);
-#elif WINDOW_MSWIN32
-    Maximized = (GetWindowLong((HWND)SendMessage (hMDIClientWnd,
-                                                  WM_MDIGETACTIVE,
-                                                  0, 0L),
-                                GWL_STYLE) & WS_MAXIMIZE);
-#else
     Maximized = HIWORD(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L));
 #endif
     if (Maximized) {
@@ -545,16 +539,10 @@ static int PASCAL mswsizscr (SCREEN *sp)
 	   allowed to change its size. If it is the active MDI child and
 	   is maximized, we will actually resize the frame window so, if
 	   the later is maximized, we restore it first. */
-#if WINXP
+#if WINDOW_MSWIN32
 		HWND hActiveScr;
 		hActiveScr = (HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0);
 		Maximized = (hScrWnd == hActiveScr) && (GetWindowLongPtr(hScrWnd, GWL_STYLE) & WS_MAXIMIZE);
-#elif WINDOW_MSWIN32
-	HWND   hActiveScr;
-
-	hActiveScr = (HWND)SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L);
-        Maximized = (hScrWnd == hActiveScr) &&
-                    (GetWindowLong(hScrWnd, GWL_STYLE) & WS_MAXIMIZE);
 #else
 	DWORD   ActiveScr;
 
@@ -662,10 +650,8 @@ static int PASCAL mswtopscr (SCREEN *sp)
 	InternalRequest = TRUE;
 	SendMessage (hMDIClientWnd, WM_MDIACTIVATE,
 		     (WPARAM)sp->s_drvhandle, 0L);
-#if WINXP
+#if WINDOW_MSWIN32
 	if (GetWindowLongPtr(sp->s_drvhandle, GWL_STYLE) & WS_MAXIMIZE) {
-#elif WINDOW_MSWIN32
-    if (GetWindowLong(sp->s_drvhandle, GWL_STYLE) & WS_MAXIMIZE) {
 #else
     if (HIWORD(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L))) {
 #endif

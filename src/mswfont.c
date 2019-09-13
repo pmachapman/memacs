@@ -546,6 +546,8 @@ static void PASCAL ChangeFont (void)
                 Rect.right, Rect.bottom - EmacsCM.MLHeight,
                 TRUE);
 } /* ChangeFont */
+   
+#ifdef WIN32
 
 static
 BOOL choose_font()
@@ -589,6 +591,8 @@ BOOL choose_font()
 	return success;
 }
 
+#endif
+
 /* PickEmacsFont:   calls-up the FONTS dialog box */
 /* =============                                  */
 
@@ -596,7 +600,7 @@ BOOL FAR PASCAL PickEmacsFont (void)
 
 /* returns TRUE is a new font has been picked */
 {
-#if WINVER >= _WIN32_WINNT_WIN2K
+#ifdef WIN32
 	static int newway = 0;
 	if(newway)
 	{

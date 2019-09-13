@@ -87,6 +87,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>BUILD_XPCONSOLE=1;_CRT_SECURE_NO_WARNINGS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4090;4131;4100</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -94,6 +97,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>BUILD_XPCONSOLE=1;_CRT_SECURE_NO_WARNINGS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4090;4131;4100</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -103,6 +109,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>BUILD_XPCONSOLE=1;_CRT_SECURE_NO_WARNINGS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4090;4131;4100</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -116,6 +125,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>BUILD_XPCONSOLE=1;_CRT_SECURE_NO_WARNINGS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4090;4131;4100</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -140,6 +152,7 @@
     <ClInclude Include="..\..\h\latin.h" />
     <ClInclude Include="..\..\h\platin.h" />
     <ClInclude Include="..\..\h\spanish.h" />
+    <ClInclude Include="..\estruct.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\abbrev.c" />
@@ -168,7 +181,7 @@
     <ClCompile Include="..\..\src\lock.c" />
     <ClCompile Include="..\..\src\main.c" />
     <ClCompile Include="..\..\src\mouse.c" />
-    <ClCompile Include="..\..\src\ntconio.c" />
+    <ClCompile Include="..\..\src\nt.c" />
     <ClCompile Include="..\..\src\random.c" />
     <ClCompile Include="..\..\src\region.c" />
     <ClCompile Include="..\..\src\replace.c" />
@@ -186,7 +199,6 @@
     <ClCompile Include="..\..\src\window.c" />
     <ClCompile Include="..\..\src\wmcs.c" />
     <ClCompile Include="..\..\src\word.c" />
-    <ClCompile Include="..\..\src\xp.c" />
     <ClCompile Include="..\..\src\xpconio.c" />
   </ItemGroup>
   <ItemGroup>

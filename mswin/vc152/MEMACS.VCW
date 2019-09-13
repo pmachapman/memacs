@@ -1,0 +1,24 @@
+[MSVC Status File]
+Version=1.00
+ProjectType=0
+External=0
+BrkptCount=2
+BrkptType1=0
+BrkptActive1=1
+BrkptAmbig1=0
+BrkptIndex1=-1
+BrkptLoc1={,c:\dev\memacs\src\mswfont.c,} .602
+BrkptType2=0
+BrkptActive2=1
+BrkptAmbig2=0
+BrkptIndex2=-1
+BrkptLoc2={,c:\dev\memacs\src\mswfile.c,} .197
+WatchCount=8
+WatchExpr1=bp->b_bname
+WatchExpr2=(char *)0
+WatchExpr3=ptr
+WatchExpr4=(char far *)ptr
+WatchExpr5=(char near *)ptr
+WatchExpr6=(int)ptr
+WatchExpr7=(char *)ds:0
+WatchExpr8=cs

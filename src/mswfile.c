@@ -133,6 +133,8 @@ char * PASCAL   fullpathname (char *PathName, int Nbuf)
     return PathName;
 } /* fullpathname */
 
+#if WINVER >= _WIN32_WINNT_WIN2K
+
 static
 int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
 {
@@ -180,7 +182,9 @@ int PASCAL filenamedlg_ofn(char *prompt, char *buf, int nbuf, int fullpath)
 	}
 	return success;
 }
-
+       
+#endif 
+      
 /* filenamedlg: equivalent of mlreply, but specifically to get a filename */
 /* ===========                                                            */
 
