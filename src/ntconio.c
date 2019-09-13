@@ -78,7 +78,7 @@ int revflag = FALSE;                    /* are we currently in rev video? */
 static HANDLE hInput, hOutput;
 static char chConsoleTitle[256];    // Preserve the title of the console.
 static DWORD ConsoleMode, OldConsoleMode;
-CONSOLE_SCREEN_BUFFER_INFOEX OldConsoleInfo = { 0 };
+CONSOLE_SCREEN_BUFFER_INFO OldConsoleInfo = { 0 };
 
 static WORD wKeyEvent;
 
@@ -797,14 +797,14 @@ int PASCAL NEAR ntbeep(void)
 int PASCAL NEAR ntopen()
 {
 	BOOL success = FALSE;
-	CONSOLE_SCREEN_BUFFER_INFOEX Console = { 0 };
-	Console.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
+	CONSOLE_SCREEN_BUFFER_INFO Console = { 0 };
+	// Console.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
 
 	/* Get our standard handles */
 	hInput = GetStdHandle(STD_INPUT_HANDLE);
 	hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 	/* Store the original console info */
-	success = GetConsoleScreenBufferInfoEx(hOutput, &Console);
+	success = GetConsoleScreenBufferInfo(hOutput, &Console);
 
 	OldConsoleInfo = Console;
 
@@ -848,21 +848,29 @@ int PASCAL NEAR ntopen()
 		term.t_ncol = term.t_mcol;
 #endif
 #if 0
+  
 	term.t_mrow = term.t_nrow;
 	term.t_mcol = term.t_ncol;
-
+#endif  
+  
 	Console.dwSize.Y = term.t_nrow+1;
 	Console.dwSize.X = term.t_ncol;
 	Console.srWindow.Bottom = Console.srWindow.Top + term.t_nrow+1;
 	Console.srWindow.Right = Console.srWindow.Left + term.t_ncol;
 	Console.dwMaximumWindowSize.X = Console.dwSize.X;
 	Console.dwMaximumWindowSize.Y = Console.dwSize.Y;
-#endif
+  Console.wAttributes = (FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+  
+#if 0  
 	Console.bFullscreenSupported = TRUE;
-	Console.wAttributes = (FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-
-
-	success = SetConsoleScreenBufferInfoEx(hOutput, &Console);
+  success = SetConsoleScreenBufferInfoEx(hOutput, &Console);
+#endif
+  
+	
+	success = SetConsoleScreenBufferSize(hOutput,Console.dwSize);
+	success = SetConsoleWindowInfo(hOutput, FALSE, &(Console.srWindow));
+	success = SetConsoleTextAttribute(hOutput, Console.wAttributes);
+  
 	/* remeber this size */
 	lastwrow = term.t_nrow;
 	lastwcol = term.t_ncol;
@@ -900,9 +908,13 @@ int PASCAL NEAR ntclose(void)
 	/* reset the title on the window */
 	SetConsoleTitle(chConsoleTitle);
 
-	if(OldConsoleInfo.cbSize == sizeof(CONSOLE_SCREEN_BUFFER_INFOEX))
+	if(OldConsoleInfo.dwSize.X > 0 )
 	{
-		SetConsoleScreenBufferInfoEx(hOutput, &OldConsoleInfo);
+		// SetConsoleScreenBufferInfo(hOutput, &OldConsoleInfo);
+		SetConsoleScreenBufferSize(hOutput,OldConsoleInfo.dwSize);
+		SetConsoleWindowInfo(hOutput, FALSE, &(OldConsoleInfo.srWindow));
+		SetConsoleTextAttribute(hOutput, OldConsoleInfo.wAttributes);
+
 	}
 
 	/* FreeConsole(); */
@@ -922,8 +934,9 @@ int PASCAL NEAR ntkopen(void)
 	/* and reset this to what MicroEMACS needs */
 	ConsoleMode = OldConsoleMode;
 	ConsoleMode &= ~(ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT |
-		ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT);
-	ConsoleMode |= ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+		ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT /* | ENABLE_QUICK_EDIT_MODE*/ );
+	ConsoleMode |= (ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT);
+  
 	SetConsoleMode(hInput, ConsoleMode);
 
 	return(TRUE);

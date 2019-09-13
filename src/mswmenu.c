@@ -899,11 +899,7 @@ InvokeHelp:
 	case IDM_NORMALIZE:
 	    {
 		SCREEN  *sp;
-#if WINXP
 		sp = (SCREEN*)GetWindowLongPtr((HWND)(SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0)), GWL_SCRPTR);
-#else
-		sp = (SCREEN*)GetWindowLong((HWND)(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L)), GWL_SCRPTR);
-#endif
 		newsize (TRUE, sp->s_nrow);
 		newwidth (TRUE, sp->s_ncol);
 		update (FALSE);
@@ -949,10 +945,8 @@ static int PASCAL   MenuEntryCount (HMENU hMenu)
 
     Count = GetMenuItemCount (hMenu);
     if (hMenu == GetMenu (hFrameWnd)) {
-#if WINXP
+#if WINDOW_MSWIN32
 		if (GetWindowLongPtr((HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0), GWL_STYLE) & WS_MAXIMIZE) {
-#elif WINDOW_MSWIN32
-		if (GetWindowLong((HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L), GWL_STYLE) & WS_MAXIMIZE) {
 #else
         if (HIWORD(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L))) {
 #endif
@@ -970,10 +964,8 @@ static int PASCAL   MenuEntryCount (HMENU hMenu)
 static int PASCAL   MenuEntryOffset (HMENU hMenu)
 {
     if (hMenu == GetMenu (hFrameWnd)) {
-#if WINXP
+#if WINDOW_MSWIN32
 		if (GetWindowLongPtr((HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0), GWL_STYLE) & WS_MAXIMIZE) {
-#elif WINDOW_MSWIN32
-		if (GetWindowLong((HWND)SendMessage(hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L), GWL_STYLE) & WS_MAXIMIZE) {
 #else
         if (HIWORD(SendMessage (hMDIClientWnd, WM_MDIGETACTIVE, 0, 0L))) {
 #endif

@@ -51,9 +51,15 @@
 #define HPUX8	0			/* HPUX HP 9000 ver 8 or less	*/
 #define HPUX9	0			/* HPUX HP 9000 ver 9           */
 #define MPE	0			/* HP MPE/XL			*/
+#ifdef WIN32
 #define MSDOS	0			/* MS-DOS			*/
 #define WINNT	0			/* MS-Win NT			*/
 #define	WINXP	1			/* Windows XP/Visual studio 2008*/
+#else
+#define MSDOS	1			/* MS-DOS			*/
+#define WINNT	0			/* MS-Win NT			*/
+#define	WINXP	0			/* Windows XP/Visual studio 2008*/
+#endif
 #define OS2	0			/* Microsoft or IBM OS/2	*/
 #define SMOS	0			/* Supermax UNIX System V	*/
 #define SUN	0			/* SUN v4.0			*/
@@ -122,16 +128,26 @@
 #define TERMCAP 0			/* Use TERMCAP			*/
 #define TIPC	0			/* TI Profesional PC driver	*/
 #define VT52	0			/* VT52 terminal (Zenith).	*/
+#ifdef WIN32
 #define NTCON	0			/* Windows NT console		*/
 #define	XPCON	1			/* windows XP console app	*/
+#else
+#define NTCON	0			/* Windows NT console		*/
+#define	XPCON	0			/* windows XP console app	*/
+#endif
 #define	XVT	0			/* XVT windowing system		*/
 #define Z309	0			/* Zenith 100 PC family driver	*/
 
 /*	Windowing system style (pick one)				*/
 
 #define WINDOW_TEXT	0		/* [default] Text mode		*/
+#ifdef WIN32
 #define WINDOW_MSWIN	0		/* MicroSoft Windows		*/
 #define WINDOW_MSWIN32	1		/* MicroSoft Windows 32 bit API */
+#else
+#define WINDOW_MSWIN	1		/* MicroSoft Windows		*/
+#define WINDOW_MSWIN32	0		/* MicroSoft Windows 32 bit API */
+#endif
 #define WINDOW_X	0		/* X/Unix			*/
 
 /*	Language text options	(pick one)				*/
@@ -278,6 +294,24 @@
 #undef  MAC     /* Mac conflicts with a definition used by rpc.h */
 #undef  VOID    /* windows.h will wind up defining this when compiled as a console app */
 #include <windows.h>    /* --------- Huge include file here !!! ---------*/
+
+/* if SetWindowLongPtr isn't defined, then assume we're using an old compiler */
+/* That is either 32-bit or 16-bit. In either case, just define the new API names */
+/* to be the old API names instead of lettering the code with a bunch of ifdefs */
+#ifndef SetWindowLongPtr
+
+#define SetWindowLongPtr SetWindowLong
+#define GetWindowLongPtr GetWindowLong
+#define LRESULT LONG
+#define DWORD_PTR DWORD
+#define LONG_PTR LONG
+#define INT_PTR int
+#define intptr_t int
+#define UINT_PTR UINT
+#define GWLP_WNDPROC GWL_WNDPROC
+
+#endif
+
 #ifndef VOID
 #define VOID void /* Redefine, incase we are compiled as a Windows app */
 #endif
