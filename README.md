@@ -16,3 +16,6 @@ Please refer to [DOC/README](doc/readme) for the complete MicroEMACS readme file
 This code retains the copyright Daniel placed on this work (refer to [LICENSE.md](LICENSE.md)), and on his passing I assume it is now with his estate.
 
 I will endeavour to respect this, and request that you do the same, until notified otherwise.
+
+
+http://dfrench.hypermart.net/js/Downloads/Editors/MicroEMACS/index.content.shtml
