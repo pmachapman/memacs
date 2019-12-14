@@ -19,3 +19,17 @@ I will endeavour to respect this, and request that you do the same, until notifi
 
 
 http://dfrench.hypermart.net/js/Downloads/Editors/MicroEMACS/index.content.shtml
+
+
+```
+(prefer-coding-system 'utf-8)
+(set-language-environment "Chinese-GB")
+(set-locale-environment "Chinese-GB")
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-default-font "-outline-Microsoft YaHei Mono-normal-r-normal-normal-16-120-96-96-c-*-iso8859-1")
+
+(setq default-frame-alist
+'((height . 36) (width . 120) (menu-bar-lines . 20) (tool-bar-lines . 0)))
+```
