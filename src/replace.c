@@ -17,7 +17,7 @@ static char	*oldpatmatch = NULL;	/* allocated memory for un-do.*/
 /*
  * sreplace -- Search and replace.
  */
-int PASCAL NEAR sreplace(f, n)
+int sreplace(f, n)
 int f;					/* default flag */
 int n;					/* # of repetitions wanted */
 {
@@ -27,7 +27,7 @@ int n;					/* # of repetitions wanted */
 /*
  * qreplace -- search and replace with query.
  */
-int PASCAL NEAR qreplace(f, n)
+int qreplace(f, n)
 int f;					/* default flag */
 int n;					/* # of repetitions wanted */
 {
@@ -38,22 +38,22 @@ int n;					/* # of repetitions wanted */
  * replaces -- Search for a string and replace it with another
  *	string.  Query might be enabled (according to kind).
  */
-int PASCAL NEAR	replaces(kind, f, n)
-int	kind;				/* Query enabled flag */
-int	f;					/* default flag */
-int	n;					/* # of repetitions wanted */
+int NEAR	replaces(kind, f, n)
+int	kind;			/* Query enabled flag */
+int	f;			/* default flag */
+int	n;			/* # of repetitions wanted */
 {
 	register int status;	/* success flag on pattern inputs */
 	register int nummatch;	/* number of found matches */
-	long numsub;			/* number of substitutions */
-	int nlflag;			/* last char of search string a <NL>? */
-	int nlrepl;			/* was a replace done on the last line? */
-	char c;				/* input char for query */
+	long numsub;		/* number of substitutions */
+	int nlflag;		/* last char of search string a <NL>? */
+	int nlrepl;		/* was a replace done on the last line? */
+	char c;			/* input char for query */
 	LINE *origline;		/* original "." position */
 	int origoff;		/* and offset (for . query option) */
 	LINE *lastline;		/* position of last replace and */
-	int lastoff;		/* offset (for 'u' query option) */
-	int oldmatchlen;	/* Closure may alter the match length.*/
+	int lastoff = 0;	/* offset (for 'u' query option) */
+	int oldmatchlen = 0;	/* Closure may alter the match length.*/
 
 	/*
 	 * Don't allow this command if we are
@@ -83,7 +83,7 @@ int	n;					/* # of repetitions wanted */
 	/* Set up flags so we can make sure not to do a recursive
 	 * replace on the last line.
 	 */
-	nlflag = (pat[strlen(pat) - 1] == '\r');
+	nlflag = (pat[strlen((CONST char*) pat) - 1] == RET_CHAR);
 	nlrepl = FALSE;
 
 	/* Save original . position, reset the number of matches and
@@ -291,7 +291,7 @@ qprompt:
 /*
  * mlrquery -- The prompt for query-replace-string.
  */
-VOID PASCAL NEAR mlrquery()
+VOID mlrquery()
 {
 	register int	tcol;
 #if	MAGIC
@@ -334,13 +334,13 @@ VOID PASCAL NEAR mlrquery()
  *	then either insert the string directly, or make use of
  *	replacement meta-array.
  */
-int PASCAL NEAR delins(dlength, instr, use_rmc)
+int delins(dlength, instr, use_rmc)
 int	dlength;
 char	*instr;
 int	use_rmc;
 {
 	register int	status;
-	register char	*rstr;
+	register CONST char	*rstr;
 #if	MAGIC
 	register RMC	*rmcptr;
 #endif
@@ -384,7 +384,7 @@ int	use_rmc;
  *	the array is never actually created - we will just use the
  *	character array rpat[] as the replacement string.
  */
-int PASCAL NEAR rmcstr()
+int rmcstr()
 {
 	RMC	*rmcptr;
 	char	*patptr;
@@ -502,7 +502,7 @@ int PASCAL NEAR rmcstr()
 /*
  * rmcclear -- Free up any strings, and MCNIL the RMC array.
  */
-VOID PASCAL NEAR rmcclear()
+VOID rmcclear()
 {
 	register RMC	*rmcptr;
 

@@ -4,7 +4,7 @@
 			All Rights reserved
 
 	The names of function key command strings have been changed to
-	help make these names machine independent.  This program translates
+	help make these names machine independant.  This program translates
 	old files to new.
 
 */
@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include "estruct.h"
 
-PASCAL fix();
+fix();
 
 /*	Table of command key name changes */
 
@@ -87,7 +87,7 @@ char *trans[][2] = {
 	"FNu",	"FN^>",
 	"FNv",	"FN^V",
 	"FNw",	"FN^<",
-	"FN„",	"FN^Z",
+	"FNï¿½",	"FN^Z",
 	"set-fill-column", "set $fillcol",
 };
 
@@ -143,7 +143,7 @@ char *argv[];	/* text of command line arguments */
 	exit(0);
 }
 
-PASCAL fix(fname)
+fix(fname)
 
 char *fname;	/* file to fix */
 

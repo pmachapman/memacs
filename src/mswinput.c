@@ -90,16 +90,16 @@ int in_get (void)
 /* typahead:    TRUE if there are typeahead characters in the input stream */
 /* ========                                                                */
 
-PASCAL typahead (void)
+typahead (void)
 {
     if (in_check()) return TRUE;
     else return FALSE;
 } /* typahead */
-
+
 /* EatKey: processes WM_(SYS)KEYxxx and WM_(SYS/MENU)CHAR messages */
 /* ======                                                          */
 
-BOOL FAR PASCAL EatKey (UINT MsgCode, WPARAM wParam, LPARAM lParam)
+BOOL FAR EatKey (UINT MsgCode, WPARAM wParam, LPARAM lParam)
 
 /* This function must be called for each WM_(SYS)KEYxxx or
    WM_(SYS/MENU)CHAR message. It returns TRUE if it has taken possesion
@@ -224,7 +224,7 @@ KeyDown:
 /* PutMouseMessage: feeds a mouse message into the in_put queue */
 /* ===============                                              */
 
-void PASCAL    PutMouseMessage (UINT wMsg, WPARAM wParam, POINT Position)
+void    PutMouseMessage (UINT wMsg, WPARAM wParam, POINT Position)
 
 {
     char    c;
@@ -277,7 +277,7 @@ void PASCAL    PutMouseMessage (UINT wMsg, WPARAM wParam, POINT Position)
 /* MouseMessage:    handles client area mouse messages */
 /* ============                                        */
 
-void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
+void FAR MouseMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     POINT           Position;
     static POINT old_Position = {-1, -1};/* last position reported by movement */
@@ -334,7 +334,7 @@ void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam
 /* DropMessage:    handles WM_DROPFILES messages */
 /* ===========                                   */
 
-void FAR PASCAL DropMessage (HWND hWnd, HDROP hDrop)
+void FAR DropMessage (HWND hWnd, HDROP hDrop)
 
 /* Generates a MS! keystroke. $xpos/$ypos contain the position where
    the files were dropped, or -1 (actually, 255) if the drop occurred
@@ -356,9 +356,9 @@ void FAR PASCAL DropMessage (HWND hWnd, HDROP hDrop)
         else {
             /* the drop occured on a screen */
 #if WINXP
-			addline(DropBuf, ((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR))->s_screen_name);
+			addline(DropBuf, ((ESCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR))->s_screen_name);
 #else
-			addline(DropBuf, ((SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR))->s_screen_name);
+			addline(DropBuf, ((ESCREEN*)GetWindowLong (hWnd, GWL_SCRPTR))->s_screen_name);
 #endif
             if (DragQueryPoint (hDrop, &Point)) {
                 ClientToCell (hWnd, Point, &Point);

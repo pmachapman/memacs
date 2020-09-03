@@ -9,7 +9,7 @@
 #include	"edef.h"
 #include	"elang.h"
 
-VOID PASCAL NEAR ab_save(c)
+VOID ab_save(c)
 
 char c;		/* character to add to current word buffer */
 
@@ -36,12 +36,12 @@ char c;		/* character to add to current word buffer */
 	*ab_pos = 0;
 }
 
-VOID PASCAL NEAR ab_expand()
+VOID ab_expand()
 
 {
 	char *exp;	/* expansion of current symbol */
 	char c;		/* current character to insert */
-	
+
 	/* only in ABBREV mode, never in VIEW mode */
 	if ((curbp->b_mode & MDABBR) == 0 ||
 	    (curbp->b_mode & MDVIEW) == MDVIEW)
@@ -83,7 +83,7 @@ VOID PASCAL NEAR ab_expand()
 
 /* add a new abbreviation */
 
-int PASCAL NEAR add_abbrev(f, n)
+int add_abbrev(f, n)
 
 int f, n;	/* numeric flag and argument */
 
@@ -114,7 +114,7 @@ int f, n;	/* numeric flag and argument */
 
 /* Delete a single abbreviation */
 
-int PASCAL NEAR del_abbrev(f, n)
+int del_abbrev(f, n)
 
 int f, n;	/* numeric flag and argument */
 
@@ -134,7 +134,7 @@ int f, n;	/* numeric flag and argument */
 
 /* Kill all abbreviations */
 
-int PASCAL NEAR kill_abbrevs(f, n)
+int kill_abbrevs(f, n)
 
 int f, n;	/* numeric flag and argument */
 
@@ -143,7 +143,7 @@ int f, n;	/* numeric flag and argument */
 	return(ab_clean());
 }
 
-int PASCAL NEAR desc_abbrevs(f, n)
+int desc_abbrevs(f, n)
 
 int f, n;	/* numeric flag and argument */
 
@@ -172,7 +172,7 @@ int f, n;	/* numeric flag and argument */
 		/* add in the abbreviation symbol name */
 		strcpy(outseq, cur_node->ab_sym);
 		pad(outseq, 20);
-	        
+
 		/* add it's expansion */
 		strncat(outseq, cur_node->ab_exp, NSTRING - 20);
 		outseq[NSTRING - 1] = 0;
@@ -192,7 +192,7 @@ int f, n;	/* numeric flag and argument */
 
 /* insert a list of all the current abbreviations into the current buffer */
 
-int PASCAL NEAR ins_abbrevs(f, n)
+int ins_abbrevs(f, n)
 
 int f, n;	/* numeric flag and argument */
 
@@ -206,7 +206,7 @@ int f, n;	/* numeric flag and argument */
 		/* insert the abbreviation symbol as a line */
 		if (addline(curbp, cur_node->ab_sym) != TRUE)
 			return(FALSE);
-	        
+
 		/* now a line with the expansion */
 		if (addline(curbp, cur_node->ab_exp) != TRUE)
 			return(FALSE);
@@ -217,25 +217,25 @@ int f, n;	/* numeric flag and argument */
 	return(TRUE);
 }
 
-int PASCAL NEAR def_abbrevs(f, n)
+int def_abbrevs(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
 	register BUFFER *bp;	/* ptr to buffer to dump */
 	register LINE *lp;	/* ptr to current line in our buffer */
-	register llength;	/* length of the current line being examined */
+	register int llength;	/* length of the current line being examined */
 	char cur_sym[MAXSYM+1];	/* current symbol being defined */
 	char cur_exp[NSTRING];	/* current expansion */
-	
+
 	/* get the buffer to load abbreviations from */
 	bp = getdefb();
 	bp = getcbuf(TEXT236, bp ? bp->b_bname : mainbuf, TRUE);
-/*		     "Define Abbreviations in buffer" */
+/*		     "Define Abbreviations from buffer" */
 	if (bp == NULL)
 		return(ABORT);
 
-	/* step throught the buffer */
+	/* step through the buffer */
 	lp = lforw(bp->b_linep);
 	while (lp != bp->b_linep) {
 
@@ -264,14 +264,16 @@ int f,n;	/* prefix flag and argument */
 		/* on to the next pair */
 		lp = lforw(lp);
 	}
+
+	return(TRUE);
 }
 
-VOID PASCAL NEAR ab_init()
+VOID ab_init()
 
 {
 	ab_head = (ABBREV *)NULL; /* abbreviation list empty */
  	ab_bell = FALSE;	/* no ringing please! */
-	ab_cap = FALSE;		/* don't match capatilization on expansion */
+	ab_cap = FALSE;		/* don't match capitalization on expansion */
 	ab_quick = FALSE;	/* no aggressive expansion */
 	ab_pos = ab_word;	/* no word accumulated yet */
 	ab_end = &ab_word[NSTRING - 1];	/* ptr to detect end of this buffer */
@@ -281,7 +283,7 @@ VOID PASCAL NEAR ab_init()
 		<expansion>
 */
 
-int PASCAL NEAR ab_insert(sym, expansion)
+int ab_insert(sym, expansion)
 
 char *sym;		/* symbol to expand */
 char *expansion;	/* string to expand to */
@@ -328,7 +330,7 @@ char *expansion;	/* string to expand to */
 			cur_node = ab_head;
 			while (cur_node->ab_next != NULL) {
 
-				if (strcmp(sym, cur_node->ab_next->ab_sym) > 0) {
+				if (strcmp(sym, cur_node->ab_next->ab_sym) < 0) {
 
 					/* insert after cur_node */
 					new_node->ab_next = cur_node->ab_next;
@@ -353,7 +355,7 @@ char *expansion;	/* string to expand to */
 		Return a NULL if it is not in the list
 */
 
-char *PASCAL NEAR ab_lookup(sym)
+char *ab_lookup(sym)
 
 char *sym;	/* name of the symbol to look up */
 
@@ -378,7 +380,7 @@ char *sym;	/* name of the symbol to look up */
 
 /* ab_delete:	Delete <sym> from the abbreviation list */
 
-int PASCAL NEAR ab_delete(sym)
+int ab_delete(sym)
 
 char *sym;
 
@@ -403,7 +405,7 @@ char *sym;
 
 		} else if (strcmp(sym,cur_node->ab_sym) == 0
 			    && cur_node != NULL) {
-			previous->ab_next=NULL;			
+			previous->ab_next=NULL;
 			free(cur_node);
 			return(TRUE);
 		}
@@ -417,7 +419,7 @@ char *sym;
 	return(FALSE);
 }
 
-int PASCAL NEAR ab_clean()
+int ab_clean()
 
 {
 

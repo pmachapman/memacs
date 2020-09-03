@@ -146,7 +146,7 @@ int undo_op()
 			/* fall into the next case! */
 
 		case OP_DELC:
-			if (up->undo_obj.obj_char == '\r') {
+			if (up->undo_obj.obj_char == RET_CHAR) {
 				count = up->count;
 				while (count--)
 					status = lnewline();
@@ -202,7 +202,7 @@ BUFFER *bp;
 
 /* Undo last done command */
 
-int PASCAL NEAR undo(f, n)
+int undo(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -239,7 +239,7 @@ int f,n;	/* prefix flag and argument */
 
 /* delete current buffer's undo stack */
 
-int PASCAL NEAR undo_delete(f, n)
+int undo_delete(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -251,7 +251,7 @@ int f,n;	/* prefix flag and argument */
 
 /* pop up a list of the current buffer's undo stack */
 
-int PASCAL NEAR undo_list(f, n)
+int undo_list(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -263,7 +263,7 @@ int f,n;	/* prefix flag and argument */
 	return(wpopup(ulistp));
 }
 
-PASCAL NEAR undolist()
+int undolist()
 
 {
 	register char *cp1;	/* scanning pointer into line to build */
@@ -448,6 +448,8 @@ nextbuf:	bp = getoldb();
 		lp->next = (UNDO_OBJ *)NULL;
 		bp->undo_count--;
 	}
+
+	return((char *)NULL);
 }
 
 /*	RE-ROOM: Allocate memory using realloc()
@@ -511,5 +513,7 @@ nxtbuf:		bp = getoldb();
 		lp->next = (UNDO_OBJ *)NULL;
 		bp->undo_count--;
 	}
+
+	return((char *)NULL);
 }
 

@@ -28,7 +28,7 @@ static HANDLE   hClipData = NULL;   /* used by insertclip and
 /* CopyToClipboard: internal function to copy region to clipboard */
 /* ===============                                                */
 
-static BOOL PASCAL CopyToClipboard (REGION *Region)
+static BOOL CopyToClipboard (REGION *Region)
 {
     long    Size = 0L;
     HANDLE  hData;
@@ -101,7 +101,7 @@ NoClipboardMemory:
 /* cutregion:   move the current region to the clipboard */
 /* =========                                             */
 
-int PASCAL cutregion (int f, int n)
+int cutregion (int f, int n)
 {
     REGION  Region;
     int     Result;
@@ -120,7 +120,7 @@ int PASCAL cutregion (int f, int n)
 /* clipregion:  copy the current region into the clipboard */
 /* ==========                                              */
 
-int PASCAL clipregion (int f, int n)
+int clipregion (int f, int n)
 {
     REGION  Region;
     int     Result;
@@ -133,7 +133,7 @@ int PASCAL clipregion (int f, int n)
 /* insertclip:  insert the clipboard contents at dot */
 /* ==========                                        */
 
-int PASCAL insertclip (int f, int n)
+int insertclip (int f, int n)
 {
     BOOL    Result = TRUE;
     char    *Text, *TextHead;
@@ -193,7 +193,7 @@ bail_out:
 /* ClipboardCleanup:    to be called if the user aborts during a longop */
 /* ================                                                     */
 
-void FAR PASCAL ClipboardCleanup (void)
+void FAR ClipboardCleanup (void)
 {
     if (hClipData) {
         GlobalUnlock (hClipData);
@@ -204,7 +204,7 @@ void FAR PASCAL ClipboardCleanup (void)
 /* helpengine:  invoke the MS-Windows help engine */
 /* ==========                                     */
 
-int PASCAL helpengine (int f, int n)
+int helpengine (int f, int n)
 {
     char    OldHelpFile [NFILEN];
     char    HelpKey [NLINE];
@@ -255,7 +255,7 @@ int PASCAL helpengine (int f, int n)
 /* minimizescreen:  turn the current screen into an icon */
 /* ==============                                        */
 
-PASCAL  minimizescreen (int f, int n)
+ minimizescreen (int f, int n)
 {
     BOOL    nq;
 
@@ -269,7 +269,7 @@ PASCAL  minimizescreen (int f, int n)
 /* ForceMessage:    do a SendMessage, forcing quiescent mode */
 /* ============                                              */
 
-static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
+static ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     BOOL    nq;
 
@@ -282,7 +282,7 @@ static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 /* maximizescreen:  maximize the current screen */
 /* ==============                               */
 
-PASCAL  maximizescreen (int f, int n)
+ maximizescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIMAXIMIZE,
                   (UINT)first_screen->s_drvhandle, 0L);
@@ -292,7 +292,7 @@ PASCAL  maximizescreen (int f, int n)
 /* restorescreen:   restore the current screen from maximized/minimized state */
 /* =============                                                              */
 
-PASCAL  restorescreen (int f, int n)
+ restorescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIRESTORE,
                   (UINT)first_screen->s_drvhandle, 0L);
@@ -302,7 +302,7 @@ PASCAL  restorescreen (int f, int n)
 /* tilescreens: tile the non-iconized screens */
 /* ===========                                */
 
-PASCAL  tilescreens (int f, int n)
+ tilescreens (int f, int n)
 
 /* without a numeric argument, tile horizontally. With a numeric argument
    of 1, tile vertically */
@@ -317,7 +317,7 @@ PASCAL  tilescreens (int f, int n)
 /* cascadescreens:  position the non-iconized screens in cascade */
 /* ==============                                                */
 
-PASCAL  cascadescreens (int f, int n)
+ cascadescreens (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDICASCADE, 0, 0L);
     return TRUE;
@@ -325,7 +325,7 @@ PASCAL  cascadescreens (int f, int n)
 
 /* ScrollMessage:   handle WM_HSCROLL and WM_VSCROLL */
 /* =============                                     */
-void FAR PASCAL ScrollMessage (HWND hWnd, UINT wMsg, WORD ScrlCode, int Pos)
+void FAR ScrollMessage (HWND hWnd, UINT wMsg, WORD ScrlCode, int Pos)
 
 {
     int     Delta;
@@ -406,20 +406,20 @@ void FAR PASCAL ScrollMessage (HWND hWnd, UINT wMsg, WORD ScrlCode, int Pos)
 
 /* ScrollBars:      shows/hides, enables/disables scroll bars for all screens */
 /* ==========                                                                 */
-void FAR PASCAL ScrollBars (void)
+void FAR ScrollBars (void)
 
 {
     static int VScroll = TRUE;
     static int HScroll = TRUE;
     static int Enabled = TRUE;
     int     Quiescence;
-    SCREEN  *sp;
+    ESCREEN  *sp;
 
     if (vscrollbar) vscrollbar = TRUE;  /* normalize... */
     if (hscrollbar) hscrollbar = TRUE;
     Quiescence = (notquiescent == 0);
 
-    for (sp = first_screen; sp != (SCREEN*)NULL; sp = sp->s_next_screen) {
+    for (sp = first_screen; sp != (ESCREEN*)NULL; sp = sp->s_next_screen) {
         if (vscrollbar != VScroll) {
             ShowScrollBar ((HWND)sp->s_drvhandle, SB_VERT, vscrollbar);
         }
@@ -444,7 +444,7 @@ void FAR PASCAL ScrollBars (void)
 
 /* updscrollbars:      updates the scroll bars for a screen */
 /* =============                                            */
-PASCAL  updscrollbars (SCREEN *sp, char w_flag)
+ updscrollbars (ESCREEN *sp, char w_flag)
 
 /* the w_flag is used to determine what needs updating: if the WFHARD
    bit is set, both scroll bars need an update. If the WFMOVE bit

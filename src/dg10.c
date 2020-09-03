@@ -21,25 +21,25 @@
 #define BEL     0x07                    /* BEL character.               */
 #define ESC     30                      /* DG10 ESC character.          */
 
-extern PASCAL NEAR ttopen();               /* Forward references.          */
-extern PASCAL NEAR ttgetc();
-extern PASCAL NEAR ttputc();
-extern PASCAL NEAR ttflush();
-extern PASCAL NEAR ttclose();
-extern PASCAL NEAR dg10kopen();
-extern PASCAL NEAR dg10kclose();
-extern PASCAL NEAR dg10move();
-extern PASCAL NEAR dg10eeol();
-extern PASCAL NEAR dg10eeop();
-extern PASCAL NEAR dg10beep();
-extern PASCAL NEAR dg10open();
-extern PASCAL NEAR dg10rev();
-extern PASCAL NEAR dg10close();
-extern PASCAL NEAR dg10cres();
+extern ttopen();               /* Forward references.          */
+extern ttgetc();
+extern ttputc();
+extern ttflush();
+extern ttclose();
+extern dg10kopen();
+extern dg10kclose();
+extern dg10move();
+extern dg10eeol();
+extern dg10eeop();
+extern dg10beep();
+extern dg10open();
+extern dg10rev();
+extern dg10close();
+extern dg10cres();
 
 #if	COLOR
-extern PASCAL NEAR dg10fcol();
-extern PASCAL NEAR dg10bcol();
+extern dg10fcol();
+extern dg10bcol();
 
 int	cfcolor = -1;		/* current forground color */
 int	cbcolor = -1;		/* current background color */
@@ -80,7 +80,7 @@ TERM    term    = {
 };
 
 #if	COLOR
-PASCAL NEAR dg10fcol(color)		/* set the current output color */
+dg10fcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -93,7 +93,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-PASCAL NEAR dg10bcol(color)		/* set the current background color */
+dg10bcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -107,19 +107,19 @@ int color;	/* color to set */
 }
 #endif
 
-PASCAL NEAR dg10move(row, col)
+dg10move(row, col)
 {
 	ttputc(16);
         ttputc(col);
 	ttputc(row);
 }
 
-PASCAL NEAR dg10eeol()
+dg10eeol()
 {
         ttputc(11);
 }
 
-PASCAL NEAR dg10eeop()
+dg10eeop()
 {
 #if	COLOR
 	dg10fcol(gfcolor);
@@ -130,7 +130,7 @@ PASCAL NEAR dg10eeop()
         ttputc(0106);
 }
 
-PASCAL NEAR dg10rev(state)		/* change reverse video state */
+dg10rev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -146,25 +146,25 @@ int state;	/* TRUE = reverse, FALSE = normal */
 #endif
 }
 
-PASCAL NEAR dg10cres()	/* change screen resolution */
+dg10cres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
-PASCAL NEAR spal()		/* change palette string */
+spal()		/* change palette string */
 
 {
 	/*	Does nothing here	*/
 }
 
-PASCAL NEAR dg10beep()
+dg10beep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-PASCAL NEAR dg10open()
+dg10open()
 {
 	strcpy(sres, "NORMAL");
 	strcpy(os, "DG10);
@@ -172,7 +172,7 @@ PASCAL NEAR dg10open()
         ttopen();
 }
 
-PASCAL NEAR dg10close()
+dg10close()
 
 {
 #if	COLOR
@@ -182,18 +182,18 @@ PASCAL NEAR dg10close()
 	ttclose();
 }
 
-PASCAL NEAR dg10kopen()
+dg10kopen()
 
 {
 }
 
-PASCAL NEAR dg10kclose()
+dg10kclose()
 
 {
 }
 
 #if	FLABEL
-PASCAL NEAR fnclabel(f, n)		/* label a function key */
+fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

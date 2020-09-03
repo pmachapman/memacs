@@ -13,7 +13,7 @@
 #if	BSD || FREEBSD || WMCS || SUN || XENIX || HPUX8 || HPUX9 || AVIION || USG || AIX || AUX
 #include <sys/errno.h>
 extern int sys_nerr;		/* number of system error messages defined */
-extern char *sys_errlist[];	/* list of message texts */
+extern CONST char * CONST sys_errlist[];	/* list of message texts */
 #endif
 
 #if	MSC
@@ -27,9 +27,9 @@ int numlocks;		/* # of current locks active */
 
 /* lockchk:	check a file for locking and add it to the list */
 
-lockchk(fname)
+int lockchk(fname)
 
-char *fname;	/* file to check for a lock */
+CONST char *fname;	/* file to check for a lock */
 
 {
 	register int i;		/* loop indexes */
@@ -72,10 +72,9 @@ char *fname;	/* file to check for a lock */
 
 /*	lockrel:	release all the file locks so others may edit */
 
-lockrel()
+int lockrel()
 
 {
-	register int i;		/* loop index */
 	register int status;	/* status of locks */
 	register int s;		/* status of one unlock */
 
@@ -94,9 +93,9 @@ lockrel()
 			ABORT = file was locked, abort command
 */
 
-xlock(fname)
+int xlock(fname)
 
-char *fname;	/* file name to lock */
+CONST char *fname;	/* file name to lock */
 
 {
 	register char *locker;	/* lock error message */
@@ -132,7 +131,7 @@ char *fname;	/* file name to lock */
 		this only warns the user if it fails
 							*/
 
-xunlock(fname)
+int xunlock(fname)
 
 char *fname;	/* file to unlock */
 
@@ -149,7 +148,7 @@ char *fname;	/* file to unlock */
 	return(FALSE);
 }
 
-lckerror(errstr)	/* report a lock error */
+VOID lckerror(errstr)	/* report a lock error */
 
 char *errstr;		/* lock error string to print out */
 
@@ -159,11 +158,7 @@ char *errstr;		/* lock error string to print out */
 	strcpy(obuf, errstr);
 	strcat(obuf, " - ");
 #if	BSD || FREEBSD || WMCS || SUN || XENIX || HPUX8 || HPUX9 || AVIION || USG || AIX || AUX
-	if (errno < sys_nerr)
-		strcat(obuf, sys_errlist[errno]);
-	else
-		strcat(obuf, TEXT178);
-/*                           "[can not get system error message]" */
+	strcat(obuf, strerror(errno));
 #else
 	strcat(obuf, "Error # ");
 	strcat(obuf, int_asc(errno));
@@ -172,7 +167,7 @@ char *errstr;		/* lock error string to print out */
 	update(TRUE);
 }
 #else
-lckhello()	/* dummy function */
+VOID lckhello()	/* dummy function */
 {
 }
 #endif

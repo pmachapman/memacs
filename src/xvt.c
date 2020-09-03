@@ -32,7 +32,7 @@
 #include	<xvtmenu.h>
 #include	"uemacs.h"
 
-int PASCAL NEAR fnclabel(int f, int n);
+int fnclabel(int f, int n);
 
 #define NROW	25			/* Screen size. 		*/
 #define NCOL	80			/* Edit if you want to. 	*/
@@ -43,21 +43,21 @@ int PASCAL NEAR fnclabel(int f, int n);
 #define ESC	0x1B			/* ESC character.		*/
 
 /* Forward references.		*/
-extern int PASCAL NEAR xvtmove();
-extern int PASCAL NEAR xvteeol();
-extern int PASCAL NEAR xvteeop();
-extern int PASCAL NEAR xvtbeep();
-extern int PASCAL NEAR xvtopen();
-extern int PASCAL NEAR xvtrev();
-extern int PASCAL NEAR xvtclose();
-extern int PASCAL NEAR xvtkopen();
-extern int PASCAL NEAR xvtkclose();
-extern int PASCAL NEAR xvtcres();
-extern int PASCAL NEAR xvtgetc();
-extern int PASCAL NEAR xvtputc();
-extern int PASCAL NEAR xvtflush();
-extern int PASCAL NEAR xvtfcol();
-extern int PASCAL NEAR xvtbcol();
+extern int xvtmove();
+extern int xvteeol();
+extern int xvteeop();
+extern int xvtbeep();
+extern int xvtopen();
+extern int xvtrev();
+extern int xvtclose();
+extern int xvtkopen();
+extern int xvtkclose();
+extern int xvtcres();
+extern int xvtgetc();
+extern int xvtputc();
+extern int xvtflush();
+extern int xvtfcol();
+extern int xvtbcol();
 static int rev_state = FALSE;
 
 static int cfcolor = -1;	/* current foreground color */
@@ -71,8 +71,8 @@ static int oldrow;	/* previous y position of mouse */
 
 #define	MAXOBUF	256	/* maximum number of output characters buffered */
 
-WINDOW xvt_win;		/* current window being displayed by XVT */
-WINDOW init_win;	/* the initial window we are to toss */
+EWINDOW xvt_win;		/* current window being displayed by XVT */
+EWINDOW init_win;	/* the initial window we are to toss */
 int xvt_char_width;	/* width of characters in pixels */
 int xvt_char_height;	/* height of characters in pixels */
 int xvt_descent;	/* height of descenders (character offset) */
@@ -187,7 +187,7 @@ dump_event(char *typ, EVENT *ep)
 	}
 }
 
-static long windowHandler(WINDOW win, EVENT *ep)
+static long windowHandler(EWINDOW win, EVENT *ep)
 
 {
 	register int etype;	/* event type byte */
@@ -366,7 +366,7 @@ int xvt_code;
 
 }
 
-static long taskHandler(WINDOW win, EVENT *ep)
+static long taskHandler(EWINDOW win, EVENT *ep)
 {
 	RCT rct;
 	char aname[80]; 	/* application name */
@@ -450,7 +450,7 @@ char **argv;
 	xvt_system(argc, argv, 0L, taskHandler, &config);
 }
 
-PASCAL NEAR xvtfcol(color)		/* set the current output color */
+xvtfcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -462,7 +462,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-PASCAL NEAR xvtbcol(color)		/* set the current background color */
+xvtbcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -474,14 +474,14 @@ int color;	/* color to set */
 	cbcolor = color;
 }
 
-PASCAL NEAR xvtmove(row, col)
+xvtmove(row, col)
 {
 	xvtflush();
 	xvt_row = row;
 	xvt_col = col;
 }
 
-PASCAL NEAR xvteeol()
+xvteeol()
 {
 	RCT rect;	/* rectangle to use to clear to end of this line */
 	CBRUSH brush;	/* brushed used for the clearing */
@@ -504,7 +504,7 @@ PASCAL NEAR xvteeol()
 	win_draw_rect(xvt_win, &rect);
 }
 
-PASCAL NEAR xvteeop()
+xvteeop()
 {
 	RCT rect;	/* rectangle to use to clear to end of this line */
 	CBRUSH brush;	/* brushed used for the clearing */
@@ -538,7 +538,7 @@ PASCAL NEAR xvteeop()
 	win_draw_rect(xvt_win, &rect);
 }
 
-PASCAL NEAR xvtrev(state)		/* change reverse video state */
+xvtrev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -556,24 +556,24 @@ int state;	/* TRUE = reverse, FALSE = normal */
 	}
 }
 
-PASCAL NEAR xvtcres()	/* change screen resolution */
+xvtcres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
-PASCAL NEAR spal(char *dummy)		/* change pallette settings */
+spal(char *dummy)		/* change pallette settings */
 
 {
 	/* none for now */
 }
 
-PASCAL NEAR xvtbeep()
+xvtbeep()
 {
 	xvt_beep();
 }
 
-PASCAL NEAR xvtopen()
+xvtopen()
 
 {
 	DRAW_CTOOLS dtool;
@@ -614,7 +614,7 @@ PASCAL NEAR xvtopen()
 	ttopen();
 }
 
-PASCAL NEAR xvtclose()
+xvtclose()
 
 {
 	xvtfcol(7);
@@ -622,13 +622,13 @@ PASCAL NEAR xvtclose()
 	ttclose();
 }
 
-PASCAL NEAR xvtkopen()	/* open the keyboard (a noop here) */
+xvtkopen()	/* open the keyboard (a noop here) */
 
 {
 
 }
 
-PASCAL NEAR xvtkclose() /* close the keyboard (a noop here) */
+xvtkclose() /* close the keyboard (a noop here) */
 
 {
 	xvtflush();
@@ -638,7 +638,7 @@ PASCAL NEAR xvtkclose() /* close the keyboard (a noop here) */
  * Read a character from the terminal, performing no editing and doing no echo
  * at all. Also mouse events are forced into the input stream here.
  */
-int PASCAL NEAR xvtgetc()
+int xvtgetc()
 
 {
 	xvtflush();
@@ -663,7 +663,7 @@ int PASCAL NEAR xvtgetc()
 	}
 }
 
-int PASCAL NEAR xvtflush()
+int xvtflush()
 
 {
 	/* if there's nothing to flush */
@@ -679,7 +679,7 @@ int PASCAL NEAR xvtflush()
 	xvt_next = xvt_obuf;
 }
 
-int PASCAL NEAR xvtputc(c)
+int xvtputc(c)
 
 char c;	/* character to write to the current xvt window */
 
@@ -701,7 +701,7 @@ char c;	/* character to write to the current xvt window */
 }
 
 #if	FLABEL
-int PASCAL NEAR fnclabel(f, n)		/* label a function key */
+int fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

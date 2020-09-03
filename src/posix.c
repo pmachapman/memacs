@@ -11,8 +11,11 @@
 **/
 
 /** Include files **/
-#include <stdio.h>			/* Standard I/O definitions	*/
 #include "estruct.h"			/* Emacs definitions		*/
+
+#if	POSIX
+
+#include <stdio.h>			/* Standard I/O definitions	*/
 
 /** Do nothing routine **/
 int scnothing()
@@ -212,25 +215,25 @@ int fn;					/* Resulting keycode		*/
 	/* If no keys defined, go directly to insert mode */
 	first = 1;
 	if (nxtkey != keymap) {
-		
+
 		/* Start at top of key map */
 		cur = keymap;
-		
+
 		/* Loop until matches exhast */
 		while (*seq) {
-			
+
 			/* Do we match current character */
 			if (*seq == cur->ch) {
-				
+
 				/* Advance to next level */
 				seq++;
 				cur = cur->nxtlvl;
 				first = 0;
 			} else {
-				
+
 				/* Try next character on same level */
 				nxtcur = cur->samlvl;
-				
+
 				/* Stop if no more */
 				if (nxtcur)
 					cur = nxtcur;
@@ -239,25 +242,25 @@ int fn;					/* Resulting keycode		*/
 			}
 		}
 	}
-	
+
 	/* Check for room in keymap */
 	if (strlen(seq) > NKEYENT - (nxtkey - keymap))
 		return;
-		
+
 	/* If first character in sequence is inserted, add to prefix table */
 	if (first)
 		keyseq[*seq] = 1;
-		
+
 	/* If characters are left over, insert them into list */
 	for (first = 1; *seq; first = 0) {
-		
+
 		/* Make new entry */
 		nxtkey->ch = *seq++;
 		nxtkey->code = fn;
-		
+
 		/* If root, nothing to do */
 		if (nxtkey != keymap) {
-			
+
 			/* Set first to samlvl, others to nxtlvl */
 			if (first)
 				cur->samlvl = nxtkey;
@@ -324,12 +327,12 @@ int ch;					/* Character to add		*/
 {
 	/* Check for overflow */
 	if (inbuft == &inbuf[sizeof(inbuf)]) {
-		
+
 		/* Annoy user */
 		ttbeep();
 		return;
 	}
-	
+
 	/* Add character */
 	*inbuft++ = ch;
 }
@@ -339,11 +342,11 @@ void cook()
 {
 	unsigned char ch;
 	struct keyent * cur;
-	
+
 	/* Get first character untimed */
 	ch = grabwait();
 	qin(ch);
-	
+
 	/* Skip if the key isn't a special leading escape sequence */
 	if (keyseq[ch] == 0)
 		return;
@@ -367,7 +370,7 @@ void cook()
 			} else {
 				/* Advance to next level */
 				cur = cur->nxtlvl;
-			
+
 				/* Get next character, timed */
 				ch = grabnowait();
 				if (ch == TIMEOUT)
@@ -389,7 +392,7 @@ int ttgetc()
 
 	/* Loop until character found */
 	while (1) {
-	
+
 		/* Get input from buffer, if available */
 		if (inbufh != inbuft) {
 			ch = *inbufh++;
@@ -401,7 +404,7 @@ int ttgetc()
 			/* Fill input buffer */
 			cook();
 	}
-	
+
 	/* Return next character */
 	return(ch);
 }
@@ -433,7 +436,7 @@ int bktoshell(f, n)
 {
 	/* Reset the terminal and go to the last line */
 	vttidy();
-	
+
 	/* Okay, stop... */
 	kill(getpid(), SIGTSTP);
 
@@ -621,7 +624,7 @@ int n;					/* Argument count		*/
 }
 
 /** Filter buffer through command **/
-int filter(f, n)
+int uefilter(f, n)
 int f;					/* Flags			*/
 int n;					/* Argument count		*/
 {
@@ -670,7 +673,7 @@ int n;					/* Argument count		*/
 			/* Mark buffer as changed */
 			bp->b_flag |= BFCHG;
 	}
-			
+
 
 	/* Reset file name */
 	strcpy(bp->b_fname, tmpnam);
@@ -756,3 +759,4 @@ char *getnfile()
 	return(rbuf);
 }
 
+#endif

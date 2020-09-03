@@ -62,13 +62,13 @@ static HCURSOR  hRealHourglass;
 #endif
 
 /* prototypes */
-static void  PASCAL MessageLoop (BOOL WaitMode);
-static BOOL  PASCAL UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam);
-static void  PASCAL SetHourglass (BOOL hg);
+static void  MessageLoop (BOOL WaitMode);
+static BOOL  UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam);
+static void  SetHourglass (BOOL hg);
 
-/* timeset: return a system-dependant time string */
+/* timeset: return a system-dependent time string */
 /* =======                                        */
-char *PASCAL timeset()
+char *timeset()
 
 {
     register char *sp;	/* temp string pointer */
@@ -83,7 +83,7 @@ char *PASCAL timeset()
 /* longop:    to be called regularly while a long operation is in progress */
 /* ========                                                                */
 
-PASCAL longop (int f)
+longop (int f)
 
 /* f is TRUE to set long operation status and FALSE to reset that status */
 /* when a long operation is signaled at least twice, the hourglass
@@ -125,7 +125,7 @@ PASCAL longop (int f)
 /* mlyesno: ask a yes/no question */
 /* =======                        */
 
-PASCAL mlyesno (char *prompt)
+mlyesno (char *prompt)
 
 /* This function replaces the mlyesno from input.c. Instead of asking a
    question on the message line, it pops up a message box */
@@ -139,7 +139,7 @@ PASCAL mlyesno (char *prompt)
 /* mlabort: display a serious error message (proposes abort) */
 /* =======                                                   */
 
-VOID PASCAL NEAR mlabort (char *s)
+VOID mlabort (char *s)
 {
     char    text[NSTRING];  /* hopefully sufficient! */
     
@@ -159,7 +159,7 @@ VOID PASCAL NEAR mlabort (char *s)
 /* WinInit: all the window initialization crap... */
 /* =======                                        */
 
-BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
+BOOL FAR WinInit (LPSTR lpCmdLine, int nCmdShow)
 
 /* returns FALSE if failed init */
 {
@@ -348,7 +348,7 @@ ParsingDone:
 /* SetFrameCaption: sets the frame window's text according to the app Id */
 /* ===============                                                       */
 
-static void PASCAL  SetFrameCaption (void)
+static void  SetFrameCaption (void)
 {
     char    text[sizeof(PROGNAME) + sizeof(VERSION)+20];
     char    *t;
@@ -369,9 +369,9 @@ static void PASCAL  SetFrameCaption (void)
 
 /* BroadcastEnumProc:   used by EmacsBroadcast */
 /* =================                           */
-BOOL EXPORT FAR PASCAL BroadcastEnumProc (HWND hWnd, LPARAM lParam)
+BOOL EXPORT FAR BroadcastEnumProc (HWND hWnd, LPARAM lParam)
 {
-    char    ClassName [sizeof(FrameClassName)+1];
+    char    ClassName [sizeof(FrameClassName)*4+1];
     UINT    RetVal;
     
     if (hWnd != hFrameWnd) {
@@ -397,7 +397,7 @@ BOOL EXPORT FAR PASCAL BroadcastEnumProc (HWND hWnd, LPARAM lParam)
 /* EmacsBroadcast:  send a broadcast message to all Emacs applications */
 /* ==============                                                      */
 
-static DWORD PASCAL   EmacsBroadcast (DWORD MsgParam)
+static DWORD   EmacsBroadcast (DWORD MsgParam)
 
 /* If MsgParam is not zero, the broadcast is sent as an EmacsBroadcastMsg
    to all the Emacs frame windows, except the one specified by hFrameWnd.
@@ -423,7 +423,7 @@ static DWORD PASCAL   EmacsBroadcast (DWORD MsgParam)
 /* MDIClientSubProc:    Subclassing window proc for the MDI Client window */
 /* ================                                                       */
 
-LONG EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LONG EXPORT FAR MDIClientSubProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				         LPARAM lParam)
 {
     switch (wMsg) {
@@ -463,7 +463,7 @@ DefaultProc:
 /* FrameInit:   Frame window's WM_CREATE */
 /* =========                             */
 
-void FAR PASCAL FrameInit (CREATESTRUCT *cs)
+void FAR FrameInit (CREATESTRUCT *cs)
 {
     RECT    Rect;
     CLIENTCREATESTRUCT  ccs;
@@ -526,7 +526,7 @@ void FAR PASCAL FrameInit (CREATESTRUCT *cs)
 /* CloseEmacs:   handle WM_CLOSE of WM_QUERYENDSESSION messages */
 /* ==========                                                   */
 
-static BOOL  PASCAL CloseEmacs (UINT wMsg)
+static BOOL  CloseEmacs (UINT wMsg)
 
 /* returns TRUE if emacs should exit */
 {
@@ -558,7 +558,7 @@ static BOOL  PASCAL CloseEmacs (UINT wMsg)
 
 /* ScrWndProc:  MDI child (screen) window function */
 /* ==========                                      */
-LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LONG EXPORT FAR ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				   LPARAM lParam)
 {
     switch (wMsg) {
@@ -575,9 +575,9 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	    SetWindowWord (hWnd, GWW_SCRCY, (WORD)Rect.bottom);
 	}
 	{   /*-setup the stuff for display.c */
-	    SCREEN  *sp;
+	    ESCREEN  *sp;
 
-	    sp = (SCREEN*)(((MDICREATESTRUCT*)(((CREATESTRUCT*)lParam)->
+	    sp = (ESCREEN*)(((MDICREATESTRUCT*)(((CREATESTRUCT*)lParam)->
 					       lpCreateParams))->lParam);
 #if WINXP
 		SetWindowLongPtr(hWnd, GWL_SCRPTR, (LONG_PTR)sp);
@@ -590,9 +590,9 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	
     case WM_DESTROY:
 #if WINXP
-		vtfreescr((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR));
+		vtfreescr((ESCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR));
 #else
-		vtfreescr((SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR));
+		vtfreescr((ESCREEN*)GetWindowLong(hWnd, GWL_SCRPTR));
 #endif
 	break;
 	
@@ -616,18 +616,18 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	    if (!InternalRequest) {
 	        InternalRequest = TRUE;
 #if WINXP
-			select_screen((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR), FALSE);
+			select_screen((ESCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR), FALSE);
 #else
-			select_screen((SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR), FALSE);
+			select_screen((ESCREEN*)GetWindowLong(hWnd, GWL_SCRPTR), FALSE);
 #endif
 		InternalRequest = FALSE;
 	    }
 	    else {
-		SCREEN  *sp;
+		ESCREEN  *sp;
 #if WINXP
-		sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
+		sp = (ESCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
 #else
-		sp = (SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR);
+		sp = (ESCREEN*)GetWindowLong(hWnd, GWL_SCRPTR);
 #endif
 		if (sp->s_virtual == NULL) {
 		    /* this is initialization time! */
@@ -706,13 +706,13 @@ LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 	    goto DefaultProc;
 	case SC_CLOSE:
 	    if (!notquiescent) {
-		SCREEN  *sp;
+		ESCREEN  *sp;
 
 		/* this must be done here, before any MDI mumbo-jumbo */
 #if WINXP
-		sp = (SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
+		sp = (ESCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR);
 #else
-		sp = (SCREEN*)GetWindowLong(hWnd, GWL_SCRPTR);
+		sp = (ESCREEN*)GetWindowLong(hWnd, GWL_SCRPTR);
 #endif
 		if (sp == first_screen) {
 		    cycle_screens (FALSE, 0);
@@ -746,7 +746,7 @@ DefaultProc:
 
 /* FrameWndProc:    frame window function */
 /* ============                           */
-LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LONG EXPORT FAR FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				     LPARAM lParam)
 {
     switch (wMsg) {
@@ -935,7 +935,7 @@ DefaultProc:
 /* WinMain: Application entry point */
 /* =======                          */
 
-int PASCAL  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
+int  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                      LPSTR lpCmdLine, int nCmdShow)
 {
     hEmacsInstance = hInstance;
@@ -962,7 +962,7 @@ int PASCAL  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /* ModifyCursor:    forces a WM_SETCURSOR */
 /* ============                           */
 
-static void PASCAL  ModifyCursor (void)
+static void  ModifyCursor (void)
 {
     POINT   pt;
 
@@ -973,7 +973,7 @@ static void PASCAL  ModifyCursor (void)
 /* MessageLoop: Main message loop */
 /* ===========                    */
 
-static void  PASCAL MessageLoop (BOOL WaitMode)
+static void  MessageLoop (BOOL WaitMode)
 
 /* If WaitMode is TRUE this function uses GetMessage the first time and
    PeekMessage after that, until the input queue is empty and there is
@@ -1034,7 +1034,7 @@ static void  PASCAL MessageLoop (BOOL WaitMode)
 
 /* The returned value is the next character from the input stream */
 
-int FAR PASCAL GetInput (void)
+int FAR GetInput (void)
 {
     if (!in_check ()) {
 	ShowEmacsCaret (TRUE);
@@ -1047,7 +1047,7 @@ int FAR PASCAL GetInput (void)
 /* TakeANap:    put emacs to sleep for a few milliseconds */
 /* ========                                               */
 
-int FAR PASCAL  TakeANap (int t)
+int FAR  TakeANap (int t)
 /* this function is used by mswsleep(). It returns TRUE unless the timer
    could not be created. Note that for a null time, it simply
    relinquishes the processor */
@@ -1077,7 +1077,7 @@ int FAR PASCAL  TakeANap (int t)
 /* UpdateCursor:    sets the apropriate Emacs cursor shape */
 /* ============                                            */
 
-static BOOL  PASCAL UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam)
+static BOOL  UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 /* this function should be called on each WM_SETCURSOR message, to
    display the appropriate cursor. It returns TRUE if all processing has
@@ -1140,7 +1140,7 @@ static BOOL  PASCAL UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam)
 /* SetHourglass:    sets or removes the hourglass cursor */
 /* ============                                          */
 
-static void  PASCAL SetHourglass (BOOL hg)
+static void  SetHourglass (BOOL hg)
 
 /* hg = TRUE sets the hourglass, hg = FALSE removes it */
 {

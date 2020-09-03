@@ -15,11 +15,11 @@ dumpscreens(msg)
 char *msg;
 
 {
-	SCREEN *sp;
+	ESCREEN *sp;
 
 	printf("<%s>\n", msg);
 	sp = first_screen;
-	while (sp != (SCREEN *)NULL) {
+	while (sp != (ESCREEN *)NULL) {
 		printf("%lu - [%s] %d/%d to %d/%d \n", sp, sp->s_screen_name,
 		sp->s_roworg, sp->s_colorg, sp->s_nrow, sp->s_ncol);
 		sp = sp->s_next_screen;
@@ -32,9 +32,9 @@ char *msg;
 #if	WINDOW_TEXT
 /* Redraw given screen and all screens behind it */
 
-VOID PASCAL NEAR refresh_screen(sp)
+VOID refresh_screen(sp)
 
-SCREEN *sp;	/* screen image to refresh */
+ESCREEN *sp;	/* screen image to refresh */
 
 {
 	/* if we are suppressing redraws */
@@ -42,13 +42,13 @@ SCREEN *sp;	/* screen image to refresh */
 		return;
 
 	/* at end of list, do nothing */
-	if (sp == (SCREEN *)NULL)
+	if (sp == (ESCREEN *)NULL)
 		return;
 
 	/* if first refresh, erase the page */
 	if (sp == first_screen) {
 		(*term.t_clrdesk)();
-		if (sp->s_next_screen == (SCREEN *)NULL)
+		if (sp->s_next_screen == (ESCREEN *)NULL)
 			sgarbf = TRUE;
 	}
 
@@ -66,29 +66,29 @@ SCREEN *sp;	/* screen image to refresh */
 	to A-N on machines with an ALT key
 */
 
-PASCAL NEAR cycle_screens(f, n)
+int cycle_screens(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
-	SCREEN *sp;		/* ptr to screen to switch to */
+	ESCREEN *sp;		/* ptr to screen to switch to */
 
 	/* find the last screen */
 	sp = first_screen;
-	while (sp->s_next_screen != (SCREEN *)NULL)
+	while (sp->s_next_screen != (ESCREEN *)NULL)
 		sp = sp->s_next_screen;
 
 	/* and make this screen current */
 	return(select_screen(sp, TRUE));
 }
 
-PASCAL NEAR find_screen(f, n)
+int find_screen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
 	char scr_name[NSTRING];	/* buffer to hold screen name */
-	SCREEN *sp;		/* ptr to screen to switch to */
+	ESCREEN *sp;		/* ptr to screen to switch to */
 	int result;
 
 	/* get the name of the screen to switch to */
@@ -98,7 +98,7 @@ int f,n;	/* prefix flag and argument */
         }
 	sp = lookup_screen(scr_name);
 
-	if (sp == (SCREEN *)NULL) {
+	if (sp == (ESCREEN *)NULL) {
 
 		/* save the current dot position in the buffer info
 		   so the new screen will start there! */
@@ -113,9 +113,9 @@ int f,n;	/* prefix flag and argument */
 	return(select_screen(sp, TRUE));
 }
 
-PASCAL NEAR free_screen(sp)	/* free all resouces associated with a screen */
+VOID free_screen(sp)	/* free all resouces associated with a screen */
 
-SCREEN *sp;	/* screen to dump */
+ESCREEN *sp;	/* screen to dump */
 
 {
 	register int cmark;	/* mark ordinal index */
@@ -149,11 +149,11 @@ SCREEN *sp;	/* screen to dump */
 	free((char *) sp);
 }
 
-int PASCAL NEAR unlist_screen(sp)
+VOID unlist_screen(sp)
 
-SCREEN *sp;         /* screen to remove from the list */
+ESCREEN *sp;         /* screen to remove from the list */
 {
-	SCREEN *last_scr;	/* screen previous to one to delete */
+	ESCREEN *last_scr;	/* screen previous to one to delete */
 
 	last_scr = first_screen;
 	while (last_scr) {
@@ -164,13 +164,13 @@ SCREEN *sp;         /* screen to remove from the list */
 	last_scr->s_next_screen = sp->s_next_screen;
 }
 
-PASCAL NEAR delete_screen(f, n)
+int delete_screen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
 	char scr_name[NSTRING];	/* buffer to hold screen name */
-	SCREEN *sp;		/* ptr to screen to switch to */
+	ESCREEN *sp;		/* ptr to screen to switch to */
 	int result;
 
 	/* get the name of the screen to delete */
@@ -181,7 +181,7 @@ int f,n;	/* prefix flag and argument */
 	sp = lookup_screen(scr_name);
 
 	/* make sure it exists... */
-	if (sp == (SCREEN *)NULL) {
+	if (sp == (ESCREEN *)NULL) {
 		mlwrite(TEXT240);   /* "[No such screen]" */
 		return(FALSE);
 	}
@@ -202,29 +202,29 @@ int f,n;	/* prefix flag and argument */
 
 /* this function initializes a new screen.... */
 
-SCREEN *PASCAL NEAR init_screen(scr_name, scr_buf)
+ESCREEN *init_screen(scr_name, scr_buf)
 
 char *scr_name;		/* screen name */
 BUFFER *scr_buf;	/* buffer to place in first window of screen */
 
 {
 	int cmark;		/* current mark to initialize */
-	SCREEN *sp;		/* pointer to allocated screen */
-	SCREEN *last_sp;	/* pointer to last screen */
+	ESCREEN *sp;		/* pointer to allocated screen */
+	ESCREEN *last_sp;	/* pointer to last screen */
 	EWINDOW *wp;		/* ptr to first window of new screen */
 
 	/* allocate memory for this screen */
-	sp = (SCREEN *)room(sizeof(SCREEN));
-	if (sp == (SCREEN *)NULL)
+	sp = (ESCREEN *)room(sizeof(ESCREEN));
+	if (sp == (ESCREEN *)NULL)
 		return(sp);
 
 	/* set up this new screens fields! */
-	sp->s_next_screen = (SCREEN *)NULL;
+	sp->s_next_screen = (ESCREEN *)NULL;
 	sp->s_screen_name = copystr(scr_name);
 #if     WINDOW_MSWIN
 	if (term.t_newscr (sp) != TRUE) {       /* failed */
 	    free ((void *)sp);
-	    return ((SCREEN *)NULL);
+	    return ((ESCREEN *)NULL);
 	}
 	/* ... in MSWIN, the s_nrow/ncol etc... values are kept up to
 	   date by vtinitscr; besides, term entries may actually match
@@ -244,7 +244,7 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 	wp = (EWINDOW *)room(sizeof(EWINDOW));
 	if (wp == (EWINDOW *)NULL) {
 		free((char *)sp);
-		return((SCREEN *)NULL);
+		return((ESCREEN *)NULL);
 	}
 	sp->s_first_window = sp->s_cur_window = wp;
 
@@ -279,14 +279,14 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 	wp->w_flag  = WFMODE|WFHARD;		/* Full.		*/
 
 	/* first screen? */
-	if (first_screen == (SCREEN *)NULL) {
+	if (first_screen == (ESCREEN *)NULL) {
 		first_screen = sp;
 		return(sp);
 	}
 
 	/* insert it at the tail of the screen list */
 	last_sp = first_screen;
-	while (last_sp->s_next_screen != (SCREEN *)NULL)
+	while (last_sp->s_next_screen != (ESCREEN *)NULL)
 		last_sp = last_sp->s_next_screen;
 	last_sp->s_next_screen = sp;
 
@@ -294,12 +294,12 @@ BUFFER *scr_buf;	/* buffer to place in first window of screen */
 	return(sp);
 }
 
-SCREEN *PASCAL NEAR lookup_screen(scr_name)
+ESCREEN *lookup_screen(scr_name)
 
 char *scr_name;		/* named screen to find */
 
 {
-	SCREEN *result;
+	ESCREEN *result;
 
 	/* scan the screen list */
 	result = first_screen;
@@ -314,20 +314,20 @@ char *scr_name;		/* named screen to find */
 	}
 
 	/* we didn't find it..... */
-	return((SCREEN *)NULL);
+	return((ESCREEN *)NULL);
 }
 
-int PASCAL NEAR select_screen(sp, announce)
+int select_screen(sp, announce)
 
-SCREEN *sp;	/* ptr to screen to switch to */
+ESCREEN *sp;	/* ptr to screen to switch to */
 int announce;	/* announce the selection? */
 
 {
 	EWINDOW *temp_wp;	/* backup of current window ptr (curwp) */
-	SCREEN *temp_screen;	/* temp ptr into screen list */
+	ESCREEN *temp_screen;	/* temp ptr into screen list */
 
 	/* make sure there is something here to set to! */
-	if (sp == (SCREEN *)NULL)
+	if (sp == (ESCREEN *)NULL)
 		return(FALSE);
 
 	/* nothing to do, it is already current */
@@ -361,7 +361,7 @@ int announce;	/* announce the selection? */
 
 	/* re-order the screen list */
 	temp_screen = first_screen;
-	while (temp_screen->s_next_screen != (SCREEN *)NULL) {
+	while (temp_screen->s_next_screen != (ESCREEN *)NULL) {
 		if (temp_screen->s_next_screen == sp) {
 			temp_screen->s_next_screen = sp->s_next_screen;
 			break;
@@ -396,7 +396,7 @@ int announce;	/* announce the selection? */
 	Bound to "A-B".
 */
 
-PASCAL NEAR list_screens(f, n)
+int list_screens(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -418,12 +418,12 @@ int f,n;	/* prefix flag and argument */
  * is an error (if there is no memory). Iflag
  * indicates whether to list hidden screens.
  */
-PASCAL NEAR screenlist(iflag)
+int screenlist(iflag)
 
 int iflag;	/* list hidden screen flag */
 
 {
-	SCREEN *sp;		/* ptr to current screen to list */
+	ESCREEN *sp;		/* ptr to current screen to list */
 	EWINDOW *wp;		/* ptr into current screens window list */
 	int status;		/* return status from functions */
 	char line[NSTRING];	/* buffer to construct list lines */
@@ -492,7 +492,7 @@ int iflag;	/* list hidden screen flag */
 
 /* rename_screen:    change the current screen's name	*/
 
-int PASCAL NEAR rename_screen(f, n)
+int rename_screen(f, n)
 
 int f, n;	/* default number and arguments */
 
@@ -506,7 +506,7 @@ int f, n;	/* default number and arguments */
 		return(result);
 	} 
 
-	if (lookup_screen(scr_name) != (SCREEN*)NULL) {
+	if (lookup_screen(scr_name) != (ESCREEN*)NULL) {
 		mlwrite(TEXT336);
 /*			"[Screen name already in use]" */
 		return(FALSE);

@@ -14,8 +14,20 @@
 #if	BSD | FREEBSD | SUN | USG | AIX
 #include	<sys/types.h>
 #include	<sys/stat.h>
+# if	BACKUP
+#  include <errno.h>
+# endif
 #endif
-
+#if	THEOS
+# include <sys/stat.h>
+# include <unistd.h>
+#endif
+#if	(MSDOS|TOS)
+#  include <io.h>
+#  include <errno.h>
+#  include <sys\types.h>
+#  include <sys\stat.h>
+#endif
 /*
  * Read a file into the current
  * buffer. This is really easy; all you do is
@@ -23,9 +35,9 @@
  * "read a file into the current buffer" code.
  * Bound to "C-X C-R".
  */
-PASCAL NEAR fileread(f, n)
+int fileread(f, n)
 
-int f, n;	/* defualt and numeric arguments (unused) */
+int f, n;	/* default and numeric arguments (unused) */
 
 {
 	char *fname;	/* file name to read */
@@ -36,6 +48,10 @@ int f, n;	/* defualt and numeric arguments (unused) */
 	if ((fname = gtfilename(TEXT131)) == NULL)
 /*                              "Read file" */
 		return(FALSE);
+#if	THEOS4
+	if (! addlname(fname))
+		return (FALSE);
+#endif
 	return(readin(fname, TRUE));
 }
 
@@ -46,23 +62,27 @@ int f, n;	/* defualt and numeric arguments (unused) */
  * "insert a file into the current buffer" code.
  * Bound to "C-X C-I".
  */
-PASCAL NEAR insfile(f, n)
+int insfile(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
 	register int	s;
 	char *fname;	/* file name */
-	LINE *curline;
+	LINE *curline = NULL;
 
 	if (restflag)		/* don't allow this command if restricted */
 		return(resterr());
 	if (curbp->b_mode&MDVIEW)      /* don't allow this command if  */
 		return(rdonly());	/* we are in read only mode	*/
 
-	if ((fname = gtfilename(TEXT132)) == NULL) 
+	if ((fname = gtfilename(TEXT132)) == NULL)
 /*                              "Insert file" */
 		return(FALSE);
+#if	THEOS4
+	if (! addlname(fname))
+		return (FALSE);
+#endif
 	/*
 	 * Save the local pointers to hold global ".", in case
 	 * $yankflag is set to 1.  Insert-file always places the
@@ -89,7 +109,7 @@ int f,n;	/* prefix flag and argument */
  * text, and switch to the new buffer.
  * Bound to C-X C-F.
  */
-PASCAL NEAR filefind(f, n)
+int filefind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -99,13 +119,17 @@ int f,n;	/* prefix flag and argument */
 	if (restflag)		/* don't allow this command if restricted */
 		return(resterr());
 
-	if ((fname = gtfilename(TEXT133)) == NULL) 
+	if ((fname = gtfilename(TEXT133)) == NULL)
 /*                              "Find file" */
 		return(FALSE);
+#if	THEOS4
+	if (! addlname(fname))
+		return (FALSE);
+#endif
 	return(getfile(fname, TRUE));
 }
 
-PASCAL NEAR viewfile(f, n)	/* visit a file in VIEW mode */
+int viewfile(f, n)	/* visit a file in VIEW mode */
 
 int f,n;	/* prefix flag and argument */
 
@@ -116,9 +140,13 @@ int f,n;	/* prefix flag and argument */
 	if (restflag)		/* don't allow this command if restricted */
 		return(resterr());
 
-	if ((fname = gtfilename(TEXT134)) == NULL) 
+	if ((fname = gtfilename(TEXT134)) == NULL)
 /*                              "View file" */
 		return(FALSE);
+#if	THEOS4
+	if (! addlname(fname))
+		return (FALSE);
+#endif
 	s = getfile(fname, FALSE);
 	if (s) {	/* if we succeed, put it in view mode */
 		curwp->w_bufp->b_mode |= MDVIEW;
@@ -128,7 +156,7 @@ int f,n;	/* prefix flag and argument */
 }
 
 #if	CRYPT
-PASCAL NEAR resetkey()	/* reset the encryption key if needed */
+int resetkey()	/* reset the encryption key if needed */
 
 {
 	register int s; /* return status */
@@ -161,7 +189,7 @@ PASCAL NEAR resetkey()	/* reset the encryption key if needed */
 }
 #endif
 
-PASCAL NEAR getfile(fname, lockfl)
+int getfile(fname, lockfl)
 
 char fname[];		/* file name to find */
 int lockfl;		/* check the file for locks? */
@@ -171,11 +199,11 @@ int lockfl;		/* check the file for locks? */
 	register LINE	*lp;
 	register int	i;
 	register int	s;
-	SCREEN		*sp;	/* screen pointer, if we need it */
+	ESCREEN		*sp;	/* screen pointer, if we need it */
 	char bname[NBUFN];	/* buffer name to put file */
 	char prompt[NSTRING];	/* string for collisions prompt */
 
-#if	MSDOS | WINNT | WINXP | AOSVS | VMS | TOS
+#if	MSDOS | WINNT | WINXP | AOSVS | VMS | TOS | THEOS4
 	mklower(fname); 	       /* msdos isn't case sensitive */
 #endif
 	for (bp=bheadp; bp!=NULL; bp=bp->b_bufp) {
@@ -232,7 +260,7 @@ int lockfl;		/* check the file for locks? */
 	 */
 	if (newscreenflag) {
 		sp = lookup_screen(bname);
-		if (sp == (SCREEN *)NULL) {
+		if (sp == (ESCREEN *)NULL) {
 			/* screen does not exist, create it */
 			sp = init_screen(bname, bp);
 		}
@@ -247,14 +275,14 @@ int lockfl;		/* check the file for locks? */
 	Read file "fname" into the current buffer, blowing away any text
 	found there.  Called by both the read and find commands.  Return
 	the final status of the read.  Also called by the mainline, to
-	read in a file specified on the command line as an argument. 
+	read in a file specified on the command line as an argument.
 	The command in $readhook is called after the buffer is set up
-	and before it is read. 
+	and before it is read.
 */
 
-PASCAL NEAR readin(fname, lockfl)
+int readin(fname, lockfl)
 
-char	fname[];	/* name of file to read */
+CONST char*	fname;	/* name of file to read */
 int	lockfl;		/* check for file locks? */
 
 {
@@ -270,7 +298,8 @@ int	lockfl;		/* check for file locks? */
 	char mesg[NSTRING];
 
 #if	FILOCK
-	force_read = FALSE;
+	int force_read = FALSE;
+
 	if (lockfl && lockchk(fname) == ABORT)
 		force_read = TRUE;
 #endif
@@ -386,16 +415,56 @@ out:
  * Returns a pointer into fname indicating the end of the file path; i.e.,
  * 1 character BEYOND the path name.
  */
-char *PASCAL NEAR makename(bname, fname)
+CONST char *makename(bname, fname)
 
 char *bname;
-char *fname;
+CONST char *fname;
 
 {
-	register char *cp1;
+	register CONST char *cp1;
 	register char *cp2;
-	register char *pathp;
+	register CONST char *pathp;
 
+#if	THEOS
+#if	THEOS4
+	register int np = 0;
+
+	cp1 = fname;
+	while (*cp1) {
+		if (*cp1 == '.')
+			np++;
+		++cp1;
+	}
+	if (np != 2) {
+		while (cp1 != fname && cp1[-1] != '/' && *cp1 != '\\')
+			--cp1;
+	} else
+		cp1 = strrchr(fname,'.')+1;
+
+	/* cp1 is pointing to the first real filename char */
+	pathp = cp1;
+
+	cp2 = bname;
+	while (cp2!=&bname[NBUFN-1] && *cp1 && *cp1!=':' && *cp1!='.')
+		*cp2++ = *cp1++;
+	*cp2 = 0;
+#else
+	cp1 = fname;
+	while (*cp1 != 0)
+		++cp1;
+
+	while (cp1 != fname && cp1[-1] != '/' && *cp1 != '\\')
+		--cp1;
+
+	/* cp1 is pointing to the first real filename char */
+	pathp = cp1;
+
+	cp2 = bname;
+	while (cp2!=&bname[NBUFN-1] && *cp1 && *cp1!=':')
+		*cp2++ = *cp1++;
+	*cp2 = 0;
+#endif
+#else	/* ?THEOS */
 #if     AOSVS | MV_UX
         resolve_full_pathname(fname, fname);
         mklower(fname);   /* aos/vs not case sensitive */
@@ -428,7 +497,7 @@ char *fname;
 	while (cp1!=&fname[0] && cp1[-1]!=':' && cp1[-1]!='\\'&&cp1[-1]!='/')
 		--cp1;
 #endif
-#if	USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | BSD | FREEBSD | SUN | XENIX | AVIION
+#if	USG | LINUX | AIX | AUX | SMOS | HPUX8 | HPUX9 | BSD | FREEBSD | SUN | XENIX | AVIION
 	while (cp1!=&fname[0] && cp1[-1]!='/')
 		--cp1;
 #endif
@@ -444,10 +513,11 @@ char *fname;
 		*cp2++ = *cp1++;
 	*cp2 = 0;
 
+#endif	/* !THEOS */
 	return(pathp);
 }
 
-VOID PASCAL NEAR unqname(name)	/* make sure a buffer name is unique */
+VOID unqname(name)	/* make sure a buffer name is unique */
 
 char *name;	/* name to check on */
 
@@ -480,7 +550,7 @@ char *name;	/* name to check on */
  * and ^X^A for appending.
  */
 
-PASCAL NEAR filewrite(f, n)
+int filewrite(f, n)
 
 int f, n;	/* emacs arguments */
 
@@ -494,6 +564,10 @@ int f, n;	/* emacs arguments */
 	if ((fname = gtfilename(TEXT144)) == NULL)
 /*                     "Write file: " */
 		return(FALSE);
+#if	THEOS4
+	if (! addlname(fname))
+		return (FALSE);
+#endif
 	if ((s=writeout(fname, "w")) == TRUE) {
 		strcpy(curbp->b_fname, fname);
 		curbp->b_flag &= ~BFCHG;
@@ -503,7 +577,7 @@ int f, n;	/* emacs arguments */
 	return(s);
 }
 
-PASCAL NEAR fileapp(f, n)	/* append file */
+int fileapp(f, n)	/* append file */
 
 int f, n;	/* emacs arguments */
 
@@ -532,7 +606,7 @@ int f, n;	/* emacs arguments */
  * name for the buffer. Bound to "C-X C-S". May
  * get called by "C-Z".
  */
-PASCAL NEAR filesave(f, n)
+int filesave(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -577,6 +651,90 @@ int f,n;	/* prefix flag and argument */
 	return(s);
 }
 
+#if	(MSDOS|TOS)
+char* backname(char* tname, char* fn)
+{
+	char* p;
+
+	strcpy(tname, fn);
+	if ((p = strchr(tname, '.') != NULL)
+		*p = '\0';
+
+	return strcat(tname, ".bak");
+}
+
+#elif	BSD | SUN | V7 | USG | LINUX
+
+char* backname(char* tname, CONST char* fn)
+{
+	strcpy(tname, fn);
+	return strcat(tname, "~");
+}
+
+#elif THEOS4
+
+extern char* backname(char* tname, CONST char* fn)
+{
+	char fname[NFILEN];
+	char rname[NFILEN];
+	char dname[NFILEN];
+	char* p;
+	char* q;
+	char* d;
+
+	strcpy(fname, fn);
+
+	if ((p = strchr(fname, ':')) != NULL) {
+		strcpy(dname, p);
+		*p = '\0';
+	} else
+		dname[0] = '\0';
+
+	if ((q = strrchr(fname, '/')) == NULL)
+		q = fname;
+
+	if ((p = strchr(q, '.')) != NULL) {
+		strcpy(tname, fname);
+
+		if ((q = strchr(p + 1, '.')) == NULL) {
+			strcpy(strrchr(tname, '.'), ".BACKUP");
+		} else {
+			if ((p = strrchr(tname, '/')) == NULL)
+				p = tname;
+			else
+				p++;
+
+			strcpy(p, q + 1);
+			strcat(p, ".BACKUP");
+		}
+	} else
+		strcat(strcpy(tname, fname), ".BACKUP");
+
+	strcat(tname, dname);
+	return tname;
+}
+
+#elif THEOS
+
+extern char* backname(char* tname, CONST char* fn)
+{
+	char dname[NFILEN];
+	char* p;
+
+	strcpy(tname, fn);
+
+	if ((p = strchr(tname, ':')) != NULL) {
+		strcpy(dname, p);
+		*p = '\0';
+	} else
+		dname[0] = '\0';
+
+	strcat(tbame, ".bak");
+	strcat(tname, dname);
+	return tname;
+}
+
+#endif
 /*
  * This function performs the details of file writing. It uses
  * the file management routines in the "fileio.c" package. The
@@ -588,7 +746,7 @@ int f,n;	/* prefix flag and argument */
  * a user specifyable routine (in $writehook) can be run.
  */
 
-PASCAL NEAR writeout(fn, mode)
+int writeout(fn, mode)
 
 char *fn;	/* name of file to write current buffer to */
 char *mode;	/* mode to open file (w = write a = append) */
@@ -598,19 +756,34 @@ char *mode;	/* mode to open file (w = write a = append) */
 	register long nline;	/* number of lines written */
 	int status;		/* return status */
 	int sflag;		/* are we safe saving? */
-	char tname[NSTRING];	/* temporary file name */
+	char tname[NFILEN];	/* temporary file name */
+	char bname[NFILEN];	/* backup file name */
 	char buf[NSTRING];	/* message buffer */
-#if	BSD | FREEBSD | SUN | XENIX | USG | AIX
+#if	BSD | FREEBSD | SUN | XENIX | USG | AIX | THEOS
 	struct stat st;		/* we need info about the file permisions */
 #endif
+#if	BACKUP
+# if	(MSDOS|TOS)
+#  if	TOS
+#   define EACCES AEACCDN
+#  endif	/* TOS */
+
+	struct	stat st;
+	extern	char *strchr();
+	char	*p;
+# endif	/* (MSDOS|TOS) */
+#endif	/* BACKUP */
 
 	/* let a user macro get hold of things...if he wants */
 	execkey(&writehook, FALSE, 1);
 
 	/* determine if we will use the save method */
-	sflag = FALSE;
-	if (ssave && fexist(fn) && *mode == 'w')
-		sflag = TRUE;
+    sflag = ((ssave
+#if BACKUP
+              || (curbp->b_mode & MDNOBAK) == 0
+#endif
+              )
+		&& fexist(fn) && *mode == 'w') ? TRUE : FALSE;
 
 #if	CRYPT
 	/* set up for file encryption */
@@ -621,6 +794,16 @@ char *mode;	/* mode to open file (w = write a = append) */
 
 	/* turn off ALL keyboard translation in case we get a dos error */
 	TTkclose();
+
+#if	BACKUP
+	backname(bname, fn);
+
+	if (sflag && access(bname, 0) == 0 && unlink(bname) == EOF) {
+		TTkopen();
+		mlwrite(TEXT49, bname);
+		return(FALSE);
+	}
+#endif /* BACKUP */
 
 	/* Perform Safe Save..... */
 	if (sflag) {
@@ -680,18 +863,47 @@ char *mode;	/* mode to open file (w = write a = append) */
 			strcat(buf, "s");
 
 		if (sflag) {
-#if	BSD | FREEBSD | SUN | XENIX | USG | AIX
+#if	BSD | FREEBSD | SUN | XENIX | USG | AIX | THEOS
 			/* get the permisions on the original file */
+#if defined(S_ISLNK) && ! THEOS
+#if defined(UW7) || defined(LINUX)
+			struct stat stl;
+			stat(fn, &st);
+			lstat(fn, &stl);
+#else
+			statlstat(fn, &st);
+#endif
+
+			if (S_ISLNK(stl.st_mode)) {
+				char ln[NFILEN];
+				int l;
+				l = readlink(fn, ln, sizeof(ln));
+				if (l > -1) {
+					ln[l] = '\0';
+					strcpy(fn, ln);
+				}
+			}
+#endif
 			stat(fn, &st);
 #endif
-			/* erase original file */
+#if BACKUP
+			/* move original file to backup */
+			status = rename(fn, bname);
+#else
+			/* remove original file */
+			status = unlink(fn);
+#endif
 			/* rename temporary file to original name */
-			if (unlink(fn) == 0 && rename(tname, fn) == 0) {
+			if (status == 0 && rename(tname, fn) == 0) {
 #if	BSD | FREEBSD | SUN | XENIX | USG | AIX
 				chown(fn, (int)st.st_uid, (int)st.st_gid);
 				chmod(fn, (int)st.st_mode);
 #else
+#if	THEOS
+				_chstat(fn, st.st_protect);
+#else
 				;
+#endif
 #endif
 			} else {
 				strcat(buf, TEXT150);
@@ -703,6 +915,11 @@ char *mode;	/* mode to open file (w = write a = append) */
 		strcat(buf, "]");
 		mlwrite(buf);
 	}
+
+#if BACKUP
+	if (curbp->b_mode & MDNOBAK)
+		unlink(bname);
+#endif
 
 	/* reopen the keyboard, and return our status */
 	TTkopen();
@@ -719,7 +936,7 @@ char *mode;	/* mode to open file (w = write a = append) */
  * prompt if you wish.
  */
 
-PASCAL NEAR filename(f, n)
+int filename(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -734,8 +951,13 @@ int f,n;	/* prefix flag and argument */
 		return(s);
 	if (s == FALSE)
 		strcpy(curbp->b_fname, "");
-	else
+	else {
+#if	THEOS4
+		if (! addlname(fname))
+			return (FALSE);
+#endif
 		strcpy(curbp->b_fname, fname);
+	}
 	/* Update mode lines.	*/
 	upmode();
 	curbp->b_mode &= ~MDVIEW;      /* no longer read only mode */
@@ -747,7 +969,7 @@ int f,n;	/* prefix flag and argument */
  * buffer, Called by insert file command. Return the final
  * status of the read.
  */
-PASCAL NEAR ifile(fname)
+int ifile(fname)
 char	fname[];
 {
 	register LINE *lp0;
@@ -859,7 +1081,7 @@ out:
 			names of all the files in a given directory
 */
 
-PASCAL NEAR showfiles(f, n)
+int showfiles(f, n)
 
 int f,n;	/* prefix flag and argument */
 

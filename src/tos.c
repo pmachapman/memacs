@@ -286,7 +286,7 @@ pipecmd(f, n)
  * filter a buffer through an external DOS program
  * Bound to ^X #
  */
-filter(f, n)
+uefilter(f, n)
 
 {
         register int    s;	/* return status from CLI */
@@ -360,9 +360,9 @@ char *newname;		/* new file name */
 	Frename(0, oldname, newname);
 }
 
-/* return a system dependant string with the current time */
+/* return a system dependent string with the current time */
 
-char *PASCAL NEAR timeset()
+char *timeset()
 
 {
 	register char *sp;	/* temp string pointer */
@@ -382,14 +382,14 @@ char rbuf[NFILEN];		/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *PASCAL NEAR getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* file to match */
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -432,7 +432,7 @@ char *fspec;	/* file to match */
 	return(rbuf);
 }
 
-char *PASCAL NEAR getnfile()
+char *getnfile()
 
 {
 

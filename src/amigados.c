@@ -713,7 +713,7 @@ pipecmd(f, n)
  * filter a buffer through an external DOS program
  * Bound to ^X #
  */
-filter(f, n)
+uefilter(f, n)
 
 {
         register int    s;	/* return status from CLI */
@@ -777,9 +777,9 @@ filter(f, n)
 	return(TRUE);
 }
 
-/* return a system dependant string with the current time */
+/* return a system dependent string with the current time */
 
-char *PASCAL NEAR timeset()
+char *timeset()
 
 {
 	return(errorm);
@@ -794,7 +794,7 @@ extern char *scdir();
 
 /*	do a wild card directory search (for file name completion) */
 
-char *PASCAL NEAR getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
@@ -822,7 +822,7 @@ char *fspec;	/* pattern to match */
 	return(getnfile());
 }
 
-char *PASCAL NEAR getnfile()
+char *getnfile()
 
 {
 	register char *sp;	/* return from scdir */
@@ -837,7 +837,7 @@ char *PASCAL NEAR getnfile()
 	return(rbuf);
 }
 #else
-char *PASCAL NEAR getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* file to match */
 
@@ -845,7 +845,7 @@ char *fspec;	/* file to match */
 	return(NULL);
 }
 
-char *PASCAL NEAR getnfile()
+char *getnfile()
 
 {
 	return(NULL);

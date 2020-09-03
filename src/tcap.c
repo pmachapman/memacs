@@ -1,59 +1,59 @@
 /*	tcap:	Unix V5, SUN OS, SCO XENIX, and BS4.2 Termcap video driver
 		for MicroEMACS 4.00
 
-         12-10-88 - Modifications made by Guy Turcotte to accomodate
+         12-10-88 - Modifications made by Guy Turcotte to accommodate
                     SunOS V4.0 and Xenix V2.2.1 :
- 
+
                   SunOS mods:
-                  
+
                   o p_seq field of TBIND struct augmented to 10 chars
                     to take into account longer definitions for keys
                     (some Sun's keys definitions need at least 7 chars...)
                     as such, the code in get1key has been modified to take
                     care of the longer p_seq string.
- 
+
                   o tcapopen modified to take care of the tgetstr problem
                     (returns NULL on undefined keys instead of a valid
                     string pointer...)
- 
+
                   o The timout algorithm of get1key has been modified to
                     take care of the following select() function problem:
                     if some chars are already in the terminal buffer before
                     select is called and no others char appears on the terminal,
                     it will timeout anyway... (maybe a feature of SunOs V4.0)
- 
+
                   Xenix mods:
- 
+
                   o The first two points indicated above are applicable for
                     the Xenix OS
- 
+
                   o With my current knowledge, I can't find a clean solution
                     to the timeout problem of the get1key function
-                    under Xenix. I modified the code to get rid of the BSD code 
+                    under Xenix. I modified the code to get rid of the BSD code
                     (via the #if directive) and use the Xenix nap() and rdchk()
-                    functions to 
+                    functions to
                     make a 1/30 second wait. Seems to work as long as there is
                     not to much of activity from other processes on the system.
                     (The link command of the makefile must be modified to
                     link with the x library... you must add the option -lx)
- 
+
                   o The input.c file has been modified to not include the
                     get1key function defined there in the case of USG. The
-                    #if directive preceeding the get1key definition has been
+                    #if directive preceding the get1key definition has been
                     modified from:
- 
+
                      #if BSD == 0
- 
+
                     to:
- 
+
                      #if (BSD == 0) && (USG == 0)
-                     
+
                   o The following lines define the new termcap entry for
                     the ansi kind of terminal: it permits the use of functions
                     keys F1 .. F10 and keys HOME,END,PgUp,PgDn on the IBM PC
                     keyboard (the last 3 lines of the definition have been
                     added):
- 
+
  li|ansi|Ansi standard crt:\
  	:al=\E[L:am:bs:cd=\E[J:ce=\E[K:cl=\E[2J\E[H:cm=\E[%i%d;%dH:co#80:\
  	:dc=\E[P:dl=\E[M:do=\E[B:bt=\E[Z:ei=:ho=\E[H:ic=\E[@:im=:li#25:\
@@ -67,18 +67,19 @@
  	:k1=\E[M:k2=\E[N:k3=\E[O:k4=\E[P:k5=\E[Q:\
  	:k6=\E[R:k7=\E[S:k8=\E[T:k9=\E[U:k0=\E[V:\
  	:kh=\E[H:kH=\E[F:kA=\E[L:kN=\E[G:kP=\E[I:
-                    
+
 */
 
 #define termdef 1			/* don't define "term" external */
 
-#include <stdio.h>
 #include	"estruct.h"
+
+#if TERMCAP
+
+#include 	<stdio.h>
 #include	"eproto.h"
 #include	"edef.h"
 #include	"elang.h"
-
-#if TERMCAP
 
 #if	USG | AUX | HPUX8 | HPUX9 | SMOS
 #include	<time.h>
@@ -90,7 +91,7 @@
 
 #define MARGIN	8
 #define SCRSIZ	64
-#define NPAUSE	10			/* # times thru update to pause */
+#define NPAUSE	500		/* Pause in milliseconds	*/
 #define BEL	0x07
 #define ESC	0x1B
 
@@ -183,9 +184,9 @@ extern	int	tcapfcol();
 extern	int	tcapbcol();
 #endif
 
-#define TCAPSLEN 1024
+#define TCAPSLEN 4096
 char tcapbuf[TCAPSLEN];
-char *UP, PC, *CM, *CE, *CL, *SO, *SE, *IS, *KS, *KE;
+char *UP, PC, *CM, *CE, *CL, *SO, *SE, *IS, *KS, *KE, *HO;
 
 TERM term = {
 	0, 0, 0, 0,	/* these four values are set dynamically at open time */
@@ -266,7 +267,7 @@ tcapopen()
 {
 	register int index;		/* general index */
 	char *t, *p;
-	char tcbuf[1024];
+	char tcbuf[4096];
 	char *tv_stype;
 	char err_str[72];
 	char *tgetstr();
@@ -285,7 +286,7 @@ tcapopen()
 		meexit(1);
 	}
 
- 
+
 	if ((term.t_nrow=(short)tgetnum("li")-1) == -1) {
 	       puts(TEXT184);
 /*		    "termcap entry incomplete (lines)" */
@@ -311,6 +312,7 @@ tcapopen()
 	UP = tgetstr("up", &p);
 	SE = tgetstr("se", &p);
 	SO = tgetstr("so", &p);
+	HO = tgetstr("ho", &p);
 	if (SO != NULL)
 		revexist = TRUE;
 
@@ -323,18 +325,18 @@ tcapopen()
 
 	if (CE == NULL) 	/* will we be able to use clear to EOL? */
 		eolexist = FALSE;
-		 
+
 	IS = tgetstr("is", &p); /* extract init string */
 	KS = tgetstr("ks", &p); /* extract keypad transmit string */
 	KE = tgetstr("ke", &p); /* extract keypad transmit end string */
-	        
+
 	/* read definitions of various function keys into ttable */
 	for (index = 0; index < NTBINDS; index++) {
 		strcpy(ttable[index].p_seq,
 			fixnull(tgetstr(ttable[index].p_name, &p)));
 	}
 
-	/* tell unix we are goint to use the terminal */
+	/* tell unix we are going to use the terminal */
 	ttopen();
 
 	/* make sure we don't over run the buffer (TOO LATE I THINK) */
@@ -347,14 +349,14 @@ tcapopen()
 	/* send init strings if defined */
 	if (IS != NULL)
 		putpad(IS);
- 
+
 	if (KS != NULL)
 		putpad(KS);
 
 	/* initialize the input buffer */
 	in_init();
 }
- 
+
 tcapclose()
 {
 	/* send end-of-keypad-transmit string if defined */
@@ -433,13 +435,13 @@ int tcapgetc()
 		it was generated by an escape sequence and should be SPECed.
 */
 
-int PASCAL NEAR get1key()
+int get1key()
 
 {
 	register int c;
 	register int index;	/* index into termcap binding table */
 	char *sp;
-#if	BSD | HPUX8 | HPUX9
+#if	BSD | HPUX8 | HPUX9 | LINUX
 	int fdset;
 	struct timeval timeout;
 #endif
@@ -453,7 +455,7 @@ int PASCAL NEAR get1key()
 
 	/* process a possible escape sequence */
 	/* set up to check the keyboard for input */
-#if	BSD | HPUX8 | HPUX9
+#if	BSD | HPUX8 | HPUX9 | LINUX
 	fdset = 1;
 	timeout.tv_sec = 0;
 	timeout.tv_usec = 35000L;
@@ -474,7 +476,7 @@ int PASCAL NEAR get1key()
 
 #if	USG | AUX | SMOS
 	/* we don't know how to do this check for a pending char within
-	   1/30th of a second machine independantly in the general System V
+	   1/30th of a second machine independently in the general System V
 	   case.... so we don't */
 	if (kbdmode != PLAY)
 		return(CTRL | '[');
@@ -567,6 +569,7 @@ char	*str;
 
 putnpad(str, n)
 char	*str;
+int n;
 {
 	tputs(str, n, ttputc);
 }

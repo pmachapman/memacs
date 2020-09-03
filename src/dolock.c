@@ -32,7 +32,7 @@ char *fname;
 {
 	int i,j,k,lun,status;
 	char xname[95],c;
-	
+
 	for(lun=4; _getfnam(lun,xname) == 0; lun++) {
 		for(i=0;i<strlen(xname);i++)	{
 			k = i;
@@ -95,7 +95,7 @@ extern int errno;
  *
  * dolock -- lock the file fname
  *
- * if successful, returns NULL 
+ * if successful, returns NULL
  * if file locked, returns username of person locking the file
  * if other error, returns "LOCK ERROR: explanation"
  *
@@ -197,7 +197,7 @@ char *buf;
 	char *c;	/* ptr to current character to examine */
 
 	c = buf + strlen(buf) - 1;
-	while ((c >= buf) && (*c == '\r') || (*c == '\n') || (*c == ' ')
+	while (((c >= buf) && (*c == RET_CHAR)) || (*c == '\n') || (*c == ' ')
 	    || (*c == '\t')) {
 		*c = 0;
 		c--;
@@ -207,19 +207,21 @@ char *buf;
 
 char *dolock(filespec)
 
-char *filespec;		/* full file spec of file to lock */
+CONST char *filespec;		/* full file spec of file to lock */
 
 {
 	struct stat sb;			/* stat buffer for info on files/dirs */
 	FILE *fp;			/* ptr to lock file */
-	long proc_id;			/* process id from lock file */
 	char filename[NFILEN];		/* name of file to lock */
 	char pathname[NFILEN];		/* path leading to file to lock */
 	char drivename[NFILEN];		/* drive for file to lock */
 	char lockpath[NFILEN];		/* lock directory name */
 	char lockfile[NFILEN];		/* lock file name */
 	char buf[NSTRING];		/* input buffer */
+#if	SUN
+	long proc_id;			/* process id from lock file */
 	char host[NSTRING];		/* current host name */
+#endif
 	static char result[NSTRING];	/* error return string */
 
 	/* separate filespec into components */
@@ -357,8 +359,9 @@ char *filespec;		/* full file spec of file to lock */
 
 		/* get the process id */
 		fgets(buf, NSTRING, fp);
+#if	SUN
 		proc_id = asc_int(buf);
-
+#endif
 		/* get the user name */
 		fgets(result, NSTRING, fp);
 		term_trim(result);
@@ -399,14 +402,14 @@ char *filespec;		/* full file spec of file to lock */
  *
  * undolock -- unlock the file fname
  *
- * if successful, returns NULL 
+ * if successful, returns NULL
  * if other error, returns "LOCK ERROR: explanation"
  *
  *********************/
 
 char *undolock(filespec)
 
-char *filespec;		/* filespec to unlock */
+CONST char *filespec;		/* filespec to unlock */
 
 {
 	char filename[NFILEN];		/* name of file to lock */
@@ -445,9 +448,9 @@ char *filespec;		/* filespec to unlock */
 #if	LOCKDEBUG
 	printf("Lockfile [%s]\n", lockfile); tgetc();
 #endif
-	if (unlink(lockfile)) { 
-		strcat(result, "could not remove lock file"); 
-		return(result); 
+	if (unlink(lockfile)) {
+		strcat(result, "could not remove lock file");
+		return(result);
 	} else {
 		rmdir(lockpath);   /* this will work only if dir is empty */
   	  	return(NULL);
@@ -455,7 +458,7 @@ char *filespec;		/* filespec to unlock */
 }
 
 #else
-dolhello()
+VOID dolhello(VOID)
 {
 }
 #endif

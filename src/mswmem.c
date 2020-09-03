@@ -359,7 +359,7 @@ void * CDECL realloc(void * oldblock, size_t size);
 /* InitializeFarStorage:    start the suballocation mechanism */
 /* ====================                                       */
 
-void FAR PASCAL InitializeFarStorage (void)
+void FAR InitializeFarStorage (void)
 {
 #if SUBALLOC
     FarStorage = TRUE;
@@ -369,7 +369,7 @@ void FAR PASCAL InitializeFarStorage (void)
 /* JettisonFarStorage: Release all the global segments (quitting time) */
 /* ==================                                                  */
 
-void FAR PASCAL JettisonFarStorage (void)
+void FAR JettisonFarStorage (void)
 {
 #if SUBALLOC
     SEGHEADER   *sp;

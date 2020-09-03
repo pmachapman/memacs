@@ -34,7 +34,7 @@
  * repaint. Bound to "^X C". The message at the start in VMS puts out a newline.
  * Under some (unknown) condition, you don't get one free when DCL starts up.
  */
-PASCAL NEAR spawncli(f, n)
+spawncli(f, n)
 {
         /* don't allow this command if restricted */
         if (restflag)
@@ -55,7 +55,7 @@ PASCAL NEAR spawncli(f, n)
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X !".
  */
-PASCAL NEAR spawn(f, n)
+spawn(f, n)
 {
         register int s;
         char line[NLINE];
@@ -87,7 +87,7 @@ PASCAL NEAR spawn(f, n)
  * done. Bound to "C-X $".
  */
 
-PASCAL NEAR execprg(f, n)
+execprg(f, n)
 {
         register int s;
         char line[NLINE];
@@ -118,7 +118,7 @@ PASCAL NEAR execprg(f, n)
  * We use a unique temporary file name so that multiple instances of
  * MicroEMACS don't try to use the same file.
  */
-PASCAL NEAR pipecmd(f, n)
+pipecmd(f, n)
 {
         register EWINDOW *wp;    /* pointer to new window */
         register BUFFER *bp;    /* pointer to buffer to zot */
@@ -207,7 +207,7 @@ PASCAL NEAR pipecmd(f, n)
  * We use unique temporary file names so that multiple instances of
  * MicroEMACS don't try to use the same file.
  */
-PASCAL NEAR filter(f, n)
+uefilter(f, n)
 
 {
         register int    s;      /* return status from CLI */
@@ -341,7 +341,7 @@ execprog( char *cmd)
         args[i] = args[i + 1] = 0;      /* terminate with 2 nulls */
 
 
-        /* look up the program on the path, trying various extentions */
+        /* look up the program on the path, trying various extensions */
         if ((sp = flook(prog, TRUE)) == NULL)
                 if ((sp = flook(strcat(prog, ".exe"), TRUE)) == NULL) {
                         return(FALSE);
@@ -367,14 +367,14 @@ char rbuf[NFILEN];      /* return file buffer */
 
 /*      do a wild card directory search (for file name completion) */
 
-char *PASCAL NEAR getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;    /* pattern to match */
 
 {
         register int index;             /* index into various strings */
         register int point;             /* index into other strings */
-        register int extflag;           /* does the file have an extention? */
+        register int extflag;           /* does the file have an extension? */
         char fname[NFILEN];             /* file/path for DOS call */
 
         /* first parse the file path off the file spec */
@@ -417,7 +417,7 @@ char *fspec;    /* pattern to match */
         return(rbuf);
 }
 
-char *PASCAL NEAR getnfile()
+char *getnfile()
 
 {
         /* and call for the next file */
@@ -433,9 +433,9 @@ char *PASCAL NEAR getnfile()
         return(rbuf);
 }
 
-/* return a system dependant string with the current time */
+/* return a system dependent string with the current time */
 
-char *PASCAL NEAR timeset()
+char *timeset()
 
 {
         register char *sp;      /* temp string pointer */

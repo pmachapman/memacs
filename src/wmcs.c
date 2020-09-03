@@ -287,7 +287,7 @@ pipecmd(f, n)
  * filter a buffer through an external DOS program
  * Bound to ^X #
  */
-filter(f, n)
+uefilter(f, n)
 
 {
         register int    s;	/* return status from CLI */
@@ -353,9 +353,9 @@ filter(f, n)
 	return(TRUE);
 }
 
-/* return a system dependant string with the current time */
+/* return a system dependent string with the current time */
 
-char *PASCAL NEAR timeset()
+char *timeset()
 
 {
 	register char *sp;	/* temp string pointer */

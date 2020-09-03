@@ -7,6 +7,9 @@
 
 #include    "estruct.h"
 #include    <stdio.h>
+#if JMDEXT
+#include    <commdlg.h>
+#endif
 #include    "eproto.h"
 #include    "edef.h"
 
@@ -55,11 +58,11 @@ static  char    StarName [FNAMELEN] = "*.*";    /* starname */
 static  PARAMS  *Par;
 
 /* function prototypes */
-int EXPORT FAR PASCAL FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+int EXPORT FAR FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                    LPARAM lParam);
 static void    CompletePath (char *s, char *FileName);
 static void    UpdateAll (HWND hDlg, char *s);
-
+
 /* ChangeWorkingDir:    sets the working dir to match the supplied path */
 /* ================                                                     */
 
@@ -101,7 +104,7 @@ static int ChangeWorkingDir (char * FilePath)
 /* SetWorkingDir:   sets the working dir to the current window's path */
 /* =============                                                      */
 
-int FAR PASCAL SetWorkingDir (void)
+int FAR SetWorkingDir (void)
 
 /* returns 0 if successful, -1 otherwise */
 /* this function also sets the text of the Path displayed in the FILE
@@ -117,7 +120,7 @@ int FAR PASCAL SetWorkingDir (void)
 /* fullpathname:    fully qualifies the given pathname */
 /* ============                                        */
 
-char * PASCAL   fullpathname (char *PathName, int Nbuf)
+char *   fullpathname (char *PathName, int Nbuf)
 
 /* the PathName argument is assumed to be at least Nbuf characters
    long. It is modified to contain the corresponding full pathname. The
@@ -134,11 +137,16 @@ char * PASCAL   fullpathname (char *PathName, int Nbuf)
 /* filenamedlg: equivalent of mlreply, but specifically to get a filename */
 /* ===========                                                            */
 
-PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
+ filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
 {
+    BOOL    Result;
+#if JMDEXT
+    static OPENFILENAME ofn;
+    char szFileName[256];
+#else
     PARAMS  Parameters;
     FARPROC ProcInstance;
-    BOOL    Result;
+#endif
 
     SetWorkingDir ();
     if (clexec || (kbdmode != STOP)) {  /* not interactive */
@@ -148,6 +156,28 @@ PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
         }
         return Result;
     }
+#if JMDEXT
+    strcpy(szFileName, "*.*");
+    
+    /* Set all structure members to zero. */
+	
+    memset(&ofn, 0, sizeof(OPENFILENAME));
+	
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = hFrameWnd;
+    ofn.lpstrFilter = "All Files\0*.*\0Text Files\0*.txt\0C++ Files\0*.c;*.cpp\0C++ Headers\0*.h;*.hpp\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFile = szFileName;
+    ofn.nMaxFile = sizeof(szFileName);
+    ofn.lpstrTitle = prompt;
+    ofn.Flags = OFN_SHOWHELP | OFN_PATHMUSTEXIST;
+	
+    if (GetOpenFileName(&ofn)) {
+        strcpy(buf, ofn.lpstrFile);
+        Result = TRUE;
+    } else
+    	Result = FALSE;
+#else
     Parameters.Prompt = prompt;
     Par = &Parameters;
     ProcInstance = MakeProcInstance ((FARPROC)FileDlgProc, hEmacsInstance);
@@ -156,14 +186,16 @@ PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
         CompletePath (buf, Parameters.Name);
     }
     FreeProcInstance (ProcInstance);
+#endif
     SetWorkingDir ();
     return Result;
 } /* filenamedlg */
 
+#if !JMDEXT
 /* FileDlgOK:   process OK in File Dialog */
 /* =========                              */
 
-static BOOL PASCAL FileDlgOK (HWND hDlg)
+static BOOL FileDlgOK (HWND hDlg)
 
 /* this is a service function for FileDlgProc. It processes the OK case.
    The returned value is TRUE if the dialog box is ending, FALSE
@@ -216,7 +248,7 @@ ExtractedOK:
     }
     return FALSE;
 } /* FileDlgOK */
-
+
 /* FileNameCompletion:  process filename edit box for name completion */
 /* ==================                                                 */
 
@@ -224,7 +256,7 @@ ExtractedOK:
    attempt filename completion if a space is placed at the end of the
    edit field. Returns TRUE if filename completion was attempted and
    successful, FALSE otherwise. */
-static BOOL PASCAL FileNameCompletion (HWND hDlg)
+static BOOL FileNameCompletion (HWND hDlg)
 {
     char    s [NFILEN];
     int     i;
@@ -278,7 +310,7 @@ static BOOL PASCAL FileNameCompletion (HWND hDlg)
 
 /* FileDlgProc: Open file dialog function */
 /* ===========                            */
-int EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+int EXPORT FAR  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                     LPARAM lParam)
 {
     char    s [NFILEN];    /* all purpose */
@@ -418,7 +450,7 @@ NoMoreTypeAhead:
     }
     return FALSE;
 } /* FileDlgProc */
-
+
 /* CompletePath:  prepend Path to the FileName, result in s */
 /* ============                                             */
 
@@ -452,7 +484,10 @@ static void    UpdateAll (HWND hDlg, char *s)
 #endif
     }
 } /* UpdateAll */
-
+
+
+#endif // !JMDEXT
+
 #if	TURBO | IC
 /*	FILE Directory routines		*/
 /* all borrowed from MSDOS.C */
@@ -462,14 +497,14 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *PASCAL getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -511,12 +546,12 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *PASCAL getnfile()
+char *getnfile()
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the first file */
@@ -540,14 +575,14 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *PASCAL getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -600,12 +635,12 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *PASCAL getnfile()
+char *getnfile()
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the next file */
@@ -634,7 +669,7 @@ char *PASCAL getnfile()
 	return(rbuf);
 }
 #else
-char *PASCAL getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* file to match */
 
@@ -642,12 +677,11 @@ char *fspec;	/* file to match */
 	return(NULL);
 }
 
-char *PASCAL getnfile()
+char *getnfile()
 
 {
 	return(NULL);
 }
 #endif
 #endif
-
 

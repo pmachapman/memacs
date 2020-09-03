@@ -102,19 +102,19 @@ union REGS rg;		/* cpu register for use of DOS calls */
 struct SREGS sg;	/* cpu segment registers	     */
 
 #if	PROTO
-int PASCAL NEAR fnclabel(int f, int n);
-int PASCAL NEAR readparam( int *v);
-void PASCAL NEAR dobbnmouse(void);
-void PASCAL NEAR docsi( int oh);
-void PASCAL NEAR ttputs(char *string);
-void PASCAL NEAR charwrite(int row, char *outstr, int forg, int left, int right);
+int fnclabel(int f, int n);
+int readparam( int *v);
+void dobbnmouse(void);
+void docsi( int oh);
+void ttputs(char *string);
+void charwrite(int row, char *outstr, int forg, int left, int right);
 #else
-int PASCAL NEAR fnclabel();
-int PASCAL NEAR readparam();
-void PASCAL NEAR dobbnmouse();
-void PASCAL NEAR docsi();
-void PASCAL NEAR ttputs();
-void PASCAL NEAR charwrite();
+int fnclabel();
+int readparam();
+void dobbnmouse();
+void docsi();
+void ttputs();
+void charwrite();
 #endif
 
 #define NROW    24                      /* Screen size.                 */
@@ -126,24 +126,24 @@ void PASCAL NEAR charwrite();
 #define ESC     0x1B                    /* ESC character.               */
 
 /* Forward references.          */
-extern int PASCAL NEAR fmrmove();
-extern int PASCAL NEAR fmreeol();
-extern int PASCAL NEAR fmreeop();
-extern int PASCAL NEAR fmrbeep();
-extern int PASCAL NEAR fmropen();
-extern int PASCAL NEAR fmrrev();
-extern int PASCAL NEAR fmrclose();
-extern int PASCAL NEAR fmrkopen();
-extern int PASCAL NEAR fmrkclose();
-extern int PASCAL NEAR fmrcres();
-extern int PASCAL NEAR fmrparm();
+extern int fmrmove();
+extern int fmreeol();
+extern int fmreeop();
+extern int fmrbeep();
+extern int fmropen();
+extern int fmrrev();
+extern int fmrclose();
+extern int fmrkopen();
+extern int fmrkclose();
+extern int fmrcres();
+extern int fmrparm();
 
 unsigned int octype;		/* original cursor type */
 unsigned int ocraster;		/* original cursor raster line limits */
 
 #if	COLOR
-extern int PASCAL NEAR fmrfcol();
-extern int PASCAL NEAR fmrbcol();
+extern int fmrfcol();
+extern int fmrbcol();
 
 static int cfcolor = -1;	/* current forground color */
 static int cbcolor = -1;	/* current background color */
@@ -187,7 +187,7 @@ NOSHARE TERM term    = {
 };
 
 #if	COLOR
-PASCAL NEAR fmrfcol(color)		/* set the current output color */
+fmrfcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -201,7 +201,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-PASCAL NEAR fmrbcol(color)		/* set the current background color */
+fmrbcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -218,7 +218,7 @@ int color;	/* color to set */
 }
 #endif
 
-PASCAL NEAR fmrmove(row, col)
+fmrmove(row, col)
 {
         ttputc(ESC);
         ttputc('[');
@@ -228,14 +228,14 @@ PASCAL NEAR fmrmove(row, col)
         ttputc('H');
 }
 
-PASCAL NEAR fmreeol()
+fmreeol()
 {
         ttputc(ESC);
         ttputc('[');
         ttputc('K');
 }
 
-PASCAL NEAR fmreeop()
+fmreeop()
 {
 #if	COLOR
 	fmrfcol(gfcolor);
@@ -249,7 +249,7 @@ PASCAL NEAR fmreeop()
 	gds_erase();	/* dump the background colors */
 }
 
-PASCAL NEAR fmrrev(state)		/* change reverse video state */
+fmrrev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -262,25 +262,25 @@ int state;	/* TRUE = reverse, FALSE = normal */
 		fmrfcol(7);
 }
 
-PASCAL NEAR fmrcres()	/* change screen resolution */
+fmrcres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
-PASCAL NEAR spal(char *dummy)		/* change pallette settings */
+spal(char *dummy)		/* change pallette settings */
 
 {
 	/* none for now */
 }
 
-PASCAL NEAR fmrbeep()
+fmrbeep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-PASCAL NEAR fmrparm(n)
+fmrparm(n)
 register int    n;
 {
         register int q,r;
@@ -296,7 +296,7 @@ register int    n;
         ttputc((n%10) + '0');
 }
 
-PASCAL NEAR fmropen()
+fmropen()
 
 {
 	strcpy(sres, "NORMAL");
@@ -311,7 +311,7 @@ PASCAL NEAR fmropen()
 	gds_init();		/* initialize the GDS driver */
 }
 
-PASCAL NEAR fmrclose()
+fmrclose()
 
 {
 #if	COLOR
@@ -322,7 +322,7 @@ PASCAL NEAR fmrclose()
 	ttclose();
 }
 
-PASCAL NEAR fmrkopen()	/* open the keyboard */
+fmrkopen()	/* open the keyboard */
 
 {
 	/* save the original function key definitions */
@@ -345,7 +345,7 @@ PASCAL NEAR fmrkopen()	/* open the keyboard */
 	upwind();
 }
 
-PASCAL NEAR fmrkclose()	/* close the keyboard (a noop here) */
+fmrkclose()	/* close the keyboard (a noop here) */
 
 {
 	setkeys(&functab);
@@ -440,7 +440,7 @@ KEYDEF *ftable;		/* table to set definitions from */
 
 /* charwrite:	write some chars directly out to the video */
 
-void PASCAL NEAR charwrite(row, outstr, forg, left, right)
+void charwrite(row, outstr, forg, left, right)
 
 int row;	/* row of screen to place outstr on */
 char *outstr;	/* string to write out (must be term.t_ncol long) */
@@ -448,7 +448,7 @@ int forg;	/* forground color of string to write */
 int left, right;	/* limits of the reverse field area */
 
 {
-	/* move to the begining of the destination line */
+	/* move to the beginning of the destination line */
 	fmrmove(row, left);
 	outstr += left;
 
@@ -465,7 +465,7 @@ int left, right;	/* limits of the reverse field area */
 
 /* scwrite:	write a line directly out to the video */
 
-PASCAL NEAR scwrite(row, outstr, forg, bacg, left, right)
+scwrite(row, outstr, forg, bacg, left, right)
 
 int row;	/* row of screen to place outstr on */
 char *outstr;	/* string to write out (must be term.t_ncol long) */
@@ -502,7 +502,7 @@ int left, right;	/* limits of the reverse field area */
 }
 
 #if	FLABEL
-int PASCAL NEAR fnclabel(f, n)		/* label a function key */
+int fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

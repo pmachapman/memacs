@@ -23,34 +23,34 @@
 #define BEL     0x07                    /* BEL character.               */
 #define ESC     0x1B                    /* ESC character.               */
 
-extern int PASCAL NEAR  openhp();	/* Forward references.          */
-extern int PASCAL NEAR	hpflush();
-extern int PASCAL NEAR  closehp();
-extern int PASCAL NEAR	hp15kopen();
-extern int PASCAL NEAR	hp15kclose();
-extern int PASCAL NEAR  hp15move();
-extern int PASCAL NEAR  hp15eeol();
-extern int PASCAL NEAR  hp15eeop();
-extern int PASCAL NEAR  hp15beep();
-extern int PASCAL NEAR	gethpkey();
-extern int PASCAL NEAR	hp15rev();
-extern int PASCAL NEAR	hp15cres();
+extern int  openhp();	/* Forward references.          */
+extern int NEAR	hpflush();
+extern int  closehp();
+extern int NEAR	hp15kopen();
+extern int NEAR	hp15kclose();
+extern int  hp15move();
+extern int  hp15eeol();
+extern int  hp15eeop();
+extern int  hp15beep();
+extern int NEAR	gethpkey();
+extern int NEAR	hp15rev();
+extern int NEAR	hp15cres();
 #if	COLOR
-extern int PASCAL NEAR	hp15fcol();
-extern int PASCAL NEAR	hp15bcol();
+extern int NEAR	hp15fcol();
+extern int NEAR	hp15bcol();
 #endif
 
-PASCAL NEAR hp15parm();
-PASCAL NEAR rawon();
-PASCAL NEAR rawoff();
-PASCAL NEAR ckeyoff();
-PASCAL NEAR ckeyon();
-PASCAL NEAR agios();
-PASCAL NEAR keycon();
-PASCAL NEAR keycoff();
-PASCAL NEAR defkey();
-PASCAL NEAR undefkey();
-PASCAL NEAR dsplbls();
+hp15parm();
+rawon();
+rawoff();
+ckeyoff();
+ckeyon();
+agios();
+keycon();
+keycoff();
+defkey();
+undefkey();
+dsplbls();
 
 /*	Some needed locals	*/
 
@@ -91,7 +91,7 @@ TERM    term    = {
 #endif
 };
 
-PASCAL NEAR hp15move(row, col)
+hp15move(row, col)
 {
         ttputc(ESC);
         ttputc('&');
@@ -102,25 +102,25 @@ PASCAL NEAR hp15move(row, col)
         ttputc('R');
 }
 
-PASCAL NEAR hpflush()
+hpflush()
 
 {
 
 }
 
-PASCAL NEAR hp15eeol()
+hp15eeol()
 {
         ttputc(ESC);
         ttputc('K');
 }
 
-PASCAL NEAR hp15eeop()
+hp15eeop()
 {
         ttputc(ESC);
         ttputc('J');
 }
 
-PASCAL NEAR hp15rev(status)	/* change the reverse video status */
+hp15rev(status)	/* change the reverse video status */
 
 int status;	/* TRUE = on, FALSE = off */
 
@@ -131,25 +131,25 @@ int status;	/* TRUE = on, FALSE = off */
 	ttputc((status != FALSE) ? 'B': '@');
 }
 
-PASCAL NEAR hp15cres()	/* change screen resolution */
+hp15cres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
-PASCAL NEAR spal()		/* change pallette register */
+spal()		/* change pallette register */
 
 {
 	/*   not here */
 }
 
-PASCAL NEAR hp15beep()
+hp15beep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-PASCAL NEAR hp15parm(n)
+hp15parm(n)
 
 register int    n;
 
@@ -163,16 +163,16 @@ register int    n;
 }
 
 #if	COLOR
-PASCAL NEAR hp15fcol()	/* we really can't do colors here, so just ignore it */
+hp15fcol()	/* we really can't do colors here, so just ignore it */
 {
 }
 
-PASCAL NEAR hp15bcol()	/* we really can't do colors here, so just ignore it */
+hp15bcol()	/* we really can't do colors here, so just ignore it */
 {
 }
 #endif
 
-PASCAL NEAR gethpkey()	/* get a key from the HP keyboard while in keycode mode */
+gethpkey()	/* get a key from the HP keyboard while in keycode mode */
 
 {
 	unsigned c;		/* character to translate */
@@ -342,7 +342,7 @@ unsigned c;		/* byte following a zero extended char byte */
 	return(sstate | c);
 }
 
-PASCAL NEAR openhp()		/* open the HP150 screen for input */
+openhp()		/* open the HP150 screen for input */
 
 {
 	strcpy(sres, "NORMAL");
@@ -350,12 +350,12 @@ PASCAL NEAR openhp()		/* open the HP150 screen for input */
 	revexist = TRUE;
 }
 
-PASCAL NEAR closehp()		/* close the HP150 screen for input */
+closehp()		/* close the HP150 screen for input */
 
 {
 }
 
-PASCAL NEAR hp15kopen()		/* open the HP150 keyboard for input */
+hp15kopen()		/* open the HP150 keyboard for input */
 
 {
 	/* define key charectoristics with AGIOS call (0, 40) */
@@ -374,7 +374,7 @@ PASCAL NEAR hp15kopen()		/* open the HP150 keyboard for input */
 	dsplbls();
 }
 
-PASCAL NEAR hp15kclose()	/* close the HP150 keyboard for input */
+hp15kclose()	/* close the HP150 keyboard for input */
 
 {
 	/* define key charectoristics with AGIOS call (0, 40) */
@@ -390,7 +390,7 @@ PASCAL NEAR hp15kclose()	/* close the HP150 keyboard for input */
 	keycoff();
 }
 
-PASCAL NEAR rawon()	/* put the HP150 keyboard into RAW mode */
+rawon()	/* put the HP150 keyboard into RAW mode */
 
 {
 	/* get the IO control info */
@@ -409,7 +409,7 @@ PASCAL NEAR rawon()	/* put the HP150 keyboard into RAW mode */
 	intdos(&r, &r);		/* go fer it */
 }
 
-PASCAL NEAR rawoff()	/* put the HP150 keyboard into COOKED mode */
+rawoff()	/* put the HP150 keyboard into COOKED mode */
 
 {
 	/* get the IO control info */
@@ -428,7 +428,7 @@ PASCAL NEAR rawoff()	/* put the HP150 keyboard into COOKED mode */
 	intdos(&r, &r);		/* go fer it */
 }
 
-PASCAL NEAR ckeyoff()	/* turn control-C trapping off */
+ckeyoff()	/* turn control-C trapping off */
 
 {
 	/* find the current state of the control break inturrupt */
@@ -446,7 +446,7 @@ PASCAL NEAR ckeyoff()	/* turn control-C trapping off */
 	}
 }
 
-PASCAL NEAR ckeyon()	/* turn control-C trapping on */
+ckeyon()	/* turn control-C trapping on */
 
 {
 	if (break_flag == 1) {
@@ -461,7 +461,7 @@ PASCAL NEAR ckeyon()	/* turn control-C trapping on */
 #undef	unsigned
 #endif
 
-PASCAL NEAR agios(buf, len)	/* perform an AGIOS call */
+agios(buf, len)	/* perform an AGIOS call */
 
 char *buf;	/* sequence of bytes in command */
 int len;	/* length of command in bytes */
@@ -474,7 +474,7 @@ int len;	/* length of command in bytes */
 	return(intdos(&r, &r));	/* do it */
 }
 
-PASCAL NEAR keycon()	/* turn keycode mode on */
+keycon()	/* turn keycode mode on */
 
 {
 	static char cmd[] = {43, 0, 1};
@@ -482,7 +482,7 @@ PASCAL NEAR keycon()	/* turn keycode mode on */
 	return(agios(&cmd[0], 3));
 }
 
-PASCAL NEAR keycoff()	/* turn keycode mode off */
+keycoff()	/* turn keycode mode off */
 
 {
 	static char cmd[] = {43, 0, 0};
@@ -490,7 +490,7 @@ PASCAL NEAR keycoff()	/* turn keycode mode off */
 	return(agios(&cmd[0], 3));
 }
 
-PASCAL NEAR defkey()	/* change all special keys to intercept mode */
+defkey()	/* change all special keys to intercept mode */
 
 {
 	static char cmd[] = {40, 0, 2, 0, 0xfe, 0};
@@ -498,7 +498,7 @@ PASCAL NEAR defkey()	/* change all special keys to intercept mode */
 	return(agios(&cmd[0], 6));
 }
 
-PASCAL NEAR undefkey()	/* change all special keys to intercept mode */
+undefkey()	/* change all special keys to intercept mode */
 
 {
 	static char cmd[] = {40, 0, 0, 0, 0xfe, 0};
@@ -506,7 +506,7 @@ PASCAL NEAR undefkey()	/* change all special keys to intercept mode */
 	return(agios(&cmd[0], 6));
 }
 
-PASCAL NEAR dsplbls()	/* display the application softkey labels on the screen */
+dsplbls()	/* display the application softkey labels on the screen */
 
 {
 	static char cmd[] = {11, 0};
@@ -515,7 +515,7 @@ PASCAL NEAR dsplbls()	/* display the application softkey labels on the screen */
 }
 
 #if	FLABEL
-PASCAL NEAR fnclabel(f, n)		/* label a function key */
+fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument */
 
@@ -575,7 +575,7 @@ force:	cmd[4] = ptru.cstr[0];
 }
 #endif
 #else
-PASCAL NEAR h15hello()
+h15hello()
 
 {
 }

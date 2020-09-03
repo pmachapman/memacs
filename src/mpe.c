@@ -729,7 +729,7 @@ int n;					/* Argument count		*/
 }
 
 /** Filter buffer through command **/
-int filter(f, n)
+int uefilter(f, n)
 int f;					/* Flags			*/
 int n;					/* Argument count		*/
 {

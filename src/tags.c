@@ -29,8 +29,6 @@
 #include "edef.h"
 #include "elang.h"
 
-static char SVER[] = "@(#) %M% %I% %H%";
-
 #ifdef	min
 #undef min
 #endif
@@ -41,20 +39,20 @@ static char SVER[] = "@(#) %M% %I% %H%";
 #define TAGWIDTH	30
 
 typedef struct	TAG
-	{
+{
 	struct	TAG *t_tagp;	/* Link to the next 'tags' file	*/
 	char	t_path[NFILEN];	/* Path of 'tags' file		*/
 	FILE	*t_fp;		/* File pointer to 'tags' file	*/
 	char	t_wd[TAGWIDTH + 1];	/* Word last tagged (this file)	*/
 	char	t_fname[NFILEN];	/* Holds name of file from where*/
-					/* we tagged.			*/
+	/* we tagged.			*/
 	int	t_indexed;		/* Flag:  1=file is indexed	*/
 	long	t_dotos[NINDEXES];	/* Offsets of first chars (used	*/
-					/* for speed-up purposes only).	*/
-	}	TAG;
+	/* for speed-up purposes only).	*/
+}	TAG;
 
 static TAG *theadp = NULL;	/* Pointer to the head of the	*/
-					/* 'tags'-chain.		*/
+/* 'tags'-chain.		*/
 static TAG *curtp = NULL;	/* Currently in-use 'tags'.	*/
 
 
@@ -67,24 +65,24 @@ static TAG *curtp = NULL;	/* Currently in-use 'tags'.	*/
  * return with TRUE only if we are succesfull.
  */
 
-newtags(path)
+int newtags(path)
 char path[NFILEN];
-	{
+{
 	register TAG	*tnewp;
 	register int	i = NINDEXES;
 
 	if ((tnewp = (TAG *) room(sizeof(TAG))) == NULL)
-		{
+	{
 		mlwrite("[OUT OF MEMORY]");
 		return (FALSE);
-		}
+	}
 	strcpy(tnewp->t_path, path);
 	strcat(path, "tags");
 	if ((tnewp->t_fp = fopen(path, "r")) == NULL)
-		{
+	{
 		free((char *) tnewp);
 		return (FALSE);
-		}
+	}
 
 	tnewp->t_tagp = theadp;
 	curtp = theadp = tnewp;
@@ -97,7 +95,7 @@ char path[NFILEN];
 		tnewp->t_dotos[--i] = -1L;
 
 	return (TRUE);
-	}
+}
 
 
 /*
@@ -105,8 +103,8 @@ char path[NFILEN];
  * try it the hard way.  If we find the file we return TRUE.
  */
 
-lookup()
-	{
+int lookup()
+{
 	TAG		*tmp = curtp;	/* Remember current 'tags'	*/
 	char		cpath[NFILEN];	/* Path of current file		*/
 	register char	*cp;	/* Auxiliary pointer		*/
@@ -116,9 +114,9 @@ lookup()
 #if	MSDOS
 	while (cp >= curbp->b_fname && *cp != DIRSEPCHAR && *cp != ':')
 #else
-	while (cp >= curbp->b_fname  &&  *cp != DIRSEPCHAR)
+		while (cp >= curbp->b_fname  &&  *cp != DIRSEPCHAR)
 #endif
-		cp--;
+			cp--;
 
 	memset(cpath, '\0', NFILEN);
 	if (cp >= curbp->b_fname)
@@ -141,7 +139,7 @@ lookup()
 	else
 		curtp = tmp;
 	return (FALSE);
-	}
+}
 
 
 /*
@@ -176,27 +174,27 @@ VOID fix_index()
  * str (but maximum lmax characters).  '.' is preserved.
  */
 
-restword(str, lmax)
+int restword(str, lmax)
 char *str;
 int  lmax;
-	{
+{
 	register int i;
 	register int go_on = TRUE;
 	register LINE *dotp = curwp->w_dotp;	/* Preserve '.' info	*/
 	register int   doto = curwp->w_doto;	/* Preserve '.' info	*/
 
 	for (i = 0;  go_on && i < lmax - 1 && inword();  i++)
-		{
+	{
 		str[i] = lgetc(curwp->w_dotp, curwp->w_doto);
 		go_on = forwchar(FALSE, 1);
-		}
+	}
 
 	str[i] = 0;			/* Terminate word		*/
 	curwp->w_dotp = dotp;	/* Restore '.' 			*/
 	curwp->w_doto = doto;
 
 	return (TRUE);
-	}
+}
 
 
 /*
@@ -207,11 +205,11 @@ int  lmax;
  * results from this code (I did).
  */
 
-backupword(f, n)
+int backupword(f, n)
 
 int f, n;
 
-	{
+{
 	while (inword())
 		if (backchar(FALSE, 1) == FALSE)
 			break;
@@ -219,7 +217,7 @@ int f, n;
 		forwchar(FALSE, 1);
 
 	return (TRUE);
-	}
+}
 
 
 /*
@@ -232,13 +230,13 @@ int f, n;
  * and search direction characters (? or /)
  */
 
-alterpattern(pattern)
+int alterpattern(pattern)
 register char pattern[];
-	{
+{
 	register int	i = 0;	/* EMACS pattern index	*/
 	register int	j = 1;	/* VI pattern -skip /or?*/
 	int		len = strlen(pattern) - 1;	/* pattern length - 1	*/
-						/* i.e. drop '/' or '?'	*/
+	/* i.e. drop '/' or '?'	*/
 
 	if (pattern[len - 1] == '$')
 		len--;
@@ -251,7 +249,7 @@ register char pattern[];
 
 	pattern[min(i, NPAT/2)] = '\0';	/* Terminate pattern string	*/
 	return (TRUE);
-	}
+}
 
 
 /*
@@ -259,7 +257,7 @@ register char pattern[];
  */
 
 static int thisfile = FALSE;	/* TRUE if curtp->t_fname equals*/
-					/* curbp->fname when tagging	*/
+/* curbp->fname when tagging	*/
 static int tagvalid = FALSE;	/* TRUE if last tag was a succes*/
 
 /*
@@ -275,7 +273,7 @@ char *filename;
 	char *tp;
 
 	if (curtp->t_path[0] == '.' && curtp->t_path[1] == DIRSEPCHAR &&
-		curtp->t_path[2] == '\0')
+			curtp->t_path[2] == '\0')
 		return;
 
 	for (tp = filename;  *tp && *tp != DIRSEPCHAR;  tp++)
@@ -298,13 +296,13 @@ char *filename;
  * so as to prevent loosing the return information.
  */
 
-tagger(errmsg, retag)
-char *errmsg;
+static int tagger(errmsg, retag)
+CONST char *errmsg;
 int  retag;
-	{
+{
 	char	tagf[NFILEN];	/* File of tagged word	*/
 	char	pretagpat[NPAT];	/* Search pattern prior	*/
-						/* to our tagging.	*/
+	/* to our tagging.	*/
 	char	line[NLINE];	/* Auxilliary string	*/
 	int	ok = 1;			/* Tag search flag	*/
 	int	result = FALSE;	/* Default return value */
@@ -317,18 +315,18 @@ int  retag;
 
 	/* Search for  curtp->t_wd  in the 'tags' file	*/
 	while (ok > 0 && fgets(line, NLINE, curtp->t_fp) != NULL)
-		{
+	{
 		if ((ok = strncmp(curtp->t_wd, line, taglen)) < 0)
 			break;
 		else if (ok == 0 && line[taglen] != '\t')
 			ok = -1;
-		}
+	}
 
 	if (ok < 0)
-		{				/* We couldn't find it..*/
+	{				/* We couldn't find it..*/
 		mlwrite(errmsg, curtp->t_wd);
 		return (FALSE);
-		}
+	}
 
 	strcpy(pretagpat, (char *) pat);	/* Preserve old search pattern	*/
 
@@ -344,7 +342,7 @@ int  retag;
 	file_ok = thisfile ? TRUE : getfile(tagf, TRUE);
 	oldbmode = curbp->b_mode;	/* Preserve buffer mode		*/
 	if (file_ok)
-		{				/* Ok, we got the file. Search!	*/
+	{				/* Ok, we got the file. Search!	*/
 		if (thisfile && retag == FALSE)
 			/* It's the same file so just set mark	*/
 			setmark(FALSE, FALSE);
@@ -363,35 +361,35 @@ int  retag;
 		rmcclear();
 		if (mcscanner(&mcdeltapat[0], FORWARD, PTBEG, 1) == FALSE)
 #else
-		if (scanner(FORWARD, PTBEG, 1) == FALSE)
+			if (scanner(FORWARD, PTBEG, 1) == FALSE)
 #endif
 			{
-			/* Sorry, we couldn't find pattern so return...	*/
-			if (thisfile && retag == FALSE)
-				/* It's the same file so simply swapmark*/
-				swapmark(FALSE, FALSE);
-			else 		/* Get old file	*/
-				getfile(curtp->t_fname, TRUE);
-			/* Tell user about our misfortune	*/
-			mlwrite("[Failed to tag '%s']", curtp->t_wd);
+				/* Sorry, we couldn't find pattern so return...	*/
+				if (thisfile && retag == FALSE)
+					/* It's the same file so simply swapmark*/
+					swapmark(FALSE, FALSE);
+				else 		/* Get old file	*/
+					getfile(curtp->t_fname, TRUE);
+				/* Tell user about our misfortune	*/
+				mlwrite("[Failed to tag '%s']", curtp->t_wd);
 			}
-		else {			/* We found the pattern.  Now point at word!	*/
-			strcpy((char *) pat, curtp->t_wd);
-			setjtable();
+			else {			/* We found the pattern.  Now point at word!	*/
+				strcpy((char *) pat, curtp->t_wd);
+				setjtable();
 #if MAGIC
-			result = mcscanner(&mcdeltapat[0], FORWARD, PTBEG, 1);
+				result = mcscanner(&mcdeltapat[0], FORWARD, PTBEG, 1);
 #else
-			result = scanner(FORWARD, PTBEG, 1);
+				result = scanner(FORWARD, PTBEG, 1);
 #endif
 			}
-		}
+	}
 
 	curbp->b_mode = oldbmode;	/* Restore buffer mode		*/
 
 	strcpy((char *) pat, pretagpat);	/* Restore search pattern	*/
 	setjtable();
 	return (result);
-	}
+}
 
 
 
@@ -400,7 +398,7 @@ int  retag;
  * '.' is preserved, and return information (= current filename) is saved.
  */
 
-extern int PASCAL NEAR tagword(f, n)
+extern int tagword(f, n)
 
 int f, n;
 
@@ -413,17 +411,17 @@ int f, n;
 		return (resterr());
 
 	if (lookup() == FALSE)
-		{				/* Is 'tags' avaliable for this file?	*/
+	{				/* Is 'tags' avaliable for this file?	*/
 		mlwrite("[Sorry, can't find any 'tags']");
 		return (FALSE);
-		}
+	}
 
 	/* Get word to tag	*/
 	if (inword())
-		{
+	{
 		backupword(FALSE, 1);
 		restword(curtp->t_wd, TAGWIDTH);	/* Grab word to tag	*/
-		}
+	}
 	else if (mlreply("Word to tag: ", curtp->t_wd, TAGWIDTH) != TRUE)
 		return (FALSE);
 
@@ -434,10 +432,10 @@ int f, n;
 
 	/* Ok, set file offset according to  curtp->t_wd (if any)	*/
 	if ((i = INDEX(*curtp->t_wd)) == -1 || curtp->t_dotos[i] == -1L)
-		{
+	{
 		mlwrite("[No tag entry for '%s' found]", curtp->t_wd);
 		return (FALSE);
-		}
+	}
 	fseek(curtp->t_fp, curtp->t_dotos[i], 0);
 
 	strcpy(curtp->t_fname, curbp->b_fname);	/* Save name of current file */
@@ -452,11 +450,11 @@ int f, n;
  * Note, retagword  do not mess up the return information (tagf).
  */
 
-extern int PASCAL NEAR retagword(f, n)
+extern int retagword(f, n)
 
 int f, n;
 
-	{
+{
 	if (restflag == TRUE)	/* Don't allow when in restricted mode	*/
 		return (resterr());
 
@@ -464,7 +462,7 @@ int f, n;
 		return (FALSE);
 
 	return (tagger("[No additional tag entry for '%s' found]", TRUE));
-	}
+}
 
 
 /*
@@ -473,25 +471,25 @@ int f, n;
  * we just swap mark with '.' .
  */
 
-extern int PASCAL NEAR backtagword(f, n)
+extern int backtagword(f, n)
 
 int f, n;
 
-	{
+{
 	if (restflag == TRUE)	/* Don't allow when in restricted mode	*/
 		return (resterr());
 
 	if (*curtp->t_fname != '\0')
-		{
+	{
 		if (thisfile)
 			swapmark(FALSE, FALSE);
 		else
 			getfile(curtp->t_fname, TRUE);
 		*curtp->t_fname = '\0';
-		}
+	}
 
 	return (TRUE);
-	}
+}
 
 #else
 tagshello()

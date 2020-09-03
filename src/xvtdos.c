@@ -54,7 +54,7 @@ static int oldbut;	/* Previous state of mouse buttons */
 static int oldcol;	/* previous x position of mouse */
 static int oldrow;	/* previous y position of mouse */
 
-int PASCAL NEAR execprog(char *cmd);
+int execprog(char *cmd);
 
 /*	input buffers and pointers	*/
 
@@ -102,7 +102,7 @@ int in_get()	/* get an event from the input buffer */
  * This function is called once to set up the terminal device streams.
  */
 
-int PASCAL NEAR ttopen()
+int ttopen()
 
 {
 
@@ -125,7 +125,7 @@ int PASCAL NEAR ttopen()
  * interpreter. On VMS it puts the terminal back in a reasonable state.
  * Another no-operation on CPM.
  */
-int PASCAL NEAR ttclose()
+int ttclose()
 {
 	/* nothing here! */
 }
@@ -134,7 +134,7 @@ int PASCAL NEAR ttclose()
  * Flush terminal buffer. Does real work where the terminal output is buffered
  * up. A no-operation on systems where byte at a time terminal I/O is done.
  */
-int PASCAL NEAR ttflush()
+int ttflush()
 {
 }
 
@@ -142,7 +142,7 @@ int PASCAL NEAR ttflush()
 		keyboard buffer
 */
 
-int PASCAL NEAR typahead()
+int typahead()
 
 {
 	return(in_check());
@@ -154,7 +154,7 @@ int PASCAL NEAR typahead()
  * repaint. Bound to "^X C".
  */
 
-int PASCAL NEAR spawncli(f, n)
+int spawncli(f, n)
 
 int f, n;
 
@@ -180,7 +180,7 @@ int f, n;
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X !".
  */
-int PASCAL NEAR spawn(f, n)
+int spawn(f, n)
 
 int f, n;
 
@@ -220,7 +220,7 @@ int f, n;
  * done. Bound to "C-X $".
  */
 
-int PASCAL NEAR execprg(f, n)
+int execprg(f, n)
 
 {
         register int s;
@@ -253,7 +253,7 @@ int PASCAL NEAR execprg(f, n)
  * Pipe a one line command into a window
  * Bound to ^X @
  */
-int PASCAL NEAR pipecmd(f, n)
+int pipecmd(f, n)
 
 int f, n;
 
@@ -343,7 +343,7 @@ int f, n;
  * filter a buffer through an external DOS program
  * Bound to ^X #
  */
-int PASCAL NEAR filter(f, n)
+int uefilter(f, n)
 
 int f, n;
 
@@ -426,7 +426,7 @@ extern int _doserrno;
 
 /*	SHELLPROG: Execute a command in a subshell		*/
 
-int PASCAL NEAR shellprog(cmd)
+int shellprog(cmd)
 
 char *cmd;	/*  Incoming command line to execute  */
 
@@ -475,7 +475,7 @@ char *cmd;	/*  Incoming command line to execute  */
 #define	CFLAG	1
 #endif
 
-int PASCAL NEAR execprog(cmd)
+int execprog(cmd)
 
 char *cmd;	/*  Incoming command line to execute  */
 
@@ -510,7 +510,7 @@ char *cmd;	/*  Incoming command line to execute  */
 	strcpy(&tail[1], cmd);
 	strcat(&tail[1], "\r");
 
-	/* look up the program on the path trying various extentions */
+	/* look up the program on the path trying various extensions */
 	if ((sp = flook(prog, TRUE)) == NULL)
 		if ((sp = flook(strcat(prog, ".exe"), TRUE)) == NULL) {
 			strcpy(&prog[strlen(prog)-4], ".com");
@@ -584,9 +584,9 @@ char *cmd;	/*  Incoming command line to execute  */
 	return((rval < 0) ? FALSE : TRUE);
 }
 
-/* return a system dependant string with the current time */
+/* return a system dependent string with the current time */
 
-char *PASCAL NEAR timeset()
+char *timeset()
 
 {
 #if	MWC | TURBO | IC | MSC | ZTC
@@ -616,14 +616,14 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *PASCAL NEAR getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -665,12 +665,12 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *PASCAL NEAR getnfile()
+char *getnfile()
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the first file */
@@ -694,14 +694,14 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *PASCAL NEAR getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -743,12 +743,12 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *PASCAL NEAR getnfile()
+char *getnfile()
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the first file */
@@ -764,7 +764,7 @@ char *PASCAL NEAR getnfile()
 	return(rbuf);
 }
 #else
-char *PASCAL NEAR getffile(fspec)
+char *getffile(fspec)
 
 char *fspec;	/* file to match */
 
@@ -772,7 +772,7 @@ char *fspec;	/* file to match */
 	return(NULL);
 }
 
-char *PASCAL NEAR getnfile()
+char *getnfile()
 
 {
 	return(NULL);
