@@ -2576,10 +2576,11 @@
  *	- caused XP code (in XPCONIO.C) to create new mouse input sequence
  *	  [0 MOUS #col #row 2] as MS2 and bound it to mouse-resize2-window
  *	Sep 2020 Jean-Michel Dubois
+ *	- Changed minor version number to 5.10
  *	- Added Unicode support with UTF-8 files
  *	- Added Theos O.S. support (in 1988-1992)
  *	- Added Cygwin support
- *	- Added ncurses display with drop down menus
+ *	- Added ncurses display with drop down menus (Linux and Cygwin only)
  *	- Added file backup (likely borrowed to Mark Williams)
  *	- Added help on language keywords (currently for Theos C only) (borrowed to Mark Williams)
  *	- Added semi-graphics character entry through numeric keypad
