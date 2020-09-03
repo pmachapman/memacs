@@ -22,35 +22,35 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{E5216D5D-1F3A-4E77-922B-ADC7FC5492D4}</ProjectGuid>
     <RootNamespace>memacs</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>memacs</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -87,6 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>.\</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -94,6 +95,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>.\</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -103,6 +105,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>.\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -116,6 +119,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>.\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -131,7 +135,6 @@
     <ClInclude Include="..\..\h\english.h" />
     <ClInclude Include="..\..\h\epath.h" />
     <ClInclude Include="..\..\h\eproto.h" />
-    <ClInclude Include="..\..\h\estruct.h" />
     <ClInclude Include="..\..\h\evar.h" />
     <ClInclude Include="..\..\h\french.h" />
     <ClInclude Include="..\..\h\frenchis.h" />
@@ -140,6 +143,8 @@
     <ClInclude Include="..\..\h\latin.h" />
     <ClInclude Include="..\..\h\platin.h" />
     <ClInclude Include="..\..\h\spanish.h" />
+    <ClInclude Include="..\..\h\utf8.h" />
+    <ClInclude Include="estruct.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\abbrev.c" />
@@ -157,10 +162,6 @@
     <ClCompile Include="..\..\src\file.c" />
     <ClCompile Include="..\..\src\fileio.c" />
     <ClCompile Include="..\..\src\history.c" />
-    <ClCompile Include="..\..\src\hp110.c" />
-    <ClCompile Include="..\..\src\hp150.c" />
-    <ClCompile Include="..\..\src\i55.c" />
-    <ClCompile Include="..\..\src\ibmpc.c" />
     <ClCompile Include="..\..\src\input.c" />
     <ClCompile Include="..\..\src\isearch.c" />
     <ClCompile Include="..\..\src\keyboard.c" />
@@ -168,23 +169,15 @@
     <ClCompile Include="..\..\src\lock.c" />
     <ClCompile Include="..\..\src\main.c" />
     <ClCompile Include="..\..\src\mouse.c" />
-    <ClCompile Include="..\..\src\ntconio.c" />
     <ClCompile Include="..\..\src\random.c" />
     <ClCompile Include="..\..\src\region.c" />
     <ClCompile Include="..\..\src\replace.c" />
     <ClCompile Include="..\..\src\screen.c" />
     <ClCompile Include="..\..\src\search.c" />
-    <ClCompile Include="..\..\src\smg.c" />
     <ClCompile Include="..\..\src\tags.c" />
-    <ClCompile Include="..\..\src\tcap.c" />
-    <ClCompile Include="..\..\src\tipc.c" />
-    <ClCompile Include="..\..\src\tos.c" />
     <ClCompile Include="..\..\src\undo.c" />
-    <ClCompile Include="..\..\src\unix.c" />
-    <ClCompile Include="..\..\src\vms.c" />
-    <ClCompile Include="..\..\src\vt52.c" />
+    <ClCompile Include="..\..\src\utf8.c" />
     <ClCompile Include="..\..\src\window.c" />
-    <ClCompile Include="..\..\src\wmcs.c" />
     <ClCompile Include="..\..\src\word.c" />
     <ClCompile Include="..\..\src\xp.c" />
     <ClCompile Include="..\..\src\xpconio.c" />
