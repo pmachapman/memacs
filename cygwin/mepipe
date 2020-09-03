@@ -1,0 +1,4 @@
+# to allow non interactive command to be piped and return exit code 0
+#!/bin/bash
+$*
+exit 0
