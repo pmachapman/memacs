@@ -2,7 +2,7 @@
                         MicroEMACS 4.00
 
 			Translated by Paul De Bra
-			debra@research.att.com          
+			debra@research.att.com
 			(C)opyright 1995 by Daniel Lawrence
 */
 
@@ -38,7 +38,11 @@
 #define	TEXT27	"Pop buffer"
 #define	TEXT28	"Buffer wordt nog getoond"
 #define	TEXT29	"Verander buffer-naam in: "
+#if	JMDEXT
+#define	TEXT30	"ACTN   Modus    Grootte Buffer          File"
+#else
 #define	TEXT30	"ACTN   Modus   Grootte Buffer          File"
+#endif
 /*   ^^^The underlining will not match exactly for this line, but it's close*/
 #define	TEXT31	"         Globale Modi"
 #define	TEXT32	"Vergeet Veranderingen"
@@ -70,7 +74,7 @@
 #define	TEXT57	"Kan lijst van variabelen niet tonen"
 #define	TEXT58	"[Opbouwen lijst van variabelen]"
 #define	TEXT59	UNUSED
-#define	TEXT60	"Lijn %D/%D Kolom %d/%d Kar. %D/%D (%d%%) Kar. = 0x%x"
+#define	TEXT60	"Lijn %D/%D Kolom %d/%d Kar. %D/%D (%d%%) Kar. = 0x%x %d"
 #define	TEXT61	"<NOT USED>"
 #define	TEXT62	"Globale modus om "
 #define	TEXT63	"Modus om "
@@ -253,7 +257,26 @@
 #define	TEXT248 "Enter Label String: "
 #define TEXT249 "Global variable to declare: "
 #define	TEXT250 "Local variable to declare: "
-
+#if	JMDEXT
+#define TEXT284 "Function not available"
+#define TEXT285 "No topic"
+#define TEXT286 "Searching topic \"%s\""
+#define TEXT287 "Searching keyword \"%s\""
+#define TEXT288 "Topic: "
+#define TEXT289 "Keyword: "
+#define TEXT290 "No help for topic \"%s\""
+#define TEXT291 "No help for keyword \"%s\""
+#define TEXT292 "Unable to open the help file %s"
+#define TEXT293 "Index of "
+#define TEXT294 "[Help]"
+#define TEXT295 "[Errors]"
+#define TEXT296 "[Function Keys]"
+#define TEXT297 "%s is not a regular file"
+#endif
+#if	THEOS
+#define TEXT298 "%s is not a sequential file"
+#define TEXT299 "%s is not a library"
+#endif
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrect menu]"
 #define	TEXT301 "[Too many nested popup menus]"
@@ -292,4 +315,5 @@
 #define TEXT335 "Change screen name to: "
 #define TEXT336 "[Screen name already in use]"
 #define TEXT337 "cannot monitor external program"
+#define TEXT338 "space for help :"
 

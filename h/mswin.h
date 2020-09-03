@@ -55,7 +55,7 @@
 #define MLSIZE  NSTRING         /* message line buffer size */
 
 /* offsets for the screen windows extra bytes */
-#define GWL_SCRPTR  0                   /* SCREEN structure pointer */
+#define GWL_SCRPTR  0                   /* ESCREEN structure pointer */
 #if WINXP
 #define GWW_SCRCX   (GWL_SCRPTR+sizeof(LONG_PTR))   /* client area width */
 #else
@@ -157,51 +157,51 @@ void in_put (int event);
 int  in_get (void);
 
 /* Windows-implementation specific functions */
-LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LONG EXPORT FAR ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				   LPARAM lParam);
-LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LONG EXPORT FAR FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				     LPARAM lParam);
-int FAR PASCAL GetInput (void);
-int FAR PASCAL TakeANap (int t);
+int FAR GetInput (void);
+int FAR TakeANap (int t);
 
-void FAR PASCAL GenerateMenuSeq (UINT ID);
-KEYTAB * FAR PASCAL FindKeyBinding (void *Func);
-void FAR PASCAL InitMenuPopup (HMENU hMenu, LPARAM lParam);
-BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam);
-HMENU FAR PASCAL GetScreenMenuHandle (void);
+void FAR GenerateMenuSeq (UINT ID);
+KEYTAB * FAR FindKeyBinding (void *Func);
+void FAR InitMenuPopup (HMENU hMenu, LPARAM lParam);
+BOOL FAR MenuCommand (WPARAM wParam, LPARAM lParam);
+HMENU FAR GetScreenMenuHandle (void);
 
-BOOL FAR PASCAL EatKey (UINT MsgCode, WPARAM wParam, LPARAM lParam);
-void FAR PASCAL MouseMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam);
-void FAR PASCAL DropMessage (HWND hWnd, HANDLE hDrop);
+BOOL FAR EatKey (UINT MsgCode, WPARAM wParam, LPARAM lParam);
+void FAR MouseMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam);
+void FAR DropMessage (HWND hWnd, HANDLE hDrop);
 
-void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont);
-void FAR PASCAL InvalidateCells (HWND hWnd, int leftcol, int toprow,
+void FAR BuildCellMetrics (CellMetrics *cm, HFONT hFont);
+void FAR InvalidateCells (HWND hWnd, int leftcol, int toprow,
                                  int rightcol, int bottomrow);
-void FAR PASCAL MinimumClientSize (HWND hWnd, int NCols, int NRows,
+void FAR MinimumClientSize (HWND hWnd, int NCols, int NRows,
 				   int *Width, int *Height);
-int FAR PASCAL DisplayableRows (HWND hWnd, int Height, CellMetrics *cm);
-int FAR PASCAL DisplayableColumns (HWND hWnd, int Width, CellMetrics *cm);
-void FAR PASCAL EmacsCaret (BOOL Show);
-void FAR PASCAL MoveEmacsCaret (HWND hWnd, int col, int row);
-void FAR PASCAL ShowEmacsCaret (BOOL Show);
-void FAR PASCAL CellToClient (HWND hWnd, POINT Cell, LPPOINT Client);
-void FAR PASCAL ClientToCell (HWND hWnd, POINT Client, LPPOINT Cell);
-void FAR PASCAL GetMinMaxInfo (HWND hWnd, LPPOINT rgpt);
-BOOL FAR PASCAL ScrReSize (HWND hWnd, WPARAM wParam, WORD cx, WORD cy);
-void FAR PASCAL ScrPaint (HWND hWnd);
-void FAR PASCAL MLPaint (void);
+int FAR DisplayableRows (HWND hWnd, int Height, CellMetrics *cm);
+int FAR DisplayableColumns (HWND hWnd, int Width, CellMetrics *cm);
+void FAR EmacsCaret (BOOL Show);
+void FAR MoveEmacsCaret (HWND hWnd, int col, int row);
+void FAR ShowEmacsCaret (BOOL Show);
+void FAR CellToClient (HWND hWnd, POINT Cell, LPPOINT Client);
+void FAR ClientToCell (HWND hWnd, POINT Client, LPPOINT Cell);
+void FAR GetMinMaxInfo (HWND hWnd, LPPOINT rgpt);
+BOOL FAR ScrReSize (HWND hWnd, WPARAM wParam, WORD cx, WORD cy);
+void FAR ScrPaint (HWND hWnd);
+void FAR MLPaint (void);
 
-BOOL FAR PASCAL InMessageLine (void);
+BOOL FAR InMessageLine (void);
 
-void FAR PASCAL ClipboardCleanup (void);
-void FAR PASCAL ScrollMessage (HWND hWnd, UINT wMsg, WORD ScrlCode, int Pos);
-void FAR PASCAL ScrollBars (void);
+void FAR ClipboardCleanup (void);
+void FAR ScrollMessage (HWND hWnd, UINT wMsg, WORD ScrlCode, int Pos);
+void FAR ScrollBars (void);
 
-int FAR PASCAL SetWorkingDir (void);
+int FAR SetWorkingDir (void);
 
-void FAR PASCAL InitializeFarStorage (void);
-void FAR PASCAL JettisonFarStorage (void);
+void FAR InitializeFarStorage (void);
+void FAR JettisonFarStorage (void);
 
-HFONT FAR PASCAL SelectFont (HDC hDC, HFONT hFont);
-BOOL FAR PASCAL PickEmacsFont (void);
-void FAR PASCAL FontInit (void);
+HFONT FAR SelectFont (HDC hDC, HFONT hFont);
+BOOL FAR PickEmacsFont (void);
+void FAR FontInit (void);

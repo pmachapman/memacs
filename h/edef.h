@@ -4,6 +4,8 @@
                         written by Daniel Lawrence
                         based on code by Dave G. Conroy,
                         	Steve Wilhite and George Jones
+
+                        Unicode support by Jean-Michel Dubois
 */
 
 #ifdef	maindef
@@ -12,8 +14,22 @@
 
 /* initialized global definitions */
 
+#if	CURSES
+
+WINDOW* wmenubar;
+WINDOW* wmain;
+PANEL* pmenu;
+PANEL* pmain;
+WINDOW* wdrop = NULL;
+PANEL* pdrop;
+#endif
+
 NOSHARE int DNEAR fillcol = 72; 	/* Current fill column		*/
+#if 	UTF8
+NOSHARE unsigned int kbdm[NKBDM];	/* Macro			*/
+#else
 NOSHARE short kbdm[NKBDM];		/* Macro			*/
+#endif
 NOSHARE char *execstr = NULL;		/* pointer to string to execute */
 NOSHARE char golabel[NPAT] = "";	/* current line to go to	*/
 NOSHARE char paralead[NPAT] = " \t";	/* paragraph leadin chars	*/
@@ -32,12 +48,31 @@ NOSHARE int DNEAR mouse_move = 1;	/* user allow tracking mouse moves? */
 NOSHARE int DNEAR mmove_flag = TRUE;	/* code currently allowing mmoves? */
 NOSHARE int DNEAR newscreenflag = FALSE;/* Create new screen on reads? */
 NOSHARE int DNEAR overlap = 2;		/* overlap when paging screens */
-CONST char *modename[] = { 		/* name of modes		*/
+CONST char *modename[NUMMODES] = { 	/* name of modes		*/
 	"WRAP", "CMODE", "SPELL", "EXACT", "VIEW", "OVER",
-	"MAGIC", "CRYPT", "ASAVE", "REP", "ABBREV"};
+	"MAGIC", "CRYPT", "ASAVE", "REP", "ABBREV"
+#if	JMDEXT
+	, "NOBAK", "SLINE", "DLINE"
+#if	THEOX
+	, "THEOX"			/* support of TheoX character set */
+#endif
+#endif
+	};
+#if	JMDEXT
+CONST char modecode[] = "WCSEVOMYARBKsl"/* letters to represent modes	*/
+#if	THEOX
+	"X"
+#endif
+	;
+#else
 CONST char modecode[] = "WCSEVOMYARB";	/* letters to represent modes	*/
+#endif
 NOSHARE int DNEAR numfunc = NFUNCS;	/* number of bindable functions */
+#if	MDTHEOX
 NOSHARE int DNEAR gmode = 0;		/* global editor mode		*/
+#else
+NOSHARE int DNEAR gmode = 0;		/* global editor mode		*/
+#endif
 NOSHARE int DNEAR gflags = GFREAD;	/* global control flag		*/
 NOSHARE int DNEAR gfcolor = 7;		/* global forgrnd color (white) */
 NOSHARE int DNEAR gbcolor = 0;		/* global backgrnd color (black)*/
@@ -94,7 +129,7 @@ NOSHARE CONST char *cname[] = {		/* names of colors		*/
 	"MAGENTA", "CYAN", "GREY",
 	"GRAY", "LRED", "LGREEN", "LYELLOW", "LBLUE",
 	"LMAGENTA", "LCYAN", "WHITE"};
-  
+
 NOSHARE int kill_index;			/* current index into kill ring */
 NOSHARE KILL *kbufp[NRING];		/* current kill buffer chunk pointer*/
 NOSHARE KILL *kbufh[NRING];		/* kill buffer header pointer	*/
@@ -103,8 +138,17 @@ NOSHARE int kused[NRING];		/* # of bytes used in last kill chunk*/
 NOSHARE EWINDOW *swindow = NULL; 	/* saved window pointer 	*/
 NOSHARE int cryptflag = FALSE;		/* currently encrypting?	*/
 NOSHARE int oldcrypt = FALSE;		/* using old(broken) encryption? */
+#if	UTF8
+NOSHARE unsigned int *kbdptr;			/* current position in keyboard buf */
+NOSHARE unsigned int *kbdend = &kbdm[0];/* ptr to end of the keyboard */
+#else
 NOSHARE short *kbdptr;			/* current position in keyboard buf */
+#if	THEOSC
+NOSHARE short *kbdend = kbdm;		/* ptr to end of the keyboard */
+#else
 NOSHARE short *kbdend = &kbdm[0];	/* ptr to end of the keyboard */
+#endif
+#endif
 NOSHARE int DNEAR kbdmode = STOP;	/* current keyboard macro mode	*/
 NOSHARE int DNEAR kbdrep = 0;		/* number of repetitions	*/
 NOSHARE int DNEAR restflag = FALSE;	/* restricted use?		*/
@@ -119,6 +163,7 @@ CONST char errorm[] = "ERROR";		/* error literal		*/
 CONST char truem[] = "TRUE";		/* true literal 		*/
 CONST char falsem[] = "FALSE";		/* false litereal		*/
 NOSHARE int DNEAR cmdstatus = TRUE;	/* last command status		*/
+NOSHARE int schstatus = TRUE;		/* last search status jmd	*/
 NOSHARE char palstr[49] = "";		/* palette string		*/
 NOSHARE char lastmesg[NSTRING] = ""; 	/* last message posted		*/
 NOSHARE char rval[NSTRING] = "0";	/* result of last procedure/sub	*/
@@ -155,6 +200,9 @@ NOSHARE EWINDOW *curwp; 	/* Current window		*/
 NOSHARE BUFFER *curbp; 		/* Current buffer		*/
 NOSHARE EWINDOW *wheadp;	/* Head of list of windows	*/
 NOSHARE BUFFER *bheadp;		/* Head of list of buffers 	*/
+#if	LIBHELP
+NOSHARE BUFFER *helpbp;		/* Help buffer			*/
+#endif
 NOSHARE UTABLE *uv_head;	/* head of list of user variables */
 NOSHARE UTABLE *uv_global;	/* global variable table */
 NOSHARE ABBREV *ab_head;	/* head of the abbreviation list */
@@ -164,16 +212,19 @@ NOSHARE int DNEAR ab_quick;	/* aggressive completion enabled? */
 NOSHARE char ab_word[NSTRING];	/* current word being typed */
 NOSHARE char *ab_pos;		/* current place in ab_word */
 NOSHARE char *ab_end;		/* ptr to physical end of ab_word */
-NOSHARE SCREEN *first_screen;	/* Head and current screen in list */
+NOSHARE ESCREEN *first_screen;	/* Head and current screen in list */
 NOSHARE BUFFER *blistp;		/* Buffer for C-X C-B		*/
 NOSHARE BUFFER *ulistp;		/* Buffer for C-X U		*/
 NOSHARE BUFFER *slistp;		/* Buffer for A-B		*/
 
 NOSHARE char sres[NBUFN];	/* current screen resolution	*/
 NOSHARE char os[NBUFN];		/* what OS are we running under */
-
+#if	UTF8
+NOSHARE char locale[NSTRING];	/* LC_CTYPE locale backup	*/
+#else
 NOSHARE	char lowcase[HICHAR];	/* lower casing map		*/
 NOSHARE	char upcase[HICHAR];	/* upper casing map		*/
+#endif
 
 NOSHARE unsigned char pat[NPAT];	/* Search pattern		*/
 NOSHARE unsigned char tap[NPAT];	/* Reversed pattern array.	*/
@@ -214,7 +265,7 @@ NOSHARE MC tapcm[NPAT]; 	/* the reversed magic pattern	*/
 NOSHARE MC mcdeltapat[2]; 	/* the no-magic pattern		*/
 NOSHARE MC tapatledcm[2]; 	/* the reversed no-magic pattern*/
 NOSHARE RMC rmcpat[NPAT];	/* the replacement magic array	*/
-NOSHARE char *grpmatch[MAXGROUPS];	/* holds groups found in search */ 
+NOSHARE char *grpmatch[MAXGROUPS];	/* holds groups found in search */
 
 #endif
 
@@ -253,9 +304,22 @@ int winch_flag=0;			/* Window size changed flag */
 /* for all the other .C files */
 
 /* initialized global external declarations */
+#if	CURSES
+extern WINDOW* wmenubar;
+extern WINDOW* wmain;
+extern PANEL* pmenu;
+extern PANEL* pmain;
+extern WINDOW* wdrop;
+extern PANEL* pdrop;
+#endif
+
 
 NOSHARE extern int DNEAR fillcol;	/* Current fill column		*/
+#if	UTF8
+NOSHARE extern unsigned int kbdm[DUMMYSZ];	/* Holds keyboard macro data	*/
+#else
 NOSHARE extern short kbdm[DUMMYSZ];	/* Holds keyboard macro data	*/
+#endif
 NOSHARE extern char *execstr;		/* pointer to string to execute */
 NOSHARE extern char golabel[DUMMYSZ];	/* current line to go to	*/
 NOSHARE extern char paralead[DUMMYSZ];	/* paragraph leadin chars	*/
@@ -332,7 +396,7 @@ NOSHARE extern int DNEAR predef;	/*     "       "     default flag */
 
 NOSHARE extern int DNEAR quotec;	/* quote char during mlreply() */
 NOSHARE extern CONST char *cname[DUMMYSZ];/* names of colors		*/
-  
+
 NOSHARE extern int kill_index;		/* current index into kill ring */
 NOSHARE extern KILL *kbufp[DUMMYSZ];	/* current kill buffer chunk pointer */
 NOSHARE extern KILL *kbufh[DUMMYSZ];	/* kill buffer header pointer	*/
@@ -341,8 +405,13 @@ NOSHARE extern int kused[DUMMYSZ];	/* # of bytes used in kill buffer*/
 NOSHARE extern EWINDOW *swindow; 	/* saved window pointer 	*/
 NOSHARE extern int cryptflag;		/* currently encrypting?	*/
 NOSHARE extern int oldcrypt;		/* using old(broken) encryption? */
+#if	UTF8
+NOSHARE extern unsigned int *kbdptr;	/* current position in keyboard buf */
+NOSHARE extern unsigned int *kbdend;	/* ptr to end of the keyboard */
+#else
 NOSHARE extern short *kbdptr;		/* current position in keyboard buf */
 NOSHARE extern short *kbdend;		/* ptr to end of the keyboard */
+#endif
 NOSHARE extern int kbdmode;		/* current keyboard macro mode	*/
 NOSHARE extern int kbdrep;		/* number of repetitions	*/
 NOSHARE extern int restflag;		/* restricted use?		*/
@@ -357,6 +426,7 @@ CONST extern char errorm[DUMMYSZ];	/* error literal		*/
 CONST extern char truem[DUMMYSZ];	/* true literal 		*/
 CONST extern char falsem[DUMMYSZ];	/* false litereal		*/
 NOSHARE extern int DNEAR cmdstatus;	/* last command status		*/
+NOSHARE extern int schstatus;		/* last search status jmd	*/
 NOSHARE extern char palstr[DUMMYSZ];	/* palette string		*/
 NOSHARE extern char lastmesg[DUMMYSZ];	/* last message posted		*/
 NOSHARE extern char rval[DUMMYSZ];	/* result of last procedure	*/
@@ -393,6 +463,9 @@ NOSHARE extern EWINDOW *curwp; 		/* Current window		*/
 NOSHARE extern BUFFER *curbp; 		/* Current buffer		*/
 NOSHARE extern EWINDOW *wheadp;		/* Head of list of windows	*/
 NOSHARE extern BUFFER *bheadp;		/* Head of list of buffers	*/
+#if	LIBHELP
+NOSHARE extern BUFFER *helpbp;		/* Help buffer			*/
+#endif
 NOSHARE extern ABBREV *ab_head;		/* head of the abbreviation list */
 NOSHARE extern UTABLE *uv_head;		/* head of list of user variables */
 NOSHARE extern UTABLE *uv_global;	/* global variable table */
@@ -402,17 +475,19 @@ NOSHARE extern int DNEAR ab_quick;	/* aggressive completion enabled? */
 NOSHARE extern char ab_word[DUMMYSZ];	/* current word being typed */
 NOSHARE extern char *ab_pos;		/* current place in ab_word */
 NOSHARE extern char *ab_end;		/* ptr to physical end of ab_word */
-NOSHARE extern SCREEN *first_screen;	/* Head and current screen in list */
+NOSHARE extern ESCREEN *first_screen;	/* Head and current screen in list */
 NOSHARE extern BUFFER *blistp;		/* Buffer for C-X C-B		*/
 NOSHARE extern BUFFER *ulistp;		/* Buffer for C-X U		*/
 NOSHARE extern BUFFER *slistp;		/* Buffer for A-B		*/
 
 NOSHARE extern char sres[NBUFN];	/* current screen resolution	*/
 NOSHARE extern char os[NBUFN];		/* what OS are we running under */
-
+#if	UTF8
+NOSHARE char locale[NSTRING];		/* LC_CTYPE locale backup	*/
+#else
 NOSHARE	extern char lowcase[HICHAR];	/* lower casing map		*/
 NOSHARE	extern char upcase[HICHAR];	/* upper casing map		*/
-
+#endif
 NOSHARE extern unsigned char pat[DUMMYSZ]; /* Search pattern		*/
 NOSHARE extern unsigned char tap[DUMMYSZ]; /* Reversed pattern array.	*/
 NOSHARE extern unsigned char rpat[DUMMYSZ]; /* replacement pattern	*/
@@ -440,7 +515,7 @@ NOSHARE extern MC tapcm[NPAT];		/* the reversed magic pattern	*/
 NOSHARE extern MC mcdeltapat[2]; 	/* the no-magic pattern		*/
 NOSHARE extern MC tapatledcm[2]; 	/* the reversed no-magic pattern*/
 NOSHARE extern RMC rmcpat[NPAT];	/* the replacement magic array	*/
-NOSHARE extern char *grpmatch[MAXGROUPS];	/* holds groups found in search */ 
+NOSHARE extern char *grpmatch[MAXGROUPS];	/* holds groups found in search */
 #endif
 
 NOSHARE extern DELTA deltapat;	/* Forward pattern delta structure.*/

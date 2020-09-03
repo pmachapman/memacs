@@ -1,4 +1,4 @@
-/*      FRENCHISO.H:    French language text strings for
+/*      FRENCHISO.H:    French language text ISO8859 strings for
                         MicroEMACS 4.00
 
                         (C)opyright 1995 by Daniel Lawrence
@@ -45,7 +45,11 @@
 #define TEXT29  "Changer le nom du tampon en: "                 /*"Change buffer name to: "*/
 
 /*              "ACTN   Modes      Size  Buffer          File"*/
+#if	JMDEXT
+#define TEXT30  "ACTN   Modes     Taille  Tampon          Fichier"
+#else
 #define TEXT30  "ACTN   Modes    Taille  Tampon          Fichier"
+#endif
 #define TEXT31  "         Modes Globaux"                        /*"         Global Modes"*/
 #define TEXT32  "Annuler les modifications"                     /*"Discard changes"*/
 #define TEXT33  "Cha\356ne d'encryptage: "                              /*"Encryption String: "*/
@@ -77,7 +81,7 @@
 #define TEXT59  UNUSED
 
 /*              "Line %d/%d Col %d/%d Char %D/%D (%d%%) char = 0x%x"*/
-#define TEXT60  "Ligne %D/%D Col %d/%d Car %D/%D (%d%%) car = 0x%x"
+#define TEXT60  "Ligne %D/%D Col %d/%d Car %D/%D (%d%%) car = 0x%x %d"
 
 #define TEXT61  "<NOT USED>"                                    /*"not used"*/
 #define TEXT62  "Mode global \340 "                             /*"Global mode to "*/
@@ -284,7 +288,8 @@
 #define TEXT233 "[Construction liste des abr\351viations]"	/*"[Building Abbreviation list]"*/
 #define TEXT234 "Liste des abr\351viations"			/*"Abbreviation list"*/
 #define TEXT235 "Impossible d'afficher la liste des abr\351viations"	/*"Can not display abbreviation list"*/
-#define TEXT236 "D\351finition abr\351viations dans un tampon"	/*"Define Abbreviations in buffer"*/
+#define TEXT236 "D\351finition abr\351viations depuis le tampon"	/*"Define Abbreviations from buffer"*/
+
 #define TEXT240 "[Aucun \351cran de ce nom]"                            /*"[No such screen]"*/
 #define TEXT241 "%%Impossible de supprimer l'\351cran courant"     /*"%%Can't delete current screen"*/
 #define TEXT242 "Chercher l'\351cran: "                           /*"Find Screen: "*/
@@ -296,7 +301,26 @@
 #define	TEXT248 "Entrer une \351tiquette: "                    /*"Enter Label String: "*/
 #define TEXT249 "Variable globale \340 d\351clarer : "
 #define	TEXT250 "Variable locale  \340 d\351clarer : "
-
+#if	JMDEXT
+#define TEXT284 "Fonction non disponible"
+#define TEXT285 "Aucun sujet indiqu\351"
+#define TEXT286 "Recherche du sujet \"%s\""
+#define TEXT287 "Recherche du mot-cl\351 \"%s\""
+#define TEXT288 "Sujet: "
+#define TEXT289 "Mot-cl\351: "
+#define TEXT290 "Pas d'aide pour le sujet \"%s\""
+#define TEXT291 "Pas d'aide pour le mot-cl\351 \"%s\""
+#define TEXT292 "Impossible d'ouvrir le fichier d'aide %s"
+#define TEXT293 "Index de "
+#define TEXT294 "[Help]"
+#define TEXT295 "[Errors]"
+#define TEXT296 "[Function Keys]"
+#if	THEOS
+#define TEXT297 "%s n'est pas un fichier"
+#define TEXT298 "%s n'est pas un fichier s\351quentiel"
+#define TEXT299 "%s n'est pas une biblioth\350que"
+#endif
+#endif
 /* some of these are just used in the microsoft windows version */
 #define TEXT300 "[Menu incorrect]"                              /*"[Incorrect menu]"*/
 #define TEXT301 "[Trop de menus imbriqu\351s]"                     /*"[Too many nested popup menus]"*/
@@ -336,3 +360,4 @@
 #define TEXT335 "Changer le nom de l'\351cran en: "                    /*"Change screen name to: "*/
 #define TEXT336 "[Nom d'\351cran d\351j\340 utilis\351]"                      /*"[Screen name already in use]"*/
 #define TEXT337 "impossible de contr\364ler un programme externe"       /*"cannot monitor external program"*/
+#define TEXT338 "space for help :"
