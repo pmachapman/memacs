@@ -5,6 +5,8 @@
 			written by Daniel Lawrence
 			based on code by Dave G. Conroy,
 				Steve Wilhite and George Jones
+
+                        Unicode support by Jean-Michel Dubois
 */
 
 #ifdef	LATTICE
@@ -189,6 +191,7 @@
 #define THEOX	1	/* allow TheoX character set files edition	*/
 			/* including semi-graphics entry from numeric	*/
 			/* keypad (require UTF8)			*/
+#define TXBASIC 1	/* TxBasic IDE menu				*/
 #endif
 
 #if DYNMSGS
