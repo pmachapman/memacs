@@ -184,11 +184,12 @@
 
 #if	JMDEXT
 #define BACKUP	1	/* backup previous file version			*/
-#define LIBHELP 1	/* online help for C functions			*/
+#define LIBHELP 1	/* online help from Mark Williams version	*/
 #define DYNMSGS	1	/* dynamic load of messages			*/
 #define THEOX	1	/* allow TheoX character set files edition	*/
 			/* including semi-graphics entry from numeric	*/
 			/* keypad (require UTF8)			*/
+#define TXBASIC 1	/* TxBasic IDE menu				*/
 #endif
 
 #if DYNMSGS
