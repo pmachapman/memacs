@@ -1,7 +1,9 @@
 /*
  * The routines in this file implement commands that work word or a
  * paragraph at a time.  There are all sorts of word mode commands.  If I
- * do any sentence mode commands, they are likely to be put in this file. 
+ * do any sentence mode commands, they are likely to be put in this file.
+ *
+ * Unicode support by Jean-Michel Dubois
  */
 
 #include	<stdio.h>
@@ -18,11 +20,11 @@
  * left edge of the current window
  * Returns TRUE on success, FALSE on errors.
  */
-PASCAL NEAR wrapword(f, n)
+int wrapword(f, n)
 
 int f;		/* default flag */
 int n;		/* numeric argument */
- 
+
 {
 	register int cnt;	/* size of word wrapped to next line */
 	register int c;		/* charector temporary */
@@ -74,7 +76,7 @@ int n;		/* numeric argument */
  * performed by the "backchar" and "forwchar" routines. Error if you try to
  * move beyond the buffers.
  */
-PASCAL NEAR backword(f, n)
+int backword(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -100,7 +102,7 @@ int f,n;	/* prefix flag and argument */
  * Move the cursor forward by the specified number of words. All of the motion
  * is done by "forwchar". Error if you try and move beyond the buffer's end.
  */
-PASCAL NEAR forwword(f, n)
+int forwword(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -127,7 +129,7 @@ int f,n;	/* prefix flag and argument */
  * Move forward to the end of the nth next word. Error if you move past
  * the end of the buffer.
  */
-PASCAL NEAR endword(f, n)
+int endword(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -155,13 +157,16 @@ int f,n;	/* prefix flag and argument */
  * convert any characters to upper case. Error if you try and move beyond the
  * end of the buffer. Bound to "M-U".
  */
-PASCAL NEAR upperword(f, n)
+int upperword(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
+#if	UTF8
+	unsigned int c;
+#else
 	int c;
-
+#endif
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
 		return(rdonly());	/* we are in read only mode	*/
 	if (n < 0)
@@ -173,6 +178,33 @@ int f,n;	/* prefix flag and argument */
 		}
 		while (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
+#if	UTF8
+#if	THEOX
+			if ((c & 0x80) && (curbp->b_mode & MDTHEOX)) {
+				if (_b_islower(c)) {
+					c = _b_theox2wchar(_b_toupper(c));
+
+					if (lowrite(c) == FALSE)
+						return (FALSE);
+
+					continue;
+				}
+			} else
+#endif
+			if (is_multibyte_utf8(c)) {
+				if (utf8_to_unicode(curwp->w_dotp->l_text, curwp->w_doto, lused(curwp->w_dotp), &c) > 1 && iswlower(c)) {
+#if WINXP
+					c = CharUpperW(c);
+#else
+					c = ToWUpper(c);
+#endif
+					if (lowrite(c) == FALSE)
+						return (FALSE);
+
+					continue;
+				}
+			} else
+#endif
 			if (is_lower(c)) {
 				obj.obj_char = c;
 				c = upperc(c);
@@ -192,13 +224,16 @@ int f,n;	/* prefix flag and argument */
  * convert characters to lower case. Error if you try and move over the end of
  * the buffer. Bound to "M-L".
  */
-PASCAL NEAR lowerword(f, n)
+int lowerword(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
+#if	UTF8
+	unsigned int c;
+#else
 	int c;
-
+#endif
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
 		return(rdonly());	/* we are in read only mode	*/
 	if (n < 0)
@@ -210,6 +245,30 @@ int f,n;	/* prefix flag and argument */
 		}
 		while (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
+#if	UTF8
+#if	THEOX
+			if ((c & 0x80) && (curbp->b_mode & MDTHEOX)) {
+				if (_b_isupper(c)) {
+					c = _b_theox2wchar(_b_tolower(c));
+
+					if (lowrite(c) == FALSE)
+						return (FALSE);
+
+					continue;
+				}
+			} else
+#endif
+			if (is_multibyte_utf8(c)) {
+				if (utf8_to_unicode(curwp->w_dotp->l_text, curwp->w_doto, lused(curwp->w_dotp), &c) > 1 && iswupper(c)) {
+					c = ToWLower(c);
+
+					if (lowrite(c) == FALSE)
+						return (FALSE);
+
+					continue;
+				}
+			} else
+#endif
 			if (is_upper(c)) {
 				obj.obj_char = c;
 				c = lowerc(c);
@@ -230,13 +289,16 @@ int f,n;	/* prefix flag and argument */
  * characters to lower case. Error if you try and move past the end of the
  * buffer. Bound to "M-C".
  */
-PASCAL NEAR capword(f, n)
+int capword(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
+#if	UTF8
+	unsigned int c;
+#else
 	int c;
-
+#endif
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
 		return(rdonly());	/* we are in read only mode	*/
 	if (n < 0)
@@ -248,19 +310,68 @@ int f,n;	/* prefix flag and argument */
 		}
 		if (inword() != FALSE) {
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
+#if	UTF8
+#if	THEOX
+			if ((c & 0x80) && (curbp->b_mode & MDTHEOX)) {
+				if (_b_islower(c)) {
+					c = _b_theox2wchar(_b_toupper(c));
+
+					if (lowrite(c) == FALSE)
+						return (FALSE);
+					else if (forwchar(FALSE, 1) == FALSE)
+						return(FALSE);
+				}
+			} else
+#endif
+			if (is_multibyte_utf8(c)) {
+				if (utf8_to_unicode(curwp->w_dotp->l_text, curwp->w_doto, lused(curwp->w_dotp), &c) > 1 && iswlower(c)) {
+					c = ToWUpper(c);
+
+					if (lowrite(c) == FALSE)
+						return (FALSE);
+					else if (forwchar(FALSE, 1) == FALSE)
+						return(FALSE);
+				} else if (forwchar(FALSE, 1) == FALSE)
+					return(FALSE);
+			} else
+#endif
 			if (is_lower(c)) {
-				obj.obj_char = c;
 				c = upperc(c);
 				lputc(curwp->w_dotp, curwp->w_doto, c);
 				undo_insert(OP_REPC, 1L, obj);
 				lchange(WFHARD);
-			}
-			if (forwchar(FALSE, 1) == FALSE)
+
+				if (forwchar(FALSE, 1) == FALSE)
+					return(FALSE);
+			} else if (forwchar(FALSE, 1) == FALSE)
 				return(FALSE);
 			while (inword() != FALSE) {
 				c = lgetc(curwp->w_dotp, curwp->w_doto);
+#if	UTF8
+#if	THEOX
+				if ((c & 0x80) && (curbp->b_mode & MDTHEOX)) {
+					if (_b_isupper(c)) {
+						c = _b_theox2wchar(_b_tolower(c));
+
+						if (lowrite(c) == FALSE)
+							return (FALSE);
+
+						continue;
+					}
+				} else
+#endif
+				if (is_multibyte_utf8(c)) {
+					if (utf8_to_unicode(curwp->w_dotp->l_text, curwp->w_doto, lused(curwp->w_dotp), &c) > 1 && iswupper(c)) {
+						c = ToWLower(c);
+
+						if (lowrite(c) == FALSE)
+							return (FALSE);
+
+						continue;
+					}
+				} else
+#endif
 				if (is_upper(c)) {
-					obj.obj_char = c;
 					c = lowerc(c);
 					lputc(curwp->w_dotp, curwp->w_doto, c);
 					undo_insert(OP_REPC, 1L, obj);
@@ -280,7 +391,7 @@ int f,n;	/* prefix flag and argument */
  * command for the right number of characters. With a zero argument, just
  * kill one word and no whitespace. Bound to "M-D".
  */
-PASCAL NEAR delfword(f, n)
+int delfword(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -327,21 +438,21 @@ int f,n;	/* prefix flag and argument */
 	} else {
 		/* skip n words.... */
 		while (n--) {
-	
+
 			/* if we are at EOL; skip to the beginning of the next */
 			while (curwp->w_doto == lused(curwp->w_dotp)) {
 				if (forwchar(FALSE, 1) == FALSE)
 					return(FALSE);
 				++size;
 			}
-	
+
 			/* move forward till we are at the end of the word */
 			while (inword() == TRUE) {
 				if (forwchar(FALSE, 1) == FALSE)
 					return(FALSE);
 				++size;
 			}
-	
+
 			/* if there are more words, skip the interword stuff */
 			if (n != 0)
 				while (inword() == FALSE) {
@@ -350,7 +461,7 @@ int f,n;	/* prefix flag and argument */
 					++size;
 				}
 		}
-	
+
 		/* skip whitespace and newlines */
 		while ((curwp->w_doto == lused(curwp->w_dotp)) ||
 			((c = lgetc(curwp->w_dotp, curwp->w_doto)) == ' ') ||
@@ -364,7 +475,11 @@ int f,n;	/* prefix flag and argument */
 	/* restore the original position and delete the words */
 	curwp->w_dotp = dotp;
 	curwp->w_doto = doto;
+#if	UTF8
+	return(ldelchar(size, TRUE));
+#else
 	return(ldelete(size, TRUE));
+#endif
 }
 
 /*
@@ -372,7 +487,7 @@ int f,n;	/* prefix flag and argument */
  * counting the characters. When dot is finally moved to its resting place,
  * fire off the kill command. Bound to "M-Rubout" and to "M-Backspace".
  */
-PASCAL NEAR delbword(f, n)
+int delbword(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -415,7 +530,11 @@ int f,n;	/* prefix flag and argument */
 		return(FALSE);
 bckdel:	if (forwchar(FALSE, size) == FALSE)
 		return(FALSE);
+#if	UTF8
+	return(ldelchar(-size, TRUE));
+#else
 	return(ldelete(-size, TRUE));
+#endif
 }
 
 /*
@@ -424,18 +543,55 @@ bckdel:	if (forwchar(FALSE, size) == FALSE)
  * has been set by the user, use that instead
  */
 
-int PASCAL NEAR inword()
+int inword()
 
 {
+#if	UTF8
+	LINE* lp = curwp->w_dotp;
+	short pos = curwp->w_doto;
+
+	/* the end of a line is never in a word */
+	if (pos == lused(lp))
+		return(FALSE);
+
+	/* grab the word to check */
+	char c = lgetc(lp, pos);
+
+	if (is_multibyte_utf8(c)) {	/* Is it a UTF-8 multi byte character ? */
+		/* Yes, convert it to a wide character */
+		unsigned int wc;
+		utf8_to_unicode(lp->l_text, pos, lused(lp), &wc);
+		return iswalpha(wc);
+	}
+
+	return(isinword(c));
+#else
 	/* the end of a line is never in a word */
 	if (curwp->w_doto == lused(curwp->w_dotp))
 		return(FALSE);
 
 	/* grab the word to check */
 	return(isinword(lgetc(curwp->w_dotp, curwp->w_doto)));
+#endif
 }
 
-int PASCAL NEAR isinword(c)
+#if	UTF8
+
+int isinword(unsigned int c)
+{
+	/* if we are using the table.... */
+	if (wlflag)
+		return(wordlist[(int) (char) c]);
+	/* else use the default hard coded check */
+	if (iswalnum(c) || c == '_')
+		return(TRUE);
+
+	return(FALSE);
+}
+
+#else
+
+int isinword(c)
 
 char c;
 
@@ -454,7 +610,9 @@ char c;
 	return(FALSE);
 }
 
-PASCAL NEAR fillpara(f, n)	/* Fill the current paragraph according to the
+#endif
+
+int fillpara(f, n)	/* Fill the current paragraph according to the
 			   current fill column */
 
 int f, n;	/* Default flag and Numeric argument */
@@ -552,7 +710,7 @@ int f, n;	/* Default flag and Numeric argument */
 	return(status);
 }
 
-VOID PASCAL NEAR reform(para)	/* reformat a paragraph as stored in a string */
+VOID reform(para)	/* reformat a paragraph as stored in a string */
 
 char *para;	/* string buffer containing paragraph */
 
@@ -575,7 +733,7 @@ char *para;	/* string buffer containing paragraph */
 
 			/* break on whitespace? */
 			if (col > fillcol) {
-				*sp = '\r';
+				*sp = RET_CHAR;
 				col = 0;
 			}
 
@@ -590,8 +748,8 @@ char *para;	/* string buffer containing paragraph */
 			if (col > fillcol) {
 				/* line break here! */
 				if ((lastword > para) &&
-				   (*(lastword - 1) != '\r')) {
-				   	*(lastword - 1) = '\r';
+				   (*(lastword - 1) != RET_CHAR)) {
+				   	*(lastword - 1) = RET_CHAR;
 				   	sp = lastword;
 				   	col = 0;
 				}
@@ -600,7 +758,7 @@ char *para;	/* string buffer containing paragraph */
 	}
 }
 
-PASCAL NEAR killpara(f, n)	/* delete n paragraphs starting with the current one */
+int killpara(f, n)	/* delete n paragraphs starting with the current one */
 
 int f;	/* default flag */
 int n;	/* # of paras to delete */
@@ -620,7 +778,7 @@ int n;	/* # of paras to delete */
 		/* go to the beginning of the paragraph */
 		gotobop(FALSE, 1);
 		curwp->w_doto = 0;	/* force us to the beginning of line */
-	
+
 		/* and delete it */
 		if ((status = killregion(FALSE, 1)) != TRUE)
 			return(status);
@@ -635,7 +793,7 @@ int n;	/* # of paras to delete */
 			along with average word sizes, # of chars, etc,
 			and report on them.			*/
 
-PASCAL NEAR wordcount(f, n)
+int wordcount(f, n)
 
 int f, n;	/* ignored numeric arguments */
 
@@ -669,7 +827,7 @@ int f, n;	/* ignored numeric arguments */
 
 		/* get the current character */
 		if (offset == lused(lp)) {	/* end of line */
-			ch = '\r';
+			ch = RET_CHAR;
 			lp = lforw(lp);
 			offset = 0;
 			++nlines;
@@ -680,7 +838,11 @@ int f, n;	/* ignored numeric arguments */
 
 		/* and tabulate it */
 		wordflag = (is_letter(ch) ||
-			    (ch >= '0' && ch <= '9'));
+			    (ch >= '0' && ch <= '9')
+#if	LIBHELP
+			   || ch == '_'
+#endif
+			    );
 		if (wordflag == TRUE && lastword == FALSE)
 			++nwords;
 		lastword = wordflag;

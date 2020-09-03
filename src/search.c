@@ -3,6 +3,8 @@
  * and backward directions.
  *
  * (History comments formerly here have been moved to history.c)
+ *
+ * Unicode support by Jean-Michel Dubois
  */
 
 #include <stdio.h>
@@ -31,9 +33,9 @@ static int  o = 0;	/* For longop() calls.*/
  *	the match string, and (perhaps) repaint the display.
  */
 #if PROTO
-int PASCAL NEAR forwsearch(int f, int n)
+int forwsearch(int f, int n)
 #else
-int PASCAL NEAR forwsearch( f, n)
+int forwsearch( f, n)
 int f;
 int n;
 #endif
@@ -64,9 +66,9 @@ int n;
  *	and (perhaps) repaint the display.
  */
 #if PROTO
-int PASCAL NEAR forwhunt(int f, int n)
+int forwhunt(int f, int n)
 #else
-int PASCAL NEAR forwhunt( f, n)
+int forwhunt( f, n)
 int f;
 int n;
 #endif
@@ -135,9 +137,9 @@ int n;
  *	(the last character that was matched).
  */
 #if PROTO
-int PASCAL NEAR backsearch(int f, int n)
+int backsearch(int f, int n)
 #else
-int PASCAL NEAR backsearch( f, n)
+int backsearch( f, n)
 int f;
 int n;
 #endif
@@ -169,9 +171,9 @@ int n;
  *	(the last character that was matched).
  */
 #if PROTO
-int PASCAL NEAR backhunt(int f, int n)
+int backhunt(int f, int n)
 #else
-int PASCAL NEAR backhunt( f, n)
+int backhunt( f, n)
 int f;
 int n;
 #endif
@@ -240,9 +242,9 @@ int n;
  *	and (perhaps) repaint the display.
  */
 #if PROTO
-int PASCAL NEAR mcscanner(MC *mcpatrn, int direct, int beg_or_end, int repeats)
+int mcscanner(MC *mcpatrn, int direct, int beg_or_end, int repeats)
 #else
-int PASCAL NEAR mcscanner( mcpatrn, direct, beg_or_end, repeats)
+int mcscanner( mcpatrn, direct, beg_or_end, repeats)
 MC *mcpatrn;
 int direct;
 int beg_or_end;
@@ -378,9 +380,9 @@ int repeats;
  *	in Kernighan & Plauger's "Software Tools".
  */
 #if PROTO
-int PASCAL NEAR	amatch(MC *mcptr, int direct, LINE **pcwline, int *pcwoff)
+int NEAR	amatch(MC *mcptr, int direct, LINE **pcwline, int *pcwoff)
 #else
-int PASCAL NEAR	amatch( mcptr, direct, pcwline, pcwoff)
+int NEAR	amatch( mcptr, direct, pcwline, pcwoff)
 MC *mcptr;
 int direct;
 LINE **pcwline;
@@ -410,7 +412,7 @@ int *pcwoff;
 		/* Is the current meta-character modified
 		 * by a closure?
 		 */
-		if (cl_type = (mcptr->mc_type & ALLCLOS)) {
+		if ((cl_type = (mcptr->mc_type & ALLCLOS))) {
 
 			/* Minimum number of characters that may
 			 * match is 0 or 1.
@@ -526,9 +528,9 @@ success:
  *	Software-Practice and Experience, vol 10, 501-506 (1980)
  */
 #if PROTO
-int PASCAL NEAR scanner(int direct, int beg_or_end, int repeats)
+int scanner(int direct, int beg_or_end, int repeats)
 #else
-int PASCAL NEAR scanner( direct, beg_or_end, repeats)
+int scanner( direct, beg_or_end, repeats)
 int direct;
 int beg_or_end;
 int repeats;
@@ -647,9 +649,9 @@ fail:;			/* continue to search */
  *	restrictions.
  */
 #if PROTO
-int PASCAL NEAR	fbound(DELTA *tbl, int jump, LINE **pcurline, int *pcuroff, int dir)
+int NEAR	fbound(DELTA *tbl, int jump, LINE **pcurline, int *pcuroff, int dir)
 #else
-int PASCAL NEAR	fbound( tbl, jump, pcurline, pcuroff, dir)
+int NEAR	fbound( tbl, jump, pcurline, pcuroff, dir)
 DELTA *tbl;
 int jump;
 LINE **pcurline;
@@ -659,7 +661,9 @@ int dir;
 {
 	int	curoff;
 	LINE	*curline;
-
+#if	UTF8
+	unsigned int wc;
+#endif
 	curline = *pcurline;
 	curoff = *pcuroff;
 
@@ -676,9 +680,15 @@ int dir;
 				return (TRUE);	/* hit end of buffer */
 
 			if (curoff == lused(curline))
-				jump = tbl->delta[(int) '\r'];
-			else
+				jump = tbl->delta[(int) RET_CHAR];
+			else {
+#if	UTF8
+				utf8_to_unicode(ltext(curline), curoff, lused(curline), &wc);
+				jump = tbl->delta[(unsigned short) wc];
+#else
 				jump = tbl->delta[(int) lgetc(curline, curoff)];
+#endif
+			}
 		}
 	}
 	else			/* Reverse.*/
@@ -696,7 +706,7 @@ int dir;
 				return (TRUE);	/* hit end of buffer */
 
 			if (curoff == lused(curline))
-				jump = tbl->delta[(int) '\r'];
+				jump = tbl->delta[(int) RET_CHAR];
 			else
 				jump = tbl->delta[(int) lgetc(curline, curoff)];
 		}
@@ -713,14 +723,66 @@ int dir;
  *	alone and return TRUE.  Otherwise all went well, and return FALSE.
  */
 #if PROTO
-int PASCAL NEAR movelocalpoint(int n, int *pcuroff, LINE **pcurline)
+int movelocalpoint(int n, int *pcuroff, LINE **pcurline)
 #else
-int PASCAL NEAR movelocalpoint( n, pcuroff, pcurline)
+int movelocalpoint( n, pcuroff, pcurline)
 int n;
 int *pcuroff;
 LINE **pcurline;
 #endif
 {
+#if	UTF8
+	int curoff;
+	LINE *curline;
+	unsigned int wc;
+
+	curline = *pcurline;
+	curoff = *pcuroff;
+
+	if (n > 0) {
+		if (curline == curbp->b_linep)
+			return TRUE;		/* hit end of buffer */
+
+		while (n) {
+			curoff += utf8_to_unicode(ltext(curline), curoff, lused(curline), &wc);
+			n--;
+
+			if (curoff > lused(curline)) {
+				curline = lforw(curline);
+				curoff = 0;
+
+				if (curline == curbp->b_linep)
+					return (TRUE);	/* hit end of buffer */
+			}
+		}
+	} else {
+		while (n) {
+			curoff--;
+
+			if (curoff < 0) {
+				curline = lback(curline);
+				curoff = lused(curline);
+
+				if (curline == curbp->b_linep)
+					return TRUE;		/* hit end of buffer */
+			}
+
+			while (! is_beginning_utf8(lgetc(curline, curoff))) {
+				curoff--;
+
+				if (curoff < 0) {
+					curline = lback(curline);
+					curoff = lused(curline);
+
+					if (curline == curbp->b_linep)
+						return TRUE;		/* hit end of buffer */
+				}
+			}
+
+			++n;
+		}
+	}
+#else
 	register int spare;
 	register int curoff;
 	register LINE *curline;
@@ -747,6 +809,7 @@ LINE **pcurline;
 				return (TRUE);	/* hit end of buffer */
 		}
 	}
+#endif
 	*pcurline = curline;
 	*pcuroff = curoff;
 	return FALSE;
@@ -756,13 +819,58 @@ LINE **pcurline;
  * make_delta -- Create the delta tables.
  */
 #if PROTO
-VOID make_delta(char *pstring, DELTA *tbl)
+VOID make_delta(CONST char *pstring, DELTA *tbl)
 #else
 VOID make_delta( pstring, tbl)
-char *pstring;
+CONST char *pstring;
 DELTA *tbl;
 #endif
 {
+#if	UTF8
+	int	j, jump_by, pos;
+	unsigned int ch;
+	size_t len = strlen(pstring);
+
+	strcpy(tbl->patrn, pstring);
+
+	for (j = jump_by = 0; j < len; ) {
+		j += utf8_to_unicode(pstring, j, len, &ch);
+		++jump_by;
+	}
+
+	for (j = 0; j < HICHAR; j++)
+		tbl->delta[j] = jump_by;
+
+	jump_by -= 1;
+
+	/* Now put in the characters contained
+	 * in the pattern, duplicating the CASE.
+	 */
+	for (j = pos = 0; j < jump_by; ++j) {
+		unsigned int bytes = utf8_to_unicode(pstring, pos, len, &ch);
+
+		if (iswalpha(ch))
+			tbl->delta[(unsigned short) chcase(ch)] = jump_by - j;
+
+		tbl->delta[(unsigned short) ch] = jump_by - j;
+		pos += bytes;
+	}
+
+	/* The last character (left over from the loop above) will
+	 * have the pattern length, unless there are duplicates of
+	 * it.  Get the number to jump from the delta array, and
+	 * overwrite with zeroes in delta duplicating the CASE.
+	 */
+	utf8_to_unicode(pstring, pos, len, &ch);
+
+	tbl->patlen = jump_by;
+	tbl->jump = jump_by + tbl->delta[(unsigned short) ch];
+
+	if (iswalpha(ch))
+		tbl->delta[(unsigned short) chcase(ch)] = 0;
+
+	tbl->delta[(unsigned short) ch] = 0;
+#else
 	int	j, jump_by, ch;
 
 	strcpy(tbl->patrn, pstring);
@@ -778,7 +886,7 @@ DELTA *tbl;
 	 * in the pattern, duplicating the CASE.
 	 */
 	for (j = 0; j < jump_by; j++) {
-		ch = *pstring++;
+		ch = (unsigned char) *pstring++;
 		if (is_letter(ch))
 			tbl->delta[(unsigned char) chcase(ch)] = jump_by - j;
 		tbl->delta[ch] = jump_by - j;
@@ -789,25 +897,26 @@ DELTA *tbl;
 	 * it.  Get the number to jump from the delta array, and
 	 * overwrite with zeroes in delta duplicating the CASE.
 	 */
-	ch = *pstring;
+	ch = (unsigned char) *pstring;
 	tbl->patlen = jump_by;
 	tbl->jump = jump_by + tbl->delta[ch];
 
 	if (is_letter(ch))
 		tbl->delta[(unsigned char) chcase(ch)] = 0;
 	tbl->delta[ch] = 0;
+#endif
 }
 
 /*
- * setjtable -- Settting up search delta forward and delta backward
+ * setjtable -- Setting up search delta forward and delta backward
  *	tables.  The reverse search string and string lengths are
  *	set here, for table initialization and for substitution
  *	purposes.  The default for any character to jump is the
  *	pattern length.
  */
-VOID PASCAL NEAR setjtable()
+VOID setjtable()
 {
-	make_delta(pat, &deltapat);
+	make_delta((char*) pat, &deltapat);
 	make_delta(strrev(strcpy((char *)tap, (char *)pat)), &tapatled);
 }
 
@@ -815,7 +924,7 @@ VOID PASCAL NEAR setjtable()
  * eq -- Compare two characters.  The "bc" comes from the buffer, "pc"
  *	from the pattern.  If we are not in EXACT mode, fold out the case.
  */
-int PASCAL NEAR eq(bc, pc)
+int eq(bc, pc)
 register unsigned char bc;
 register unsigned char pc;
 {
@@ -829,6 +938,27 @@ register unsigned char pc;
 
 	return (bc == pc);
 }
+
+#if	UTF8
+
+/*
+ * weq -- Compare two UTF-8 characters.  The "bc" comes from the buffer, "pc"
+ *	from the pattern.  If we are not in EXACT mode, fold out the case.
+ */
+int weq(unsigned int bc, unsigned int pc)
+{
+	if ((curwp->w_bufp->b_mode & MDEXACT) == 0) {
+		if (iswlower(bc))
+			bc = chcase(bc);
+
+		if (iswlower(pc))
+			pc = chcase(pc);
+	}
+
+	return (bc == pc);
+}
+
+#endif
 
 /*
  * readpattern -- Read a pattern.  Stash it in apat.  If it is the
@@ -844,10 +974,10 @@ register unsigned char pc;
  *	string.
  */
 #if PROTO
-int PASCAL NEAR readpattern(char *prompt, char apat[], int srch)
+int readpattern(CONST char *prompt, char apat[], int srch)
 #else
-int PASCAL NEAR readpattern( prompt, apat, srch)
-char *prompt;
+int readpattern( prompt, apat, srch)
+CONST char *prompt;
 char apat[];
 int srch;
 #endif
@@ -858,7 +988,7 @@ int srch;
 	mlprompt(prompt, apat, sterm);
 
 	/* Read a pattern.  Either we get one,
-	 * or we just get the META charater, and use the previous pattern.
+	 * or we just get the META character, and use the previous pattern.
 	 * Then, if it's the search string, create the delta tables.
 	 * *Then*, make the meta-pattern, if we are defined that way.
 	 */
@@ -876,13 +1006,14 @@ int srch;
 	/* Only make the meta-pattern if in magic mode, since the
 	 * pattern in question might have an invalid meta combination.
 	 */
-	if (status == TRUE)
+	if (status == TRUE) {
 		if ((curwp->w_bufp->b_mode & MDMAGIC) == 0) {
 			mcclear();
 			rmcclear();
 		}
 		else
 			status = srch? mcstr(): rmcstr();
+	}
 #endif
 	return (status);
 }
@@ -890,7 +1021,7 @@ int srch;
 /*
  * savematch -- We found the pattern?  Let's save it away.
  */
-int PASCAL NEAR savematch()
+int savematch()
 {
 	register int	j;
 	REGION		tmpreg;
@@ -936,9 +1067,9 @@ int PASCAL NEAR savematch()
  *	FALSE depending on if a boundry is hit (ouch).
  */
 #if PROTO
-int PASCAL NEAR boundry(LINE *curline, int curoff, int dir)
+int boundry(LINE *curline, int curoff, int dir)
 #else
-int PASCAL NEAR boundry( curline, curoff, dir)
+int boundry( curline, curoff, dir)
 LINE *curline;
 int curoff;
 int dir;
@@ -967,9 +1098,9 @@ int dir;
  *	look at the character.
  */
 #if PROTO
-int PASCAL NEAR nextch(LINE **pcurline, int *pcuroff, int dir)
+int nextch(LINE **pcurline, int *pcuroff, int dir)
 #else
-int PASCAL NEAR nextch( pcurline, pcuroff, dir)
+int nextch( pcurline, pcuroff, dir)
 LINE **pcurline;
 int *pcuroff;
 int dir;
@@ -977,8 +1108,11 @@ int dir;
 {
 	register LINE	*curline;
 	register int	curoff;
+#if	UTF8
+	unsigned int	c;
+#else
 	register int	c;
-
+#endif
 	curline = *pcurline;
 	curoff = *pcuroff;
 
@@ -987,20 +1121,33 @@ int dir;
 		{
 			curline = lforw(curline);	/* skip to next line */
 			curoff = 0;
-			c = '\r';			/* and return a <NL> */
+			c = RET_CHAR;			/* and return a <NL> */
 		}
 		else
+#if	UTF8
+			curoff += utf8_to_unicode(ltext(curline), curoff, lused(curline), &c);
+#else
 			c = lgetc(curline, curoff++);	/* get the char */
+#endif
 	}
 	else			/* Reverse.*/
 	{
 		if (curoff == 0) {
 			curline = lback(curline);
 			curoff = lused(curline);
-			c = '\r';
+			c = RET_CHAR;
 		}
 		else
+		{
+#if	UTF8
+			while (--curoff >= 0 && ! is_beginning_utf8(lgetc(curline, curoff)))
+				;
+
+			utf8_to_unicode(ltext(curline), curoff, lused(curline), &c);
+#else
 			c = lgetc(curline, --curoff);
+#endif
+		}
 	}
 	*pcurline = curline;
 	*pcuroff = curoff;
@@ -1013,9 +1160,9 @@ int dir;
  *	Returns 0 (no match) or the number of characters matched.
  */
 #if PROTO
-int PASCAL NEAR liteq(LINE **curline, int *curpos, int direct, char *lstring)
+int liteq(LINE **curline, int *curpos, int direct, char *lstring)
 #else
-int PASCAL NEAR liteq( curline, curpos, direct, lstring)
+int liteq( curline, curpos, direct, lstring)
 LINE **curline;
 int *curpos;
 int direct;
@@ -1024,13 +1171,31 @@ char *lstring;
 {
 	LINE	*scanline = *curline;
 	int	scanpos = *curpos;
+#if	UTF8
+	size_t len = strlen(lstring);
+#else
 	register int	c;
+#endif
 	register int	count = 0;
+	while (*lstring) {
+#if	UTF8
+		unsigned int wc;
+		unsigned int bytes = utf8_to_unicode(lstring, 0, len, &wc);
 
-	while ((c = (unsigned char)(*lstring++)) != '\0') {
+		if (! weq(wc, nextch(&scanline, &scanpos, direct)))
+			return 0;
+
+		count++;
+		lstring += bytes;
+		len -= bytes;
+#else
+		c = *lstring++;
+		
 		if (!eq(c, nextch(&scanline, &scanpos, direct)))
 			return 0;
+			
 		count++;
+#endif
 	}
 
 	*curline = scanline;
@@ -1052,7 +1217,7 @@ char *lstring;
  *	within the 64K limit.  C compilers actually do very little
  *	in the way of optimizing - they expect you to do that.
  */
-int PASCAL NEAR mcstr()
+int mcstr()
 {
 	MC	*mcptr, *rtpcm;
 	DELTA	*tbl;
@@ -1274,7 +1439,7 @@ litcase:
 /*
  * mcclear -- Free up any CCL bitmaps, and MCNIL the MC search arrays.
  */
-VOID PASCAL NEAR mcclear()
+VOID mcclear()
 {
 	register MC	*mcptr;
 	register int	j;
@@ -1329,9 +1494,9 @@ VOID PASCAL NEAR mcclear()
  *	too many functions with the 'match' name already.
  */
 #if PROTO
-int PASCAL NEAR	mceq(unsigned char bc, MC *mt)
+int NEAR	mceq(unsigned char bc, MC *mt)
 #else
-int PASCAL NEAR	mceq( bc, mt)
+int NEAR	mceq( bc, mt)
 unsigned char bc;
 MC *mt;
 #endif
@@ -1344,7 +1509,7 @@ MC *mt;
 			break;
 
 		case ANY:
-			result = (bc != '\r');
+			result = (bc != RET_CHAR);
 			break;
 
 		case CCL:
@@ -1380,9 +1545,9 @@ MC *mt;
  *	so that a loop may automatically increment with safety.
  */
 #if PROTO
-int PASCAL NEAR	cclmake(char **ppatptr, MC *mcptr)
+int NEAR	cclmake(char **ppatptr, MC *mcptr)
 #else
-int PASCAL NEAR	cclmake( ppatptr, mcptr)
+int NEAR	cclmake( ppatptr, mcptr)
 char **ppatptr;
 MC *mcptr;
 #endif
@@ -1477,9 +1642,9 @@ MC *mcptr;
  *	you will also need to update this function!
  */
 #if PROTO
-int PASCAL NEAR	litmake(char **ppatptr, MC *mcptr)
+int NEAR	litmake(char **ppatptr, MC *mcptr)
 #else
-int PASCAL NEAR	litmake( ppatptr, mcptr)
+int NEAR	litmake( ppatptr, mcptr)
 char **ppatptr;
 MC *mcptr;
 #endif
@@ -1500,7 +1665,7 @@ MC *mcptr;
 	 * Now loop through the pattern, collecting characters until
 	 * we run into a meta-character.
 	 */
-	while (pchr = *++patptr)
+	while ((pchr = *++patptr))
 	{
 		/*
 		 * If the current character is a closure character,
@@ -1573,9 +1738,9 @@ MC *mcptr;
  * biteq -- is the character in the bitmap?
  */
 #if PROTO
-int PASCAL NEAR	biteq(int bc, EBITMAP cclmap)
+int NEAR	biteq(int bc, EBITMAP cclmap)
 #else
-int PASCAL NEAR	biteq( bc, cclmap)
+int NEAR	biteq( bc, cclmap)
 int bc;
 EBITMAP cclmap;
 #endif
@@ -1590,9 +1755,9 @@ EBITMAP cclmap;
  * setbit -- Set a bit (ON only) in the bitmap.
  */
 #if PROTO
-VOID PASCAL NEAR setbit(int bc, EBITMAP cclmap)
+VOID setbit(int bc, EBITMAP cclmap)
 #else
-VOID PASCAL NEAR setbit( bc, cclmap)
+VOID setbit( bc, cclmap)
 int bc;
 EBITMAP cclmap;
 #endif
@@ -1605,9 +1770,9 @@ EBITMAP cclmap;
 #if DEBUG_SEARCH
 
 #if PROTO
-int PASCAL NEAR mc_list(int f, int n)
+int mc_list(int f, int n)
 #else
-int PASCAL NEAR mc_list( f, n)
+int mc_list( f, n)
 int f;
 int n;
 #endif
@@ -1723,9 +1888,9 @@ int n;
 }
 
 #if PROTO
-int PASCAL NEAR rmc_list(int f, int n)
+int rmc_list(int f, int n)
 #else
-int PASCAL NEAR rmc_list( f, n)
+int rmc_list( f, n)
 int f;
 int n;
 #endif
@@ -1791,9 +1956,9 @@ int n;
 }
 
 #if PROTO
-VOID PASCAL NEAR mctype_cat(char pline[], int mc_type)
+VOID mctype_cat(char pline[], int mc_type)
 #else
-VOID PASCAL NEAR mctype_cat( pline, mc_type)
+VOID mctype_cat( pline, mc_type)
 char pline[];
 int mc_type;
 #endif

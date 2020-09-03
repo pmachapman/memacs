@@ -4,6 +4,8 @@
  * physical display screen the same as the virtual display screen. These
  * functions use hints that are left in the windows by the commands.
  *
+ *
+ * Unicode support by Jean-Michel Dubois
  */
 
 #include	<stdio.h>
@@ -27,14 +29,14 @@ static VIDEO   **pscreen;		       /* Physical screen. */
 
 #if	PROTO
 #if	MEMMAP
-extern VOID PASCAL NEAR update_line(int row, struct VIDEO *vp1);
+extern VOID update_line(int row, struct VIDEO *vp1);
 #else
-extern VOID PASCAL NEAR update_line(int row, struct VIDEO *vp1, struct VIDEO *vp2);
+extern VOID update_line(int row, struct VIDEO *vp1, struct VIDEO *vp2);
 #endif
-extern VOID PASCAL NEAR update_hilite(void);
+extern VOID update_hilite(void);
 #else
-extern VOID PASCAL NEAR update_line();
-extern VOID PASCAL NEAR update_hilite();
+extern VOID update_line();
+extern VOID update_hilite();
 #endif
 
 /*
@@ -45,7 +47,7 @@ extern VOID PASCAL NEAR update_hilite();
  * redrawn on the first call to "update".
  */
 
-int PASCAL NEAR vtinit()
+int vtinit()
 {
 	register int i;
 	register VIDEO *vp;
@@ -56,7 +58,7 @@ int PASCAL NEAR vtinit()
 
 	/* allocate the virtual screen pointer array */
 	vscreen = (VIDEO **)room(term.t_mrow*sizeof(VIDEO *));
-	
+
 	if (vscreen == NULL)
 #if     WINDOW_MSWIN
 		return(FALSE);
@@ -80,7 +82,11 @@ int PASCAL NEAR vtinit()
 	for (i = 0; i < term.t_mrow; ++i) {
 
 		/* allocate a virtual screen line */
-		vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol);
+		vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol
+#if	UTF8
+			* sizeof(unsigned int)
+#endif
+			);
 		if (vp == NULL)
 #if     WINDOW_MSWIN
 			return(FALSE);
@@ -100,7 +106,11 @@ int PASCAL NEAR vtinit()
 
 #if	MEMMAP == 0
 		/* allocate and initialize physical shadow screen line */
-		vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol);
+		vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol
+#if	UTF8
+			* sizeof(unsigned int)
+#endif
+			);
 		if (vp == NULL)
 #if     WINDOW_MSWIN
 			return(FALSE);
@@ -123,7 +133,7 @@ int PASCAL NEAR vtinit()
 #if	CLEAN || WINDOW_MSWIN
 /* free up all the dynamically allocated video structures */
 
-VOID PASCAL NEAR vtfree()
+VOID vtfree()
 {
 	int i;
 	for (i = 0; i < term.t_mrow; ++i) {
@@ -143,7 +153,7 @@ VOID PASCAL NEAR vtfree()
 /* vtscreen:	map a screen into the Virtual Terminal system */
 /* ======== 						      */
 
-VOID PASCAL NEAR vtscreen(SCREEN *sp)
+VOID vtscreen(ESCREEN *sp)
 {
 	TTflush();
 	term.t_roworg = sp->s_roworg;
@@ -160,7 +170,7 @@ VOID PASCAL NEAR vtscreen(SCREEN *sp)
 /* vtinitscr: build a virtual terminal resource for a new screen */
 /* =========													 */
 
-int PASCAL NEAR vtinitscr(SCREEN *sp, int nrow, int ncol)
+int vtinitscr(ESCREEN *sp, int nrow, int ncol)
 
 /* returns TRUE if successful */
 {
@@ -190,7 +200,7 @@ int PASCAL NEAR vtinitscr(SCREEN *sp, int nrow, int ncol)
 /* vtfreescr:  delete a virtual terminal resource for a dying screen */
 /* =========														 */
 
-PASCAL NEAR vtfreescr(SCREEN *sp)
+vtfreescr(ESCREEN *sp)
 {
 	vtscreen(sp);
 	vtfree();
@@ -200,7 +210,7 @@ PASCAL NEAR vtfreescr(SCREEN *sp)
 /* vtsizescr:	resize the virtual terminal resources */
 /* =========										  */
 
-int PASCAL NEAR vtsizescr(SCREEN *sp, int nrow, int ncol)
+int vtsizescr(ESCREEN *sp, int nrow, int ncol)
 
 /* returns TRUE if successful. Otherwise, the old VIDEO structures are
    preserved. */
@@ -215,7 +225,7 @@ int PASCAL NEAR vtsizescr(SCREEN *sp, int nrow, int ncol)
 	if (vtinitscr(sp, nrow, ncol) == TRUE) {
 		/* success! let's free the old VIDEO structures */
 		EWINDOW *wp;
-	    
+
 		vscreen = oldvvp;
 		pscreen = oldpvp;
 		term.t_nrow = oldnrow;
@@ -250,7 +260,7 @@ int PASCAL NEAR vtsizescr(SCREEN *sp, int nrow, int ncol)
  * system prompt will be written in the line). Shut down the channel to the
  * terminal.
  */
-PASCAL NEAR vttidy()
+VOID vttidy(VOID)
 {
     mlerase();
     movecursor(term.t_nrow, 0);
@@ -264,7 +274,7 @@ PASCAL NEAR vttidy()
  * screen. There is no checking for nonsense values; this might be a good
  * idea during the early stages.
  */
-PASCAL NEAR vtmove(row, col)
+VOID vtmove(row, col)
 
 int row, col;
 
@@ -280,16 +290,24 @@ int row, col;
    terminal buffers. Only column overflow is checked.
 */
 
-PASCAL NEAR vtputc(c)
+VOID vtputc(c)
 
 int c;
 
 {
 	register VIDEO *vp;	/* ptr to line being updated */
 
-	/* defeate automatic sign extenstion */
-	c = c & 0xff;
+	/* defeat automatic sign extension */
+#if	UTF8
+	if (c < 0) {
+		c += 256;
 
+		if (c < 0)
+			return;
+	}
+#else
+	c = c & 0xff;
+#endif
 	/* this is the line to put this character! */
 	vp = vscreen[vtrow];
 
@@ -338,7 +356,7 @@ int c;
  * Erase from the end of the software cursor to the end of the line on which
  * the software cursor is located.
  */
-PASCAL NEAR vteeol()
+VOID vteeol()
 {
     register VIDEO	*vp;
 
@@ -353,7 +371,7 @@ PASCAL NEAR vteeol()
 /* upscreen:	user routine to force a screen update
 		always finishes complete update 	*/
 
-int PASCAL NEAR upscreen(f, n)
+int upscreen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -369,14 +387,14 @@ int f,n;	/* prefix flag and argument */
  * correct for the current window. Third, make the virtual and physical
  * screens the same.
  */
-VOID PASCAL NEAR update(force)
+VOID update(force)
 
 int force;	/* force update past type ahead? */
 
 {
 	register EWINDOW *wp;
 #if     WINDOW_MSWIN
-	SCREEN  *sp;
+	ESCREEN  *sp;
 #endif
 
 #if	TYPEAH
@@ -408,9 +426,9 @@ int force;	/* force update past type ahead? */
 		char scroll_flag = 0;
 		int  scroll_fcol;
 		static EWINDOW *scroll_wp = (EWINDOW *)NULL;
-	    
+
 		sp = sp->s_next_screen;
-		if (sp == (SCREEN *)NULL) {
+		if (sp == (ESCREEN *)NULL) {
 			sp = first_screen;
 			sp->s_cur_window = curwp; /* not always up to date */
 		}
@@ -418,7 +436,7 @@ int force;	/* force update past type ahead? */
 		wheadp = sp->s_first_window;
 		scroll_fcol = sp->s_cur_window->w_fcol;
 #endif
-	
+
 		/* update any windows that need refreshing */
 		wp = wheadp;
 		while (wp != NULL) {
@@ -480,12 +498,12 @@ int force;	/* force update past type ahead? */
 		upddex();
 
 		/* if screen is garbage, re-plot it */
-		if (sgarbf != FALSE)
+		if (sgarbf != FALSE) {
 			if (gflags & GFSDRAW)
 				sgarbf = FALSE;
 			else
 				updgar();
-	
+		}
 		/* update the virtual screen to the physical screen */
 		updupd(force);
 #if 	WINDOW_MSWIN
@@ -510,7 +528,7 @@ int force;	/* force update past type ahead? */
 /*	reframe:	check to see if the cursor is on in the window
 			and re-frame it if needed or wanted		*/
 
-VOID PASCAL NEAR reframe(wp)
+VOID reframe(wp)
 
 EWINDOW *wp;
 
@@ -612,12 +630,12 @@ EWINDOW *wp;
 /*	hilite:	in the current window, marks 10 and 11 are set and the
 		area between them is on screen, hilite that area	*/
 
-VOID PASCAL NEAR update_hilite()
+VOID update_hilite()
 
 {
-	int first_line;		/* first screen line to highlight */
+	int first_line = 0;	/* first screen line to highlight */
 	short first_pos;	/* position in that line */
-	int last_line;		/* last screen line to highlight */
+	int last_line = 0;	/* last screen line to highlight */
 	short last_pos;		/* position in that line */
 	LINE *forptr, *bckptr;	/* line pointers searching in current buffer */
 	int forline, bckline;	/* screen lines of for/bck ptrs */
@@ -627,6 +645,7 @@ VOID PASCAL NEAR update_hilite()
 	LINE *b_linep;		/* header line of current buffer */
 	int temp_line;		/* temp line # for swap */
 	short temp_pos;		/*  more of the same */
+	int old_v_left, old_v_right;	/* old left/right position */
 
 	/* $hilight must be set to the first of 2 consecutive marks
 	   used to define the region to highlight */
@@ -710,6 +729,8 @@ VOID PASCAL NEAR update_hilite()
 	first_line += forline;
 	last_line += forline;
 	while (forline < curwp->w_toprow + nlines) {
+		old_v_left = vscreen[forline]->v_left;
+		old_v_right = vscreen[forline]->v_right;
 		if ((forline >= first_line) && (forline <= last_line)) {
 			vscreen[forline]->v_left = 0;
 			vscreen[forline]->v_right = findcol(forptr, lused(forptr));
@@ -719,8 +740,17 @@ VOID PASCAL NEAR update_hilite()
 				vscreen[forline]->v_right = last_pos;
 
 			/* adjust for shifted window */
-			vscreen[forline]->v_left -= curwp->w_fcol;
-			vscreen[forline]->v_right -= curwp->w_fcol;
+			/* debbugged by jmd */
+			if (vscreen[forline]->v_left > curwp->w_fcol)
+				vscreen[forline]->v_left -= curwp->w_fcol;
+			else
+				vscreen[forline]->v_left = 0;
+			if (vscreen[forline]->v_right > curwp->w_fcol)
+				vscreen[forline]->v_right -= curwp->w_fcol;
+			else {
+				vscreen[forline]->v_left = FARRIGHT;
+				vscreen[forline]->v_right = 0;
+			}
 
 			/* adjust for shifted line */
 			if (vscreen[forline]->v_flag & VFEXT) {
@@ -740,11 +770,16 @@ VOID PASCAL NEAR update_hilite()
 			}
 			else if (vscreen[forline]->v_right>term.t_ncol)
 				 vscreen[forline]->v_right = term.t_ncol;
-			
+
                 } else {
                         vscreen[forline]->v_left = FARRIGHT;
                         vscreen[forline]->v_right = 0;
                 }
+
+                /* mark line as changed if changed */
+                if (vscreen[forline]->v_left != old_v_left ||
+                    vscreen[forline]->v_right != old_v_right)
+                	vscreen[forline]->v_flag |= VFCHG;
 
                 /* step up one more line */
                 if (forptr != b_linep)
@@ -759,14 +794,38 @@ VOID PASCAL NEAR update_hilite()
 
 /*      updone: update the current line to the virtual screen           */
 
-VOID PASCAL NEAR updone(wp)
+static void show_line(LINE *lp)
+{
+	int i = 0, len = lused(lp);
+#if	UTF8
+	while (i < len) {
+		unsigned int wc;
+#if	THEOX
+		char c = lgetc(lp, i);
+
+		if ((c & 0x80) && (curbp->b_mode & MDTHEOX)) {
+			wc = _b_theox2wchar(c);
+			++i;
+		} else
+#endif
+			i += utf8_to_unicode(lp->l_text, i, len, &wc);
+#if	THEOX
+		vtputc(wc);
+#endif
+	}
+#else
+        for (i=0; i < len; ++i)
+                vtputc(lgetc(lp, i));
+#endif
+}
+
+VOID updone(wp)
 
 EWINDOW *wp;     /* window to update current line in */
 
 {
         register LINE *lp;      /* line to update */
         register int sline;     /* physical screen line to update */
-        register int i;
 
         /* search down the line we want */
         lp = wp->w_linep;
@@ -778,12 +837,12 @@ EWINDOW *wp;     /* window to update current line in */
 
         /* and update the virtual line */
         vscreen[sline]->v_flag |= VFCHG;
+    	vscreen[sline]->v_flag &= ~VFREQ;
         taboff = wp->w_fcol;
         vtmove(sline, -taboff);
 
         /* move each char of line to virtual screen until at end */
-        for (i=0; i < lused(lp); ++i)
-                vtputc(lgetc(lp, i));
+        show_line(lp);
 #if     COLOR
         vscreen[sline]->v_rfcolor = wp->w_fcolor;
         vscreen[sline]->v_rbcolor = wp->w_bcolor;
@@ -794,14 +853,13 @@ EWINDOW *wp;     /* window to update current line in */
 
 /*      updall: update all the lines in a window on the virtual screen */
 
-VOID PASCAL NEAR updall(wp)
+VOID updall(wp)
 
 EWINDOW *wp;     /* window to update lines in */
 
 {
         register LINE *lp;      /* line to update */
         register int sline;     /* physical screen line to update */
-        register int i;
         register int nlines;    /* number of lines in the current window */
 
         /* search down the lines, updating them */
@@ -820,8 +878,7 @@ EWINDOW *wp;     /* window to update lines in */
                 vtmove(sline, -taboff);
                 if (lp != wp->w_bufp->b_linep) {
                         /* if we are not at the end */
-                        for (i=0; i < lused(lp); ++i)
-                                vtputc(lgetc(lp, i));
+			show_line(lp);
                         lp = lforw(lp);
                 }
 
@@ -843,7 +900,7 @@ EWINDOW *wp;     /* window to update lines in */
 /*      updpos: update the position of the hardware cursor and handle extended
                 lines. This is the only update for simple moves.        */
 
-VOID PASCAL NEAR updpos()
+VOID updpos()
 
 {
         register LINE *lp;
@@ -893,12 +950,12 @@ VOID PASCAL NEAR updpos()
 
 /*      upddex: de-extend any line that derserves it            */
 
-VOID PASCAL NEAR upddex()
+VOID upddex()
 
 {
         register EWINDOW *wp;
         register LINE *lp;
-        register int i,j;
+        register int i;
         register int nlines;    /* number of lines in the current window */
 
         wp = wheadp;
@@ -916,8 +973,7 @@ VOID PASCAL NEAR upddex()
                                    (curcol < term.t_ncol - 1)) {
                                         taboff = wp->w_fcol;
                                         vtmove(i, -taboff);
-                                        for (j = 0; j < lused(lp); ++j)
-                                                vtputc(lgetc(lp, j));
+					show_line(lp);
                                         vteeol();
                                         taboff = 0;
 
@@ -937,17 +993,24 @@ VOID PASCAL NEAR upddex()
 /*      updgar: if the screen is garbage, clear the physical screen and
                 the virtual screen and force a full update              */
 
-VOID PASCAL NEAR updgar()
+VOID updgar()
 
 {
         register int i;
 #if     MEMMAP == 0
         register int j;
+#if	UTF8
+	register unsigned int *txt;
+#else
         register char *txt;
+#endif
 #endif
 
         for (i = 0; i < term.t_nrow; ++i) {
                 vscreen[i]->v_flag |= VFCHG;
+#if REVSTA
+		vscreen[i]->v_flag &= ~VFREV;
+#endif
 #if     COLOR
                 vscreen[i]->v_fcolor = gfcolor;
                 vscreen[i]->v_bcolor = gbcolor;
@@ -963,7 +1026,7 @@ VOID PASCAL NEAR updgar()
         }
 
         movecursor(0, 0);                /* Erase the screen. */
-#if     COLOR && WINDOW_MSWIN
+#if     COLOR && (WINDOW_MSWIN || CURSES)
         TTforg(gfcolor);        /* inform the driver of the colors */
         TTbacg(gbcolor);        /* to be used for erase to end of page */
 #endif
@@ -988,7 +1051,7 @@ VOID PASCAL NEAR updgar()
         do the following things
 */
 
-VOID PASCAL NEAR update_size()
+VOID update_size()
 
 {
         /* if we need the size update */
@@ -1015,9 +1078,9 @@ VOID PASCAL NEAR update_size()
 */
 
 #if     PROTO
-int PASCAL NEAR pop(BUFFER *popbuf)
+int pop(BUFFER *popbuf)
 #else
-int PASCAL NEAR pop(popbuf)
+int pop(popbuf)
 
 BUFFER *popbuf;
 #endif
@@ -1029,7 +1092,7 @@ BUFFER *popbuf;
         int numlines;   /* remaining number of lines to display */
         int c;          /* input character */
 
-        /* add the barrior line to the end of the pop up buffer */
+        /* add the barrier line to the end of the pop up buffer */
         addline(popbuf, "------------------------------------------");
 
         /* set up to scan pop up buffer */
@@ -1107,7 +1170,7 @@ BUFFER *popbuf;
 
 /*      updupd: update the physical screen from the virtual screen      */
 
-VOID PASCAL NEAR updupd(force)
+VOID updupd(force)
 
 int force;      /* forced update flag */
 
@@ -1139,12 +1202,11 @@ int force;      /* forced update flag */
                 will be scrolled right or left to let the user see where
                 the cursor is
                                                                 */
-VOID PASCAL NEAR updext()
+VOID updext()
 
 {
         register int rcursor;   /* real cursor location */
         register LINE *lp;      /* pointer to current line */
-        register int j;         /* index into line */
 
         /* calculate what column the real cursor will end up in */
         rcursor = ((curcol - term.t_ncol) % term.t_scrsiz)
@@ -1156,9 +1218,7 @@ VOID PASCAL NEAR updext()
         /* once we reach the left edge                                  */
         vtmove(currow, -taboff); /* start scanning offscreen */
         lp = curwp->w_dotp;             /* line to output */
-        for (j=0; j<lused(lp); ++j)     /* until the end-of-line */
-                vtputc(lgetc(lp, j));
-
+	show_line(lp);
         /* truncate the virtual line, restore tab offset */
         vteeol();
         taboff = 0;
@@ -1175,7 +1235,7 @@ VOID PASCAL NEAR updext()
 #if     MEMMAP
 /*      UPDATE_LINE:    specific code for memory mapped displays */
 
-VOID PASCAL NEAR update_line(row, vp)
+VOID update_line(row, vp)
 
 int row;                /* row of screen to update */
 struct VIDEO *vp;       /* virtual screen image */
@@ -1197,21 +1257,28 @@ struct VIDEO *vp;       /* virtual screen image */
         vp->v_flag &= ~(VFCHG | VFCOL);
 }
 #else
-VOID PASCAL NEAR update_line(row, vp, pp)
+VOID update_line(row, vp, pp)
 
 int row;                /* row of screen to update */
 struct VIDEO *vp;       /* virtual screen image */
 struct VIDEO *pp;       /* physical screen image */
 
 {
-
+#if	UTF8
+        register unsigned int *vir_left;        /* left pointer to virtual line */
+        register unsigned int *phy_left;        /* left pointer to physical line */
+        register unsigned int *vir_right;       /* right pointer to virtual line */
+        register unsigned int *phy_right;       /* right pointer to physical line */
+        unsigned int *left_blank;               /* left-most trailing blank */
+#else
         register char *vir_left;        /* left pointer to virtual line */
         register char *phy_left;        /* left pointer to physical line */
         register char *vir_right;       /* right pointer to virtual line */
         register char *phy_right;       /* right pointer to physical line */
+        char *left_blank;               /* left-most trailing blank */
+#endif
         int rev_left;                   /* leftmost reversed char index */
         int rev_right;                  /* rightmost reversed char index */
-        char *left_blank;               /* left-most trailing blank */
         int non_blanks;                 /* non-blanks to the right flag */
         int update_column;              /* update column */
         int old_rev_state = FALSE;      /* reverse video states */
@@ -1237,7 +1304,7 @@ struct VIDEO *pp;       /* physical screen image */
                         ++update_column;
                         ++phy_left;
                 }
-        
+
 #if     DBCS
                 /* don't optimize on the left in the middle of a 2 byte char */
                 if ((vir_left > &vp->v_text[0]) && is2byte(vp->v_text, vir_left - 1)) {
@@ -1246,7 +1313,7 @@ struct VIDEO *pp;       /* physical screen image */
                         --phy_left;
                 }
 #endif
-                
+
                 /* advance past any common chars at the right */
                 non_blanks = FALSE;
                 while ((vir_right[-1] == phy_right[-1]) &&
@@ -1258,7 +1325,7 @@ struct VIDEO *pp;       /* physical screen image */
                         if (vir_right[0] != ' ')
                                 non_blanks = TRUE;
                 }
-        
+
 #if     DBCS
                 /* don't stop in the middle of a 2 byte char */
                 if (is2byte(vp->v_text, vir_right-1) || is2byte(pp->v_text, phy_right-1)) {
@@ -1336,7 +1403,7 @@ struct VIDEO *pp;       /* physical screen image */
         /* move to the beginning of the text to update */
         movecursor(row, update_column);
 
-        while (vir_left != left_blank) {                /* Ordinary. */
+        while (vir_left != left_blank && update_column < term.t_ncol) {                /* Ordinary. */
 
                 /* are we in a reverse video field? */
                 if (pp->v_left <= update_column && update_column < pp->v_right)
@@ -1404,12 +1471,13 @@ struct VIDEO *pp;       /* physical screen image */
  * change the modeline format by hacking at this routine. Called by "update"
  * any time there is a dirty window.
  */
-VOID PASCAL NEAR modeline(wp)
+VOID modeline(wp)
 
 EWINDOW *wp;	/* window to update modeline for */
 
 {
 	register char *cp;
+	register CONST char* ccp;
 	register unsigned char c;
 	register int n;		/* cursor position count */
 	register BUFFER *bp;
@@ -1440,8 +1508,8 @@ EWINDOW *wp;	/* window to update modeline for */
 	vscreen[n]->v_left = 0;
 	vscreen[n]->v_right = term.t_ncol;
 #if	COLOR
-	vscreen[n]->v_rfcolor = 7;			/* black on */
-	vscreen[n]->v_rbcolor = 0;			/* white.....*/
+	vscreen[n]->v_rfcolor = 0;			/* black on */
+	vscreen[n]->v_rbcolor = 7;			/* white.....*/
 #endif
 	vtmove(n, 0);				/* Seek to right line. */
 	if (wp == curwp)			/* mark the current buffer */
@@ -1569,10 +1637,15 @@ EWINDOW *wp;	/* window to update modeline for */
 	if (bp->b_fname[0] != 0) {	/* File name. */
 		vtputc(' ');
 		++n;
-		cp = TEXT34;
+#if	LIBHELP
+		if (bp->b_flag & BFHELP)
+			ccp = TEXT289;
+		else
+#endif
+		ccp = TEXT34;
 /*                   "File: " */
 
-		while ((c = *cp++) != 0) {
+		while ((c = *ccp++) != 0) {
 			vtputc(c);
 			++n;
 		}
@@ -1594,7 +1667,7 @@ EWINDOW *wp;	/* window to update modeline for */
 	}
 }
 
-VOID PASCAL NEAR getdtime(ts)	/* get the current display time string */
+VOID getdtime(ts)	/* get the current display time string */
 
 char *ts;
 
@@ -1612,19 +1685,19 @@ char *ts;
 	return;
 }
 
-VOID PASCAL NEAR upmode()	/* update all the mode lines */
+VOID upmode()	/* update all the mode lines */
 
 {
 	register EWINDOW *wp;
 #if     WINDOW_MSWIN
-    SCREEN  *sp;
+    ESCREEN  *sp;
 
     /* loop through all screens to update even partially hidden ones.
        Note that we process the "first" screen last */
     sp = first_screen;
     do {
         sp = sp->s_next_screen;
-        if (sp == (SCREEN *)NULL) sp = first_screen;
+        if (sp == (ESCREEN *)NULL) sp = first_screen;
         vtscreen (sp);
         wheadp = sp->s_first_window;
 #endif
@@ -1639,19 +1712,19 @@ VOID PASCAL NEAR upmode()	/* update all the mode lines */
 #endif
 }
 
-VOID PASCAL NEAR upwind()	/* force hard updates on all windows */
+VOID upwind()	/* force hard updates on all windows */
 
 {
 	register EWINDOW *wp;
 #if     WINDOW_MSWIN
-    SCREEN  *sp;
+    ESCREEN  *sp;
 
     /* loop through all screens to update even partially hidden ones.
        Note that we process the "first" screen last */
     sp = first_screen;
     do {
         sp = sp->s_next_screen;
-        if (sp == (SCREEN *)NULL) sp = first_screen;
+        if (sp == (ESCREEN *)NULL) sp = first_screen;
         vtscreen (sp);
         wheadp = sp->s_first_window;
 #endif
@@ -1671,7 +1744,7 @@ VOID PASCAL NEAR upwind()	/* force hard updates on all windows */
  * and column "col". The row and column arguments are origin 0. Optimize out
  * random calls. Update "ttrow" and "ttcol".
  */
-VOID PASCAL NEAR movecursor(row, col)
+VOID movecursor(row, col)
 
 int row, col;
 
@@ -1708,7 +1781,7 @@ int row, col;
  * immediately; the terminal buffer is flushed via a call to the flusher.
  */
 
-VOID PASCAL NEAR mlferase()
+VOID mlferase()
 
 {
 	register int save_discmd;
@@ -1719,11 +1792,11 @@ VOID PASCAL NEAR mlferase()
 	discmd = save_discmd;;
 }
 
-VOID PASCAL NEAR mlerase()
+VOID mlerase()
 
 {
 	int i;
-    
+
 	movecursor(term.t_nrow, 0);
 	if (discmd == FALSE)
 		return;
@@ -1756,7 +1829,7 @@ VOID PASCAL NEAR mlerase()
  *  flag TRUE.  Don't write beyond the end of the current terminal width.
  */
 
-VOID PASCAL NEAR mlout(c)
+VOID mlout(c)
 
 int c;	/* character to write */
 
@@ -1766,11 +1839,21 @@ int c;	/* character to write */
 #else
 	if (ttcol + 1 < term.t_ncol) {
 #endif
+#if	THEOX
+#if	WINNT || WINXP
+		theoxputchar(c);
+		fflush(stdout);
+#else
+		theoxputchar(c);
+#endif
+#else
 #if	WINNT || WINXP
 		putchar(c);
-		fflush(stdout);		
-#endif
+		fflush(stdout);
+#else
 		TTputc(c);
+#endif
+#endif
 	}
 	if (c != '\b')
 		*lastptr++ = c;
@@ -1780,14 +1863,18 @@ int c;	/* character to write */
 
 #if	VARARG
 #if	VARG
-VOID CDECL NEAR mlwrite(va_alist)
+VOID CDECL mlwrite(va_alist)
 
 va_dcl		/* variable argument list
 			arg1 = format string
 			arg2+ = arguments in that string */
 
 {
+#if	UTF8
+	register unsigned int c; 	/* current char in format string */
+#else
 	register int c; 	/* current char in format string */
+#endif
 	register char *fmt;	/* ptr to format string */
 	register va_list ap;	/* ptr to current data field */
 	int arg_int;		/* integer argument */
@@ -1816,12 +1903,25 @@ va_dcl		/* variable argument list
 
 	movecursor(term.t_nrow, 0);
  	lastptr = &lastmesg[0];		/* setup to record message */
-	while ((c = *fmt++) != 0) {
+	while (*fmt) {
+#if	UTF8
+		unsigned int bytes = utf8_to_unicode(fmt, 0, len, &c);
+		fmt += bytes;
+		len -= bytes;
+#else
+		c = *fmt++;
+#endif
 		if (c != '%') {
 			mlout(c);
 			++ttcol;
 		} else {
+#if	UTF8
+			bytes = utf8_to_unicode(fmt, 0, len, &c);
+			fmt += bytes;
+			len -= bytes;
+#else
 			c = *fmt++;
+#endif
 			switch (c) {
 				case 'd':
 					arg_int = va_arg(ap, int);
@@ -1870,11 +1970,11 @@ va_dcl		/* variable argument list
 }
 #else
 #if PROTO
-VOID CDECL NEAR mlwrite(char *fmt, ...)
+VOID CDECL mlwrite(CONST char *fmt, ...)
 /* char * fmt;*/
 #else
-VOID CDECL NEAR mlwrite()
-char *fmt;
+VOID CDECL mlwrite()
+CONST char *fmt;
 #endif
 
 		/* variable argument list
@@ -1882,7 +1982,12 @@ char *fmt;
 			arg2+ = arguments in that string */
 
 {
+#if	UTF8
+	size_t len = strlen(fmt);
+	unsigned int c; 		/* current char in format string */
+#else
 	register int c; 	/* current char in format string */
+#endif
 	va_list ap;		/* ptr to current data field */
 	int arg_int;		/* integer argument */
 	long arg_long;		/* long argument */
@@ -1909,12 +2014,25 @@ char *fmt;
 
 	movecursor(term.t_nrow, 0);
  	lastptr = &lastmesg[0];		/* setup to record message */
-	while ((c = *fmt++) != 0) {
+	while (*fmt) {
+#if	UTF8
+		unsigned int bytes = utf8_to_unicode(fmt, 0, len, &c);
+		fmt += bytes;
+		len -= bytes;
+#else
+		c = *fmt++;
+#endif
 		if (c != '%') {
 			mlout(c);
 			++ttcol;
 		} else {
+#if	UTF8
+			bytes = utf8_to_unicode(fmt, 0, len, &c);
+			fmt += bytes;
+			len -= bytes;
+#else
 			c = *fmt++;
+#endif
 			switch (c) {
 				case 'd':
 					arg_int = va_arg(ap, int);
@@ -1970,12 +2088,18 @@ char *fmt;
 #define	ADJUST(ptr, dtype)	ptr += sizeof(dtype)
 #endif
 
-VOID CDECL NEAR mlwrite(fmt)
+VOID CDECL mlwrite(fmt)
 
 char *fmt;	/* format string for output */
 
 {
+#if	UTF8
+	size_t len = strlen(fmt);
+	unsigned int bytes;
+	unsigned int c;	 	/* current char in format string */
+#else
 	register int c; 	/* current char in format string */
+#endif
 	register char *ap;	/* ptr to current data field */
 
 	/* if we are not currently echoing on the command line, abort this */
@@ -2057,9 +2181,9 @@ char *fmt;	/* format string for output */
 	and for the write-message and clear-message-line commands
 */
 
-VOID PASCAL NEAR mlforce(s)
+VOID mlforce(s)
 
-char *s;	/* string to force out */
+CONST char *s;	/* string to force out */
 
 {
 	register int oldcmd;	/* original command display flag */
@@ -2076,8 +2200,8 @@ char *s;	/* string to force out */
    that does not like these kind of errors is used, so that the user can
    be offered to abort the application */
 
-VOID PASCAL NEAR mlabort(s)
-char *s;
+VOID mlabort(s)
+CONST char *s;
 {
     mlforce(s);
 }
@@ -2086,27 +2210,40 @@ char *s;
 /*
  * Write out a string. Update the physical cursor position. This assumes that
  * the characters in the string all have width "1"; if this is not the case
- * things will get screwed up a little.
+ * things will get screwed up a little. Supports UTF-8 now.
  */
 
-VOID PASCAL NEAR mlputs(s)
+VOID mlputs(s)
 
-char *s;
+CONST char *s;
 
 {
+#if	UTF8
+	unsigned int c;
+	size_t len = strlen(s);
+
+	while (*s) {
+		unsigned int bytes = utf8_to_unicode(s, 0, len, &c);
+		s += bytes;
+		len -= bytes;
+		mlout(c);
+		++ttcol;
+	}
+#else
 	register int c;
 
 	while ((c = *s++) != 0) {
 		mlout(c);
 		++ttcol;
 	}
+#endif
 }
 
 /*
  * Write out an integer, in the specified radix. Update the physical cursor
  * position.
  */
-VOID PASCAL NEAR mlputi(i, r)
+VOID mlputi(i, r)
 
 int i, r;
 
@@ -2132,7 +2269,7 @@ int i, r;
 /*
  * do the same except as a long integer.
  */
-VOID PASCAL NEAR mlputli(l, r)
+VOID mlputli(l, r)
 
 long l;
 int r;
@@ -2159,7 +2296,7 @@ int r;
  *	write out a scaled integer with two decimal places
  */
 
-VOID PASCAL NEAR mlputf(s)
+VOID mlputf(s)
 
 int s;	/* scaled integer to output */
 
@@ -2180,7 +2317,7 @@ int s;	/* scaled integer to output */
 }
 
 #if HANDLE_WINCH
-winch_vtresize(rows, cols)
+VOID winch_vtresize(rows, cols)
      int rows, cols;
 {
   int i;
@@ -2193,26 +2330,34 @@ winch_vtresize(rows, cols)
   free(vscreen);
   free(pscreen);
 
+#if	CURSES
+  term.t_mrow=term.t_nrow=rows-2;
+#else
   term.t_mrow=term.t_nrow=rows-1;
+#endif
   term.t_mcol=term.t_ncol=cols;
 
   vscreen = (VIDEO **)room(term.t_mrow*sizeof(VIDEO *));
-  
+
   if (vscreen == NULL)
     meexit(1);
-  
+
   pscreen = (VIDEO **)room(term.t_mrow*sizeof(VIDEO *));
-  
+
   if (pscreen == NULL)
     meexit(1);
-  
+
   for (i = 0; i < term.t_mrow; ++i)
     {
-      vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol);
-      
+      vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol
+#if	UTF8
+		*sizeof(unsigned int)
+#endif
+				);
+
       if (vp == NULL)
 	meexit(1);
-      
+
       vp->v_flag = 0;
       vp->v_left = FARRIGHT;
       vp->v_right = 0;
@@ -2225,18 +2370,22 @@ winch_vtresize(rows, cols)
       vp->v_rline = i;
 #endif
       vscreen[i] = vp;
-      vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol);
-      
+      vp = (VIDEO *)room(sizeof(VIDEO)+term.t_mcol
+#if	UTF8
+		*sizeof(unsigned int)
+#endif
+		);
+
       if (vp == NULL)
 	meexit(1);
-      
+
       vp->v_flag = VFNEW;
       vp->v_left = FARRIGHT;
       vp->v_right = 0;
 #if	INSDEL
       vp->v_rline = i;	/* set requested line position */
 #endif
-      
+
       pscreen[i] = vp;
     }
 }

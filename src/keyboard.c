@@ -17,10 +17,13 @@
                                 Jon Saxton
                                 24 Jan 1990
 
-===========================================================================*/  
+                                Unicode support by Jean-Michel Dubois
+
+===========================================================================*/
 
 #include	<stdio.h>
 #include	"estruct.h"
+
 #include	"eproto.h"
 #include	"edef.h"
 #include	"elang.h"
@@ -155,7 +158,7 @@ case 0x8C:	return(SPEC | ALTD | '=');	/* alt F12 */
    This implementation distinguishes between the cursor controls on the
    number pad and those on the grey keypad if an AT-style keyboard is
    fitted.
-*/ 
+*/
 
 case 0xE047:	return(SPEC | 'a');		/* grey home */
 case 0xE048:	return(SPEC | 'b');		/* grey cursor up */
@@ -237,9 +240,9 @@ typedef struct keyent {			/* Key mapping entry		*/
 
 /* Needed Prototype */
 #if	PROTO
-extern int PASCAL NEAR rec_seq(char *buf, char *bufstart, KEYENT *node);
+extern int rec_seq(char *buf, char *bufstart, KEYENT *node);
 #else
-extern int PASCAL NEAR rec_seq();
+extern int rec_seq();
 #endif
 
 /* some globals needed here */
@@ -252,9 +255,9 @@ static BUFFER *seqbuf;			/* For the pop-up buffer	*/
  * add-keymap "escape sequence" keyname
  */
 #if PROTO
-int PASCAL NEAR addkeymap(int f, int n)
+int addkeymap(int f, int n)
 #else
-int PASCAL NEAR addkeymap( f, n)
+int addkeymap( f, n)
 int f;
 int n;
 #endif
@@ -289,7 +292,7 @@ int n;
 			}
 			esc_seq[idx++] = c;
 			movecursor(term.t_nrow, col);	/* Position the cursor	*/
-			col += echochar(c);
+			col += ueechochar(c);
 		}
 
 		ostring(" ");
@@ -300,7 +303,7 @@ int n;
 		return FALSE;
 	}
 
-	ec = stock(codeseq);
+	ec = stock((unsigned char*) codeseq);
 
 	ostring(codeseq);
 	return (addkey(esc_seq, ec));	/* Add to tree */
@@ -310,9 +313,9 @@ int n;
  * list-keymappings
  */
 #if PROTO
-int PASCAL NEAR listkeymaps(int f, int n)
+int listkeymaps(int f, int n)
 #else
-int PASCAL NEAR listkeymaps( f, n)
+int listkeymaps( f, n)
 int f;
 int n;
 #endif
@@ -348,9 +351,9 @@ int n;
  * and their function name equivalents.
  */
 #if PROTO
-int PASCAL NEAR rec_seq(char *buf, char *bufstart, KEYENT *node)
+int rec_seq(char *buf, char *bufstart, KEYENT *node)
 #else
-int PASCAL NEAR rec_seq( buf, bufstart, node)
+int rec_seq( buf, bufstart, node)
 char *buf;
 char *bufstart;
 KEYENT *node;
@@ -380,7 +383,7 @@ KEYENT *node;
  *
  *  Adds a new escape sequence to the sequence table.
  *  I am not going to try to explain this table to you in detail.
- *  However, in short, it creates a tree which can easily be transversed
+ *  However, in short, it creates a tree which can easily be traversed
  *  to see if input is in a sequence which can be translated to a
  *  function key (arrows and find/select/do etc. are treated like
  *  function keys).  If the sequence is ambiguous or duplicated,
@@ -393,18 +396,18 @@ KEYENT *node;
  *  fn  - Resulting keycode
  */
 #if PROTO
-int PASCAL NEAR addkey(unsigned char * seq, int fn)
+int addkey(char * seq, int fn)
 #else
-int PASCAL NEAR addkey( seq, fn)
-unsigned char * seq;
+int addkey( seq, fn)
+char * seq;
 int fn;
 #endif
 {
 	int first;
-	KEYENT *cur, *nxtcur;
+	KEYENT *cur = NULL, *nxtcur;
 
 	/* Skip on null sequences or single character sequences. */
-	if (seq == NULL || strlen(seq) < 2)
+	if (seq == NULL || strlen((CONST char*) seq) < 2)
 		return FALSE;
 
 
@@ -440,14 +443,14 @@ int fn;
 	}
 
 	/* Check for room in keymap */
-	if (strlen(seq) > NKEYSEQ - (nxtkey - keymap)) {
+	if (strlen((CONST char*) seq) > NKEYSEQ - (nxtkey - keymap)) {
 		mlwrite("No more room for key entries.");
 		return FALSE;
 	}
 
 	/* If first character in sequence is inserted, add to prefix table */
 	if (first)
-		keyseq[*seq] = 1;
+		keyseq[(unsigned char) *seq] = 1;
 
 	/* If characters are left over, insert them into list */
 	for (first = 1; *seq; first = 0) {
@@ -472,6 +475,8 @@ int fn;
 	return TRUE;
 }
 
+#if	!CURSES
+
 /*
  * Cook input characters, using the key sequences stored by addkey().
  *
@@ -480,7 +485,11 @@ int fn;
 #define TIMEOUT	255
 VOID cook()
 {
+#if	UTF8
+	register unsigned int ch;
+#else
 	register unsigned char ch;
+#endif
 	KEYENT *cur;
 
 	qin(ch = grabwait());	/* Get first character untimed */
@@ -493,8 +502,8 @@ VOID cook()
 		 * But if it is a '\0', make it a (0/1/32).
 		 */
 		if (ch == 0) {
-			qin(CTRL >> 8);	/* control */
-			qin(32);	/* space */
+			qin(CTRL >> SHIFTPFX);	/* control */
+			qin(32);		/* space */
 		}
 		return;
 	}
@@ -530,4 +539,7 @@ VOID cook()
 			cur = cur->samlvl;
 	}
 }
+
+#endif
+
 #endif

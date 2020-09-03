@@ -4,6 +4,8 @@
  * between "." and mark. Some functions are
  * commands. Some functions are just for
  * internal use.
+ *
+ * Unicode support by Jean-Michel Dubois
  */
 #include	<stdio.h>
 #include	"estruct.h"
@@ -15,7 +17,7 @@
 			used by the trim/entab/detab-region commands
 */
 
-int PASCAL NEAR reglines()
+int reglines()
 
 {
 	register LINE *linep;	/* position while scanning */
@@ -51,7 +53,7 @@ int PASCAL NEAR reglines()
  * Move "." to the start, and kill the characters.
  * Bound to "C-W".
  */
-PASCAL NEAR killregion(f, n)
+int killregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -87,7 +89,7 @@ int f,n;	/* prefix flag and argument */
  * at all. This is a bit like a kill region followed
  * by a yank. Bound to "M-W".
  */
-PASCAL NEAR copyregion(f, n)
+int copyregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -106,7 +108,7 @@ int f,n;	/* prefix flag and argument */
 	loffs = region.r_offset;		/* Current offset.	*/
 	while (region.r_size--) {
 		if (loffs == lused(linep)) {  /* End of line.	      */
-			if ((s=kinsert(FORWARD, '\r')) != TRUE)
+			if ((s=kinsert(FORWARD, RET_CHAR)) != TRUE)
 				return(s);
 			linep = lforw(linep);
 			loffs = 0;
@@ -129,7 +131,7 @@ int f,n;	/* prefix flag and argument */
  * redisplay is done in all buffers. Bound to
  * "C-X C-L".
  */
-PASCAL NEAR lowerregion(f, n)
+int lowerregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -137,7 +139,12 @@ int f,n;	/* prefix flag and argument */
 	register LINE *save_dotp;/* pointer and offset to position to preserve */
 	register int save_doto;
 	register int status;	/* return status from fetching region */
+#if	UTF8
+	char utf8[6];
+	unsigned int c;
+#else
 	int c;			/* current character */
+#endif
 	REGION region;		/* region which is being used */
 
 	/* don't bother if we are in read only mode */
@@ -170,7 +177,21 @@ int f,n;	/* prefix flag and argument */
 
 			/* lowercase this character */
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
+#if	UTF8
+			if (is_multibyte_utf8(c)) {
+				if (utf8_to_unicode(curwp->w_dotp->l_text, curwp->w_doto, lused(curwp->w_dotp), &c) > 1 && iswupper(c)) {
+					c = ToWLower(c);
+					unicode_to_utf8(c, utf8);
+
+					if (lowrite(c) == FALSE)
+						return (FALSE);
+
+					continue;
+				}
+			} else
+#endif
 			if (is_upper(c)) {
+
 				obj.obj_char = c;
 				c = lowerc(c);
 				lputc(curwp->w_dotp, curwp->w_doto, c);
@@ -194,7 +215,7 @@ int f,n;	/* prefix flag and argument */
  * redisplay is done in all buffers. Bound to
  * "C-X C-L".
  */
-PASCAL NEAR upperregion(f, n)
+int upperregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -202,9 +223,13 @@ int f,n;	/* prefix flag and argument */
 	register LINE *save_dotp;/* pointer and offset to position to preserve */
 	register int save_doto;
 	register int status;	/* return status from fetching region */
+#if	UTF8
+	char utf8[6];
+	unsigned int c;		/* current character */
+#else	
 	int c;			/* current character */
+#endif
 	REGION region;		/* region which is being used */
-
 	/* don't bother if we are in read only mode */
 	if (curbp->b_mode&MDVIEW)
 		return(rdonly());
@@ -235,6 +260,19 @@ int f,n;	/* prefix flag and argument */
 
 			/* uppercase this character */
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
+#if	UTF8
+			if (is_multibyte_utf8(c)) {
+				if (utf8_to_unicode(curwp->w_dotp->l_text, curwp->w_doto, lused(curwp->w_dotp), &c) > 1 && iswlower(c)) {
+					c = ToWUpper(c);
+					unicode_to_utf8(c, utf8);
+					
+					if (lowrite(c) == FALSE)
+						return (FALSE);
+
+					continue;
+				}
+			} else
+#endif
 			if (is_lower(c)) {
 				obj.obj_char = c;
 				c = upperc(c);
@@ -255,14 +293,14 @@ int f,n;	/* prefix flag and argument */
 	the current buffer invisable and unchangable
 */
 
-PASCAL NEAR narrow(f, n)
+int narrow(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
 	register int status;	/* return status */
 	BUFFER *bp;		/* buffer being narrowed */
-	SCREEN *scrp;		/* screen to fix pointers in */
+	ESCREEN *scrp;		/* screen to fix pointers in */
 	EWINDOW *wp;		/* windows to fix up pointers in as well */
 	REGION creg;		/* region boundry structure */
 	int cmark;		/* current mark */
@@ -345,14 +383,14 @@ int f,n;	/* prefix flag and argument */
 
 /*	widen-from-region (^X->) restores a narrowed region	*/
 
-PASCAL NEAR widen(f, n)
+int widen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
 	LINE *lp;	/* temp line pointer */
 	BUFFER *bp;	/* buffer being narrowed */
-	SCREEN *scrp;	/* screen to fix pointers in */
+	ESCREEN *scrp;	/* screen to fix pointers in */
 	EWINDOW *wp;	/* windows to fix up pointers in as well */
 	int cmark;	/* current mark */
 
@@ -438,7 +476,7 @@ int f,n;	/* prefix flag and argument */
  * "ABORT" status; we might make this have the confirm thing later.
  */
 
-PASCAL NEAR getregion(rp)
+int getregion(rp)
 
 register REGION *rp;
 
@@ -500,7 +538,7 @@ register REGION *rp;
  * It is assumed that the buffer size is at least one plus the
  * region size.
  */
-char *PASCAL NEAR regtostr(buf, region)
+char *regtostr(buf, region)
 
 char *buf;
 REGION *region;
@@ -517,7 +555,7 @@ REGION *region;
 	rsize = region->r_size;
 	while (rsize--) {
 		if (loffs == lused(linep)) {	/* End of line. 	*/
-			*ptr = '\r';
+			*ptr = RET_CHAR;
 			linep = lforw(linep);
 			loffs = 0;
 		} else {			/* Middle of line.	*/
@@ -530,7 +568,7 @@ REGION *region;
 	return buf;
 }
 
-char *PASCAL NEAR getreg(value) /* return some of the contents of the current region */
+char *getreg(value) /* return some of the contents of the current region */
 
 char *value;
 
@@ -539,7 +577,7 @@ char *value;
 
 	/* get the region limits */
 	if (getregion(&region) != TRUE)
-		return(errorm);
+		return((char*)errorm);
 
 	/* don't let the region be larger than a string can hold */
 	if (region.r_size >= NSTRING)
@@ -548,7 +586,7 @@ char *value;
 }
 
 
-PASCAL NEAR indent_region(f, n) /* indent a region n tab-stops */
+int indent_region(f, n) /* indent a region n tab-stops */
 
 int f,n;	/* default flag and numeric repeat count */
 
@@ -587,7 +625,7 @@ int f,n;	/* default flag and numeric repeat count */
 	return(TRUE);
 }
 
-PASCAL NEAR undent_region(f, n) /* undent a region n tab-stops */
+int undent_region(f, n) /* undent a region n tab-stops */
 
 int f,n;	/* default flag and numeric repeat count */
 

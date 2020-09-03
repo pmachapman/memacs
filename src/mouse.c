@@ -2,6 +2,7 @@
 			for MicroEMACS 4.00
 			originally written by Dave G. Conroy
 			modified by Jeff Lomicka and Daniel Lawrence
+			Unicode support by Jean-Michel Dubois
 */
 
 #include	<stdio.h>
@@ -29,7 +30,7 @@ NOSHARE int	lastmcmd = MNONE;	/* Last mouse command.		*/
  * of the text). If the mouse points at text then dot is
  * moved to that location.
  */
-PASCAL NEAR movemd(f, n)
+int movemd(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -37,46 +38,62 @@ int f,n;	/* prefix flag and argument */
 	register EWINDOW *wp;
 	register EWINDOW *lastwp;
 	register LINE	*lp;
+#if	CURSES
+	WINDOW* wmouse = NULL;
 
-	/* make sure we are on the proper screen */
-	mouse_screen();
+	if (wdrop != NULL && wenclose(wdrop, ypos, xpos))
+		wmouse_trafo(wmouse = wdrop, &ypos, &xpos, 0);
+	else if (wenclose(wmain, ypos, xpos))
+		wmouse_trafo(wmouse = wmain, &ypos, &xpos, 0);
+	else if (wenclose(wmenubar, ypos, xpos))
+		wmouse_trafo(wmouse = wmenubar, &ypos, &xpos, 0);
 
-	/* adjust position by screen offset */
-	ypos -= term.t_roworg;
-	xpos -= term.t_colorg;
+	if (wmouse == wmain) {
+		handlemenu(wmouse, ypos, xpos);
+#endif
+		/* make sure we are on the proper screen */
+		mouse_screen();
 
-	/* if anything has changed, reset the click count */
-	if (lastmcmd != MMOVE || lastypos!=ypos || lastxpos!=xpos)
-		nclicks = 0;
-	++nclicks;
-	lastwp = mousewindow(lastypos);		/* remember last window */
+		/* adjust position by screen offset */
+		ypos -= term.t_roworg;
+		xpos -= term.t_colorg;
 
-	/* reset the last position */
-	lastypos = ypos;
-	lastxpos = xpos;
-	lastmcmd = MMOVE;
+		/* if anything has changed, reset the click count */
+		if (lastmcmd != MMOVE || lastypos!=ypos || lastxpos!=xpos)
+			nclicks = 0;
+		++nclicks;
+		lastwp = mousewindow(lastypos);		/* remember last window */
 
-	/* if we move the mouse off the windows, don't do anything with it */
-	if ((wp=mousewindow(ypos)) == NULL)
-		return(FALSE);
+		/* reset the last position */
+		lastypos = ypos;
+		lastxpos = xpos;
+		lastmcmd = MMOVE;
 
-	/* if we are on the line with the point, adjust for extended lines */
-	if (wp == curwp && (lp = mouseline(wp, ypos)) == curwp->w_dotp)
-		xpos += lbound;
+		/* if we move the mouse off the windows, don't do anything with it */
+		if ((wp=mousewindow(ypos)) == NULL)
+			return(FALSE);
 
-	/* make the window the mouse points to current */
-	curwp = wp;
-	curbp = wp->w_bufp;
+		/* if we are on the line with the point, adjust for extended lines */
+		if (wp == curwp && (lp = mouseline(wp, ypos)) == curwp->w_dotp)
+			xpos += lbound;
 
-	/* if we changed windows, update the modelines */
-	if (wp != lastwp)
-		upmode();
+		/* make the window the mouse points to current */
+		curwp = wp;
+		curbp = wp->w_bufp;
 
-	/* if we aren't off the end of the text, move the point to the mouse */
-	if ((lp=mouseline(wp, ypos)) != NULL) {
-		curwp->w_dotp = lp;
-		curwp->w_doto = mouseoffset(wp, lp, xpos);
-	}
+		/* if we changed windows, update the modelines */
+		if (wp != lastwp)
+			upmode();
+
+		/* if we aren't off the end of the text, move the point to the mouse */
+		if ((lp=mouseline(wp, ypos)) != NULL) {
+			curwp->w_dotp = lp;
+			curwp->w_doto = mouseoffset(wp, lp, xpos);
+		}
+#if	CURSES
+	} else if (wmouse)
+		return handlemenu(wmouse, ypos, xpos);
+#endif
 
 	return(TRUE);
 }
@@ -86,7 +103,7 @@ int f,n;	/* prefix flag and argument */
 			only if we are holding down the proper button
 */
 
-PASCAL NEAR mmove(f, n)
+int mmove(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -94,8 +111,8 @@ int f,n;	/* prefix flag and argument */
 	register EWINDOW *wp;
 	register EWINDOW *lastwp;
 	register LINE *lp;
-	register int lastmodeline;	/* was the dowbclick on a modeline? */
-	register int lastcmdline;	/* was the downclick on the command line? */
+	register int lastmodeline;	/* was the down click on a modeline? */
+	register int lastcmdline;	/* was the down click on the command line? */
 
 	/* ignore this if not hilighting */
 	if (hilite >= NMARKS)
@@ -132,7 +149,7 @@ int f,n;	/* prefix flag and argument */
 		wp->w_marko[hilite+1] = mouseoffset(wp, lp, xpos);
 	}
 
-	return(TRUE);		
+	return(TRUE);
 }
 
 /*	mouse-region-down:	mouse region operations
@@ -146,7 +163,7 @@ int f,n;	/* prefix flag and argument */
 			kill-region
 */
 
-PASCAL NEAR mregdown(f, n)
+int mregdown(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -154,7 +171,7 @@ int f,n;	/* prefix flag and argument */
 	register EWINDOW *wp;
 	register EWINDOW *lastwp;
 	register LINE	*lp;
-	SCREEN *sp;
+	ESCREEN *sp;
 	char scr_name[12];		/* constructed temp screen name */
 	static int temp_count = 0;	/* next temp screen number! */
 
@@ -184,11 +201,11 @@ int f,n;	/* prefix flag and argument */
 		/* get the name of the screen to create */
 		strcpy(scr_name, "SCREEN");
 		strcat(scr_name, int_asc(temp_count++));
-		while (lookup_screen(scr_name) != (SCREEN *)NULL) {
+		while (lookup_screen(scr_name) != (ESCREEN *)NULL) {
 			strcpy(scr_name, "SCREEN");
 			strcat(scr_name, int_asc(temp_count++));
 		}
-	
+
 		/* save the current dot position in the buffer info
 		   so the new screen will start there! */
 		curbp->b_dotp = curwp->w_dotp;
@@ -196,7 +213,7 @@ int f,n;	/* prefix flag and argument */
 
 		/* screen does not exist, create it */
 		sp = init_screen(scr_name, curbp);
-	
+
 		/* and make this screen current */
 		return(select_screen(sp, TRUE));
 	}
@@ -241,7 +258,7 @@ int f,n;	/* prefix flag and argument */
 
 /*	mouse-region-up:	mouse region operations
 
-	If the corrosponding downclick was on a modeline, then we
+	If the corresponding downclick was on a modeline, then we
 	wish to delete the indicated window. Otherwise we are using
 	this button to copy/paste.
 
@@ -254,7 +271,7 @@ int f,n;	/* prefix flag and argument */
 		  3:	reset nclicks to 0
 */
 
-PASCAL NEAR mregup(f, n)
+int mregup(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -262,7 +279,7 @@ int f,n;	/* prefix flag and argument */
 	register EWINDOW *wp;
 	register EWINDOW *lastwp;
 	register LINE *lp;
-	register SCREEN *sp;		/* ptr to screen to delete */
+	register ESCREEN *sp;		/* ptr to screen to delete */
 	register int lastmodeline;	/* was the dowbclick on a modeline? */
 	register int lastcmdline;	/* was the downclick on the command line? */
 
@@ -312,7 +329,7 @@ int f,n;	/* prefix flag and argument */
 		else {
 
 			/* delete the screen last screen means exiting */
-			if (first_screen->s_next_screen == (SCREEN *)NULL)
+			if (first_screen->s_next_screen == (ESCREEN *)NULL)
 				return(quit(FALSE, 0));
 
 			/* bring the second last screen to front*/
@@ -372,7 +389,7 @@ int f,n;	/* prefix flag and argument */
  * window scrolls. The code in this function is just
  * too complex!
  */
-PASCAL NEAR movemu(f, n)
+int movemu(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -501,13 +518,13 @@ int f,n;	/* prefix flag and argument */
 }
 
 /*
- * Return a pointer to the WINDOW structure
+ * Return a pointer to the EWINDOW structure
  * for the window in which "row" is located, or NULL
  * if "row" isn't in any window. The mode line is
  * considered to be part of the window.
  */
 
-EWINDOW *PASCAL NEAR mousewindow(row)
+EWINDOW *mousewindow(row)
 
 register int	row;
 
@@ -535,14 +552,14 @@ register int	row;
 
 /*
  * The row "row" is a row within the window
- * whose WINDOW structure is pointed to by the "wp"
+ * whose EWINDOW structure is pointed to by the "wp"
  * argument. Find the associated line, and return a pointer
  * to it. Return NULL if the mouse is on the mode line,
  * or if the mouse is pointed off the end of the
  * text in the buffer.
  */
 
-LINE *PASCAL NEAR mouseline(wp, row)
+LINE *mouseline(wp, row)
 
 register EWINDOW *wp;
 register int	row;
@@ -568,7 +585,7 @@ register int	row;
  * LINE structure is pointed to by "lp".
  */
 
-PASCAL NEAR mouseoffset(wp, lp, col)
+int mouseoffset(wp, lp, col)
 
 register EWINDOW *wp;
 register LINE	*lp;
@@ -585,16 +602,22 @@ register int	col;
 	col += wp->w_fcol;	/* adjust for extended lines */
 	while (offset != lused(lp)) {
 		newcol = curcol;
-		if ((c=lgetc(lp, offset)) == '\t' && tabsize > 0)
+		c = lgetc(lp, offset);
+#if	UTF8
+		if (is_multibyte_utf8(c)) {
+			unsigned int wc;
+
+			offset += utf8_to_unicode(ltext(lp), offset, lused(lp) - offset, &wc) - 1;
+		} else
+#endif
+		if (c == '\t' && tabsize > 0)
 			newcol += -(newcol % tabsize) + (tabsize - 1);
-		else {
-			if (disphigh && c > 0x7f) {
-				newcol += 2;
-				c -= 0x80;
-			}
-			if (c < 0x20 || c == 0x7f)	/* ISCTRL */
-				++newcol;
-		}
+		else if (disphigh && c > 0x7f) {
+			newcol += 2;
+			c -= 0x80;
+		} else if (c < 0x20 || c == 0x7f)	/* ISCTRL */
+			++newcol;
+
 		++newcol;
 		if (newcol > col)
 			break;
@@ -604,10 +627,10 @@ register int	col;
 	return(offset);
 }
 
-PASCAL NEAR mouse_screen()
+VOID mouse_screen()
 
 {
-	register SCREEN *screen_ptr;	/* screen to test mouse in */
+	register ESCREEN *screen_ptr;	/* screen to test mouse in */
 
 	/* if we move the mouse off the windows, check for other windows */
 	if ((ypos < term.t_roworg) || (xpos < term.t_colorg) ||
@@ -616,7 +639,7 @@ PASCAL NEAR mouse_screen()
 
 		/* scan through the other windows */
 		screen_ptr = first_screen->s_next_screen;
-		while (screen_ptr != (SCREEN *)NULL) {
+		while (screen_ptr != (ESCREEN *)NULL) {
 
 			/* is the mouse in this window? */
 			if ((ypos >= screen_ptr->s_roworg) &&
@@ -637,7 +660,7 @@ PASCAL NEAR mouse_screen()
 	}
 }
 
-PASCAL NEAR ismodeline(wp, row)
+int ismodeline(wp, row)
 
 EWINDOW *wp;
 int row;
@@ -659,7 +682,7 @@ int row;
    let emacs know about the newsize, and have him force a re-draw
 */
 
-PASCAL NEAR resizm(f, n)
+int resizm(f, n)
 
 int f, n;	/* these are ignored... we get the new size info from
 		   the mouse driver */
@@ -694,7 +717,7 @@ int f, n;	/* these are ignored... we get the new size info from
 	return(TRUE);
 }
 
-PASCAL NEAR resizm2(f, n)
+int resizm2(f, n)
 
 int f, n;	/* these are ignored... we get the new size info from
 		   the mouse driver */
@@ -713,7 +736,7 @@ int f, n;	/* these are ignored... we get the new size info from
 }
 
 #else
-mousehello()
+VOID mousehello()
 {
 }
 #endif

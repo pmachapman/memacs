@@ -1,6 +1,8 @@
 /*
  * This file contains the command processing functions for a number of random
  * commands. There is no functional grouping here, for sure.
+ *
+ * Unicode support by Jean-Michel Dubois
  */
 
 #include <stdio.h>
@@ -8,6 +10,10 @@
 #include "eproto.h"
 #include "edef.h"
 #include "elang.h"
+#if	THEOSC
+# include	<sc.h>
+# include	<time.h>
+#endif
 
 /*
  * Display the current position of the cursor, in origin 1 X-Y coordinates,
@@ -17,7 +23,7 @@
  * Normally this is bound to "C-X =".
  */
 
-PASCAL NEAR showcpos(f, n)
+int showcpos(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -25,9 +31,13 @@ int f, n;				/* prefix flag and argument */
 	register LINE *lp;		/* current line */
 	register long numchars;		/* # of chars in file */
 	register long numlines;		/* # of lines in file */
-	register long predchars;	/* # chars preceding point */
-	register long predlines;	/* # lines preceding point */
+	register long predchars = 0;	/* # chars preceding point */
+	register long predlines = 0;	/* # lines preceding point */
+#if	UTF8
+	unsigned int curchar;			/* character under cursor */
+#else
 	register int curchar;		/* character under cursor */
+#endif
 	int ratio;
 	int col;
 	int savepos;		/* temp save for current offset */
@@ -35,7 +45,7 @@ int f, n;				/* prefix flag and argument */
 
 	/* starting at the beginning of the buffer */
 	lp = lforw(curbp->b_linep);
-	curchar = '\r';
+	curchar = RET_CHAR;
 
 	/* start counting chars and lines */
 	numchars = 0;
@@ -47,9 +57,13 @@ int f, n;				/* prefix flag and argument */
 			predlines = numlines;
 			predchars = numchars + curwp->w_doto;
 			if ((curwp->w_doto) == lused(lp))
-				curchar = '\r';
+				curchar = RET_CHAR;
 			else
-				curchar = lgetc(lp, curwp->w_doto);
+#if	UTF8
+				utf8_to_unicode(lp->l_text, curwp->w_doto, lused(lp), &curchar);
+#else
+			curchar = lgetc(lp, curwp->w_doto);
+#endif
 		}
 
 		/* on to the next line */
@@ -78,91 +92,90 @@ int f, n;				/* prefix flag and argument */
 	/* summarize and report the info */
 #if	DBCS
 	if (is2byte(ltext(curwp->w_dotp),
-	    ltext(curwp->w_dotp) + curwp->w_doto)) {
+			ltext(curwp->w_dotp) + curwp->w_doto)) {
 		mlwrite(TEXT220,
-/*		"Line %D/%D Col %d/%d Char %D/%D (%d%%) char = 0x%x%x" */
-			predlines+1, numlines+1, col, ecol,
-			predchars, numchars, ratio, (unsigned char)curchar,
-			(unsigned char)(lgetc(curwp->w_dotp, curwp->w_doto+1)));
+				/*		"Line %D/%D Col %d/%d Char %D/%D (%d%%) char = 0x%x%x" */
+				predlines+1, numlines+1, col, ecol,
+				predchars, numchars, ratio, (unsigned char)curchar,
+				(unsigned char)(lgetc(curwp->w_dotp, curwp->w_doto+1)));
 		return(TRUE);
 	}
 #endif
+#if	UTF8
+#if	THEOX
 	mlwrite(TEXT60,
-/*		"Line %D/%D Col %d/%d Char %D/%D (%d%%) char = 0x%x" */
+/*		"Line %D/%D Col %d/%d Char %D/%D (%d%%) Unicode char = 0x%x %d, TheoX char = 0x%x %d" */
 		predlines + 1, numlines + 1, col, ecol,
-		predchars, numchars, ratio, curchar);
+		predchars, numchars, ratio,
+		(curbp->b_mode & MDTHEOX) ? _b_theox2wchar(curchar) : curchar,
+		(curbp->b_mode & MDTHEOX) ? _b_theox2wchar(curchar) : curchar,
+		(curbp->b_mode & MDTHEOX) ? curchar : _b_wchar2theox(curchar),
+		(curbp->b_mode & MDTHEOX) ? curchar : _b_wchar2theox(curchar));
+#else
+	mlwrite(TEXT60,
+/*		"Line %D/%D Col %d/%d Char %D/%D (%d%%) Unicode char = 0x%x %d, TheoX char = 0x%x %d" */
+		predlines + 1, numlines + 1, col, ecol,
+		predchars, numchars, ratio, (unsigned int) curchar, (unsigned int) curchar,
+		_b_wchar2theox(curchar), _b_wchar2theox(curchar));
+#endif
+#else
+	mlwrite(TEXT60,
+			/*		"Line %D/%D Col %d/%d Char %D/%D (%d%%) char = 0x%x %d" */
+			predlines + 1, numlines + 1, col, ecol,
+			predchars, numchars, ratio, curchar, curchar);
+#endif
 	return(TRUE);
 }
 
-long PASCAL NEAR getlinenum(bp, sline)	/* get the a line number */
+long getlinenum(bp, sline)	/* get the a line number */
 
-BUFFER *bp;				/* buffer to get current line from */
+BUFFER *bp;			/* buffer to get current line from */
 LINE *sline;			/* line to search for */
-	{
-	register LINE	*lp;	/* current line */
-	register long	numlines;	/* # of lines before point */
+{
+	register LINE *lp; 	/* current line */
+	register long numlines; /* # of lines before point */
 
 	/* starting at the beginning of the buffer */
 	lp = lforw(bp->b_linep);
 
 	/* start counting lines */
 	numlines = 0L;
-	while (lp != bp->b_linep)
-		{
+	while (lp != bp->b_linep) {
 		/* if we are on the current line, record it */
 		if (lp == sline)
 			break;
 		++numlines;
 		lp = lforw(lp);
-		}
+	}
 
 	/* and return the resulting count */
-	return(numlines + 1L);
-	}
+	return (numlines + 1L);
+}
 
 /*
  * Return current column.  Stop at first non-blank given TRUE argument.
  */
 
-PASCAL NEAR getccol(bflg)
+int getccol(bflg)
 int bflg;
 
 {
 	register int i, col;
+#if	UTF8
+	unsigned int c;
+	int len = lused(curwp->w_dotp);
+#else
 	register unsigned char c;
-
+#endif
 	col = 0;
-	for (i = 0;  i < curwp->w_doto;  ++i) {
-		c = lgetc(curwp->w_dotp, i) & 0xFF;
+	for (i = 0;  i < curwp->w_doto; ) {
+#if	UTF8
+		i += utf8_to_unicode(curwp->w_dotp->l_text, i, len, &c);
+#else
+		c = lgetc(curwp->w_dotp, i++) & 0xFF;
+#endif
 		if (c != ' ' && c != '\t' && bflg)
 			break;
-		if (c == '\t' && tabsize > 0)
-			col += -(col % tabsize) + (tabsize - 1);
-                else {
-                        if (disphigh && c > 0x7f) {
-                                col += 2;
-                                c -= 0x80;
-                        }
-                        if (c < 0x20 || c == 0x7f)
-                                ++col;
-                }
-		++col;
-	}
-	return(col);
-}
-
-/*	findcol: Return display column in line at char position	*/
-
-int PASCAL NEAR findcol(lp, pos)
-
-LINE * lp;				/* line to scan */
-int pos;				/* character offset */
-{
-	register int c, i, col;
-
-	col = 0;
-	for (i = 0;  i < pos;  ++i) {
-		c = lgetc(lp, i);
 		if (c == '\t' && tabsize > 0)
 			col += -(col % tabsize) + (tabsize - 1);
 		else {
@@ -170,9 +183,50 @@ int pos;				/* character offset */
 				col += 2;
 				c -= 0x80;
 			}
-			if (c < 0x20 || c == 0x7F)
+			if (c < 0x20 || c == 0x7f)
 				++col;
 		}
+		++col;
+	}
+	return(col);
+}
+
+/*	findcol: Return display column in line at char position	*/
+
+int findcol(lp, pos)
+
+LINE * lp;				/* line to scan */
+int pos;				/* character offset */
+{
+#if	UTF8
+	register int i, col;
+	unsigned int c;
+#else
+	register int c, i, col;
+#endif
+	col = 0;
+	for (i = 0;  i < pos;  ) {
+		c = lgetc(lp, i);
+#if	UTF8
+		if (is_multibyte_utf8(c))
+			i += utf8_to_unicode(lp->l_text, i, lused(lp), &c) - 1;
+		else {
+#endif
+			++i;
+
+			if (c == '\t' && tabsize > 0)
+				col += -(col % tabsize) + (tabsize - 1);
+			else {
+				if (disphigh && c > 0x7f) {
+					col += 2;
+					c -= 0x80;
+				}
+				if (c < 0x20 || c == 0x7F)
+					++col;
+			}
+#if	UTF8
+		}
+#endif
 		++col;
 	}
 	return(col);
@@ -182,11 +236,15 @@ int pos;				/* character offset */
  * Set current column.
  */
 
-PASCAL NEAR setccol(pos)
+int setccol(pos)
 
 int pos;				/* position to set cursor */
 {
+#if	UTF8
+	unsigned int c;	/* character being scanned */
+#else
 	register int c;		/* character being scanned */
+#endif
 	register int i;		/* index into current line */
 	register int col;	/* current cursor column   */
 	register int llen;	/* length of line in bytes */
@@ -195,23 +253,33 @@ int pos;				/* position to set cursor */
 	llen = lused(curwp->w_dotp);
 
 	/* scan the line until we are at or past the target column */
-	for (i = 0;  i < llen;  ++i) {
+	for (i = 0;  i < llen;  ) {
 		/* upon reaching the target, drop out */
 		if (col >= pos)
 			break;
 
 		/* advance one character */
 		c = lgetc(curwp->w_dotp, i);
-		if (c == '\t' && tabsize > 0)
-			col += -(col % tabsize) + (tabsize - 1);
+#if	UTF8
+		if (is_multibyte_utf8(c))
+			i += utf8_to_unicode(ltext(curwp->w_dotp), i, llen, &c);
 		else {
-			if (disphigh && c > 0x7f) {
-				col += 2;
-				c -= 0x80;
+#endif
+			++i;
+
+			if (c == '\t' && tabsize > 0)
+				col += -(col % tabsize) + (tabsize - 1);
+			else {
+				if (disphigh && c > 0x7f) {
+					col += 2;
+					c -= 0x80;
+				}
+				if (c < 0x20 || c == 0x7F)
+					++col;
 			}
-			if (c < 0x20 || c == 0x7F)
-				++col;
+#if	UTF8
 		}
+#endif
 		++col;
 	}
 
@@ -232,7 +300,7 @@ int pos;				/* position to set cursor */
  * to keep this working as it always has.
  */
 
-PASCAL NEAR twiddle(f, n)
+int twiddle(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -287,7 +355,7 @@ int f, n;				/* prefix flag and argument */
  * function key is pressed, its symbolic MicroEMACS name gets inserted!
  */
 
-PASCAL NEAR quote(f, n)
+int quote(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
@@ -309,16 +377,14 @@ int f, n;				/* prefix flag and argument */
 		return(TRUE);
 
 	/* if this is a mouse event or function key, put its name in */
-	if ((ec & MOUS) || (ec & SPEC))
-		{
+	if ((ec & MOUS) || (ec & SPEC)) {
 		cmdstr(ec, key_name);
-		while (n--)
-		{
+		while (n--) {
 			status = linstr(key_name);
 			if (status != TRUE)
-				return(status);
+				return (status);
 		}
-		return(TRUE);
+		return (TRUE);
 	}
 
 	/* otherwise, just insert the raw character */
@@ -334,26 +400,25 @@ int f, n;				/* prefix flag and argument */
  * into "C-I" (in 10 bit code) already. Bound to "C-I".
  */
 
-PASCAL NEAR tab(f, n)
+int uetab(f, n)
 
 int f, n;				/* prefix flag and argument */
-	{
+{
 	if (n < 0)
-		return(FALSE);
-	if (n == 0 || n > 1)
-		{
+		return (FALSE);
+	if (n == 0 || n > 1) {
 		stabsize = n;
-		return(TRUE);
-		}
-	if (!stabsize)
-		return(linsert(1, '\t'));
-	return(linsert(stabsize - (getccol(FALSE) % stabsize), ' '));
+		return (TRUE);
 	}
+	if (!stabsize)
+		return (linsert(1, '\t'));
+	return (linsert(stabsize - (getccol(FALSE) % stabsize), ' '));
+}
 
-PASCAL NEAR detab(f, n) 	/* change tabs to spaces */
+int detab(f, n) 	/* change tabs to spaces */
 
 int f, n;				/* default flag and numeric repeat count */
-	{
+{
 	register int inc;	/* increment to next line [sgn(n)] */
 
 	if (curbp->b_mode & MDVIEW)	/* don't allow this command if	*/
@@ -368,37 +433,41 @@ int f, n;				/* default flag and numeric repeat count */
 	/* loop thru detabbing n lines */
 	inc = ((n > 0) ? 1 : -1);
 	while (n)
-		{
+	{
 		curwp->w_doto = 0;	/* start at the beginning */
 
 		/* detab the entire current line */
 		while (curwp->w_doto < lused(curwp->w_dotp))
-			{
+		{
 			/* if we have a tab */
 			if (lgetc(curwp->w_dotp, curwp->w_doto) == '\t')
-				{
+			{
+#if	UTF8
+				ldelchar(1L, FALSE);
+#else
 				ldelete(1L, FALSE);
-/*				insspace(TRUE, 8 - (curwp->w_doto & 7));*/
+#endif
+				/*				insspace(TRUE, 8 - (curwp->w_doto & 7));*/
 				insspace(TRUE, tabsize - (curwp->w_doto % tabsize));
-				}
-			forwchar(FALSE, 1);
 			}
+			forwchar(FALSE, 1);
+		}
 
 		/* advance/or back to the next line */
 		forwline(TRUE, inc);
 		n -= inc;
-		}
-	curwp->w_doto = 0;	/* to the begining of the line */
+	}
+	curwp->w_doto = 0;	/* to the beginning of the line */
 	thisflag &= ~CFCPCN;	/* flag that this resets the goal column */
 	lchange(WFEDIT);	/* yes, we have made at least an edit */
 	return(TRUE);
-	}
+}
 
 
-PASCAL NEAR entab(f, n) 	/* change spaces to tabs where posible */
+int entab(f, n) 	/* change spaces to tabs where posible */
 
 int f, n;				/* default flag and numeric repeat count */
-	{
+{
 	register int inc;	/* increment to next line [sgn(n)] */
 	register int fspace;	/* pointer to first space if in a run */
 	register int ccol;	/* current cursor column */
@@ -416,16 +485,16 @@ int f, n;				/* default flag and numeric repeat count */
 	/* loop thru entabbing n lines */
 	inc = ((n > 0) ? 1 : -1);
 	while (n)
-		{
+	{
 		/* entab the entire current line */
 
 		ccol = curwp->w_doto = 0;	/* start at the beginning */
 		fspace = -1;
 
 		while (curwp->w_doto < lused(curwp->w_dotp))
-			{
+		{
 			/* see if it is time to compress */
-			if ((fspace >= 0) && (nextab(fspace) <= ccol))
+			if ((fspace >= 0) && (nextab(fspace) <= ccol)) {
 				if (ccol - fspace < 2)
 					fspace = -1;
 				else {
@@ -433,49 +502,49 @@ int f, n;				/* default flag and numeric repeat count */
 					ldelete((long) (ccol - fspace), FALSE);
 					linsert(1, '\t');
 					fspace = -1;
-					}
-
+				}
+			}
 			/* get the current character */
 			cchar = lgetc(curwp->w_dotp, curwp->w_doto);
 
 			switch (cchar)
-				{
-			case '\t':	/* a tab...count em up (no break here)  */
-				ldelete(1L, FALSE);
-				insspace(TRUE, tabsize - (ccol % tabsize));
+			{
+				case '\t':	/* a tab...count em up (no break here)  */
+					ldelete(1L, FALSE);
+					insspace(TRUE, tabsize - (ccol % tabsize));
+					// no break
+				case ' ':	/* a space...compress? */
+					if (fspace == -1)
+						fspace = ccol;
+					break;
 
-			case ' ':	/* a space...compress? */
-				if (fspace == -1)
-					fspace = ccol;
-				break;
-
-			default:	/* any other char...just count */
-				fspace = -1;
-				break;
-				}
+				default:	/* any other char...just count */
+					fspace = -1;
+					break;
+			}
 			ccol++;
 			forwchar(FALSE, 1);
-			}
+		}
 
 		/* advance/or back to the next line */
 		forwline(TRUE, inc);
 		n -= inc;
 		curwp->w_doto = 0;	/* start at the beginning */
-		}
-	curwp->w_doto = 0;	/* to the begining of the line */
+	}
+	curwp->w_doto = 0;	/* to the beginning of the line */
 	thisflag &= ~CFCPCN;	/* flag that this resets the goal column */
 	lchange(WFEDIT);	/* yes, we have made at least an edit */
 	return(TRUE);
-	}
+}
 
 /* trim:	trim trailing whitespace from the point to eol
 		with no arguments, it trims the current region
-*/
+ */
 
-PASCAL NEAR trim(f, n)
+int trim(f, n)
 
 int f, n;				/* default flag and numeric repeat count */
-	{
+{
 	register LINE *lp;	/* current line pointer */
 	register int offset;	/* original line offset position */
 	register int length;	/* current length */
@@ -490,29 +559,29 @@ int f, n;				/* default flag and numeric repeat count */
 	/* loop thru trimming n lines */
 	inc = ((n > 0) ? 1 : -1);
 	while (n)
-		{
+	{
 		lp = curwp->w_dotp;	/* find current line text */
 		offset = curwp->w_doto;	/* save original offset */
 		length = lused(lp);	/* find current length */
 
 		/* trim the current line */
 		while (length > offset)
-			{
+		{
 			if (lgetc(lp, length-1) != ' ' &&
-				lgetc(lp, length-1) != '\t')
+					lgetc(lp, length-1) != '\t')
 				break;
 			length--;
-			}
+		}
 		lp->l_used = length;
 
 		/* advance/or back to the next line */
 		forwline(TRUE, inc);
 		n -= inc;
-		}
+	}
 	lchange(WFEDIT);
 	thisflag &= ~CFCPCN;	/* flag that this resets the goal column */
 	return(TRUE);
-	}
+}
 
 /*
  * Open up some blank space. The basic plan is to insert a bunch of newlines,
@@ -520,10 +589,10 @@ int f, n;				/* default flag and numeric repeat count */
  * procerssors. They even handle the looping. Normally this is bound to "C-O".
  */
 
-PASCAL NEAR openline(f, n)
+int openline(f, n)
 
 int f, n;				/* prefix flag and argument */
-	{
+{
 	register int	i;
 	register int	s;
 
@@ -536,22 +605,22 @@ int f, n;				/* prefix flag and argument */
 	i = n;				/* Insert newlines.	*/
 	do	{
 		s = lnewline();
-		}
+	}
 	while (s == TRUE && --i);
 	if (s == TRUE)		/* Then back up overtop */
 		s = backchar(f, n);	/* of them all. 	*/
 	return(s);
-	}
+}
 
 /*
  * Insert a newline. Bound to "C-M". If we are in CMODE, do automatic
  * indentation as specified.
  */
 
-PASCAL NEAR newline(f, n)
+int new_line(f, n)
 
 int f, n;				/* prefix flag and argument */
-	{
+{
 	register int	s;
 
 	if (curbp->b_mode & MDVIEW)	/* don't allow this command if	*/
@@ -561,7 +630,7 @@ int f, n;				/* prefix flag and argument */
 
 	/* if we are in C mode and this is a default <NL> */
 	if (n == 1 && (curbp->b_mode & MDCMOD) &&
-		curwp->w_dotp != curbp->b_linep)
+			curwp->w_dotp != curbp->b_linep)
 		return(cinsert());
 
 	/*
@@ -570,22 +639,21 @@ int f, n;				/* prefix flag and argument */
 	 * and we are not read-only, perform word wrap.
 	 */
 	if ((curwp->w_bufp->b_mode & MDWRAP) && fillcol > 0 &&
-		getccol(FALSE) > fillcol &&
-		(curwp->w_bufp->b_mode & MDVIEW) == FALSE)
+			getccol(FALSE) > fillcol &&
+			(curwp->w_bufp->b_mode & MDVIEW) == FALSE)
 		execkey(&wraphook, FALSE, 1);
 
 	/* insert some lines */
 	while (n--)
-		{
+	{
 		if ((s = lnewline()) != TRUE)
 			return(s);
-		}
-	return(TRUE);
 	}
+	return(TRUE);
+}
 
-PASCAL NEAR cinsert()	/* insert a newline and indentation for C */
-
-	{
+int cinsert()	/* insert a newline and indentation for C */
+{
 	register char *cptr;	/* string pointer into text to copy */
 	register int i;		/* index into line to copy indent from */
 	register int llen;	/* length of line to copy indent from */
@@ -598,12 +666,12 @@ PASCAL NEAR cinsert()	/* insert a newline and indentation for C */
 	lp = curwp->w_dotp;
 	offset = curwp->w_doto;
 	while (offset > 0 &&
-		(lgetc(lp, offset - 1) == ' ' ||
-		lgetc(lp, offset - 1) == '\t'))
-		{
+			(lgetc(lp, offset - 1) == ' ' ||
+					lgetc(lp, offset - 1) == '\t'))
+	{
 		backdel(FALSE, 1);
 		offset--;
-		}
+	}
 
 	/* check for a brace */
 	bracef = (offset > 0 && lgetc(lp, offset - 1) == '{');
@@ -628,11 +696,11 @@ PASCAL NEAR cinsert()	/* insert a newline and indentation for C */
 	/* save the indent of the last non blank line */
 	i = 0;
 	while ((i < llen) && (cptr[i] == ' ' || cptr[i] == '\t')
-		&& (i < NSTRING - 1))
-		{
+			&& (i < NSTRING - 1))
+	{
 		ichar[i] = cptr[i];
 		++i;
-		}
+	}
 	ichar[i] = 0;		/* terminate it */
 
 	/* insert this saved indentation */
@@ -640,18 +708,18 @@ PASCAL NEAR cinsert()	/* insert a newline and indentation for C */
 
 	/* and one more tab for a brace */
 	if (bracef)
-		tab(FALSE, 1);
+		uetab(FALSE, 1);
 
 	return(TRUE);
-	}
+}
 
-PASCAL NEAR insbrace(n, c)	/* insert a brace into the text here...we are in CMODE */
+int insbrace(n, c)	/* insert a brace into the text here...we are in CMODE */
 
 int n;					/* repeat count */
 int c;					/* brace to insert (always } for now) */
-	{
+{
 	register int ch;	/* last character before input */
-	register int oc;	/* caractere oppose a c */
+	register int oc;	/* opposite of c */
 	register int i, count;
 	register int target;	/* column brace should go after */
 	register LINE *oldlp;
@@ -660,29 +728,29 @@ int c;					/* brace to insert (always } for now) */
 	/* if we aren't at the beginning of the line... */
 	if (curwp->w_doto != 0)
 
-	/* scan to see if all space before this is white space */
+		/* scan to see if all space before this is white space */
 		for (i = curwp->w_doto - 1;  i >= 0;  --i)
-			{
+		{
 			ch = lgetc(curwp->w_dotp, i);
 			if (ch != ' ' && ch != '\t')
 				return(linsert(n, c));
-			}
+		}
 
 	/* chercher le caractere oppose correspondant */
 	switch (c)
-		{
-	case '}':
-		oc = '{';
-		break;
-	case ']':
-		oc = '[';
-		break;
-	case ')':
-		oc = '(';
-		break;
-	default:
-		return(FALSE);
-		}
+	{
+		case '}':
+			oc = '{';
+			break;
+		case ']':
+			oc = '[';
+			break;
+		case ')':
+			oc = '(';
+			break;
+		default:
+			return(FALSE);
+	}
 
 	oldlp = curwp->w_dotp;
 	oldoff = curwp->w_doto;
@@ -691,9 +759,9 @@ int c;					/* brace to insert (always } for now) */
 	backchar(FALSE, 1);
 
 	while (count > 0)
-		{
+	{
 		if (curwp->w_doto == lused(curwp->w_dotp))
-			ch = '\r';
+			ch = RET_CHAR;
 		else
 			ch = lgetc(curwp->w_dotp, curwp->w_doto);
 
@@ -705,14 +773,14 @@ int c;					/* brace to insert (always } for now) */
 		backchar(FALSE, 1);
 		if (boundry(curwp->w_dotp, curwp->w_doto, REVERSE))
 			break;
-		}
+	}
 
 	if (count != 0)
-		{				/* no match */
+	{				/* no match */
 		curwp->w_dotp = oldlp;
 		curwp->w_doto = oldoff;
 		return(linsert(n, c));
-		}
+	}
 
 	curwp->w_doto = 0;	/* debut de ligne */
 	/* aller au debut de la ligne apres la tabulation */
@@ -725,7 +793,7 @@ int c;					/* brace to insert (always } for now) */
 	curwp->w_doto = oldoff;
 
 	while (target != getccol(FALSE))
-		{
+	{
 		if (target < getccol(FALSE))	/* on doit detruire des caracteres */
 			while (getccol(FALSE) > target)
 				backdel(FALSE, 1);
@@ -734,16 +802,16 @@ int c;					/* brace to insert (always } for now) */
 				while (target - getccol(FALSE) >= tabsize)
 					linsert(1, '\t');
 			linsert(target - getccol(FALSE), ' ');
-			}
 		}
+	}
 
 	/* and insert the required brace(s) */
 	return(linsert(n, c));
-	}
+}
 
-PASCAL NEAR inspound()	/* insert a # into the text here...we are in CMODE */
+int inspound()	/* insert a # into the text here...we are in CMODE */
 
-	{
+{
 	register int ch;	/* last character before input */
 	register int i;
 
@@ -753,11 +821,11 @@ PASCAL NEAR inspound()	/* insert a # into the text here...we are in CMODE */
 
 	/* scan to see if all space before this is white space */
 	for (i = curwp->w_doto - 1;  i >= 0;  --i)
-		{
+	{
 		ch = lgetc(curwp->w_dotp, i);
 		if (ch != ' ' && ch != '\t')
 			return(linsert(1, '#'));
-		}
+	}
 
 	/* delete back first */
 	while (getccol(FALSE) >= 1)
@@ -765,7 +833,7 @@ PASCAL NEAR inspound()	/* insert a # into the text here...we are in CMODE */
 
 	/* and insert the required pound */
 	return(linsert(1, '#'));
-	}
+}
 
 /*
  * Delete blank lines around dot. What this command does depends if dot is
@@ -776,16 +844,16 @@ PASCAL NEAR inspound()	/* insert a # into the text here...we are in CMODE */
  * ignored.
  */
 
-PASCAL NEAR deblank(f, n)
+int deblank(f, n)
 
 int f, n;				/* prefix flag and argument */
-	{
-	register LINE	*lp1;
-	register LINE	*lp2;
+{
+	register LINE *lp1;
+	register LINE *lp2;
 	long nld;
 
 	if (curbp->b_mode & MDVIEW)	/* don't allow this command if	*/
-		return(rdonly());	/* we are in read only mode	*/
+		return (rdonly());	/* we are in read only mode	*/
 	lp1 = curwp->w_dotp;
 	while (lused(lp1) == 0 && (lp2 = lback(lp1)) != curbp->b_linep)
 		lp1 = lp2;
@@ -794,11 +862,11 @@ int f, n;				/* prefix flag and argument */
 	while ((lp2 = lforw(lp2)) != curbp->b_linep && lused(lp2) == 0)
 		++nld;
 	if (nld == 0)
-		return(TRUE);
+		return (TRUE);
 	curwp->w_dotp = lforw(lp1);
 	curwp->w_doto = 0;
-	return(ldelete(nld, FALSE));
-	}
+	return (ldelete(nld, FALSE));
+}
 
 /*
  * Insert a newline, then enough tabs and spaces to duplicate the indentation
@@ -809,46 +877,46 @@ int f, n;				/* prefix flag and argument */
  * subcomands failed. Normally bound to "C-J".
  */
 
-PASCAL NEAR indent(f, n)
+int indent(f, n)
 
 int f, n;				/* prefix flag and argument */
-	{
-	register int	nicol;
-	register int	c;
-	register int	i;
+{
+	register int nicol;
+	register int c;
+	register int i;
 
-	if (curbp->b_mode & MDVIEW)	/* don't allow this command if	*/
-		return(rdonly());	/* we are in read only mode	*/
+	if (curbp->b_mode & MDVIEW) /* don't allow this command if	*/
+		return (rdonly()); /* we are in read only mode	*/
 	if (n < 0)
-		return(FALSE);
-	while (n--)
-		{
+		return (FALSE);
+	while (n--) {
 		nicol = 0;
-		for (i = 0;  i < lused(curwp->w_dotp);  ++i)
-			{
+		for (i = 0; i < lused(curwp->w_dotp); ++i) {
 			c = lgetc(curwp->w_dotp, i);
 			if (c != ' ' && c != '\t')
 				break;
-			if (c == '\t')
+			if (c == '\t') {
 				if (tabsize > 0)
-					nicol += -(nicol % tabsize) + (tabsize - 1);
+					nicol += -(nicol % tabsize)
+					+ (tabsize - 1);
 				else
 					break;
-			++nicol;
 			}
+			++nicol;
+		}
 		if (lnewline() == FALSE)
 			return FALSE;
 		if (tabsize == 0) {
 			if (linsert(nicol, ' ') == FALSE)
-				return(FALSE);
-		}
-		else
-			if (((i = nicol / tabsize) != 0 && linsert(i, '\t') == FALSE)
-			|| ((i = nicol % tabsize) != 0 && linsert(i, ' ') == FALSE))
-				return(FALSE);
-		}
-	return(TRUE);
+				return (FALSE);
+		} else if (((i = nicol / tabsize) != 0
+				&& linsert(i, '\t') == FALSE)
+				|| ((i = nicol % tabsize) != 0
+						&& linsert(i, ' ') == FALSE))
+			return (FALSE);
 	}
+	return (TRUE);
+}
 
 /*
  * Delete forward. This is real easy, because the basic delete routine does
@@ -857,7 +925,7 @@ int f, n;				/* prefix flag and argument */
  * of text if typed with a big argument. Normally bound to "C-D".
  */
 
-PASCAL NEAR forwdel(f, n)
+int forwdel(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -876,7 +944,11 @@ int f, n;				/* prefix flag and argument */
 			next_kill();
 		thisflag |= CFKILL;
 	}
+#if	UTF8
+	return(ldelchar((long)n, f));
+#else
 	return(ldelete((long)n, f));
+#endif
 }
 
 /*
@@ -886,7 +958,7 @@ int f, n;				/* prefix flag and argument */
  * both "RUBOUT" and "C-H".
  */
 
-PASCAL NEAR backdel(f, n)
+int backdel(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -913,7 +985,11 @@ int f, n;	/* prefix flag and argument */
 
 	/* and now delete the characters */
 	if ((status = backchar(f, n)) == TRUE)
-		status = ldelete((long) n, f);
+#if	UTF8
+		status = ldelchar((long) n, f);
+#else
+	status = ldelete((long) n, f);
+#endif
 	return(status);
 }
 
@@ -926,7 +1002,7 @@ int f, n;	/* prefix flag and argument */
  * that number of newlines. Normally bound to "C-K".
  */
 
-PASCAL NEAR killtext(f, n)
+int killtext(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -974,39 +1050,39 @@ int f, n;	/* prefix flag and argument */
 	return(ldelete(chunk, TRUE));
 }
 
-PASCAL NEAR setmod(f, n)	/* prompt and set an editor mode */
+int setmod(f, n)	/* prompt and set an editor mode */
 
 int f, n;				/* default and argument */
-	{
+{
 	return(adjustmode(TRUE, FALSE));
-	}
+}
 
-PASCAL NEAR delmode(f, n)	/* prompt and delete an editor mode */
+int delmode(f, n)	/* prompt and delete an editor mode */
 
 int f, n;				/* default and argument */
-	{
+{
 	return(adjustmode(FALSE, FALSE));
-	}
+}
 
-PASCAL NEAR setgmode(f, n)	/* prompt and set a global editor mode */
+int setgmode(f, n)	/* prompt and set a global editor mode */
 
 int f, n;				/* default and argument */
-	{
+{
 	return(adjustmode(TRUE, TRUE));
-	}
+}
 
-PASCAL NEAR delgmode(f, n)	/* prompt and delete a global editor mode */
+int delgmode(f, n)	/* prompt and delete a global editor mode */
 
 int f, n;				/* default and argument */
-	{
+{
 	return(adjustmode(FALSE, TRUE));
-	}
+}
 
-PASCAL NEAR adjustmode(kind, global)	/* change the editor mode status */
+int adjustmode(kind, global)	/* change the editor mode status */
 
 int kind;				/* true = set,		false = delete */
 int global;				/* true = global flag,	false = current buffer flag */
-	{
+{
 	register char *scan;	/* scanning pointer to convert prompt */
 	register int i;		/* loop index */
 	register int status;	/* error return on input */
@@ -1019,17 +1095,17 @@ int global;				/* true = global flag,	false = current buffer flag */
 	/* build the proper prompt string */
 	if (global)
 		strcpy(prompt, TEXT62);
-/*			      "Global mode to " */
+	/*			      "Global mode to " */
 	else
 		strcpy(prompt, TEXT63);
-/*			      "Mode to " */
+	/*			      "Mode to " */
 
 	if (kind == TRUE)
 		strcat(prompt, TEXT64);
-/*			       "add: " */
+	/*			       "add: " */
 	else
 		strcat(prompt, TEXT65);
-/*			       "delete: " */
+	/*			       "delete: " */
 
 	/* prompt the user and get an answer */
 
@@ -1048,12 +1124,12 @@ int global;				/* true = global flag,	false = current buffer flag */
 
 	/* test it first against the colors we know */
 	if ((i = lookup_color(cbuf)) != -1)
-		{
+	{
 
 #if	COLOR
 		/* finding the match, we set the color */
 		if (global)
-			{
+		{
 			if (uflag)
 				gfcolor = i;
 			else
@@ -1061,7 +1137,7 @@ int global;				/* true = global flag,	false = current buffer flag */
 #if	WINDOW_TEXT & 0
 			refresh_screen(first_screen);
 #endif
-			}
+		}
 		else
 			if (uflag)
 				curwp->w_fcolor = i;
@@ -1072,85 +1148,98 @@ int global;				/* true = global flag,	false = current buffer flag */
 #endif
 		mlerase();
 		return(TRUE);
-		}
+	}
 
 	/* test it against the modes we know */
 
 	for (i = 0;  i < NUMMODES;  i++)
-		{
+	{
 		if (strcmp(cbuf, modename[i]) == 0)
-			{
+		{
 			/* finding a match, we process it */
 			if (kind == TRUE)
+			{
 				if (global)
-					{
+				{
 					gmode |= (1 << i);
 					if ((1 << i) == MDOVER)
 						gmode &= ~MDREPL;
 					else if ((1 << i) == MDREPL)
 						gmode &= ~MDOVER;
-					}
+#ifdef MDSLINE
+					else if ((1 << i) == MDSLINE)
+						gmode &= ~MDDLINE;
+					else if ((1 << i) == MDDLINE)
+						gmode &= ~MDSLINE;
+#endif
+				}
 				else {
 					curbp->b_mode |= (1 << i);
 					if ((1 << i) == MDOVER)
 						curbp->b_mode &= ~MDREPL;
 					else if ((1 << i) == MDREPL)
 						curbp->b_mode &= ~MDOVER;
-					}
-			else
-				if (global)
-					gmode &= ~(1 << i);
-				else
-					curbp->b_mode &= ~(1 << i);
+#ifdef MDSLINE
+					else if ((1 << i) == MDSLINE)
+						curbp->b_mode &= ~MDDLINE;
+					else if ((1 << i) == MDDLINE)
+						curbp->b_mode &= ~MDSLINE;
+#endif
+				}
+			} else if (global) {
+				gmode &= ~(1 << i);
+			} else
+				curbp->b_mode &= ~(1 << i);
+
 			/* display new mode line */
 			if (global == 0)
 				upmode();
 			mlerase();	/* erase the junk */
 			return(TRUE);
-			}
 		}
+	}
 
 	mlwrite(TEXT66);
-/*		"No such mode!" */
+	/*		"No such mode!" */
 	return(FALSE);
-	}
+}
 
 /*	This function simply clears the message line,
 		mainly for macro usage			*/
 
-PASCAL NEAR clrmes(f, n)
+int clrmes(f, n)
 
 int f, n;				/* arguments ignored */
-	{
+{
 	mlforce("");
 	return(TRUE);
-	}
+}
 
 /*	This function writes a string on the message line
 		mainly for macro usage			*/
 
-PASCAL NEAR writemsg(f, n)
+int writemsg(f, n)
 
 int f, n;				/* arguments ignored */
-	{
+{
 	register int status;
 	char buf[NPAT];		/* buffer to recieve message into */
 
 	if ((status = mlreply(TEXT67, buf, NPAT - 1)) != TRUE)
-/*			      "Message to write: " */
+		/*			      "Message to write: " */
 		return(status);
 
 	/* write the message out */
 	mlforce(buf);
 	return(TRUE);
-	}
+}
 
 /*	the cursor is moved to a matching fence */
 
-PASCAL NEAR getfence(f, n)
+int getfence(f, n)
 
 int f, n;				/* not used */
-	{
+{
 	register LINE *oldlp;	/* original line pointer */
 	register int oldoff;	/* and offset */
 	register int sdir;	/* direction of search (1/-1) */
@@ -1166,41 +1255,41 @@ int f, n;				/* not used */
 
 	/* get the current character */
 	if (oldoff == lused(oldlp))
-		ch = '\r';
+		ch = RET_CHAR;
 	else
 		ch = lgetc(oldlp, oldoff);
 
 	/* setup proper matching fence */
 	switch (ch)
-		{
-	case '(':
-		ofence = ')';
-		sdir = FORWARD;
-		break;
-	case '{':
-		ofence = '}';
-		sdir = FORWARD;
-		break;
-	case '[':
-		ofence = ']';
-		sdir = FORWARD;
-		break;
-	case ')':
-		ofence = '(';
-		sdir = REVERSE;
-		break;
-	case '}':
-		ofence = '{';
-		sdir = REVERSE;
-		break;
-	case ']':
-		ofence = '[';
-		sdir = REVERSE;
-		break;
-	default:
-		TTbeep();
-		return(FALSE);
-		}
+	{
+		case '(':
+			ofence = ')';
+			sdir = FORWARD;
+			break;
+		case '{':
+			ofence = '}';
+			sdir = FORWARD;
+			break;
+		case '[':
+			ofence = ']';
+			sdir = FORWARD;
+			break;
+		case ')':
+			ofence = '(';
+			sdir = REVERSE;
+			break;
+		case '}':
+			ofence = '{';
+			sdir = REVERSE;
+			break;
+		case ']':
+			ofence = '[';
+			sdir = REVERSE;
+			break;
+		default:
+			TTbeep();
+			return(FALSE);
+	}
 
 	/* set up for scan */
 	count = 1;
@@ -1208,14 +1297,14 @@ int f, n;				/* not used */
 
 	/* scan until we find it, or reach the end of file */
 	while (count > 0)
-		{
+	{
 		if (sdir == FORWARD)
 			forwchar(FALSE, 1);
 		else
 			backchar(FALSE, 1);
 
 		if (curwp->w_doto == lused(curwp->w_dotp))
-			c = '\r';
+			c = RET_CHAR;
 		else
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 
@@ -1247,34 +1336,34 @@ int f, n;				/* not used */
 		/* at the end/beginning of the buffer.... abort */
 		if (boundry(curwp->w_dotp, curwp->w_doto, sdir))
 			break;
-		}
+	}
 
 	/* if count is zero, we have a match, move the sucker */
 	if (count == 0)
-		{
+	{
 		curwp->w_flag |= WFMOVE;
 		return(TRUE);
-		}
+	}
 
 	/* restore the current position */
 	curwp->w_dotp = oldlp;
 	curwp->w_doto = oldoff;
 	TTbeep();
 	return(FALSE);
-	}
+}
 
 /*	Close fences are matched against their partners, and if
 	on screen the cursor briefly lights there		*/
 
 #if	PROTO
-PASCAL NEAR fmatch(char ch)
+int fmatch(char ch)
 #else
-PASCAL NEAR fmatch(ch)
+int fmatch(ch)
 
 char ch;	/* fence type to match against */
 #endif
 
-	{
+{
 	register LINE *oldlp;	/* original line pointer */
 	register int oldoff;	/* and offset */
 	register LINE *toplp;	/* top line in current window */
@@ -1282,7 +1371,6 @@ char ch;	/* fence type to match against */
 	register char opench;	/* open fence */
 	register char c;	/* current character in scan */
 	register int qlevel;	/* quote level */
-	register int i;
 
 	/* first get the display update out there */
 	update(FALSE);
@@ -1310,7 +1398,7 @@ char ch;	/* fence type to match against */
 
 		backchar(FALSE, 1);
 		if (curwp->w_doto == lused(curwp->w_dotp))
-			c = '\r';
+			c = RET_CHAR;
 		else
 			c = lgetc(curwp->w_dotp, curwp->w_doto);
 
@@ -1341,23 +1429,33 @@ char ch;	/* fence type to match against */
 
 		/* stop at the beginning of the buffer */
 		if (curwp->w_dotp == lforw(curwp->w_bufp->b_linep) &&
-			curwp->w_doto == 0)
+				curwp->w_doto == 0)
 			break;
-		}
+	}
 
 	/* if count is zero, we have a match, display the sucker */
-	/* there is a real machine dependant timing problem here we have
+	/* there is a real machine dependent timing problem here we have
 	   yet to solve......... */
 	if (count == 0)
-		{
+	{
 #if	WINDOW_MSWIN
 		update(FALSE);
 		term.t_sleep (term.t_pause);
 #else
+# if	THEOSC
+		update(FALSE);
+		_sleep((long) term.t_pause);
+# else
+#  if	USG && JMDEXT
+		update(FALSE);
+		usleep(term.t_pause * 1000);
+#  else
 		for (i = 0;  i < term.t_pause;  i++)
 			update(FALSE);
+#  endif
+# endif
 #endif
-		}
+	}
 
 	/* restore the current position */
 	curwp->w_dotp = oldlp;
@@ -1368,7 +1466,7 @@ char ch;	/* fence type to match against */
 /* ask for and insert a string into the current
    buffer at the current point */
 
-PASCAL NEAR istring(f, n)	
+int istring(f, n)
 
 int f, n;				/* ignored arguments */
 
@@ -1378,7 +1476,7 @@ int f, n;				/* ignored arguments */
 
 	/* ask for string to insert */
 	status = nextarg(TEXT68, tstring, NPAT, sterm);
-/*			  "String to insert: " */
+	/*			  "String to insert: " */
 	if (status != TRUE)
 		return(status);
 
@@ -1392,19 +1490,19 @@ int f, n;				/* ignored arguments */
 	while (n-- && (status = linstr(tstring)))
 		;
 	return(status);
-	}
+}
 
-PASCAL NEAR ovstring(f, n) 	/* ask for and overwite a string into the current
+int ovstring(f, n) 	/* ask for and overwite a string into the current
 		   buffer at the current point */
 
 int f, n;				/* ignored arguments */
-	{
+{
 	register int status;	/* status return code */
 	char tstring[NPAT + 1];	/* string to add */
 
 	/* ask for string to insert */
 	status = nextarg(TEXT69, tstring, NPAT, sterm);
-/*			  "String to overwrite: " */
+	/*			  "String to overwrite: " */
 	if (status != TRUE)
 		return(status);
 
@@ -1418,19 +1516,19 @@ int f, n;				/* ignored arguments */
 	while (n-- && (status = lover(tstring)))
 		;
 	return(status);
-	}
+}
 
-int PASCAL NEAR lookup_color(sp)
+int lookup_color(sp)
 
 char *sp;				/* name to look up */
-	{
+{
 	register int i;		/* index into color list */
 
 	/* test it against the colors we know */
 	for (i = 0;  i < NCOLORS;  i++)
-		{
+	{
 		if (strcmp(sp, cname[i]) == 0)
 			return(i);
-		}
-	return(-1);
 	}
+	return(-1);
+}

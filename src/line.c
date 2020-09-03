@@ -9,6 +9,8 @@
  * Since all the code acts on the current window, the buffer that we are
  * editing must be being displayed, which means that "b_nwnd" is non zero,
  * which means that the dot and mark values in the buffer headers are nonsense.
+ *
+ * Unicode support by Jean-Michel Dubois
  */
 
 #include	<stdio.h>
@@ -28,7 +30,7 @@ static long last_size = -1L;	/* last # of bytes yanked */
  * line if no space.
  */
 
-LINE *PASCAL NEAR lalloc(used)
+LINE *lalloc(used)
 
 register int used;
 
@@ -60,11 +62,11 @@ register int used;
  * might be in. Release the memory. The buffers are updated too; the magic
  * conditions described in the above comments don't hold here.
  */
-PASCAL NEAR lfree(lp)
+VOID lfree(lp)
 register LINE	*lp;
 {
 	register BUFFER *bp;
-	SCREEN *scrp;		/* screen to fix pointers in */
+	ESCREEN *scrp;		/* screen to fix pointers in */
 	register EWINDOW *wp;
 	register int cmark;		/* current mark */
 
@@ -129,11 +131,11 @@ register LINE	*lp;
  * displayed in more than 1 window we change EDIT t HARD. Set MODE if the
  * mode line needs to be updated (the "*" has to be set).
  */
-PASCAL NEAR lchange(flag)
+VOID lchange(flag)
 register int	flag;
 {
 	register EWINDOW *wp;
-	SCREEN *scrp;		/* screen to fix pointers in */
+	ESCREEN *scrp;		/* screen to fix pointers in */
 
 	if (curbp->b_nwnd != 1) 		/* Ensure hard. 	*/
 		flag = WFHARD;
@@ -158,7 +160,7 @@ register int	flag;
 	}
 }
 
-PASCAL NEAR insspace(f, n)	/* insert spaces forward into text */
+int insspace(f, n)	/* insert spaces forward into text */
 
 int f, n;	/* default flag and numeric argument */
 
@@ -175,17 +177,36 @@ int f, n;	/* default flag and numeric argument */
  */
 
 #if PROTO
-int PASCAL NEAR linstr(char *instr)
+int linstr(CONST char *instr)
 #else
-int PASCAL NEAR linstr( instr)
-char *instr;
+int linstr( instr)
+CONST char *instr;
 #endif
 {
 	register int status;
+#if	!UTF8
 	register int saved_undo;	/* saved undo flag */
-
+#endif
 	status = TRUE;
 	if (instr != NULL && *instr != '\0') {
+#if	UTF8
+		unsigned int c;
+		size_t len = strlen(instr);
+
+		while (*instr && status == TRUE) {
+			unsigned int bytes = utf8_to_unicode(instr, 0, len, &c);
+			status = ((*instr == RET_CHAR) ? lnewline(): linsert(1, c));
+
+			/* Insertion error? */
+			if (status != TRUE) {
+				mlwrite(TEXT168);
+/*                                      "%%Can not insert string" */
+				break;
+			}
+			instr += bytes;
+			len -= bytes;
+		}
+#else
 		/* record the insertion for the undo stack.... */
 		undo_insert(OP_ISTR, (long)strlen(instr), obj);
 
@@ -193,7 +214,7 @@ char *instr;
 		saved_undo = undoing;
 		undoing = TRUE;
 		do {
-			status = ((*instr == '\r') ? lnewline(): linsert(1, *instr));
+			status = ((*instr == RET_CHAR) ? lnewline(): linsert(1, *instr));
 
 			/* Insertion error? */
 			if (status != TRUE) {
@@ -204,6 +225,7 @@ char *instr;
 			instr++;
 		} while (*instr);
 		undoing = saved_undo;
+#endif
 	}
 
 	return(status);
@@ -219,15 +241,7 @@ char *instr;
  * well, and FALSE on errors.
  */
 
-#if	PROTO
-PASCAL NEAR linsert(int n, char c)
-#else
-PASCAL NEAR linsert(n, c)
-
-int	n;
-char	c;
-#endif
-
+static int linsert_byte(int n, unsigned char c)
 {
 	register char	*cp1;
 	register char	*cp2;
@@ -237,7 +251,7 @@ char	c;
 	register int	doto;
 	register int	i;
 	register EWINDOW *wp;
-	SCREEN *scrp;		/* screen to fix pointers in */
+	ESCREEN *scrp;		/* screen to fix pointers in */
 	int cmark;		/* current mark */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
@@ -335,24 +349,87 @@ char	c;
 	return(TRUE);
 }
 
+/* insert a character */
+
+#if	UTF8
+#if	PROTO
+int linsert(int n, unsigned int c)
+#else
+int linsert(n, c)
+
+int	n;
+unsigned int	c;
+#endif
+#else
+#if	PROTO
+int linsert(int n, char c)
+#else
+int linsert(n, c)
+
+int	n;
+char	c;
+#endif
+#endif
+
+{
+#if	UTF8
+#if	THEOX
+	if (! (c & 0xFFFF80) || (curbp->b_mode & MDTHEOX))
+		return linsert_byte(n, c);
+#endif
+	/* Insert a Unicode character */
+
+	char utf8[6];
+	unsigned int bytes = unicode_to_utf8(c, utf8), i;
+
+	if (bytes == 1)
+		return linsert_byte(n, (unsigned char) utf8[0]);
+
+	for (i = 0; i < n; i++) {
+		int j;
+		for (j = 0; j < bytes; j++) {
+			unsigned char c = utf8[j];
+
+			if (!linsert_byte(1, c))
+				return FALSE;
+		}
+	}
+	return TRUE;
+#else
+	return linsert_byte(n, c);
+#endif
+}
+
 /*
  * Overwrite a character into the current line at the current position
  *
  */
-
+#if	UTF8
 #if	PROTO
-PASCAL NEAR lowrite(char c)
+int lowrite(unsigned int c)
 #else
-PASCAL NEAR lowrite(c)
+int lowrite(c)
 
 char c;		/* character to overwrite on current position */
-#endif
+#endif /* PROTO */
+#else
+#if	PROTO
+int lowrite(int c)
+#else
+int lowrite(c)
 
+int c;		/* character to overwrite on current position */
+#endif
+#endif
 {
 	if (curwp->w_doto < curwp->w_dotp->l_used &&
 		((lgetc(curwp->w_dotp, curwp->w_doto) != '\t' || tabsize == 0) ||
 		 (curwp->w_doto) % tabsize == tabsize -1))
+#if	UTF8
+			ldelchar(1L, FALSE);
+#else
 			ldelete(1L, FALSE);
+#endif
 	return(linsert(1, c));
 }
 
@@ -360,16 +437,38 @@ char c;		/* character to overwrite on current position */
  * lover -- Overwrite a string at the current point
  */
 
-int PASCAL NEAR lover(ostr)
+int lover(ostr)
 
-char	*ostr;
+CONST char	*ostr;
 
 {
 	register int status = TRUE;
 
-	if (ostr != NULL)
+	if (ostr != NULL && *ostr) {
+#if	UTF8
+		unsigned int c;
+		size_t len = strlen(ostr);
+		unsigned int bytes;
+
 		while (*ostr && status == TRUE) {
-			status = ((*ostr == '\r') ? lnewline(): lowrite(*ostr));
+			if (*ostr == RET_CHAR) {
+				status = lnewline();
+				bytes = 1;
+			} else {
+				bytes = utf8_to_unicode(ostr, 0, len, &c);
+				status = lowrite(c);
+			}
+			/* Insertion error? */
+			if (status != TRUE) {
+				mlwrite(TEXT172); /* "%%Out of memory while overwriting" */
+				break;
+			}
+			ostr += bytes;
+			len -= bytes;
+		}
+#else
+		while (*ostr && status == TRUE) {
+			status = ((*ostr == RET_CHAR) ? lnewline(): lowrite(*ostr));
 
 			/* Insertion error? */
 			if (status != TRUE) {
@@ -379,6 +478,9 @@ char	*ostr;
 			}
 			ostr++;
 		}
+#endif
+	}
+
 	return(status);
 }
 
@@ -390,7 +492,7 @@ char	*ostr;
  * update of dot and mark is a bit easier then in the above case, because the
  * split forces more updating.
  */
-int PASCAL NEAR lnewline()
+int lnewline()
 {
 	register char	*cp1;
 	register char	*cp2;
@@ -398,7 +500,7 @@ int PASCAL NEAR lnewline()
 	register LINE	*lp2;
 	register int	doto;
 	register EWINDOW *wp;
-	SCREEN *scrp;		/* screen to fix pointers in */
+	ESCREEN *scrp;		/* screen to fix pointers in */
 	int cmark;		/* current mark */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
@@ -457,6 +559,53 @@ int PASCAL NEAR lnewline()
 	return(TRUE);
 }
 
+#if	UTF8
+
+int lgetchar(unsigned int *c)
+{
+#if	THEOX
+	*c = lgetc(curwp->w_dotp, curwp->w_doto);
+
+	if  (! (*c & 0xFFFF80) || (curbp->b_mode & MDTHEOX))
+		return 1;
+#endif
+	return utf8_to_unicode(curwp->w_dotp->l_text, curwp->w_doto, lused(curwp->w_dotp), c);
+}
+
+/*
+ * ldelete() really fundamentally works on bytes, not characters.
+ * It is used for things like "scan 5 words forwards, and remove
+ * the bytes we scanned".
+ *
+ * If you want to delete characters, use ldelchar().
+ */
+int ldelchar(long n, int kflag)
+{
+	if (n > 0) {
+		while (n-- > 0) {
+			unsigned int c;
+
+			if (!ldelete(lgetchar(&c), kflag))
+				return FALSE;
+		}
+	} else if (n < 0) {
+		while (n++ < 0) {
+			unsigned int c;
+
+			if (backchar(FALSE, 1)) {
+				size_t bytes = lgetchar(&c);
+				forwchar(FALSE, 1);
+
+				if (!ldelete(-bytes, kflag))
+					return FALSE;
+			}
+		}
+	}
+	return TRUE;
+}
+
+#endif
+
 /*
 
 LDELETE:
@@ -470,7 +619,7 @@ should be put in the kill buffer.
 
 */
 
-PASCAL NEAR ldelete(n, kflag)
+int ldelete(n, kflag)
 
 long n; 	/* # of chars to delete */
 int kflag;	/* put killed text in kill buffer flag */
@@ -502,32 +651,32 @@ int kflag;	/* put killed text in kill buffer flag */
 			/* record the current point */
 			dotp = curwp->w_dotp;
 			doto = curwp->w_doto;
-	
+
 			/* can't delete past the end of the buffer */
 			if (dotp == curbp->b_linep)
 				return(FALSE);
-	
+
 			/* find out how many chars to delete on this line */
 			chunk = dotp->l_used-doto;	/* Size of chunk.	*/
 			if (chunk > n)
 				chunk = n;
-	
+
 			/* if at the end of a line, merge with the next */
 			if (chunk == 0) {
-	
+
 				/* flag that we are making a hard change */
 				lchange(WFHARD);
 				if (ldelnewline() == FALSE ||
 				    (kflag != FALSE &&
-				     kinsert(FORWARD, '\r')==FALSE))
+				     kinsert(FORWARD, RET_CHAR)==FALSE))
 					return(FALSE);
 				--n;
 				continue;
 			}
-	
+
 			/* flag the fact we are changing the current line */
 			lchange(WFEDIT);
-	
+
 			/* find the limits of the kill */
 			cp1 = &dotp->l_text[doto];
 			cp2 = cp1 + chunk;
@@ -545,7 +694,7 @@ int kflag;	/* put killed text in kill buffer flag */
 				obj.obj_sptr = cp1;
 				undo_insert(OP_DSTR, (long)chunk, obj);
 			}
-	
+
 			/* save the text to the kill buffer */
 			if (kflag != FALSE) {
 				while (cp1 != cp2) {
@@ -555,23 +704,23 @@ int kflag;	/* put killed text in kill buffer flag */
 				}
 				cp1 = &dotp->l_text[doto];
 			}
-	
+
 			/* copy what is left of the line upward */
 			while (cp2 != &dotp->l_text[dotp->l_used])
 				*cp1++ = *cp2++;
 			dotp->l_used -= chunk;
-	
+
 			/* fix any other windows with the same text displayed */
 			wp = wheadp;
 			while (wp != NULL) {
-	
+
 				/* reset the dot if needed */
 				if (wp->w_dotp==dotp && wp->w_doto>=doto) {
 					wp->w_doto -= chunk;
 					if (wp->w_doto < doto)
 						wp->w_doto = doto;
 				}
-	
+
 				/* reset any marks if needed */
 				for (cmark = 0; cmark < NMARKS; cmark++) {
 					if (wp->w_markp[cmark]==dotp && wp->w_marko[cmark]>=doto) {
@@ -580,11 +729,11 @@ int kflag;	/* put killed text in kill buffer flag */
 							wp->w_marko[cmark] = doto;
 					}
 				}
-	
+
 				/* onward to the next window */
 				wp = wp->w_wndp;
 			}
-	
+
 			/* indicate we have deleted chunk characters */
 			n -= chunk;
 		}
@@ -602,33 +751,33 @@ int kflag;	/* put killed text in kill buffer flag */
 			/* record the current point */
 			dotp = curwp->w_dotp;
 			doto = curwp->w_doto;
-	
+
 			/* can't delete past the beginning of the buffer */
 			if (dotp == lforw(curbp->b_linep) && (doto == 0))
 				return(FALSE);
-	
+
 			/* find out how many chars to delete on this line */
 			chunk = doto;		/* Size of chunk.	*/
 			if (chunk > -n)
 				chunk = -n;
-	
+
 			/* if at the beginning of a line, merge with the last */
 			if (chunk == 0) {
-	
+
 				/* flag that we are making a hard change */
 				lchange(WFHARD);
 				backchar(TRUE, 1);
 				if (ldelnewline() == FALSE ||
 				    (kflag != FALSE &&
-				     kinsert(REVERSE, '\r')==FALSE))
+				     kinsert(REVERSE, RET_CHAR)==FALSE))
 					return(FALSE);
 				++n;
 				continue;
 			}
-	
+
 			/* flag the fact we are changing the current line */
 			lchange(WFEDIT);
-	
+
 			/* find the limits of the kill */
 			cp1 = &dotp->l_text[doto];
 			cp2 = cp1 - chunk;
@@ -639,7 +788,7 @@ int kflag;	/* put killed text in kill buffer flag */
 				++n;
 			}
 #endif
-	
+
 			/* save deleted characters for an undo... */
 			if (undoflag == TRUE) {
 				curwp->w_doto -= chunk;
@@ -656,24 +805,24 @@ int kflag;	/* put killed text in kill buffer flag */
 				}
 				cp1 = &dotp->l_text[doto];
 			}
-	
+
 			/* copy what is left of the line downward */
 			while (cp1 != &dotp->l_text[dotp->l_used])
 				*cp2++ = *cp1++;
 			dotp->l_used -= chunk;
 			curwp->w_doto -= chunk;
-	
+
 			/* fix any other windows with the same text displayed */
 			wp = wheadp;
 			while (wp != NULL) {
-	
+
 				/* reset the dot if needed */
 				if (wp->w_dotp==dotp && wp->w_doto>=doto) {
 					wp->w_doto -= chunk;
 					if (wp->w_doto < doto)
 						wp->w_doto = doto;
 				}
-	
+
 				/* reset any marks if needed */
 				for (cmark = 0; cmark < NMARKS; cmark++) {
 					if (wp->w_markp[cmark]==dotp && wp->w_marko[cmark]>=doto) {
@@ -682,11 +831,11 @@ int kflag;	/* put killed text in kill buffer flag */
 							wp->w_marko[cmark] = doto;
 					}
 				}
-	
+
 				/* onward to the next window */
 				wp = wp->w_wndp;
 			}
-	
+
 			/* indicate we have deleted chunk characters */
 			n += chunk;
 		}
@@ -699,9 +848,9 @@ int kflag;	/* put killed text in kill buffer flag */
 */
 
 #if PROTO
-char *PASCAL NEAR getctext(char *rline)
+char *getctext(char *rline)
 #else
-char *PASCAL NEAR getctext( rline)
+char *getctext( rline)
 char *rline;
 #endif
 
@@ -728,7 +877,7 @@ char *rline;
 
 /* putctext:	replace the current line with the passed in text	*/
 
-PASCAL NEAR putctext(iline)
+int putctext(iline)
 
 char *iline;	/* contents of new line */
 
@@ -757,7 +906,7 @@ char *iline;	/* contents of new line */
  * about in memory. Return FALSE on error and TRUE if all looks ok. Called by
  * "ldelete" only.
  */
-int PASCAL NEAR ldelnewline()
+int ldelnewline()
 {
 	register char	*cp1;
 	register char	*cp2;
@@ -765,7 +914,7 @@ int PASCAL NEAR ldelnewline()
 	register LINE	*lp2;
 	register LINE	*lp3;
 	register EWINDOW *wp;
-	SCREEN *scrp;		/* screen to fix pointers in */
+	ESCREEN *scrp;		/* screen to fix pointers in */
 	int cmark;		/* current mark */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
@@ -873,12 +1022,12 @@ int PASCAL NEAR ldelnewline()
 */
 
 #if	PROTO
-int PASCAL NEAR addline(BUFFER *bp, char *text)
+int addline(BUFFER *bp, CONST char *text)
 #else
-int PASCAL NEAR addline(bp, text)
+int addline(bp, text)
 
 BUFFER *bp;	/* buffer to add text to */
-char *text;	/* line to add */
+CONST char *text;	/* line to add */
 #endif
 {
 	register LINE	*lp;
@@ -913,7 +1062,7 @@ char *text;	/* line to add */
  * in case the buffer has grown to immense size. No errors.
  */
 
-VOID PASCAL NEAR kdelete()
+VOID kdelete()
 
 {
 	KILL *kp;	/* ptr to scan kill buffer chunk list */
@@ -941,7 +1090,7 @@ VOID PASCAL NEAR kdelete()
 		/* and reset all the kill buffer pointers */
 		kbufh[kill_index] = kbufp[kill_index] = NULL;
 		kskip[kill_index] = 0;
-		kused[kill_index] = KBLOCK; 	        
+		kused[kill_index] = KBLOCK;
 	}
 }
 
@@ -950,7 +1099,7 @@ VOID PASCAL NEAR kdelete()
 			what will be the new kill buffer
 */
 
-VOID PASCAL NEAR next_kill()
+VOID next_kill()
 
 {
 	/* advance to the next kill ring entry */
@@ -968,9 +1117,9 @@ VOID PASCAL NEAR next_kill()
  */
 
 #if	PROTO
-int PASCAL NEAR kinsert(int direct, char c)
+int kinsert(int direct, char c)
 #else
-int PASCAL NEAR kinsert(direct, c)
+int kinsert(direct, c)
 
 int direct;	/* direction (FORWARD/REVERSE) to insert characters */
 char c;		/* character to insert in the kill buffer */
@@ -1006,7 +1155,7 @@ char c;		/* character to insert in the kill buffer */
 			}
 #endif
 		}
-	
+
 		/* and now insert the character */
 		kbufp[kill_index]->d_chunk[kused[kill_index]++] = c;
 	} else {
@@ -1040,7 +1189,7 @@ char c;		/* character to insert in the kill buffer */
 			}
 #endif
 		}
-	
+
 		/* and now insert the character */
 		kbufh[kill_index]->d_chunk[--kskip[kill_index]] = c;
 	}
@@ -1053,17 +1202,21 @@ char c;		/* character to insert in the kill buffer */
  * check for errors. Bound to "C-Y".
  */
 
-#define	Char_insert(a)	(a == '\r' ? lnewline() : linsert(1, a))
+#if	UTF8
+#define	Char_insert(a)	(a == RET_CHAR ? lnewline() : linsert_byte(1, a))
+#else
+#define	Char_insert(a)	(a == RET_CHAR ? lnewline() : linsert(1, a))
+#endif
 
-int PASCAL NEAR yank(f, n)
+int yank(f, n)
 
 int f,n;	/* prefix flag and argument */
 
 {
 	register int counter;	/* counter into kill buffer data */
 	register char *sp;	/* pointer into string to insert */
-	short int curoff;	/* storage for line before yanking */
-	LINE *curline;
+	short int curoff = 0;	/* storage for line before yanking */
+	LINE *curline = NULL;
 	KILL *kptr;		/* pointer into kill buffer */
 
 	if (curbp->b_mode&MDVIEW)	/* don't allow this command if	*/
@@ -1105,7 +1258,7 @@ int f,n;	/* prefix flag and argument */
 		} else {
 			kptr = kbufh[kill_index];
 		}
-	
+
 		if (kptr != (KILL *)NULL) {
 			while (kptr != kbufp[kill_index]) {
 				sp = kptr->d_chunk;
@@ -1137,7 +1290,7 @@ int f,n;	/* prefix flag and argument */
 	return(TRUE);
 }
 
-int PASCAL NEAR cycle_ring(f, n)
+int cycle_ring(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -1160,7 +1313,7 @@ int f,n;	/* prefix flag and argument */
 	return TRUE;
 }
 
-int PASCAL NEAR yank_pop(f, n)
+int yank_pop(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -1182,7 +1335,7 @@ int f,n;	/* prefix flag and argument */
 	return(yank(FALSE, 1));
 }
 
-int PASCAL NEAR clear_ring(f, n)
+int clear_ring(f, n)
 
 int f,n;	/* prefix flag and argument */
 

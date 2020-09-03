@@ -8,6 +8,8 @@
  *	non-commercial purposes. MicroEMACS 5.00 can only be incorporated
  *	into commercial software with the permission of the current author.
  *
+ *      Unicode support by Jean-Michel Dubois
+ *
  * This file contains the main driving routine, and some keyboard processing
  * code, for the MicroEMACS screen editor.
  *
@@ -68,6 +70,13 @@ extern unsigned int _stklen = 10000;
 #include <signal.h>
 #endif
 
+#if	THEOS
+# ifndef MAINWA_BUG
+#  pragma wild argv
+# endif
+#pragma prog 5.0,0,0,0,"Port by Jean-Michel Dubois"
+#endif
+
 /*
 	This is the primary entry point that is used by command line
 	invocation, and by applications that link with microemacs in
@@ -82,15 +91,15 @@ extern unsigned int _stklen = 10000;
 
 	Note that re-entering an Emacs that is saved in a kept
 	subprocess would require a similar entrypoint.
-*/
+ */
 
 #if	CALLED
 int emacs(argc, argv)
 #else
 #if	XVT
-called_main(argc, argv)
+int called_main(argc, argv)
 #else
-main(argc, argv)
+int main(argc, argv)
 #endif
 #endif
 
@@ -98,12 +107,34 @@ int argc;			/* # of arguments */
 char *argv[];			/* argument strings */
 
 {
-	register int status;
-
+	register int status = 0;
+#if	UTF8
+	char* p = setlocale(LC_CTYPE, NULL);
+#endif
+#if defined(THEOS) && defined(MAINWA_BUG)
+	extern int _setargv(int*, char***);
+	_setargv(&argc, &argv);
+#endif
 #if HANDLE_WINCH
 	signal(SIGWINCH,winch_changed);
 #endif
+#if	UTF8
+	/* save LC_CTYPE locale */
+	if (p) {
+		size_t l = strlen(p);
+		l = min(l, NSTRING - 1);
+		strncpy(locale, p, l);
+		locale[l] = '\0';
+	}
+	else
+		p = "C";
 
+
+	if (! strstr(p, ".UTF-8")) {
+		/* set French locale */
+		setlocale(LC_CTYPE, "");
+	}
+#endif
 	/* the room mechanism would deallocate undo info no failure....
 	   its not set up yet, so make sure it doesn't try until the
 	   editor is initialized */
@@ -111,6 +142,9 @@ char *argv[];			/* argument strings */
 
 	/* Initialize the editor */
 	eexitflag = FALSE;
+#if	DYNMSGS
+	msinit();		/* load dynamic messages */
+#endif
 #if	!WINDOW_MSWIN
 	vtinit();			/* Terminal */
 #endif
@@ -120,8 +154,9 @@ char *argv[];			/* argument strings */
 	edinit(mainbuf);	/* Buffers, windows, screens */
 	ab_init();		/* initialize the abbreviation behavior */
 	varinit();		/* user variables */
+#if ! UTF8
 	initchars();		/* character set definitions */
-
+#endif
 #if MAGIC
 	mcdeltapat[0].mc_type = tapatledcm[0].mc_type = JMPTABLE;
 	mcdeltapat[0].u.jmptable = &deltapat;
@@ -152,6 +187,9 @@ abortrun:
 #if	CLEAN
 	clean();
 #endif
+#if	UTF8
+	setlocale(LC_CTYPE, locale);	/* restore LC_CTYPE locale */
+#endif
 #if	CALLED
 	return(status);
 #else
@@ -164,13 +202,13 @@ abortrun:
 	On some primitive operation systems, and when emacs is used as
 	a subprogram to a larger project, emacs needs to de-alloc its
 	own used memory, otherwise we just exit.
-*/
+ */
 
-PASCAL NEAR clean()
+clean()
 
 {
 	register BUFFER *bp;	/* buffer list pointer */
-	register SCREEN *scrp;	/* ptr to screen to dump */
+	register ESCREEN *scrp;	/* ptr to screen to dump */
 
 	/* first clean up the screens */
 	scrp = first_screen;
@@ -216,7 +254,7 @@ PASCAL NEAR clean()
 
 /*	Process a command line.   May be called any time.	*/
 
-VOID PASCAL NEAR dcline(argc, argv, firstflag)
+VOID dcline(argc, argv, firstflag)
 
 int argc;
 char *argv[];
@@ -244,8 +282,9 @@ int firstflag;			/* is this the first time in? */
 	int cryptflag;		/* encrypting on the way in? */
 	char ekey[NPAT];	/* startup encryption key */
 #endif
-	NOSHARE CONST extern char *pathname[];	/* startup file path/name array */
-
+#if	BACKUP
+	int nobackflag;		/* no backup ? */
+#endif
 	viewflag = FALSE;	/* view mode defaults off in command line */
 	gotoflag = FALSE;	/* set to off to begin with */
 	gline = 1;
@@ -258,6 +297,9 @@ int firstflag;			/* is this the first time in? */
 #if	CRYPT
 	cryptflag = FALSE;	/* no encryption by default */
 #endif
+#if	BACKUP
+	nobackflag = FALSE;	/* backup files by default */
+#endif
 	disphigh = FALSE;	/* don't escape high bit characters */
 	lterm[0] = 0;		/* standard line terminators */
 
@@ -265,67 +307,85 @@ int firstflag;			/* is this the first time in? */
 	for (carg = 1;  carg < argc;  ++carg) {
 
 		/* Process Switches */
+		if (argv[carg][0] ==
 #if WMCS
-		if (argv[carg][0] == ':') {
+				':'
 #else
-		if (argv[carg][0] == '-') {
+				'-'
 #endif
+		) {
 			/* Process Startup macroes */
 			switch (argv[carg][1]) {
 
-			case 'c':	/* -c for changable file */
-			case 'C':
-				viewflag = FALSE;
-				break;
-			case 'e':	/* -e process error file */
-			case 'E':
-				errflag = TRUE;
-				break;
-			case 'g':	/* -g for initial goto line */
-			case 'G':
-				gotoflag = TRUE;
-				gline = asc_int(&argv[carg][2]);
-				break;
-			case 'i':	/* -i<var> <value> set an initial */
-			case 'I':	/* value for a variable */
-				bytecopy(bname, &argv[carg][2], NVSIZE);
-				findvar(bname, &vd, NVSIZE + 1, VT_GLOBAL);
-				if (vd.v_type == -1) {
-					mlwrite(TEXT52, bname);
-/*							"%%No such variable as '%s'" */
+				case 'c':	/* -c for changeable file */
+				case 'C':
+					viewflag = FALSE;
 					break;
-				}
-				svar(&vd, argv[++carg]);
-				break;
-#if	CRYPT
-			case 'k':	/* -k<key> for code key */
-			case 'K':
-				cryptflag = TRUE;
-				strcpy(ekey, &argv[carg][2]);
-				break;
+				case 'e':	/* -e process error file */
+				case 'E':
+					errflag = TRUE;
+					break;
+				case 'g':	/* -g for initial goto line */
+				case 'G':
+					gotoflag = TRUE;
+					gline = asc_int(&argv[carg][2]);
+					break;
+#if	LIBHELP
+				case 'h':	/* Alternate help */
+					if (! argv[carg][2]) {
+						if (++carg == argc) {
+							continue;
+						}
+						initlook(argv[carg]);
+					} else
+						initlook(&argv[carg][2]);
+					break;
 #endif
-			case 'p':	/* -p for initial goto char position */
-			case 'P':
-				gotoflag = TRUE;
-				gchar = asc_int(&argv[carg][2]);
-				break;
-			case 'r':	/* -r restrictive use */
-			case 'R':
-				restflag = TRUE;
-				break;
-			case 's':	/* -s for initial search string */
-			case 'S':
-				searchflag = TRUE;
-				bytecopy((char *) pat, &argv[carg][2], NPAT);
-				setjtable();
-				break;
-			case 'v':	/* -v for View File */
-			case 'V':
-				viewflag = TRUE;
-				break;
-			default:	/* unknown switch */
+				case 'i':	/* -i<var> <value> set an initial */
+				case 'I':	/* value for a variable */
+					bytecopy(bname, &argv[carg][2], NVSIZE);
+					findvar(bname, &vd, NVSIZE + 1, VT_GLOBAL);
+					if (vd.v_type == -1) {
+						mlwrite(TEXT52, bname);
+						/*							"%%No such variable as '%s'" */
+						break;
+					}
+					svar(&vd, argv[++carg]);
+					break;
+#if	CRYPT
+				case 'k':	/* -k<key> for code key */
+				case 'K':
+					cryptflag = TRUE;
+					strcpy(ekey, &argv[carg][2]);
+					break;
+#endif
+#if	BACKUP
+				case 'n':	/* -n for No Backup File */
+					nobackflag = TRUE;
+					break;
+#endif
+				case 'p':	/* -p for initial goto char position */
+				case 'P':
+					gotoflag = TRUE;
+					gchar = asc_int(&argv[carg][2]);
+					break;
+				case 'r':	/* -r restrictive use */
+				case 'R':
+					restflag = TRUE;
+					break;
+				case 's':	/* -s for initial search string */
+				case 'S':
+					searchflag = TRUE;
+					bytecopy((char *) pat, &argv[carg][2], NPAT);
+					setjtable();
+					break;
+				case 'v':	/* -v for View File */
+				case 'V':
+					viewflag = TRUE;
+					break;
+				default:	/* unknown switch */
 					/* ignore this for now */
-				break;
+					break;
 			}
 
 		} else if (argv[carg][0] == '+') {
@@ -343,12 +403,15 @@ int firstflag;			/* is this the first time in? */
 
 #if WINDOW_MSWIN32
 		} else if ((argv[carg][0] != ' ') ||
-                           (argv[carg][1] != '\0')) {
-		    /* WinNT PDK2 causes spurious space arguments */
+				(argv[carg][1] != '\0')) {
+			/* WinNT PDK2 causes spurious space arguments */
 #else
 		} else {
 #endif
 			/* Process an input file */
+#if	(MSDOS|ST520|THEOS)
+			strlwr(argv[carg]);
+#endif
 #if	MSDOS | OS2
 			/* change forward slashes to back */
 			scan = (unsigned char *) argv[carg];
@@ -384,6 +447,10 @@ int firstflag;			/* is this the first time in? */
 				ecrypt(ekey, strlen(ekey));
 				bytecopy(bp->b_key, ekey, NPAT);
 			}
+#endif
+#if	BACKUP
+			if (nobackflag)
+				bp->b_mode |= MDNOBAK;
 #endif
 		}
 	}
@@ -421,13 +488,13 @@ int firstflag;			/* is this the first time in? */
 	if (gotoflag && searchflag) {
 		update(FALSE);
 		mlwrite(TEXT101);
-/*			"[Can not search and goto at the same time!]" */
+		/*			"[Can not search and goto at the same time!]" */
 	} else if (gotoflag) {
 		if ((gotoline(TRUE, gline) == FALSE) ||
-			(forwchar(TRUE, gchar - 1) == FALSE)) {
+				(forwchar(TRUE, gchar - 1) == FALSE)) {
 			update(FALSE);
 			mlwrite(TEXT102);
-/*				"[Bogus goto argument]" */
+			/*				"[Bogus goto argument]" */
 		}
 	} else if (searchflag) {
 		if (forwhunt(FALSE, 0) == FALSE)
@@ -437,19 +504,19 @@ int firstflag;			/* is this the first time in? */
 
 #if	WINDOW_MSWIN
 #define GETBASEKEY getbasekey
-static int PASCAL NEAR getbasekey()
+static int getbasekey()
 
 {
-    register int c;
+	register int c;
 
-    notquiescent = -1;  /* will be <= 0 only if get_key() is called
+	notquiescent = -1;  /* will be <= 0 only if get_key() is called
 			   directly from editloop(). This is used to
 			   restrict some windows-specific actions
 			   (menus, sizing, etc...) when not called from
 			   the lowest level of the editor */
-    c = get_key();
-    notquiescent = 1;
-    return c;
+	c = get_key();
+	notquiescent = 1;
+	return c;
 }
 #else
 #define GETBASEKEY get_key
@@ -459,9 +526,9 @@ static int PASCAL NEAR getbasekey()
 	This is called to let the user edit something.	Note that if you
 	arrange to be able to call this from a macro, you will have
 	invented the "recursive-edit" function.
-*/
+ */
 
-PASCAL NEAR editloop()
+int editloop()
 
 {
 	register int c;		/* command character */
@@ -475,14 +542,14 @@ PASCAL NEAR editloop()
 	/* setup to process commands */
 	lastflag = 0;		/* Fake last flags.	*/
 
-loop:
+	loop:
 	/* if a macro error is pending, wait for a character */
 	if (exec_error) {
 #if	WINDOW_MSWIN
 		mlhistory();
 #else
 		mlforce(TEXT227);
-/*			"\n--- Press any key to Continue ---" */
+		/*			"\n--- Press any key to Continue ---" */
 		tgetc();
 #endif
 		sgarbf = TRUE;
@@ -541,7 +608,6 @@ loop:
 	discmd = TRUE;
 	disinp = TRUE;
 	c = GETBASEKEY();
-
 	/* if there is something on the command line, clear it */
 	if (mpresf != FALSE) {
 		mlerase();
@@ -550,8 +616,8 @@ loop:
 
 	/* override the arguments if prefixed */
 	if (prefix) {
-		if (is_lower(c & 255))
-			c = (c & ~255) | upperc(c & 255);
+		if (is_lower(c & CMSK))
+			c = (c & ~CMSK) | upperc(c & CMSK);
 		c |= prefix;
 		f = predef;
 		n = prenum;
@@ -565,7 +631,7 @@ loop:
 
 	basec = c & ~META;	/* strip meta char off if there */
 	if ((c & META) && ((basec >= '0' && basec <= '9') || basec == '-') &&
-	    (getbind(c) == NULL)) {
+			(getbind(c) == NULL)) {
 		f = TRUE;		/* there is a # arg */
 		n = 0;			/* start with a zero default */
 		mflag = 1;		/* current minus flag */
@@ -596,8 +662,8 @@ loop:
 		n = 4;			/* with argument of 4 */
 		mflag = 0;		/* that can be discarded. */
 		mlwrite("Arg: 4");
-		while ((c = GETBASEKEY()) >= '0' && c <= '9' ||
-			c == reptc || c == '-') {
+		while (((c = GETBASEKEY()) >= '0' && c <= '9') ||
+				c == reptc || c == '-') {
 			if (c == reptc)
 				if ((n > 0) == ((n * 4) > 0))
 					n = n * 4;
@@ -638,8 +704,16 @@ loop:
 			n = -n;
 		}
 	}
-
+#if	MDSLINE
+	if (! (c & ~CMSK) && (curbp->b_mode & (MDSLINE|MDDLINE)) && (c =='+' || iswdigit(c)))
+		c = tosgraph(c);
+#endif
 	/* and execute the command */
+#if	CURSES
+	if (wdrop != NULL && ! (c & MOUS))
+		 menukey(c);
+	else
+#endif
 	execute(c, f, n);
 	goto loop;
 }
@@ -650,7 +724,7 @@ loop:
  * to read in a file by default, and we want the buffer name to be right.
  */
 
-VOID PASCAL NEAR edinit(bname)
+int edinit(bname)
 
 char bname[];			/* name of buffer to initialize */
 
@@ -659,7 +733,7 @@ char bname[];			/* name of buffer to initialize */
 	register int index;
 
 	/* the quote characters are LANGUAGE SPECIFIC
-	   so they need to be inited here instrad of in the header file */
+	   so they need to be set here instead of in the header file */
 	oquote = OQUOTE_CHAR;
 	cquote = CQUOTE_CHAR;
 
@@ -694,18 +768,28 @@ char bname[];			/* name of buffer to initialize */
 	blistp = bfind("[Buffers]", TRUE, BFINVS);	/* Buffer list buffer	*/
 	slistp = bfind("[Screens]", TRUE, BFINVS);	/* screen list buffer	*/
 	ulistp = bfind("[Undos]", TRUE, BFINVS);	/* undo list buffer	*/
-	if (bp == NULL || blistp == NULL)
+#if	LIBHELP
+	helpbp = bfind(TEXT294, TRUE, BFINVS|BFHELP);	/* Help buffer	*/
+	bfind(TEXT295, TRUE, BFINVS);			/* Error buffer */
+	bfind(TEXT296, TRUE, BFINVS);			/* Fkeys buffer	*/
+#endif
+	if (bp == NULL || blistp == NULL
+#if	LIBHELP
+			|| helpbp == NULL
+#endif
+	)
 		meexit(1);
 
 	/* and allocate the default screen */
-	first_screen = (SCREEN *) NULL;
+	first_screen = (ESCREEN *) NULL;
 	init_screen("MAIN", bp);
-	if (first_screen == (SCREEN *) NULL)
-		meexit(1);
+	if (first_screen == (ESCREEN *) NULL)
+		return(meexit(1));
 
 	/* set the current default screen/buffer/window */
 	curbp = bp;
 	curwp = wheadp = first_screen->s_cur_window = first_screen->s_first_window;
+	return(TRUE);
 }
 
 /*
@@ -715,7 +799,7 @@ char bname[];			/* name of buffer to initialize */
  * look at it. Return the status of command.
  */
 
-PASCAL NEAR execute(c, f, n)
+int execute(c, f, n)
 
 int c;					/* key to execute */
 int f;					/* prefix argument flag */
@@ -746,7 +830,7 @@ int n;					/* prefix value */
 
 		/* Don't reset the function type flags on a prefix */
 		if ((key->k_type == BINDFNC) &&
-			((key->k_ptr.fp == meta) || (key->k_ptr.fp == cex)))
+				((key->k_ptr.fp == uemeta) || (key->k_ptr.fp == cex)))
 			status = execkey(key, f, n);
 		else {
 			thisflag = 0;
@@ -770,12 +854,15 @@ int n;					/* prefix value */
 	 * negative, wrap mode is enabled, and we are now past fill column,
 	 * and we are not read-only, perform word wrap.
 	 */
-	if (c == ' ' && (curwp->w_bufp->b_mode & MDWRAP) && fillcol > 0 &&
-		n >= 0 && getccol(FALSE) > fillcol &&
-		(curwp->w_bufp->b_mode & MDVIEW) == FALSE)
+	if (c == ' '
+	 && (curwp->w_bufp->b_mode & MDWRAP)
+	 && fillcol > 0
+	 && n >= 0
+	 && getccol(FALSE) > fillcol
+	 && (curwp->w_bufp->b_mode & MDVIEW) == FALSE)
 		execkey(&wraphook, FALSE, 1);
 
-	if ((c >= 0x20 && c <= 0xFF)) { /* Self inserting.	*/
+	if ((c >= 0x20 && c <= CMSK)) { /* Self inserting.	*/
 		if (n <= 0) {		/* Fenceposts.		*/
 			lastflag = 0;
 			return(n < 0 ? FALSE : TRUE);
@@ -790,20 +877,24 @@ int n;					/* prefix value */
 #endif
 
 		/* replace or overwrite mode, not at the end of a string */
-		if (curwp->w_bufp->b_mode & (MDREPL | MDOVER) &&
-			curwp->w_doto < lused(curwp->w_dotp)) {
+		if ((curwp->w_bufp->b_mode & (MDREPL | MDOVER)) &&
+				curwp->w_doto < lused(curwp->w_dotp)) {
 			do {
 				/* if we are in replace mode, or
 				   (next char is not a tab or we are at a tab stop) */
-				if (curwp->w_bufp->b_mode & MDREPL ||
-					((lgetc(curwp->w_dotp, curwp->w_doto) != '\t' || tabsize == 0) ||
-					getccol(FALSE) % tabsize == (tabsize - 1))) {
+				if ((curwp->w_bufp->b_mode & MDREPL)
+				 || ((lgetc(curwp->w_dotp, curwp->w_doto) != '\t'
+				 || tabsize == 0)
+				 || getccol(FALSE) % tabsize == (tabsize - 1))) {
 
 					/* make sure the cursor gets back to
 					   the right place on an undo */
 					undo_insert(OP_CPOS, 0L, obj);
-
+#if	UTF8
+					ldelchar(1L, FALSE);
+#else
 					ldelete(1L, FALSE);
+#endif
 				}
 
 				/* do the appropriate insertion */
@@ -838,7 +929,7 @@ int n;					/* prefix value */
 						status = FALSE;
 				}
 			}
-#endif	
+#endif
 			else
 				status = linsert(n, c);
 		}
@@ -846,12 +937,12 @@ int n;					/* prefix value */
 		/* In ABBREV mode, if we are doing aggressive expansion and
 		   the current buffer is a symbol in the abbreviation table */
 		if (((curbp->b_mode & MDABBR) != 0) &&
-			(ab_quick && (ab_lookup(ab_word) != NULL)))
+				(ab_quick && (ab_lookup(ab_word) != NULL)))
 			ab_expand();
 
 		/* check for CMODE fence matching */
 		if ((c == '}' || c == ')' || c == ']') &&
-			(curbp->b_mode & MDCMOD) != 0)
+				(curbp->b_mode & MDCMOD) != 0)
 			fmatch(c);
 
 		/* check auto-save mode */
@@ -870,7 +961,7 @@ int n;					/* prefix value */
 	}
 	TTbeep();
 	mlwrite(TEXT19);	/* complain		*/
-/*		"[Key not bound]" */
+	/*		"[Key not bound]" */
 	lastflag = 0;		/* Fake last flags.	*/
 	return(FALSE);
 }
@@ -879,9 +970,9 @@ int n;					/* prefix value */
 	Fancy quit command, as implemented by Norm. If the any buffer
 has changed do a write on that buffer and exit emacs, otherwise simply
 exit.
-*/
+ */
 
-PASCAL NEAR quickexit(f, n)
+int quickexit(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -899,10 +990,10 @@ int f, n;				/* prefix flag and argument */
 	while (bp != NULL) {
 
 		if ((bp->b_flag & BFCHG) != 0	/* Changed.		*/
-			&& (bp->b_flag & BFINVS) == 0) { /* Real. */
+				&& (bp->b_flag & BFINVS) == 0) { /* Real. */
 			curbp = bp;	/* make that buffer cur */
 			mlwrite(TEXT103, bp->b_fname);
-/*				"[Saving %s]" */
+			/*				"[Saving %s]" */
 			mlwrite("\n");
 			if ((status = filesave(f, n)) != TRUE) {
 				curbp = oldcb;	/* restore curbp */
@@ -920,20 +1011,20 @@ int f, n;				/* prefix flag and argument */
  * has been changed and not written out. Normally bound to "C-X C-C".
  */
 
-PASCAL NEAR quit(f, n)
+int quit(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
 	register int status;	/* return status */
 
 	if (f != FALSE		/* Argument forces it.	*/
-	    || anycb() == FALSE	/* All buffers clean or user says it's OK. */
-	    || (status = mlyesno(TEXT104)) == TRUE) {
-/*			     "Modified buffers exist. Leave anyway" */
+			|| anycb() == FALSE	/* All buffers clean or user says it's OK. */
+			|| (status = mlyesno(TEXT104)) == TRUE) {
+		/*			     "Modified buffers exist. Leave anyway" */
 #if	FILOCK
 		if (lockrel() != TRUE) {
 			TTputc('\n');
-			TTputc('\r');
+			TTputc(RET_CHAR);
 			TTclose();
 			TTkclose();
 			status = meexit(1);
@@ -943,14 +1034,14 @@ int f, n;				/* prefix flag and argument */
 			status = meexit(n);
 		else
 			status = meexit(GOOD);
-		}
+	}
 	mlerase();
 	return(status);
-	}
+}
 
-PASCAL NEAR meexit(status)
+int meexit(status)
 int status;				/* return status of emacs */
-	{
+{
 	eexitflag = TRUE;	/* flag a program exit */
 	gflags |= GFEXIT;
 	eexitval = status;
@@ -965,18 +1056,18 @@ int status;				/* return status of emacs */
  * return.
  */
 
-PASCAL NEAR ctlxlp(f, n)
+int ctlxlp(f, n)
 
 int f, n;				/* prefix flag and argument */
 
 {
 	if (kbdmode != STOP) {
 		mlwrite(TEXT105);
-/*			"%%Macro already active" */
+		/*			"%%Macro already active" */
 		return(FALSE);
 	}
 	mlwrite(TEXT106);
-/*		"[Start macro]" */
+	/*		"[Start macro]" */
 	kbdptr = &kbdm[0];
 	kbdend = kbdptr;
 	kbdmode = RECORD;
@@ -988,19 +1079,19 @@ int f, n;				/* prefix flag and argument */
  * routine. Set up the variables and return to the caller.
  */
 
-PASCAL NEAR ctlxrp(f, n)
+int ctlxrp(f, n)
 
 int f, n;				/* prefix flag and argument */
 
 {
 	if (kbdmode == STOP) {
 		mlwrite(TEXT107);
-/*			"%%Macro not active" */
+		/*			"%%Macro not active" */
 		return(FALSE);
-		}
+	}
 	if (kbdmode == RECORD) {
 		mlwrite(TEXT108);
-/*			"[End macro]" */
+		/*			"[End macro]" */
 		kbdmode = STOP;
 	}
 	return(TRUE);
@@ -1012,14 +1103,14 @@ int f, n;				/* prefix flag and argument */
  * command gets an error. Return TRUE if all ok, else FALSE.
  */
 
-PASCAL NEAR ctlxe(f, n)
+int ctlxe(f, n)
 
 int f, n;				/* prefix flag and argument */
 
 {
 	if (kbdmode != STOP) {
 		mlwrite(TEXT105);
-/*			"%%Macro already active" */
+		/*			"%%Macro already active" */
 		return(FALSE);
 	}
 	if (n <= 0)
@@ -1036,7 +1127,7 @@ int f, n;				/* prefix flag and argument */
  * Sometimes called as a routine, to do general aborting of stuff.
  */
 
-PASCAL NEAR ctrlg(f, n)
+int ctrlg(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1044,32 +1135,32 @@ int f, n;				/* prefix flag and argument */
 	TTbeep();
 	kbdmode = STOP;
 	mlwrite(TEXT8);
-/*		"[Aborted]" */
+	/*		"[Aborted]" */
 	return(ABORT);
 }
 
 /* tell the user that this command is illegal while we are in
    VIEW (read-only) mode				*/
 
-PASCAL NEAR rdonly()
+int rdonly()
 
 {
 	TTbeep();
 	mlwrite(TEXT109);
-/*		"[Key illegal in VIEW mode]" */
+	/*		"[Key illegal in VIEW mode]" */
 	return(FALSE);
 }
 
-PASCAL NEAR resterr()
+int resterr()
 
 {
 	TTbeep();
 	mlwrite(TEXT110);
-/*		"[That command is RESTRICTED]" */
+	/*		"[That command is RESTRICTED]" */
 	return(FALSE);
 }
 
-int PASCAL NEAR nullproc(f, n)	/* user function that does NOTHING */
+int nullproc(f, n)	/* user function that does NOTHING */
 
 int n, f;	/* yes, these are default and never used.. but MUST be here */
 
@@ -1077,7 +1168,7 @@ int n, f;	/* yes, these are default and never used.. but MUST be here */
 	return(TRUE);
 }
 
-PASCAL NEAR meta(f, n)	/* set META prefixing pending */
+int uemeta(f, n)	/* set META prefixing pending */
 
 int f, n;				/* prefix flag and argument */
 
@@ -1088,7 +1179,7 @@ int f, n;				/* prefix flag and argument */
 	return(TRUE);
 }
 
-PASCAL NEAR cex(f, n)	/* set ^X prefixing pending */
+int cex(f, n)	/* set ^X prefixing pending */
 
 int f, n;				/* prefix flag and argument */
 
@@ -1099,19 +1190,32 @@ int f, n;				/* prefix flag and argument */
 	return(TRUE);
 }
 
-int PASCAL NEAR unarg()	/* dummy function for binding to universal-argument */
+int unarg()	/* dummy function for binding to universal-argument */
 {
 	return(TRUE);
 }
 
+#if	JMDEXT
+int notavail()
+{
+	mlwrite(TEXT284);
+	return (FALSE);
+}
+#else
+int notavail()
+{
+	mlwrite("Not available");
+	return (FALSE);
+}
+#endif
 /*	bytecopy:	copy a string...with length restrictions
 			ALWAYS null terminate
-*/
+ */
 
-char *PASCAL NEAR bytecopy(dst, src, maxlen)
+char *bytecopy(dst, src, maxlen)
 
 char *dst;				/* destination of copied string */
-char *src;				/* source */
+CONST char *src;			/* source */
 int maxlen;				/* maximum length */
 
 {
@@ -1126,9 +1230,9 @@ int maxlen;				/* maximum length */
 
 /*	copystr:	make another copy of the argument
 
-*/
+ */
 
-char *PASCAL NEAR copystr(sp)
+char *copystr(sp)
 
 char *sp;				/* string to copy */
 
@@ -1153,7 +1257,7 @@ char *sp;				/* string to copy */
 
 	with RAMSHOW defined, the number is also posted on the
 	end of the bottom mode line and is updated whenever it is changed.
-*/
+ */
 
 #undef	malloc
 #undef	free
