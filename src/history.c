@@ -2575,6 +2575,16 @@
  *	- added mouse-resize2-window as a new simpler mouse resize command for XP to use
  *	- caused XP code (in XPCONIO.C) to create new mouse input sequence
  *	  [0 MOUS #col #row 2] as MS2 and bound it to mouse-resize2-window
+ *	Sep 2020 Jean-Michel Dubois
+ *	- Added Unicode support with UTF-8 files
+ *	- Added Theos O.S. support (in 1988-1992)
+ *	- Added Cygwin support
+ *	- Added file backup (likely borrowed somewhere)
+ *	- Added help on language keywords (currently for Theos C only) (borrowed to Mark Williams)
+ *	- Added semi-graphics character entry through numeric keypad
+ *	- Added dynamic load of messages from a file
+ *	- Removed all PASCAL NEAR
+ *	- Some code cleanup
  */
 
 void history()
