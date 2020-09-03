@@ -183,8 +183,11 @@
 #if	JMDEXT
 #define BACKUP	1	/* backup previous file version			*/
 #define LIBHELP 1	/* online help from Mark Williams version	*/
-#define NEWVARS 1	/* other environment variables			*/
 #define DYNMSGS	1	/* load messages according to current language	*/
+#define THEOX	0	/* allow TheoX character set files edition	*/
+			/* including semi-graphics entry from numeric	*/
+			/* keypad (require UTF8)			*/
+#define TXBASIC 0	/* TxBasic IDE menu				*/
 #endif
 
 /*	Character set options		*/
