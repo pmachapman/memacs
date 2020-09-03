@@ -13,44 +13,37 @@ store-procedure clean
 	delete-buffer "[b-change-line]"
 	delete-buffer "[b-del-block]"
 	delete-buffer "[b-draw-box]"
-	delete-buffer "[b-ins-line]"
 	delete-buffer "[b-copy-block]"
 	delete-buffer "[b-yank-block]"
-	delete-buffer "[b-ins-blank]"
 	delete-buffer "[b-yank-block]"
 	delete-buffer "[getblock]"
 	delete-buffer "[putblock]"
-	delete-buffer "[drawbox]"
-	delete-buffer "[setpoints]"
-	delete-buffer "[horizontal]"
-	delete-buffer "[vertical]"
-	delete-buffer "[horline]"
-	delete-buffer "[vertline]"
-	delete-buffer "[delcol]"
 !endm
 
 ; Write out the page instructions
 	save-window
 	1 next-window
 	beginning-of-file
+	delete-mode "VIEW"
 	set $curcol 25
-	overwrite-string " F1 Line type [DOUBLE]    F2 kill block        "
+	overwrite-string " F1 single line box       F2 kill block        "
 	next-line
 	set $curcol 25
-	overwrite-string " F3 draw box              F4 copy block        "
+	overwrite-string " F3 double line box       F4 copy block        "
 	next-line
 	set $curcol 25
-	overwrite-string " F5 insert line           F6 yank block        "
+	overwrite-string "                          F6 yank block        "
 	next-line
 	set $curcol 18
 	overwrite-string "BOX "
 	set $curcol 25
-	overwrite-string " F7 insert space          F8 insert block      "
+	overwrite-string "                          F8 insert block      "
 	next-line
 	set $curcol 25
 	overwrite-string "                                               "
 	unmark-buffer
 	beginning-of-file
+	add-mode "VIEW"
 	!force restore-window
 	update-screen
 
@@ -64,414 +57,23 @@ store-procedure b-change-line
 		set %rcltype 2
 		set %rctmp "DOUBLE"
 	!else
-		!if &equ %rcltype 2
-			set %rcltype 3
-			set %rctmp "C-CMNT"
-		!else
-			set %rcltype 1
-			set %rctmp "SINGLE"
-		!endif
+		set %rcltype 1
+		set %rctmp "SINGLE"
 	!endif
 	set %cbuf $cbufname
 	set %cline $cwline
-	select-buffer "Function Keys"
+	select-buffer "[Function Keys]"
 	beginning-of-file
 	1 goto-line
 	40 forward-character
+	delete-mode "VIEW"
 	6 delete-next-character
 	insert-string %rctmp
 	unmark-buffer
-	select-buffer %cbuf	
+	add-mode "VIEW"
+	select-buffer %cbuf
 	%cline redraw-display
 	!return
-!endm
-
-;	Draw a box
-
-store-procedure b-draw-box
-	!if &equal %rcltype  1
-		set %c1 "⁄"
-		set %c2 "ƒ"
-		set %c3 "ø"
-		set %c4 "¿"
-		set %c5 "Ÿ"
-		set %c6 "≥"
-	!else
-		!if &equal %rcltype 2
-			set %c1 "…"
-			set %c2 "Õ"
-			set %c3 "ª"
-			set %c4 "»"
-			set %c5 "º"
-			set %c6 "∫"
-		!else
-			set %c1 "/"
-			set %c2 "*"
-			set %c3 "\"
-			set %c4 "\"
-			set %c5 "/"
-			set %c6 "*"
-		!endif
-	!endif
-	run drawbox	
-!endm
-
-;	insert a blank line in a box
-
-store-procedure b-ins-blank
-	set %rctmp %rcltype
-	set %rcltype 0
-	run b-ins-line
-	set %rcltype %rctmp
-!endm
-
-;	insert a line in a box
-
-store-procedure	b-ins-line
-	run setpoints
-	!if &equal %pcol %mcol
-		run vertical
-	!else
-		!if &equal %pline %mline
-			run horizontal
-		!else
-			write-message "Illegal point and mark for lines"
-		!endif
-	!endif
-!endm
-
-store-procedure setpoints
-; procedure will set pcol, pline, mcol and mline. currently at point
-; it will also detab the region
-	set %pcol $curcol
-	set %pline $curline
-	exchange-point-and-mark
-	set %mcol $curcol
-	set %mline $curline
-	exchange-point-and-mark
-	detab-region
-	set $curline %pline
-	set $curcol %pcol
-!endm
-
-store-procedure drawbox
-	run setpoints
-	set $curline %mline
-	set $curcol %mcol
-;draw top horizontal line
-	insert-string %c1
-;	set %width &sub &sub %pcol %mcol 1
-	set %width &add 2 &sub %pcol %mcol
-	%width insert-string %c2
- 	insert-string %c3
-	newline-and-indent
-;draw bottom horizontal line
-	%pline goto-line
-	next-line
-	end-of-line
-	newline
-	%mcol insert-string " "
-;	set $curcol %mcol
-	insert-string %c4
-	%width insert-string %c2
-	insert-string %c5
-; bump pline 
-	set %pline &add %pline 1
-;draw verticals -- go to top and work our way down
-	%mline goto-line
-	!while &less $curline %pline
-		next-line
-		end-of-line
-		!if &less $curcol %pcol
-			&sub %pcol $curcol insert-string " "
-		!endif
-		set $curcol %pcol
-		insert-string " "
-		insert-string %c6
-		set $curcol %mcol
-		insert-string %c6
-		insert-string " "
-	!endwhile
-;return to point
-	%pline goto-line
-	next-line
-	beginning-of-line
-	%width forward-character
-!force	6 forward-character
-!endm
-
-; user procedure to draw a horizontal from mark to point making spaces for
-; the characters.
-store-procedure horizontal
-	set %s1 "∫"
-	set %s2 "≥"
-	set %s3 "*"
-	!if &equal %rcltype  0
-;	then insert blanks
-		set %c1 "∫"
-		set %c2 "≥"
-		set %c3 " "
-		set %c4 "∫"
-		set %c5 "≥"
-		set %c6 "∫"
-		set %c7 "≥"
-		set %c8 "*"
-	!else
-		!if &equal %rcltype  1
-;		then insert a single line
-			set %c1 "«"
-			set %c2 "√"
-			set %c3 "ƒ"
-			set %c4 "◊"
-			set %c5 "≈"
-			set %c6 "∂"
-			set %c7 "¥"
-			set %c8 "*"
-		!else
-			!if &equal %rcltype 2
-;		then insert a double line
-				set %c1 "Ã"
-				set %c2 "∆"
-				set %c3 "Õ"
-				set %c4 "Œ"
-				set %c5 "ÿ"
-				set %c6 "π"
-				set %c7 "µ"
-				set %c8 "*"
-			!else
-				set %c1 "*"
-				set %c2 "*"
-				set %c3 "*"
-				set %c4 "*"
-				set %c5 "*"
-				set %c6 "*"
-				set %c7 "*"
-				set %c8 "*"
-			!endif
-		!endif
-	!endif
-	run horline
-!endm
-
-store-procedure vertical
-	set %s1 "Õ"
-	set %s2 "ƒ"
-	set %s3 "*"
-	!if &equal %rcltype  0
-		set %c1 "Õ"
-		set %c2 "ƒ"
-		set %c3 " "
-		set %c4 "Õ"
-		set %c5 "ƒ"
-		set %c6 "Õ"
-		set %c7 "ƒ"
-		set %c8 "*"
-	!else
-		!if &equal %rcltype  1
-			set %c1 "—"
-			set %c2 "¬"
-			set %c3 "≥"
-			set %c4 "ÿ"
-			set %c5 "≈"
-			set %c6 "œ"
-			set %c7 "¡"
-			set %c8 "*"
-		!else
-			!if &equal %rcltype 2
-				set %c1 "À"
-				set %c2 "“"
-				set %c3 "∫"
-				set %c4 "Œ"
-				set %c5 "◊"
-				set %c6 " "
-				set %c7 "–"
-				set %c8 "*"
-			!else
-				set %c1 "*"
-				set %c2 "*"
-				set %c3 "*"
-				set %c4 "*"
-				set %c5 "*"
-				set %c6 "*"
-				set %c7 "*"
-				set %c8 "*"
-			!endif
-		!endif
-	!endif
-	run verline
-!endm
-
-store-procedure horline
-; procedure to draw a line from beginning of line to point
-	!if &equal %mcol %pcol
-		!return
-	!endif
-	set $curline %pline
-	set $curcol %pcol
-	!if &less %pcol %mcol
-;	then point was to left of mark.  exchange and reset variables
-		exchange-point-and-mark
-		run setpoints
-	!endif
-	!if %rcinsert
-		set $curcol %mcol
-	!else
-		beginning-of-line
-		newline
-		previous-line
-;		end-of-line
-;		newline
-		; move to under mark
-		%mcol insert-string " "
-	!endif
-; see if first char is a vertical line
-	previous-line
-	set %char &chr $curchar
-	next-line
-	%rcinsert delete-next-character
-	!if &sequal %char %s1
-			insert-string %c1
-	!else
-		!if &sequal %char %s2
-			insert-string %c2
-		!else
-			!if &sequal %char %s3
-				insert-string %c8
-			!else
-				insert-string %c3
-			!endif
-		!endif
-	!endif
-; now for all chars but the last character i.e., char at point
-	!while &less $curcol %pcol
-		previous-line
-		set %char  &chr $curchar
-		next-line
-		%rcinsert delete-next-character
-		!if &sequal %char %s1
-			insert-string %c4
-        !else 
-			!if &sequal %char %s2
-				insert-string %c5
-			!else
-				!if &sequal %char %s3
-					insert-string %c8
-				!else
-					insert-string %c3
-				!endif
-			!endif
-		!endif
-	!endwhile
-; see if last char is a vertical line
-	previous-line
-	set %char  &chr $curchar
-	next-line
-	%rcinsert delete-next-character
-	!if &sequal %char %s1
-			insert-string %c6
-	!else
-		!if &sequal %char %s2
-			insert-string %c7
-		!else
-			!if &sequal %char %s3
-				insert-string %c8
-			!else
-				insert-string %c3
-			!endif
-		!endif
-	!endif
-!endm
-
-store-procedure verline
-;  proc to draw vertical line from mark to point.  mark should be above point.
-	!if &equal %mline %pline
-		!return
-	!endif
-;	if point was above mark exchange and reset variables
-	!if &less %pline %mline
-		exchange-point-and-mark
-		run setpoints
-	!endif
-;top line
-	%mline goto-line
-	set $curcol %pcol
-	backward-character
-	set %char &chr $curchar
-	forward-character
-	%rcinsert delete-next-character
-	!if &sequal %char %s1
-		insert-string %c1
-	!else
-		!if &sequal %char %s2
-			insert-string %c2
-		!else
-			!if &sequal %char %s3
-				insert-string %c8
-			!else
-				insert-string %c3
-			!endif
-		!endif
-	!endif
-;all but pline
-	!while &less $curline &sub %pline 1
-		next-line
-		beginning-of-line
-		set $curcol %pcol
-		backward-character
-		set %char &chr $curchar
-		forward-character
-		%rcinsert delete-next-character
-		!if &sequal %char %s1
-			insert-string %c4
-		!else
-			!if &sequal %char %s2
-				insert-string %c5
-			!else
-				!if &sequal %char %s3
-					insert-string %c8
-				!else
-					insert-string %c3
-				!endif
-			!endif
-		!endif
-	!endwhile
-; bottom line
-	next-line
-	beginning-of-line
-	set $curcol %pcol
-	backward-character
-	set %char &chr $curchar
-	forward-character
-	%rcinsert delete-next-character
-	!if &sequal %char %s1
-		insert-string %c6
-	!else
-		!if &sequal %char %s2
-			insert-string %c7
-		!else
-			!if &sequal %char %s3
-				insert-string %c8
-			!else
-				insert-string %c3
-			!endif
-		!endif
-	!endif
-!endm
-
-store-procedure delcol 
-; proc to delete column.  we will use the getblock procedure with the column of
-; the point set to one beyond the column point
-	set-points
-	!if &equal %mcol %pcol
-		; same columns
-		forward-character
-		run getblock
-		!return
-	!else
-		!if &equal %mline %pline
-		run getblock
-		!return
-	!endif
 !endm
 
 ;	delete a rectangular block of text
@@ -511,7 +113,7 @@ store-procedure getblock
 	set %rcbuf $cbufname
 	set %cline $cwline
 
-	;save block boundries
+	;save block boundaries
 	set %endpos $curcol
 	set %endline $curline
 	detab-region
@@ -562,12 +164,13 @@ store-procedure getblock
 ;	insert/overlay a rectangular block of text
 
 store-procedure putblock
+;	set $debug TRUE
 	;set up needed variables
 	set $discmd FALSE
 	set %rcbuf $cbufname
 	set %cline $cwline
 
-	;save block boundries
+	;save block boundaries
 	set %begpos $curcol
 	set %begline $curline
 
@@ -581,7 +184,7 @@ store-procedure putblock
 		select-buffer %rcbuf
 		beginning-of-line
 		!if &not &equ $lwidth 0
-			1 detab-line
+			1 detab-region
 			previous-line
 		!endif
 		!force set $curcol %begpos
@@ -619,16 +222,140 @@ store-procedure putblock
 	set $curcol %begpos
 	%cline redraw-display
 	set $discmd TRUE
+	set $debug FALSE
 !endm
 
-macro-to-key b-change-line	S-FN1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;	Draw a box
+
+	delete-buffer "[box]"
+	delete-buffer "[simple-box]"
+	delete-buffer "[double-box]"
+
+store-procedure box
+;	set $debug TRUE
+	set $discmd FALSE
+	!if &less $curline $mline
+		exchange-point-and-mark
+	!endif
+	set %endline $curline
+	set %rcol $curcol
+	set %endpos $cwline
+	exchange-point-and-mark
+	set %topline $curline
+	set-mark
+	set %lcol $curcol
+	!if &les %rcol %lcol
+		set %rctmp %lcol
+		set %lcol %rcol
+		set %rcol %rctmp
+	!endif
+	1 detab-region
+	previous-line
+	set $curcol %lcol
+	!if &equ $curline %endline
+		; insert horizontal line
+		!while &not &gre $curcol %rcol
+			overwrite-string %hor
+		!endwhile
+	!else
+		!if &equ %lcol %rcol
+			; insert vertical line
+			!while &not &gre $curline %endline
+				end-of-line
+				!while &les $curcol %lcol
+					overwrite-string " "
+				!endwhile
+				!force set $curcol %lcol
+				overwrite-string %ver
+				next-line
+			!endwhile
+		!else
+			; insert box
+			set %rc %rcol - 1
+			set %lc %lcol - 1
+			; insert upper left corner
+			overwrite-string %ulc
+			; insert line
+			!while &not &equ $curcol %rc
+				overwrite-string %hor
+			!endwhile
+			; insert upper right corner
+			overwrite-string %urc
+			next-line
+			!while &gre %endline $curline
+				1 detab-region
+				previous-line
+				end-of-line
+				; pad line up to the left side of the box
+				!while &les $curcol %lc
+					overwrite-string " "
+				!endwhile
+				!force set $curcol %lcol
+				overwrite-string %ver
+				end-of-line
+				!while &les $curcol %rc
+					overwrite-string " "
+				!endwhile
+				!force set $curcol %rcol
+				overwrite-string %ver
+				next-line
+			!endwhile
+			1 detab-region
+			previous-line
+			end-of-line
+			; pad line up to the left side of the box
+			!while &les $curcol %lc
+				overwrite-string " "
+			!endwhile
+			!force set $curcol %lcol
+			overwrite-string %llc
+			!while &not &equ $curcol %rc
+				overwrite-string %hor
+			!endwhile
+			overwrite-string %lrc
+		!endif
+	!endif
+	set $cwline %endpos
+	set $discmd TRUE
+!endm
+
+;	display single box
+
+store-procedure simple-box
+	set %ulc "‚îå"
+	set %urc "‚îê"
+	set %lrc "‚îò"
+	set %llc "‚îî"
+	set %hor "‚îÄ"
+	set %ver "‚îÇ"
+	run box
+!endm
+
+;	display double box
+
+store-procedure double-box
+	set %ulc "‚ïî"
+	set %urc "‚ïó"
+	set %lrc "‚ïù"
+	set %llc "‚ïö"
+	set %hor "‚ïê"
+	set %ver "‚ïë"
+	run box
+!endm
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+macro-to-key simple-box		S-FN1
 macro-to-key b-del-block	S-FN2
-macro-to-key b-draw-box		S-FN3
+macro-to-key double-box		S-FN3
 macro-to-key b-copy-block	S-FN4
-macro-to-key b-ins-line		S-FN5
+!force unbind-key      		S-FN5
 macro-to-key b-yank-block	S-FN6
-macro-to-key b-ins-blank	S-FN7
+!force unbind-key          	S-FN7
 macro-to-key b-ins-block	S-FN8
+!force unbind-key          	S-FN9
+!force unbind-key          	S-FN0
 
 ; and init some variables
 set %rcltype 2
