@@ -2579,10 +2579,11 @@
  *	- Added Unicode support with UTF-8 files
  *	- Added Theos O.S. support (in 1988-1992)
  *	- Added Cygwin support
- *	- Added file backup (likely borrowed somewhere)
+ *	- Added ncurses display with drop down menus
+ *	- Added file backup (likely borrowed to Mark Williams)
  *	- Added help on language keywords (currently for Theos C only) (borrowed to Mark Williams)
  *	- Added semi-graphics character entry through numeric keypad
- *	- Added dynamic load of messages from a file
+ *	- Added dynamic load of messages from a file (in 1988-1992)
  *	- Removed all PASCAL NEAR
  *	- Some code cleanup
  */
