@@ -1,0 +1,98 @@
+;	EMACS.RC:	Standard MicroEMACS Startup program
+;			for MicroEMACS 3.13 and above
+;			(C)opyright 1987-99 by Daniel M Lawrence
+;			Last Update: 11/13/93
+
+;set $discmd TRUE
+write-message "[Setting up....]"
+;set $debug TRUE
+
+;	If you hate clocks or position counters, comment these
+;set $timeflag TRUE
+set $posflag TRUE
+set $sscroll TRUE
+
+;	Set Default Global modes
+
+add-global-mode "white"
+add-global-mode "BLACK"
+
+;	Bring up Online-help system
+
+store-procedure get-help
+	set $discmd FALSE
+	source ehelp.cmd
+	set $discmd TRUE
+!endm
+
+macro-to-menu get-help "Help>MicroEmacs help"
+
+;	Set up default modes
+
+add-mode "white"
+add-mode "BLACK"
+
+store-procedure set-default-mode
+;	set $debug TRUE
+	set %rctmp &sri $cfname "."
+	!if &equ %rctmp 0
+		!return
+	!endif
+	set %rctmp &mid $cfname &add %rctmp 1 5
+	!if &or &seq %rctmp "c" &seq %rctmp "h"
+		add-mode "cmode"
+		delete-mode "theox"
+		set $hardtab 4
+		kill-abbrevs
+	!endif
+	!if &or &seq %rctmp "cpp" &seq %rctmp "hpp"
+		add-mode "cmode"
+		delete-mode "theox"
+		set $hardtab 4
+		kill-abbrevs
+	!endif
+	!if &seq %rctmp "b"
+		add-mode "cmode"
+		add-mode "abbrev"
+		delete-mode "theox"
+		set $hardtab 2
+		execute-file babbrevs.cmd
+	!endif
+	!if &seq %rctmp "basic"
+		add-mode "cmode"
+		add-mode "abbrev"
+		add-mode "theox"
+		set $hardtab 2
+		execute-file babbrevs.cmd
+	!endif
+	!if &or &seq %rctmp "mss" &seq %rctmp "txt"
+		add-mode "wrap"
+		delete-mode "cmode"
+		delete-mode "theox"
+		set $hardtab 8
+		kill-abbrevs
+	!endif
+!endm
+set $readhook set-default-mode
+
+;	***** Rebind the Function key group
+
+bind-to-key search-forward		FN1
+bind-to-key search-reverse		FN2
+bind-to-key hunt-forward		FN3
+bind-to-key hunt-backward		FN4
+;bind-to-key toggle-fkeys		FN5
+macro-to-key get-help			FN6
+bind-to-key next-window 		FN7
+bind-to-key previous-window		FN8
+bind-to-key exit-emacs			FN9
+bind-to-key save-file			FN0
+
+store-procedure toggle-insert
+	!if &gre &mod $cmode 64 31
+		delete-mode "over"
+	!else
+		add-mode "over"
+	!endif
+!endm
+macro-to-key toggle-insert	FNC
