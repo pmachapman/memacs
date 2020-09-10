@@ -1,0 +1,4628 @@
+@_bios_keybrd
+_bios_keybrd (MSVC) Return the keyboard status or keycode
+#include <bios.h>
+#include <extend.h>
+unsigned short _bios_keybrd(unsigned short service)
+See also: mapdoskey
+@_errarg
+_errarg (THEOS) Variable used by error message functions
+#include <stdio.h>
+extern char *_errarg;
+See also: strerror
+@_errnum
+_errnum (THEOS)  External integer for return of error status
+#include <stdio.h>
+extern short _errnum;
+Functions setting _errnum: access,chdir,clearerr,diropen,erase,fclear,fclose,
+fcreate,fopen and derivates,getmsg,mkdir,open,remove,rename,rmdir,topen,unlink
+See also: errno,fperror
+@_incrmem
+_incrmem (THEOS) ???
+#include <sc.h>
+char *_incrmem(size_t len);
+@_mfg_get_date
+_mfg_get_date (THEOS) Copy hardware date into the nuc structure
+#include <mfg_sc.h>
+void _mfg_get_date(void);
+See also: _mfg_get_time,_mfg_put_date,_mfg_put_time
+@_mfg_get_time
+_mfg_get_time (THEOS) Copy hardware time into the nuc structure
+#include <mfg_sc.h>
+void _mfg_get_time(void);
+See also: _mfg_get_date,_mfg_put_date,_mfg_put_time
+@_mfg_init
+_mfg_init (THEOS) Initialise system hardware
+#include <mfg_sc.h>
+long _mfg_init(long addr,long *store);
+@_mfg_put_date
+_mfg_put_date (THEOS) Copy date from the nuc structure to hardware
+#include <mfg_sc.h>
+void _mfg_put_date(void);
+See also: _mfg_get_date,_mfg_get_time,_mfg_put_time
+@_mfg_put_time
+_mfg_put_time (THEOS) Copy time from the nuc structure to hardware
+#include <mfg_sc.h>
+void _mfg_put_time(void);
+See also: _mfg_get_date,_mfg_get_time,_mfg_put_date
+@_mfg_reserved
+_mfg_reserved (THEOS) ???
+#include <mfg_sc.h>
+void _mfg_reserved(void)
+@_monthen
+_monthen (THEOS) Return the number of days in a month
+#include <_time.h>
+short _monthen(short year,short month);
+See also: leapyear,_yday
+@_msec_off
+_msec_off (THEOS) Turn off millisecond timing
+#include <mfg_sc.h>
+void _msec_off(void);
+See also: msec_on
+@_msec_on
+_msec_on (THEOS) Turn on millisecond timing
+#include <mfg_sc.h>
+void _msec_on(void);
+See also: msec_off
+@_read
+_read (THEOS) Read data from a file into any segment
+#include <sc.h>
+size_t _read(short fd,unsigned seg,void *buf,size_t len);
+See also: close,creat,filelength,flush,lseek,open,read,tell,_write,write
+@_rsvmem
+_rsvmem (THEOS) ???
+#include <sc.h>
+short *_rsvmem(long addr,long len,short code);
+@_sched_int
+_sched_int (THEOS) Schedule interrupt
+#include <mfg_sc.h>
+void _sched_int(short num,short (*addr)());
+@_set_slice
+_set_slice (THEOS) Set the user time slice
+#include <mfg_sc.h>
+void _set_slice(short msec);
+@_sema_isr
+_sema_isr (THEOS) ???
+#include <sc.h>
+_sema_isr(short pid,short num,short cmd);
+@_setargv
+_setargv (+THEOS) Expand wild cards argument to the list of matching files
+#include <_stdlib.h>
+short _setargv(short *pargc, char ***pargv);
+Set	: errno
+@_sync
+_sync (THEOS) Flush the cache
+#include <driver.h>
+void _sync(short code);
+@_weekday
+_weekday (THEOS) Return the number of the day in the week
+#include <_time.h>
+See also: leapyear,_monthen,_yday
+@_write
+_write (THEOS) Write data to a file from another memory segment
+#include <sc.h>
+size_t _write(short fd,unsigned seg,void *buf,size_t len);
+See also: close,creat,filelength,flush,lseek,open,_read,read,tell,write
+@_yday
+_yday (THEOS) Return the number of days since the beginning of the year
+@a64l
+a64l (UNIX) Convert a number from a base-64 ASCII string to a long integer
+#include <stdlib.h>
+long a64l(const char *s);
+See also: l64a
+@abort
+abort (ANSI) End program immediately
+#include <stdlib.h>
+void abort(void);
+See also: exit
+@abs
+abs (ANSI) Return the absolute value of an integer
+#include <stdlib.h>
+short abs(short n);
+See also: fabs
+@access
+access (UNIX) Check if a file can be accessed in a given mode
+#include <stdio.h>
+short access(const char *filename,short mode);
+mode	: 0 existence, 1 execution, 2 write, 4 read
+Set	: errno,_errnum
+See also: fperror,strerror
+@acos
+acos (ANSI) Calculate arc cosine
+#include <math.h>
+double acos(double x);
+@acot
+acot (THEOS) Calculate arc cotangent
+#include <math.h>
+double acot(double x);
+@acsc
+acsc (THEOS) Calculate arc cosecant
+#include <math.h>
+double acsc(double x);
+Set	: errno
+@addb
+addb (THEOS) Add a value to a byte in another memory segment
+#include <peek.h>
+void addb(void *ofs,unsigned seg,char val);
+See also: Other add functions
+@addcs
+addcs (THEOS) Add a value to a byte in the code segment
+#include <peek.h>
+void addcs(void *ofs,char val);
+See also: Other add functions
+@addl
+addl (THEOS) Add a value to a long in another memory segment
+#include <peek.h>
+void addl(void *ofs,unsigned seg,long val);
+See also: Other add functions
+@addlcs
+addlcs (THEOS) Add a value to a long in the code segment
+#include <peek.h>
+void addlcs(void *ofs,long val);
+See also: Other add functions
+@addw
+addw (THEOS) Add a value to a word in another memory segment
+#include <peek.h>
+void addw(void *ofs,unsigned seg,short val);
+See also: Other add functions
+@addwcs
+addwcs (THEOS) Add a value to a word in the code segment
+#include <peek.h>
+void addwcs(void *ofs,short val);
+See also: Other add functions
+@alarm
+alarm (UNIX) Start a timer in seconds generating a signal interrupt
+#include <time.h>
+short alarm(short secs);
+See also: delay,msalarm,signal
+@andb
+andb (THEOS) And a value to a byte in another memory segment
+#include <peek.h>
+void andb(void *ofs,unsigned seg,char mask);
+See also: Other and functions
+@andcs
+andcs (THEOS) And a value to a byte in the code segment
+#include <peek.h>
+void andcs(void *ofs,char mask);
+See also: Other and functions
+@andl
+andl (THEOS) And a value to a long in another memory segment
+#include <peek.h>
+void andl(void *ofs,unsigned seg,long mask);
+See also: Other and functions
+@andlcs
+andlcs (THEOS) And a value to a long in the code segment
+#include <peek.h>
+void andlcs(void *ofs,long mask);
+See also: Other and functions
+@andw
+andw (THEOS) And a value to a word in another memory segment
+#include <peek.h>
+void andw(void *ofs,unsigned seg,short mask);
+See also: Other and functions
+@andwcs
+andwcs (THEOS) And a value to a word in the code segment
+#include <peek.h>
+void andwcs(void *ofs,short mask);
+See also: Other and functions
+@asctime
+asctime (ANSI) Convert time structure to ASCII string
+#include <time.h>
+char *asctime(const struct tm *tmp);
+See also: ctime,gmtime,localtime,mktime,strftime,time
+@asec
+asec (THEOS) Calculate arc secant
+#include <math.h>
+double asec(double x);
+Set	: errno
+@asin
+asin (ANSI) Calculate inverse sine
+#include <math.h>
+double asin(double x);
+Set	: errno
+@assert
+assert (ANSI) Check assertion at run time
+#include <assert.h>
+void assert(short expression);
+@assert
+#assert (ANSI) Check assertion at compile time
+#assert expression
+@at
+at (THEOS) Position the cursor on the console
+#include <stdio.h>
+void at(short x,short y);
+See also: putch
+@atan
+atan (ANSI) Calculate inverse tangent
+#include <math.h>
+double atan(double x);
+@atan2
+atan2 (ANSI) Calculate inverse tangent
+#include <math.h>
+double atan2(double num,double den);
+Set	: errno
+@atexit
+atexit (ANSI) Specifie a routine to call at normal exit time
+#include <stdlib.h>
+short atexit(void (*func)(void));
+See also: exit
+@atof
+atof (ANSI) Convert ASCII string to floating point
+#include <stdlib.h>
+double atof(const char *string);
+See also: ftoa,strtod
+@atoi
+atoi (ANSI) Convert ASCII string to integer
+#include <stdlib.h>
+short atoi(const char *string);
+Set	: errno
+See also: itoa
+@atol
+atol (ANSI) Convert ASCII string to long integer
+#include <stdlib.h>
+long atol(const char *string);
+Set	: errno
+See also: ltoa,strtol,strtoul,ultoa
+@bcd2ieee
+bcd2ieee (THEOS) Convert a bcd floating point to ieee floating point
+#include <stdlib.h>
+void bcd2ieee(double *data);
+See also: ieee2bcd
+@bsearch
+bsearch (ANSI) Perform a binary search in a sorted array
+#include <stdlib.h>
+void *bsearch(const void *key,const void *array,size_t nbr_mbr,size_t size,
+	short (*compar)(const void *,const void *));
+See also: lfind,lsearch,qsort
+@c3tol
+c3tol (ANSI) Convert a three byte integer to a long integer
+#include <stdlib.h>
+long c3tol(const void *c);
+See also: l3tol,ltoc3,ltol3
+@cabs
+cabs (UNIX) Complex absolute value function
+#include <math.h>
+double cabs(struct complex z);
+@callcsi
+callcsi (THEOS) See system
+@calloc
+calloc (ANSI) Allocate dynamic memory
+#include <stdlib.h>
+char *calloc(size_t count,size_t size);
+See also: free,malloc,memset,realloc
+@cclose
+cclose (+THEOS) Close a serial communication file
+#include <com.h>
+short cclose(FILE *port)
+See also: ccloseall,cgetc,cputc,csetbuf,csetvbuf,getrxcnt,isrxempty,istxfull
+@ccloseall
+ccloseall (+THEOS) Close all serial communication files
+#include <com.h>
+short ccloseall(void)
+See also: cclose,cgetc,cputc,csetbuf,csetvbuf,getrxcnt,isrxempty,istxfull
+@ceil
+ceil (UNIX) Return the smallest integer greater than or equal to a value
+#include <math.h>
+double ceil(double z);
+See also: floor, round
+@cgetc
+cgetc (+THEOS) Read a character from a communication file
+#include <com.h>
+short cgetc(FILE *port);
+See also: cclose,ccloseall,cputc,csetbuf,csetvbuf,getrxcnt,isrxempty,istxfull
+@cgets
+cgets (ANSI) Accept a string from the console
+#include <conio.h>
+char *cgets(char *buffer,short len);
+See also: getch,fgets,gets
+@chdir
+chdir (UNIX) Change the current directory
+#include <stdio.h>
+short chdir(const char *path);
+Set	: errno,_errnum
+See also: mkdir,rmdir
+@chgrow
+chrow (+THEOS) Set the grow factor of file
+#include <_io.h>
+short chgrow(char *fname,short grow);
+See also: filechange
+@chlen
+chlen (+THEOS) Change the record length and key length of a file
+#include <_io.h>
+short chlen(char *fname,unsigned short reclen,unsigned short keylen);
+@chmod
+chmod (+UNIX) Change protections of a file
+#include <_io.h>
+short chmod(const char *fname,short prot);
+@chorg
+chorg (+THEOS) Change the organization mode of a file
+#include <_io.h>
+short chorg(char *fname,unsigned short filestat);
+@chown
+chown (+UNIX) Change the owner of a file
+#include <_io.h>
+short chown(const char *fname,short uid,short gid);
+@clearerr
+clearerr (ANSI) Clear the end-of-file and error status of a file
+#include <stdio.h>
+clearerr(FILE *fp);
+Set	: _errnum
+See also: feof,ferror
+@cld
+cld (THEOS) Clear direction flag
+#include <driver.h>
+void cld(void);
+See also: std
+@cli
+cli (THEOS) Clear interrupt
+#include <driver.h>
+void cli(void);
+See also: sti
+@clock
+clock (ANSI) Get number of clock ticks since system boot
+#include <time.h>
+clock_t clock(void);
+See also: time
+@clock_t
+clock_t (ANSI) Type used for the number of clock ticks since system boot
+#include <time.h>
+typedef long clock_t;
+@close
+close (UNIX) Close a file
+#include <stdio.h>
+short close(short fd);
+See also: creat,filelength,flush,lseek,open,_read,read,tell,_write,write
+@closedir
+closedir (+UNIX) Close the directory search
+#include <dirent.h>
+void closedir(DIR*);
+See also: opendir,readdir,seekdir,telldir,rewinddir
+Set	: errno
+@con_tran
+con_tran (THEOS) Test and translate system control codes
+#include <driver.h>
+short con_tran(struct ucb *ucb,short ch,unsigned seg,void *buf);
+@conmask
+conmask (THEOS) Set the console control mask
+#include <stdio.h>
+void conmask(const char *s);
+@conin
+conin (THEOS) Read character from console
+See getch
+@conout
+conout (THEOS) Display character on the console
+See putch
+@conrdy
+conrdy (THEOS) Test if characters are available on the console
+short conrdy(void);
+@cos
+cos (ANSI) Calculate cosine
+#include <math.h>
+double cos(double radian);
+Set	: errno
+@cosh
+cosh (ANSI) Calculate hyperbolic cosine
+#include <math.h>
+double cosh(double radian);
+@cot
+cot (THEOS) Calculate cotangent
+#include <math.h>
+double cot(double radian);
+@coth
+coth (THEOS) Calculate hyperbolic cotangent
+#include <math.h>
+double coth(double radian);
+@cprintf
+cprintf (MSC) Format and print text to the console
+#include <conio.h>
+short cprintf(const char *format,...);
+Note: Floating point conversions are not supported
+See also: fprintf,printf,sprintf,vfprintf,vprintf,vsprintf
+@cputc
+cputc (+THEOS) Write a character to a communication file
+#include <com.h>
+void cputc(FILE *port,short c);
+See also: cclose,ccloseall,cgetc,csetbuf,csetvbuf,getrxcnt,isrxempty,istxfull
+@cputs
+cputs (ANSI) Write a string to the console
+#include <conio.h>
+void cputs(const char *s);
+See also: cprintf,fputs,printf,putch,puts
+@creat
+creat (UNIX) Create/truncate a file
+#include <stdio.h>
+short creat(const char *filename,short mode);
+See also: close,filelength,flush,lseek,open,_read,read,tell,write,_write
+@crt
+crt (THEOS) See putchar
+@crtcolor
+crtcolor (THEOS) Change the colors of subsequent displays on the console
+#include <stdio.h>
+void crtcolor(short fg,short bg,short rfg,short rbg);
+See also: hascolor,CLASSGEN command
+@csc
+csc (THEOS) Calculate cosecant
+#include <math.h>
+double csc(double radian);
+@csch
+csch (THEOS) Calculate hyperbolic cosecant
+#include <math.h>
+double csch(double radian);
+@csetbuf
+csetbuf (+THEOS) Allocate an i/o buffer for a user buffered file
+#include <com.h>
+void csetbuf(FILE *port,UBUFFER *buffer);
+See also: cclose,ccloseall,cgetc,cputc,csetvbuf,getrxcnt,isrxempty,istxfull
+@csetvbuf
+csetvbuf (+THEOS) Allocate an i/o buffer for a user buffered file
+#include <com.h>
+short csetvbuf(FILE *port,UBUFFER *buffer,short mode,size_t size);
+See also: cclose,ccloseall,cgetc,cputc,csetbuf,getrxcnt,isrxempty,istxfull
+@csi
+csi (THEOS) Execute a CSI command without returning to the current program
+#include <process.h>
+void csi(const char *command);
+See also: system
+@ctime
+ctime (ANSI) Convert system time to an ASCII string
+#include <time.h>
+char *ctime(const time_t *timep);
+See also: asctime,localtime,mktime,strftime,time
+@cuserid
+cuserid (THEOS) Return the account name currently logged
+#include <stdlib.h>
+char *cuserid(char *account);
+See also: getlogin,getuid,logname
+@datehdng
+datehdng (THEOS) Internal function used by testhead
+@daylight
+daylight (ANSI) Variable indicating if daylight time is used
+#include <time.h>
+extern short daylight;
+See also: timezone,tzset,tzname
+@dec
+dec (THEOS) Decrement a byte in another memory segment
+#include <peek.h>
+void dec(void *ofs,unsigned seg);
+See also: Other dec functions
+@deccs
+deccs (THEOS) Decrement a byte in the code segment
+#include <peek.h>
+void deccs(void *ofs);
+See also: Other dec functions
+@deccsl
+deccsl (THEOS) Decrement a long in the code segment
+#include <peek.h>
+void deccsl(void *ofs);
+See also: Other dec functions
+@deccsw
+deccsw (THEOS) Decrement a word in the code segment
+#include <peek.h>
+void deccsw(void *ofs);
+See also: Other dec functions
+@decl
+decl (THEOS) Decrement a long in another memory segment
+#include <peek.h>
+void decl(void *ofs,unsigned seg);
+See also: Other dec functions
+@decw
+decw (THEOS) Decrement a word in another memory segment
+#include <peek.h>
+void decw(void *ofs,unsigned seg);
+See also: Other dec functions
+@define
+#define (ANSI) Define a variable as manifest constant
+#define constant value
+@delay
+delay (THEOS) Suspend operation for a given time
+#include <time.h>
+void delay(unsigned code);
+See also: alarm,msalarm,sleep
+@deletek
+deletek (THEOS) Delete a record from on indexed or keyed file
+#include <stdio.h>
+short deletek(FILE *file,const char *key);
+See also: readk,readn,readp,writek
+@devname
+devname (+THEOS) Return the name of a physical device
+#include <_stdio.h>
+char* devname(int lub);
+See also: termname,ttyname,vdiname
+@devopen
+devopen (THEOS) Open or close a device
+#include <_sc.h>
+void devopen(struct ucb *ucb,short cmd);
+cmd = 0 : open. cmd = 1 : close
+@difftime
+difftime (ANSI) Return difference between two times
+#include <time.h>
+double difftime(time_t newtime,time_t oldtime);
+@dir_mount
+dir_mount (THEOS) ???
+#include <_sc.h>
+void dir_mount(struct diskucb *ucb);
+@dir_rd
+dir_rd (THEOS) Read a sector in the directory
+#include <sc.h>
+void dir_rd(struct diskucb *ucb,long sect,void *buf);
+@dirclose
+dirclose (THEOS) Close the directory search
+#include <stdio.h>
+void dirclose(void);
+See also: diropen,dirread,find_first,find_next
+@diropen
+diropen (THEOS) Open the directory search for files in the current account
+#include <stdio.h>
+short diropen(const char *fn);
+Set	: _errnum
+See also: dirclose,dirread,find_first,find_next
+@dirread
+dirread (THEOS) Find the next file in the directory
+#include <stdio.h>
+char *dirread(void);
+See also: dirclose,diropen,find_first,find_next
+@disk_capacity
+disk_capacity (THEOS) ???
+#include <_sc.h>
+short disk_capacity(short lub,void *disk_struct);
+@display
+display (THEOS) Display a string on the console
+See cputs
+@div
+div (ANSI) Return the quotient and remainder of the division of two integers
+#include <stdlib.h>
+div_t div(short numer,short denomin);
+See also: ldiv
+@div_t
+div_t (ANSI) Used by div
+#include <stdlib.h>
+typedef struct {short quot,rem;} div_t;
+@dup
+dup (UNIX) Duplicate a file descriptor
+#include <stdio.h>
+short dup(short fd);
+Set	: errno
+See also: close,creat,open
+@elif
+#elif (ANSI) Include code conditionally
+#elif (expression);
+@else
+#else (ANSI) Include code conditionally
+#else
+@endif
+#endif (ANSI) End conditional inclusion of code
+#endif
+@erase
+erase (THEOS) Erase an existing file
+See remove
+@errbot
+errbot (THEOS) Display a system message at the bottom of the console
+#include <sc.h>
+short errbot(short num,const char *arg[],short c1,short c2,short c3,short c4);
+See also: errmsg,putmsg,syserr,yesno
+@errmsg
+errmsg (THEOS) Display a system message on stderr
+#include <stdlib.h>
+void errmsg(short num,const char *arg[]);
+See also: errbot,perror,putmsg,strerror,syserr
+@errno
+errno (ANSI) External integer for return of error status
+#include <errno.h>
+extern short errno;
+Functions setting errno: access,acos,acsc,asec,asin,atan2,atoi,atol,chdir,cos,
+dup,erase,fgetc,fputc,fstat,locking,log,log10,log2,mkdir,open,perror,pow,remove,
+rename,rmdir,signal,sin,sqrt,stat,unlink,utime
+See also: _errnum,perror
+@execl
+execl (UNIX) Transfer control to a new program
+#include <process.h>
+void execl(const char *program,const char *arg0,...,const char *argn,NULL)
+See also: execlp,execv,execvp,forktask,system
+@execlp
+execlp (UNIX) Transfer control to a new program
+#include <process.h>
+void execlp(const char *program,const char *arg0,...,const char *argn,NULL)
+See also: execl,execv,execvp,forktask,system
+@execv
+execv (UNIX) Transfer control to a new program
+#include <process.h>
+void execv(const char *program,const char *arg[]);
+See also: execl,execlp,execvp,forktask,system
+@execvp
+execvp (UNIX) Transfer control to a new program
+#include <process.h>
+void execvp(const char *program,const char *arg[]);
+See also: execl,execlp,execv,forktask,system
+@exit
+exit (ANSI) Terminate a program
+#include <stdlib.h>
+void exit(short status);
+See also: abort,atexit,csi
+@exp
+exp (ANSI) Compute exponential function
+#include <math.h>
+double exp(double z);
+@fabs
+fabs (ANSI) Compute absolute value
+#include <math.h>
+double fabs(double z);
+@farcat
+farcat (THEOS) Concatenate strings from different memory segments
+#include <string.h>
+void *farcat(unsigned tseg,char *to,unsigned fseg,const char *from);
+See also: strcat
+@farchr
+farchr (THEOS) Locate the first occurence of a byte in a string
+#include <string.h>
+void *farchr(unsigned seg,const void *ofs,short c);
+See also: memchr,strpbrk,strchr,strrchr,strstr
+@farcmp
+farcmp (THEOS) Compare two buffers in different memory segments
+#include <string.h>
+short farcmp(unsigned seg1,const void *ofs1,unsigned seg2,const void *ofs2,
+	size_t len);
+See also: fareq,memcmp,memeq,memicmp,strcmp,streq,stricmp,strncmp,strneq,
+	  strnicmp
+@farcpy
+farcpy (THEOS) Copy one buffer to another buffer in another memory segment
+#include <string.h>
+short farcpy(unsigned tseg,void *to,unsigned fseg,const void *from,size_t len);
+See also: farcpy,memccpy,memcpy,memmove,memrcpy,strdup,strmake,strncpy
+@fareq
+fareq (THEOS) Compare two string in different memory segments for equality
+#include <string.h>
+short fareq(unsigned seg1,const void *ofs1,unsigned seg2,const void *ofs2);
+See also: farcmp,memcmp,memeq,memicmp,strcmp,streq,stricmp,strncmp,strneq,
+	  strnicmp
+@farlen
+farlen (THEOS) Return the length of a string in another memory segment
+#include <string.h>
+size_t farlen(unsigned seg,const char *ofs);
+See also: strlen
+@farset
+farset (THEOS) Initialize a buffer in another memory segment
+#include <string.h>
+void *farset(unsigned seg,void *ofs,short c,size_t len);
+See also: memset,strnfill,strnset,strset
+@fbuf
+fbuf (THEOS) Allocate an i/o buffer for an open file
+#include <stdio.h>
+void fbuf(FILE *stream,void *buffer,size_t len);
+See also: setbuf,setvbuf,vbuf
+@fclear
+fclear (+THEOS) Clear a direct,indexed or keyed file
+#include <_stdio.h>
+short fclear(char *fname);
+Set	: _errnum
+@fclose
+fclose (ANSI) Close a file
+#include <stdio.h>
+short fclose(FILE *fp);
+Set	: _errnum
+See also: fcloseall,fflush,flushall
+@fcloseall
+fcloseall (MSC) Close all the open files
+#include <stdio.h>
+short fcloseall(void);
+See also: fclose,fflush,flushall
+@fcntl
+fcntl (UNIX) Access to file control bloc
+#include <stdio.h>
+short fcntl(FILE *stream,short type,size_t value);
+See also: feof,fgetpos,fopen,fsetpos,ftell
+@fcreate
+fcreate (THEOS) Create an indexed,keyed or direct file
+#include <stdio.h>
+short fcreate(const char *fname,const char *mode,short rlen,short klen,long size);
+Set	: _errnum
+See also: creat,fopen,makelib
+@fdopen
+fdopen (UNIX) Return a stream pointer to a file opened by open,creat or pipe
+#include <stdio.h>
+FILE *fdopen(short fd,const char *type);
+See also: creat,fileno,open,pipe
+@feof
+feof (ANSI) Determine if a file's current position is at end-of-file
+#include <stdio.h>
+short feof(FILE *fp);
+@ferror
+ferror (ANSI) Test an open file for its error status
+#include <stdio.h>
+short ferror(FILE *fp);
+See also: clearerr,feof,file_err,fperror
+@fflush
+fflush (ANSI) Write any data in a file's output buffer to the file
+#include <stdio.h>
+short fflush(FILE *fp);
+See also: flushall,fclose
+@fgetc
+fgetc (ANSI) Read one character from a stream
+#include <stdio.h>
+short fgetc(FILE *fp);
+Set	: errno
+See also: fgets,getch,getchar
+@fgetl
+fgetl (THEOS) Read a long integer from a stream
+#include <stdio.h>
+long fgetl(FILE *fp);
+See also: fgetc,fgetw,fputc,fputl,fputw
+@fgetpos
+fgetpos (ANSI) Get a file's current position pointer
+#include <stdio.h>
+short fgetpos(FILE *fp,fpos_t *pos);
+See also: fsetpos,ftell
+@fgets
+fgets (ANSI) Read a string from a stream up to a new line
+#include <stdio.h>
+char *fgets(char *s,size_t n,FILE *fp);
+See also: fgetsn,gets,keyin
+@fgetsn
+fgetsn (THEOS) Read a buffer from a stream
+#include <stdio.h>
+char *fgetsn(char *s,size_t n,FILE *fp);
+See also: fgets,gets,keyin
+@fgetw
+fgetw (THEOS) Read an integer from a stream
+#include <stdio.h>
+short fgetw(FILE *fp);
+See also: fgetc,fgetl,fputc,fputl,fputw
+@fgrow
+fgrow (THEOS) Set the grow factor of file
+#include <stdio.h>
+short fgrow(FILE *fp,short grow);
+See also: filechange
+@file_err
+file_err (THEOS) Test an open file and exit if error
+#include <stdio.h>
+void file_err(FILE *fp);
+See also: clearerr,feof,ferror,fperror,syserr
+@filechange
+filechange (THEOS) Change a file's directory entry (date,owner,protection...)
+#include <sc.h>
+short filechange(const char *fn,short type,size_t value);
+See also: access,fgrow,utime
+@filelength
+filelength (+MSC) Return the current filelength
+#include <_io.h>
+size_t filelength(short fd);
+See also: close,creat,flush,lseek,open,_read,read,tell,_write,write
+@filelock
+filelock (THEOS) Lock a region in a file
+#include <stdio.h>
+short filelock(FILE *fp,short code,unsigned long from,unsigned long to);
+See also: locking,reclock,recunlock,unlock
+@fileno
+fileno (UNIX) Get the file number of a open file
+#include <stdio.h>
+short fileno(FILE *fp);
+@find_first
+find_first (MSC) Find first entry matching selection in the directory
+short find_first(char *mask,void *diskfind);
+See also: dirclose,diropen,dirread,find_next
+@find_next
+find_next (MSC) Find next entry matching selection in the directory
+#include <_sc.h>
+short find_next(void *diskfind);
+See also: dirclose,diropen,dirread,find_first
+@floor
+floor (ANSI) Return the largest integer less than or equal to a value
+#include <math.h>
+double floor(double z);
+See also: ceil, round
+@flush
+flush (THEOS) Write any data in a file's output buffer to the file
+#include <stdio.h>
+short flush(short filenum);
+See also: close,creat,filelength,lseek,open,_read,read,tell,_write,write
+@flushall
+flushall (THEOS) Flush all the files opened for output
+#include <stdio.h>
+short flushall(void);
+See also: fflush
+@fmod
+fmod (ANSI) Return the remainder of a division
+#include <math.h>
+double fmod(double x,double y);
+@fopen
+fopen (ANSI) Open a file
+#include <stdio.h>
+FILE *fopen(const char *name,const char *type);
+Set	: _errnum
+See also: access,freopen
+@force
+force (THEOS) Force another process to execute a command
+#include <sc.h>
+void force(short pid,char *cmd);
+@fork
+fork (UNIX) Spawn a sub-task in a free partition
+#include <process.h>
+short fork(void);
+See also: forktask,killtask,suicide
+@forktask
+forktask (UNIX) Spawn a sub-task in a given partition
+short forktask(short pid);
+See also: fork,killtask,suicide
+@formask
+formask (THEOS) Display disk format parameters and query
+#include <format.h>
+void formask(void);
+See also: formclear,formincr,formparm
+@formclear
+formclear (THEOS) Clear the disk directory
+void formclear(struct diskucb *ucb,char *label,short dirct,short trkct,
+	short hdct,short sectct,short density);
+See also: formask,formincr,formparm
+@formincr
+formincr (THEOS) Set disk format sectors interleave table
+void formincr(short incr,short sects,short *lacetable);
+See also: formask,formclear,formparm
+@formparm
+formparm (THEOS) Sets disk format parameters from command line
+void formparm(short argc,char **argv);
+See also: formask,formclear,formincr
+@fperror
+fperror (THEOS) Display the system message pointed by _errnum on stderr
+#include <stdio.h>
+short fperror();
+See also: errmsg,file_err,perror,syserr
+@fpos_t
+fpos_t (ANSI) Used to represent the position in a file
+#include <stdio.h>
+typedef long fpos_t;
+@fprintf
+fprintf (ANSI) Print formatted output to a stream
+#include <stdio.h>
+short fprintf(FILE *fp,const char *format,...);
+See also: cprintf,printf,sprintf,vfprintf,vprintf,vsprintf
+@fputc
+fputc (ANSI) Write a character to a stream
+#include <stdio.h>
+short fputc(char c,FILE *fp);
+Set	: errno
+See also: putc,putchar
+@fputl
+fputl (THEOS) Write a character to a stream
+#include <stdio.h>
+long fputl(long l,FILE *fp);
+See also: fgetc,fgetl,fgetw,fputc,fputw
+@fputs
+fputs (ANSI) Write a string to a stream
+#include <stdio.h>
+short fputs(const char *string,FILE *fp);
+See also: fputsn,fputsnl,puts
+@fputsn
+fputsn (THEOS) Write a buffer to a stream
+#include <stdio.h>
+char *fputsn(const char *string,FILE *fp);
+See also: fputs,fputsnl,puts
+@fputsnl
+fputsnl (ANSI) Write a buffer to a stream and append a newline
+#include <stdio.h>
+short fputsnl(const char *string,FILE *fp);
+See also: fputs,fputsn,puts
+@fputw
+fputw (THEOS) Write an integer to a stream
+#include <stdio.h>
+short fputw(short word,FILE *fp);
+@fread
+fread (ANSI) Read data from file stream
+#include <stdio.h>
+short fread(void *buffer,size_t size,size_t nitems,FILE *fp);
+See also: fgets,fgetsn,fgetc,fgetl,fgetw
+@free
+free (ANSI) Return dynamic memory to free memory pool
+#include <stdlib.h>
+void free(void *ptr);
+See also: calloc,malloc,realloc
+@free_sel
+free_sel (THEOS) Release a memory selector
+#include <driver.h>
+void free_sel(short sel);
+See also: make_sel
+@freopen
+freopen (ANSI) Open a stream using an existing file stream pointer
+#include <stdio.h>
+FILE *freopen(const char *filename,const char *type,FILE *fp);
+See also: access,fdopen,fopen
+@frexp
+frexp (ANSI) Break a floating point into mantissa and exponent power of two
+#include <math.h>
+double frexp(double x,short *ep);
+See also: ldexp
+@fscanf
+fscanf (ANSI) Format input from a file stream
+#include <stdio.h>
+short fscanf(FILE *fp,const char *format,...);
+See also: scanf,sscanf
+@fseek
+fseek (ANSI) Change a stream position pointer
+#include <stdio.h>
+short fseek(FILE *fp,fpos_t pos,short base);
+See also: fsetpos,rewind,seek
+@fsetpos
+fsetpos (ANSI) Change a stream position pointer
+#include <stdio.h>
+short fsetpos(FILE *fp,fpos_t pos);
+See also: fseek,rewind,seek
+@fsign
+fsign (THEOS) Return the sign of a floating point value
+#include <math.h>
+short fsign(double x);
+@ftell
+ftell (ANSI) Return current position of stream pointer
+#include <stdio.h>
+long ftell(FILE *fp);
+See also: fgetpos
+@ftoa
+ftoa (THEOS) Convert a floating point value to a string
+#include <stdlib.h>
+char *ftoa(char *s,double f);
+See also: itoa,ltoa,utoa
+@fwrite
+fwrite (ANSI) Write data to a stream
+#include <stdio.h>
+short fwrite(const void *buffer,size_t size,size_t n,FILE *fp);
+See also: fputc,fputl,fputs,fputsn,fputsnl,fputw,putch
+@gcd
+gcd (THEOS) Return the greatest common divisor of two values
+#include <math.h>
+double gcd(double x,double y);
+@get_line
+get_line (THEOS) Accept an edited line from the standard input
+#include <stdio.h>
+char *get_line(char *line);
+See also: gets
+@get_sect
+get_sect (THEOS) ???
+#include <sc.h>
+struct fdb *get_sect(char *fn,char *buf,long *sect);
+@getar
+getar (THEOS) Internal function used by malloc
+@getbp
+getbp (THEOS) Return the value of the BP register
+#include <peek.h>
+void *getbp(void);
+See also: getcs,getcsa,getds,getldt,gettib
+@getc
+getc (ANSI) Read a character from a stream
+See fgetc
+@getch
+getch (MSC) Read a character from the console
+#include <conio.h>
+short getch(void);
+See also: getc,getchar
+@getchar
+getchar (ANSI) Read character from the standard input
+#include <stdio.h>
+short getchar(void);
+See also: getc,getch
+@getclass
+getclass (THEOS) Return the console or printer class code
+#include <stdlib.h>
+short getclass(short lub);
+@getcs
+getcs (THEOS) Return the value of the CS register
+#include <peek.h>
+unsigned getcs(void);
+See also: getbp,getcsa,getds,getldt,gettib
+@getcsa
+getcsa (THEOS) Return the value of the CS register
+#include <peek.h>
+unsigned getcsa(void);
+See also: getbp,getcs,getds,getldt,gettib
+@getcwd
+getcwd (UNIX) Return the current directory name
+#include <stdlib.h>
+char *getcwd(char *s,size_t len);
+@getdate
+getdate (THEOS) Return the current system date
+#include <time.h>
+char *getdate(char *buffer)
+See also: gettime,time
+@getdev
+getdev (THEOS) Return the device or lub number of an open file
+#include <stdio.h>
+short getdev(FILE *fp);
+@getdevn
+getdevn (+THEOS) Return the device or lub number of a device name
+#include <_stdlib.h>
+short getdevn(char *name);
+@getds
+getds (THEOS) Return the value of the DS register
+#include <peek.h>
+unsigned getds(void);
+See also: getbp,getcs,getcsa,getldt,gettib
+@getenv
+getenv (ANSI) Read environmental variable
+#include <stdlib.h>
+char *getenv(const char *variable);
+See also: getcwd,getlang,getlib,putenv
+@getenvle
+getenvle (THEOS) Internal function used by putenv
+@getflag
+getflag (THEOS) Get processor flag register
+#include <driver.h>
+long getflag(void);
+@getfn
+getfn (THEOS) Return the full pathname of a file
+#include <stdio.h>
+char *getfn(char *fn);
+See also: locate
+@getkey
+getkey (THEOS) Get a system keyword token
+#include <stdlib.h>
+short getkey(short keynum,char *s);
+See also: keyclose,matcharg
+@getlang
+getlang (THEOS) Return the current language code for the partition
+#include <stdlib.h>
+short getlang(void);
+See also: getenv
+@getldt
+getldt (THEOS) Return the Local Descriptor Table selector
+#include <peek.h>
+unsigned getldt(void);
+See also: getbp,getcs,getcsa,getds,gettib
+@getlib
+getlib (THEOS) Return the default library name for the partition
+#include <stdlib.h>
+char *getlib(void);
+See also: getcwd,getenv
+@getlimit
+getlimit (THEOS) Return the maximum address of a memory segment
+#include <stdlib.h>
+size_t getlimit(unsigned seg);
+See also: getmem
+@getll
+getll (THEOS) Return the line length of the console or a printer
+#include <stdio.h>
+short getll(short lub);
+See also: getpl
+@getlogin
+getlogin (UNIX) Return the name of the account currently logged
+#include <stdlib.h>
+char *getlogin(void);
+See also: cuserid,getuid,logname
+@getlub
+getlub (THEOS) Return the ucb number associated with a logical device
+#include <stdlib.h>
+short getlub(short lub);
+See also: getucb
+@getmem
+getmem (THEOS) Allocate memory from the system pool
+#include <getmem.h>
+unsigned getmem(size_t size,short table);
+See also: calloc,malloc,putmem,shared
+@getmsec
+getmsec (THEOS) Return the current time of day to the nearest millisecond
+#include <time.h>
+char *getmsec(char *s);
+See also: gettime,ctime,time
+@getmsg
+getmsg (THEOS) Return a system message
+#include <stdlib.h>
+char *getmsg(short num);
+Set	: _errnum
+See also: errbot,errmsg,putmsg,strerror,syserr
+@getmsw
+getmsw (THEOS) Get Machine Status Word
+#include <driver.h>
+long getmsw(void);
+@getpid
+getpid (UNIX) Return the process number
+#include <stdlib.h>
+short getpid(void);
+See also: getppid
+@getpl
+getpl (THEOS) Return the page length of the console or a printer
+#include <stdio.h>
+short getpl(short lub);
+See also: getll
+@getppid
+getppid (UNIX) Return the parent partition number
+#include <stdlib.h>
+short getppid(void);
+See also: getpid
+@getpriv
+getpriv (THEOS) Return the privilege level
+#include <stdlib.h>
+short getpriv(void);
+@getprty
+getprty (+THEOS) Return task priority
+#include <_stdlib.h>
+short getprty();
+See also: setprty
+@getrxcnt
+getrxcnt (+THEOS) Return the number of characters in the input buffer
+#include <com.h>
+short getrxcnt(FILE *port);
+See also: cclose,ccloseall,cgetc,cputc,csetbuf,csetvbuf,isrxempty,istxfull
+@gets
+gets (ANSI) Read string from the standard input
+#include <stdio.h>
+char *gets(char *buffer);
+See also: fgets,fgetsn,get_line,keyin
+@gettib
+gettib (THEOS) Return the Task Information Block selector
+#include <peek.h>
+unsigned gettib(void);
+See also: getbp,getcs,getcsa,getds,getldt,tib
+@gettime
+gettime (THEOS) Return the current system time
+#include <time.h>
+char *gettime(char *buffer);
+See also: getdate,time
+@getucb
+getucb (THEOS) Return the address of the UCB associated with an attached device
+#include <stdlib.h>
+struct ucb *getucb(short lub);
+See also: getlub
+@getuid
+getuid (UNIX) Return the number of the account currently logged
+#include <stdlib.h>
+short getuid(void);
+See also: getlogin
+@getver
+getver (THEOS) Return the version number,name,serial number
+#include <stdlib.h>
+void getver(short code,char *str);
+See also: getenv
+@getvol
+getvol (THEOS) Return a disk or tape volume label
+#include <stdlib.h>
+char *getvol(short lub);
+@getw
+getw (ANSI) Read a word from a file stream
+See fgetw
+@gmtime
+gmtime (ANSI) Convert system time to calendar structure in GMT time
+#include <time.h>
+struct tm *gmtime(const time_t *timep);
+See also: asctime,ctime,localtime,mktime,strftime,time
+@has
+has (THEOS) Test if the console can display a character or an attribute
+#include <stdio.h>
+short has(short c);
+See also: hascolor
+@hascolor
+hascolor (THEOS) Test if the console can display colors
+#include <stdio.h>
+short hascolor(void);
+See also: crtcolor,has
+@hasmouse
+hasmouse (+THEOS) Test if a session mouse is available
+#include <mouse.h>
+int hasmouse(void);
+See also: mouse, mousebutton, mouseclick, mousedisable, mouseenable,
+	mousemove, mousescale, mouseswap, mousetell, mousexy
+@hypot
+hypot (UNIX) Compute the length of the hypotenuse of a right triangle
+#include <math.h>
+double hypot(double x,double y);
+@i2tol
+i2tol (THEOS) Convert two integers to a long integer
+long i2tol(short i[2]);
+Note: Not implemented in THEOS 386 C.
+@ieee2bcd
+ieee2bcd (THEOS) Convert an ieee floating point to bcd floating point
+#include <stdlib.h>
+void ieee2bcd(double *data)
+See also: bcd2ieee
+@if
+#if (ANSI) Include code conditionally
+#if (expression);
+@ifdef
+#ifdef (ANSI) Include code conditionally
+#ifdef identifier
+@ifndef
+#ifndef (ANSI) Include code conditionally
+#ifndef identifier
+@inb
+inb (THEOS) Read a byte from a i/o port
+#include <driver.h>
+unsigned inb(unsigned port);
+See also: ind,insb,insd,insw,inw
+@include
+#include (ANSI) Copy a header file into a program
+#include <file.h>
+#include "file.h"
+@ind
+ind (THEOS) Read a long from a i/o port
+#include <driver.h>
+unsigned long ind(unsigned port);
+See also: inb,insb,insd,insw,inw
+@insb
+insb (THEOS) Read bytes from a i/o port
+#include <driver.h>
+void insb(unsigned port,unsigned seg,void *offset,size_t len);
+See also: inb,ind,insd,insw,inw
+@interrupt
+interrupt (THEOS) Interrupt function declarator
+void interrupt isr(void);
+@insd
+insd (THEOS) Read longs from a i/o port
+#include <driver.h>
+void insd(unsigned port,unsigned seg,void *offset,size_t len);
+See also: inb,ind,insb,insw,inw
+@insw
+insw (THEOS) Read words from a i/o port
+#include <driver.h>
+void insw(unsigned port,unsigned seg,void *offset,size_t len);
+See also: inb,ind,insb,insd,inw
+@inw
+inw (THEOS) Read a word on a i/o port
+#include <driver.h>
+unsigned inw(unsigned port);
+See also: ind,insb,insd,insw,inw
+@ioctl
+ioctl (UNIX) Perform extended I/O control on devices
+#include <sc.h>
+short ioctl(FILE *fp,struct bytecntl *action);
+short ioctl(FILE *fp,struct diskcntl *action);
+short ioctl(FILE *fp,struct tapecntl *action);
+@ip
+ip (THEOS) Return the integral part of a value
+#include <math.h>
+double ip(double x);
+See also: modf
+@inc
+inc (THEOS) Increment a byte in another memory segment
+#include <peek.h>
+void inc(void *ofs,unsigned seg);
+See also: Other inc functions
+@inccs
+inccs (THEOS) Increment a byte in the code segment
+#include <peek.h>
+void inccs(void *ofs);
+See also: Other inc functions
+@inccsl
+inccsl (THEOS) Increment a long in the code segment
+#include <peek.h>
+void inccsl(void *ofs);
+See also: Other inc functions
+@inccsw
+inccsw (THEOS) Increment a word in the code segment
+#include <peek.h>
+void inccsw(void *ofs);
+See also: Other inc functions
+@incl
+incl (THEOS) Increment a long in another memory segment
+#include <peek.h>
+void incl(void *ofs,unsigned seg);
+See also: Other inc functions
+@incw
+incw (THEOS) Increment a word in another memory segment
+#include <peek.h>
+void incw(void *ofs,unsigned seg);
+See also: Other inc functions
+@isalnum
+isalnum (ANSI) Check if a character is a number or letter
+#include <ctype.h>
+short isalnum(short c);
+See also: setlocale
+@isalpha
+isalpha (ANSI) Check if a character is a letter
+#include <ctype.h>
+short isalpha(short c);
+See also: setlocale
+@isascii
+isascii (UNIX) Check if a character is an ASCII character
+#include <ctype.h>
+short isascii(short c);
+See also: setlocale
+@isatty
+isatty (UNIX) Check if an open file is a serial communication device
+#include <stdio.h>
+short isatty(FILE *stream);
+@iscntrl
+iscntrl (ANSI) Check if a character is a control character
+#include <ctype.h>
+short iscntrl(short c);
+@iscomname
+iscomname (+THEOS) Test if a file name is a valid com port name
+#include <_stdlib.h>
+short iscomname(char *filename);
+@iscon
+iscon (THEOS) Check if an open file is the console
+#include <stdio.h>
+short iscon(FILE *stream);
+@iscsym
+iscsym (THEOS) Test if a character is alphabetic or an underscore
+#include <ctype.h>
+short iscsym(short c);
+See also: iscsymnum
+@iscsymnum
+iscsymnum (THEOS) Test if a character is alphanumeric or an underscore
+#include <ctype.h>
+short iscsymnum(short c);
+See also: iscsym
+@isdigit
+isdigit (ANSI) Check if a character is a decimal diqit
+#include <ctype.h>
+short isdigit(short c);
+@isdisp
+isdisp (THEOS) Check if a character is displayable by most terminal
+#include <ctype.h>
+short isdisp(short c);
+See also: isgraph,isprint
+@isfnsym
+isfnsym (THEOS) Check if a character is valid for a file name
+#include <ctype.h>
+short isfnsym(short c);
+See also: issymbol,issymnum
+@isgraph
+isgraph (ANSI) Check if a character is visible when printed
+#include <ctype.h>
+short isgraph(short c);
+See also: setlocale
+@ishex
+ishex (THEOS) Check if a character is a hexadecimal digit
+#include <ctype.h>
+short ishex(short c);
+See also: isxdigit
+@isinter
+isinter (+THEOS) Check if a character is an international character
+#include <ctype.h>
+short isinter(short c);
+See also: isalpha
+@islower
+islower (ANSI) Check if a character is a lower-case letter
+#include <ctype.h>
+short islower(short c);
+See also: setlocale
+@isoctal
+isoctal (THEOS) Check if a character is an octal digit
+#include <ctype.h>
+short isoctal(short c);
+@isprint
+isprint (ANSI) Check if a character is visible or is a space
+#include <ctype.h>
+short isprint(short c);
+See also: setlocale
+@isprtname
+isprtname (+THEOS) Test if a file name is a valid printer name
+#include <_stdlib.h>
+short isprtname(char *filename);
+@ispunct
+ispunct (ANSI) Check if a character is a punctuation mark
+#include <ctype.h>
+short ispunct(short c);
+See also: setlocale
+@isrxempty
+isrxempty (+THEOS) Test if an input buffer is empty
+#include <com.h>
+short isrxempty(FILE *port);
+See also: cclose,ccloseall,cgetc,cputc,csetbuf,csetvbuf,getrxcnt,istxfull
+@issesdev
+issesdev (+THEOS) Test if a device is session capable
+#include <_stdlib.h>
+short issesdev(FILE *fp);
+@isspace
+isspace (ANSI) Check if a character prints white space
+#include <ctype.h>
+short isspace(short c);
+@issymbol
+issymbol (THEOS) Check if a character is a valid first character for a file name
+#include <ctype.h>
+short issymbol(short c);
+See also: issymnum
+@issymnum
+issymnum (THEOS) Check if a character is a valid character for a symbol
+#include <ctype.h>
+short issymnum(short c);
+See also: issymbol
+@istapname
+istapname (+THEOS) Test if a file name is a valid tape name
+#include <_stdlib.h>
+short istapname(char *filename);
+@istxfull
+istxfull (+THEOS) Test if an input buffer is empty
+#include <com.h>
+short istxfull(FILE *port);
+See also: cclose,ccloseall,cgetc,cputc,csetbuf,csetvbuf,getrxcnt,istxfull
+@isupper
+isupper (ANSI) Check if a character is an upper-case letter
+#include <ctype.h>
+short isupper(short c);
+See also: setlocale
+@isv86
+isv86 (THEOS) Test if a process is running in Virtual 86 mode
+short isv86(short pid);
+@isxdigit
+isxdigit (ANSI) Check if a charcter is an hexadecimal digit
+#include <ctype.h>
+short isxdigit(short c);
+See also: ishex
+@itoa
+itoa (THEOS) Convert an integer into an ASCII string
+#include <stdlib.h>
+char *itoa(char *s,short i);
+See also: ftoa,ltoa,utoa
+@keyclose
+keyclose (THEOS) Close the keyword file used with getkey
+#include <stdlib.h>
+void keyclose(void);
+See also: getkey,testarg
+@keyin
+keyin (THEOS) See cgets
+@killtask
+killtask (THEOS) Kill a subtask
+#include <process.h>
+void killtask(short pid);
+See also: fork,forktask,suicide
+@l3tol
+l3tol (UNIX) Convert three bytes integers to longs integers
+#include <stdlib.h>
+void l3tol(long *l,const char *c,short cnt);
+See also: c3tol,ltoc3,ltol3
+@l64a
+l64a (UNIX) Convert a long integer to a base-64 ASCII string
+#include <stdlib.h>
+char *l64a(long x);
+See also: a64l
+@labs
+labs (ANSI) Return the absolute value of an long integer
+#include <stdlib.h>
+long labs(long l);
+See also: abs,fabs
+@ldeletek
+ldeletek (THEOS) Delete a record from a direct access file
+#include <stdio.h>
+short ldeletek(FILE *fp,const long *key);
+See also: lreadk,lreadn,lwritek
+@ldexp
+ldexp (ANSI) Combine fraction and exponent
+#include <math.h>
+double ldexp(double x,short exp);
+See also: frexp
+@ldiv
+ldiv (ANSI) Return the quotient and remainder of the division of two longs
+#include <stdlib.h>
+ldiv_t ldiv(long numer,long denom)
+@ldiv_t
+ldiv_t (ANSI) used by ldiv
+#include <stdlib.h>
+typedef struct {long quot,rem;} ldiv_t;
+See also: div
+@leapyear
+leapyear (THEOS) Indicate if a year is a leap year
+#include <time.h>
+short leapyear(short year);
+See also: _monthen,_yday
+@lfind
+lfind (MSC) Perform a linear search of an array
+#include <stdlib.h>
+void *lfind(const void *key,const void *array,size_t nbr_mbr,size_t size,
+	short (*compar)(const void *,const void *));
+See also: bsearch,lsearch,qsort
+@line
+#line (ANSI) Reset line numbering
+#line number
+#line number filename
+@linput
+linput (+THEOS) Accept a data field from the keyboard like BASIC LINPUT
+#include <_stdlib.h>
+short linput(char *case,char *before_msg,char *after_msg,char *input_var,
+	char *output_var,short length,short timeout,short timeout_key);
+@load
+load (THEOS) Load a program into memory
+#include <process.h>
+unsigned load(const char *program,short type);
+See also: unload
+@load_yn
+load_yn (THEOS) Initialise the yesno function
+#include <stdio.h>
+void load_yn(void);
+See also: yesno
+@loc1
+loc1 (THEOS) Reserved variable for regex
+#include <string.h>
+extern char *loc1;
+@localtime
+localtime (ANSI) Convert system time to calendar structure
+#include <time.h>
+struct tm *localtime(time_t *timep);
+See also: asctime,ctime,gmtime,mktime,strftime,time
+@locate
+locate (THEOS) Find a file on disk and return a copy of its FDB
+#include <sc.h>
+struct fdb *locate(const char *filename,char *buf,short *lub);
+See also: getfn
+@lock_time
+lock_time (THEOS) Set the maximum lock time wait
+#include <_stdlib.h>
+void lock_time(unsigned char seconds);
+See also: timeout
+@locking
+locking (MSC) Lock or unlock a record in a file
+#include <locking.h>
+short locking(FILE *fp,short mode,long size);
+Set	: errno
+See also: filelock,reclock,recunlock,unlock
+@lockres
+lockres (THEOS) "Unlock" a byte in memory
+#include <sc.h>
+void lockres(void *ofs,unsigned seg);
+See also: lockset
+@lockset
+lockset (THEOS) "Lock" a byte in memory
+#include <sc.h>
+void lockset(void *ofs,unsigned seg);
+See also: lockres
+@log
+log (ANSI) Compute natural logarithm
+#include <math.h>
+double log(double z);
+Set	: errno
+See also: log10,log2
+@log10
+log10 (ANSI) Compute common logarithm
+#include <math.h>
+double log10(double z);
+Set	: errno
+See also: log,log2
+@log2
+log2 (THEOS) Compute base 2 logarithm
+#include <math.h>
+double log2(double z);
+Set	: errno
+See also: log,log10
+@logname
+logname (UNIX) Return the account name currently logged
+#include <stdlib.h>
+char *logname(void);
+See also: cuserid,getlogin,getuid
+@longjmp
+longjmp (ANSI) Return from a non-local goto
+#include <setjmp.h>
+short longjmp(jmp_buf env,short rval);
+See also: setjmp
+@lowcase
+lowcase (THEOS) See strlwr
+@lprime
+lprime (+THEOS) Compute the smallest prime greater than or equal to a number
+#include <_stdlib.h>
+unsigned long lprime(unsigned long n);
+See also: prime
+@lreadk
+lreadk (THEOS) Read a record from a direct access file
+#include <stdio.h>
+short lreadk(FILE *fp,const long *key,void *rec);
+See also: ldeletek,lreadn,lwritek
+@lreadn
+lreadn (THEOS) Read the next record from a direct access file
+#include <stdio.h>
+short lreadn(FILE *fp,long *key,void *rec);
+See also: ldeletek,lreadk,lwritek
+@lsearch
+lsearch (UNIX) Perform a linear search of an array,insert key if non existent
+#include <stdlib.h>
+void *lsearch(const void *key,const void *array,size_t nbr_mbr,size_t size,
+	short (*compar)(const void *,const void *));
+See also: bsearch,lfind,qsort
+@lseek
+lseek (UNIX) Set read/write position
+#include <stdio.h>
+long lseek(short fd,short how,long where);
+See also: close,creat,filelength,flush,open,_read,read,tell,_write,write
+@ltoa
+ltoa (THEOS) Convert an long integer into an ASCII string
+#include <stdlib.h>
+char *ltoa(char *s,short l);
+See also: ftoa,itoa,utoa
+@ltoc3
+ltoc3 (THEOS) Convert a long integer to a three byte integer
+#include <stdlib.h>
+long ltoc3(void *c,long l);
+See also: c3tol,l3tol,ltol3
+@ltol3
+ltol3 (UNIX) Convert long integers to three byte integers
+#include <stdlib.h>
+long ltol3(void *c,const long *l,short cnt);
+See also: c3tol,l3tol,ltoc3
+@lwritek
+lwritek (THEOS) Write a record to a direct access file
+#include <stdio.h>
+short lwritek(FILE *fp,const long *key,const void *rec);
+See also: ldeletek,lreadk,lreadn
+@make_sel
+make_sel (THEOS) Create a memory selector
+#include <driver.h>
+void make_sel(short sel,size_t limit,unsigned long base,short int);
+See also: free_sel
+@makelib
+makelib (THEOS) Create a library file
+#include <sc.h>
+unsigned makelib(const char *filename,short size);
+See also: fcreate
+@malloc
+malloc (ANSI) Allocate dynamic memory
+#include <stdlib.h>
+char *malloc(size_t size);
+@match
+match (THEOS) Compare a string against a format mask
+#include <string.h>
+short match(const char *string,const char *mask);
+See also: strcmp,streq
+@mapdoskey
+mapdoskey (+THEOS) Convert THEOS keycodes to PC keycodes
+#include <bios.h>
+#include <extendos.h>
+unsigned short mapdoskey(unsigned short key);
+See also: _bios_keybrd
+@matcharg
+matcharg (THEOS) Compare one string with another with abbreviation capability
+#include <stdlib.h>
+short matcharg(const char *string,const char *keyword,short min);
+See also: strcmp,streq,strncmp,testarg
+@max
+max (UNIX) Return the larger of two integers
+#include <stdlib.h>
+short max(short a,short b);
+@max_alloc
+max_alloc (THEOS) Return the size of the larger memory bloc available
+#include <malloc.h>
+size_t max_alloc(void);
+See also: calloc,free,malloc,realloc,tot_alloc
+@mem_grow
+mem_grow (THEOS) ???
+#include <sc.h>
+short mem_grow(short seg,long adjust);
+@mem_ovly
+mem_ovly (THEOS) Adjust the size of the data used by the program
+#include <stdlib.h>
+void mem_ovly(size_t size);
+@memccpy
+memccpy (UNIX) Copy a buffer into another for 'n' bytes or up to a character
+#include <string.h>
+void *memcpy(void *to,const void *from,short c,size_t len);
+See also: farcpy,memcpy,memmove,memrcpy,strcpy,strdup,strmake,strncpy
+@memchr
+memchr (ANSI) Locate the first occurrence of a byte in a buffer
+#include <string.h>
+void *memchr(const void *buffer,unsigned character,size_t len);
+See also: farchr,strpbrk,strchr,strrchr,strstr
+@memcmp
+memcmp (ANSI) Compare two buffers
+#include <string.h>
+short memcmp(const void *buf1,const void *buf2,size_t len);
+See also: farcmp,fareq,memeq,memicmp,strcmp,streq,stricmp,strncmp,strneq,
+	  strnicmp
+@memcpy
+memcpy (ANSI) Copy one buffer into another
+#include <string.h>
+void *memcpy(void *to,const void *from,size_t len);
+See also: farcpy,memccpy,memmove,memrcpy,strcpy,strdup,strmake,strncpy
+@memeq
+memeq (THEOS) Compare two buffers for equality
+#include <string.h>
+short memeq(const void *buf1,const void *buf2,size_t len);
+See also: farcmp,fareq,memcmp,memicmp,strcmp,streq,stricmp,strncmp,strnicmp,
+	  strneq
+@memicmp
+memicmp (MSC) Compare two buffers,ignoring the casemode of the characters
+#include <string.h>
+short memicmp(const void *buf1,const void *buf2,size_t len);
+See also: farcmp,fareq,memcmp,memeq,strcmp,streq,stricmp,strncmp,strneq,strnicmp
+@memmove
+memmove (ANSI) Copy one buffer into another with correct handling of overlapping
+void *memmove(void *to,const void *from,size_t len);
+See also: farcpy,memcpy,memccpy,memrcpy,strcpy,strdup,strmake,strncpy
+@memrcpy
+memrcpy (THEOS) Copy one buffer into another in reverse sequence
+#include <string.h>
+void *memrcpy(void *to,const void *from,size_t len);
+See also: farcpy,memcpy,memccpy,memmove,strcpy,strdup,strmake,strncpy
+@memset
+memset (ANSI) Fill a buffer with a character
+#include <string.h>
+void *memset(char *buffer,short character,size_t len);
+See also: farset,strnfill,strset,strnset
+@menu
+menu (THEOS) Display a menu and wait for a selection
+#include <stdlib.h>
+short menu(const char **menu,short count);
+See also: menu2
+@menu2
+menu2 (THEOS) Display a menu and wait for a selection
+#include <stdlib.h>
+short menu2(const char **menu,short count,short start,short display);
+See also: menu
+@menumsg
+menumsg (+THEOS) Display a menu line a wait for a selection
+#include <_stdlib.h>
+short menumsg(char *msg,char *key,short timeout,short timeout_key);
+@min
+min (UNIX) Return the smaller of two integers
+#include <stdlib.h>
+short min(short a,short b);
+@mkdir
+mkdir (MSC) Create a directory
+#include <stdio.h>
+short mkdir(const char *filename);
+Set	: errno,_errnum
+See also: chdir,rmdir
+@mktemp
+mktemp (UNIX) Generate a temporary file name
+#include <stdio.h>
+char *mktemp(const char *template);
+See also: tmpnam,tmpfile,tmpnam
+@mktime
+mktime (MSC) Convert a time structure into a calendar time
+#include <time.h>
+time_t mktime(struct tm *timeptr)
+See also: asctime,ctime,gmtime,localtime,strftime,time
+@modf
+modf (ANSI) Separate integral and fractional part
+#include <math.h>
+double modf(double x,double *ip);
+See also: ip
+@mouse
+mouse (+THEOS) Compute mouse position and buttons for subsequent use
+#include <mouse.h>
+short mouse(void);
+See also: hasmouse, mousebutton, mouseclick, mousedisable, mouseenable,
+	mousemove, mousescale, mouseswap, mousetell, mousexy
+@mousebutton
+mousebutton (+THEOS) Return mouse buttons state
+#include <mouse.h>
+short mousebutton(void);
+See also: hasmouse, mouse, mouseclick, mousedisable, mouseenable,
+	mousemove, mousescale, mouseswap, mousetell, mousexy
+@mouseclick
+mouseclick (+THEOS) Set mouse click and dclick delay
+#include <mouse.h>
+void mouseclick(long click);
+See also: hasmouse, mouse, mousebutton, mousedisable, mouseenable,
+	mousemove, mousescale, mouseswap, mousetell, mousexy
+@mousedisable
+mousedisable (+THEOS) Disable the mouse
+#include <mouse.h>
+void mousedisable(void);
+See also: hasmouse, mouse, mousebutton, mouseclick, mouseenable,
+	mousemove, mousescale, mouseswap, mousetell, mousexy
+@mouseenable
+mouseenable (+THEOS) Initialise and enable the mouse
+#include <mouse.h>
+void mouseenable(void);
+See also: hasmouse, mouse, mousebutton, mouseclick, mousedisable,
+	mousemove, mousescale, mouseswap, mousetell, mousexy
+@mousemove
+mousemove (+THEOS) Move the mouse pointer
+#include <mouse.h>
+void mousemove(short col, short row);
+See also: hasmouse, mouse, mousebutton, mouseclick, mousedisable, mouseenable,
+	mousescale, mouseswap, mousetell, mousexy
+@mousescale
+mousescale (+THEOS) Set mouse sensitivity
+#include <mouse.h>
+void mousescale(short scale);
+See also: hasmouse, mouse, mousebutton, mouseclick, mousedisable, mouseenable,
+	mousemove, mouseswap, mousetell, mousexy
+@mouseswap
+mouseswap (+THEOS) Swap mouse left and right buttons
+#include <mouse.h>
+void mouseswap(short flag);
+See also: hasmouse, mouse, mousebutton, mouseclick, mousedisable, mouseenable,
+	mousemove, mousescale, mousetell, mousexy
+@mousetell
+mousetell (+THEOS) Read mouse swap flag and sensitivity
+#include <mouse.h>
+void mousetell(long *click, short *scale);
+See also: hasmouse, mouse, mousebutton, mouseclick, mousedisable, mouseenable,
+	mousemove, mousescale, mouseswap, mousexy
+@mousexy
+mousexy (+THEOS) Read mouse position
+#include <mouse.h>
+void mousexy(short *col, short *row);
+See also: hasmouse, mouse, mousebutton, mouseclick, mousedisable, mouseenable,
+	mousemove, mousescale, mouseswap, mousetell
+@move
+move (THEOS) Copy one buffer to another buffer in another memory segment
+Obsolete function,use farcpy
+@msalarm
+msalarm (THEOS) Start a timer in milli seconds generating a signal interrupt
+#include <time.h>
+long msalarm(long msecs);
+See also: delay,alarm,signal
+@msgclose
+msgclose (THEOS) Close the system message file
+#include <stdlib.h>
+void msgclose(void);
+See also: getmsg
+@no_val
+no_val (THEOS) Value of no answer
+extern char yes_val;
+@NULL
+NULL (ANSI) Nul pointer type
+#include <stddef.h>
+#define NULL ((void *)0)
+@offsetof
+offsetof (ANSI) Offset between the beginning of a structure and a member
+#include <stdlib.h>
+offsetof(nom_de_structure,nom_de_membre)
+@open
+open (UNIX) Open a file
+#include <fcntl.h>
+short open(const char *filename,short type,...);
+Set	: errno,_errnum
+See also: close,creat,filelength,flush,lseek,_read,read,tell,_write,write
+@opendir
+opendir (+UNIX) Open a directory
+#include <dirent.h>
+DIR* opendir(const char* fname);
+See also: readdir,closedir,seekdir,telldir,rewinddir
+Set	: errno
+@openhelp
+openhelp (THEOS) Open the help file for a program
+#include <stdlib.h>
+FILE *openhelp(const char *name);
+See also: fopen
+@openmenu
+openmenu (THEOS) Open the menu file for a program
+#include <stdlib.h>
+FILE *openmenu(const char *name);
+See also: fopen
+@orb
+orb (THEOS) Or a byte in another memory segment
+#include <peek.h>
+void orb(void *ofs,unsigned seg,char mask);
+See also: Other or functions
+@orcs
+orcs (THEOS) Or a byte in the code segment
+#include <peek.h>
+void orcs(void *ofs,char mask);
+See also: Other or functions
+@orl
+orl (THEOS) Or a long in another memory segment
+#include <peek.h>
+void orl(void *ofs,unsigned seg,long mask);
+See also: Other or functions
+@orlcs
+orlcs (THEOS) Or a long in the code segment
+#include <peek.h>
+void orlcs(void *ofs,long mask);
+See also: Other or functions
+@orw
+orw (THEOS) Or a word in another memory segment
+#include <peek.h>
+void orw(void *ofs,unsigned seg,short mask);
+See also: Other or functions
+@orwcs
+orwcs (THEOS) Or a word in the code segment
+#include <peek.h>
+void orwcs(void *ofs,short mask);
+See also: Other or functions
+@outb
+outb (THEOS) Write a byte into an i/o port
+#include <driver.h>
+void outb(unsigned port,char byte);
+See also: outd,outsb,outsd,outsw,outw
+@outd
+outd (THEOS) Write a long into an i/o port
+#include <driver.h>
+void outd(unsigned port,unsigned long dword);
+See also: outb,outsb,outsd,outsw,outw
+@outsb
+outsb (THEOS) Write bytes into an i/o port
+#include <driver.h>
+void outsb(unsigned port,unsigned seg,void *offset,size_t len);
+See also: outb,outd,outsd,outsw,outw
+@outsd
+outsd (THEOS) Write longs into an i/o port
+#include <driver.h>
+void outsd(unsigned port,unsigned seg,void *offset,size_t len);
+See also: outb,outd,outsb,outsw,outw
+@outsw
+outsw (THEOS) Write words into an i/o port
+#include <driver.h>
+void outsw(unsigned port,unsigned seg,void *offset,size_t len);
+See also: outb,outd,outsb,outsd,outw
+@outw
+outw (THEOS) Write a word into an i/o port
+#include <driver.h>
+void outw(unsigned port,unsigned word);
+See also: outb,outd,outsb,outsd,outsw
+@pagewait
+pagewait (THEOS) Display the wait prompt and wait the a key
+#include <stdio.h>
+short pagewait(void);
+See also: getpl
+@pause
+pause (THEOS) Wait a state change on ii/o port 61
+void pause(char count);
+@pcbsc
+pcbsc (THEOS) Read or write char or words in the PCB of any process
+#include <_sc.h>
+long pcbsc(short type,void *ofs,void *arg);
+Le premier PCB commence en PCBSTART,les PCB suivant sont cons�cutifs. Le
+dernier PCB est suivi par un entier � 0xFFFF. Tout acc�s � une adresse plus
+�lev�e entraine un TRAP #13.
+
+type = 1	: lit un octet 		type = 2      : lit un mot de 16 bits
+type = 0x8001	: �crit un octet	type = 0x8002 : �crit un mot de 16 bits
+
+ofs	pointe � l'int�rieur de la table des PCB
+arg	valeur � �crire si type = 0x8001 ou 0x8002
+	
+Lecture de l'�tat du PID 0	: status = pcbsc(1,PCBSTART,(void *) 0);
+Lecture de la version de l'OS	: ver = pcbsc(-1,-1,-1);
+@peek
+peek (THEOS) Return a byte from another memory segment
+#include <peek.h>
+unsigned peek(const void *ofs,unsigned seg);
+See also: Other peek functions
+@peekchar
+peekchar (THEOS) ???
+#include <_sc.h>
+void peekchar(short pid,short type);
+@peekcs
+peekcs (THEOS) Return a byte from the code segment
+#include <peek.h>
+unsigned peekcs(const void *ofs);
+See also: Other peek functions
+@peekfsa
+peekfsa (THEOS) ???
+#include <_sc.h>
+short peekfsa(void *ofs);
+@peekl
+peekl (THEOS) Return a long from another memory segment
+#include <peek.h>
+unsigned long peekl(const void *ofs,unsigned seg);
+See also: Other peek functions
+@peeklcs
+peeklcs (THEOS) Return a long from the code segment
+#include <peek.h>
+unsigned long peeklcs(const void *ofs);
+See also: Other peek functions
+@peeklnuc
+peeklnuc (THEOS) Return a long from the nucleus segment
+#include <peek.h>
+unsigned long peeklnuc(const void *ofs);
+See also: Other peek functions
+@peeklscr
+peeklscr (THEOS) Return a long from the SCR segment
+#include <peek.h>
+unsigned long peeklscr(const void *ofs);
+See also: Other peek functions
+@peeknuc
+peeknuc (THEOS) Return a byte from the nucleus segment
+#include <peek.h>
+unsigned peeknuc(const void *ofs);
+See also: Other peek functions
+@peekp
+peekp (THEOS) Return a pointer from another memory segment
+#include <peek.h>
+void *peekp(const void *ofs,unsigned seg);
+See also: Other peek functions
+@peekpcs
+peekpcs (THEOS) Return a pointer from the code segment
+#include <peek.h>
+void *peekpcs(const void *ofs);
+See also: Other peek functions
+@peekpnuc
+peekpnuc (THEOS) Return a pointer from the nucleus segment
+#include <peek.h>
+void *peekpnuc(const void *ofs);
+See also: Other peek functions
+@peekpscr
+peekpscr (THEOS) Return a pointer from the SCR segment
+#include <peek.h>
+void *peekpscr(const void *ofs);
+See also: Other peek functions
+@peekscr
+peekscr (THEOS) Return a byte from the SCR segment
+#include <peek.h>
+unsigned peekscr(const void *ofs);
+See also: Other peek functions
+@peektib
+peektib (THEOS) Get bytes in the TIB or RCR of any process
+#include <_sc.h>
+long peektib(short pid,void *ofs);
+L'adressage du scr peut �tre indiqu� en ajoutant 0x8000 � l'offset
+dans le scr. Ainsi :
+peektib(pid,0x8000) �quivaut � peektib(pid,&TIB->scr.logonname[0])
+@peekw
+peekw (THEOS) Return a word from another memory segment
+#include <peek.h>
+unsigned peekw(const void *ofs,unsigned seg);
+See also: Other peek functions
+@peekwcs
+peekwcs (THEOS) Return a word from the code segment
+#include <peek.h>
+unsigned peekwcs(const void *ofs);
+See also: Other peek functions
+@peekwnuc
+peekwnuc (THEOS) Return a word from the nucleus segment
+#include <peek.h>
+unsigned peekwnuc(const void *ofs);
+See also: Other peek functions
+@peekwscr
+peekwscr (THEOS) Return a word from the SCR segment
+#include <peek.h>
+unsigned peekwscr(const void *ofs);
+See also: Other peek functions
+@perror
+perror (ANSI) Display a program defined message with a message pointed by errno
+#include <stdio.h>
+void perror(const char *string);
+Set	: errno
+See also: errmsg,fperror,getmsg,strerror,syserr
+@phy_addr
+phy_addr (THEOS) Determine physical address of memory selector,lock and unlock
+#include <getmem.h>
+unsigned long phy_addr(unsigned seg,void *offset,size_t len);
+See also: getmem,putmem
+@pipe
+pipe (UNIX) Open an interprocess i/o channel
+#include <stdio.h>
+short pipe(short filenum[2]);
+See also: popen
+@poke
+poke (THEOS) Put a byte into another memory segment
+#include <peek.h>
+void poke(char val,void *ofs,unsigned seg);
+See also: Other poke functions
+@pokecs
+pokecs (THEOS) Put a byte into the code segment
+#include <peek.h>
+void pokecs(char val,void *ofs);
+See also: Other poke functions
+@pokecsa
+pokecsa (THEOS) Put a byte into the code segment
+#include <peek.h>
+void pokecsa(char val,void *ofs);
+See also: Other poke functions
+@pokel
+pokel (THEOS) Put a long into another memory segment
+#include <peek.h>
+void pokel(long val,void *ofs,unsigned seg);
+See also: Other poke functions
+@pokelcs
+pokelcs (THEOS) Put a long into the code segment
+#include <peek.h>
+void pokelcs(long val,void *ofs);
+See also: Other poke functions
+@pokelcsa
+pokelcsa (THEOS) Put a long into the code segment
+#include <peek.h>
+void pokelcsa(long val,void *ofs);
+See also: Other poke functions
+@pokelscr
+pokelscr (THEOS) Put a long into the SCR segment
+#include <peek.h>
+void pokelscr(long val,void *ofs);
+See also: Other poke functions
+@pokenuc
+pokenuc (THEOS) Put a byte into the nucleus segment
+#include <peek.h>
+void pokenuc(short val,void *ofs);
+See also: Other poke functions
+@pokep
+pokep (THEOS) Put a pointer into another memory segment
+#include <peek.h>
+void pokep(void *val,void *ofs,unsigned seg);
+See also: Other poke functions
+@pokepcs
+pokepcs (THEOS) Put a pointer into the code segment
+#include <peek.h>
+void pokepcs(void *val,void *ofs);
+See also: Other poke functions
+@pokepcsa
+pokepcsa (THEOS) Put a pointer into the code segment
+#include <peek.h>
+void pokepcsa(void *val,void *ofs);
+See also: Other poke functions
+@pokepscr
+pokepscr (THEOS) Put a pointer into the SCR segment
+#include <peek.h>
+void pokepscr(void *val,void *ofs);
+See also: Other poke functions
+@pokescr
+pokescr (THEOS) Put a byte into the SCR segment
+#include <peek.h>
+void pokescr(char val,void *ofs);
+See also: Other poke functions
+@pokeucb
+pokeucb (THEOS) Put a byte into the UCB segment
+#include <peek.h>
+void pokeucb(short val,void *ofs);
+See also: Other poke functions
+@pokew
+pokew (THEOS) Put a word into another memory segment
+#include <peek.h>
+void pokew(short val,void *ofs,unsigned seg);
+See also: Other poke functions
+@pokewcs
+pokewcs (THEOS) Put a word into the code segment
+#include <peek.h>
+void pokewcs(short val,void *ofs);
+See also: Other poke functions
+@pokewcsa
+pokewcsa (THEOS) Put a word into the code segment
+#include <peek.h>
+void pokewcsa(short val,void *ofs);
+See also: Other poke functions
+@pokewnuc
+pokewnuc (THEOS) Put a word into the nucleus segment
+#include <peek.h>
+void pokewnuc(short val,void *ofs);
+See also: Other poke functions
+@pokewscr
+pokewscr (THEOS) Put a word into the SCR segment
+#include <peek.h>
+void pokewscr(short val,void *ofs);
+See also: Other poke functions
+@pokewucb
+pokewucb (THEOS) Put a word into the UCB segment
+#include <peek.h>
+void pokewucb(short val,void *ofs);
+See also: Other poke functions
+@popen
+popen (UNIX) Open an interprocess i/o channel
+#include <stdio.h>
+short popen(FILE **rd_pipe,FILE **wr_pipe);
+See also: pipe
+@popf
+popf (THEOS) Pop flag register
+#include <driver.h>
+void popf(void);
+See also: pushf
+@pow
+pow (ANSI) Compute a power of a number
+#include <math.h>
+double pow(double z,double x);
+Set	: errno
+@pragma
+#pragma Sets compiler options
+#pragma align	1 | 2 (default) | 4
+#pragma align	struct | -struct (default)
+#pragma char	signed (default) | unsigned
+#pragma field	char | word (default)
+#pragma float	bcd | ieee (default)
+#pragma float	float (default) | double
+#pragma int	short (default) | long
+#pragma library
+#pragma prog	version,priv[,mfg,serial][,"copyright"][,patchsize]
+#pragma shift	logical (default) | arithmetic
+@pre_empt
+pre_empt (THEOS) ???
+#include <sc.h>
+void pre_empt(void);
+@prime
+prime (THEOS) Compute the smallest prime greater than or equal to a number
+#include <stdlib.h>
+unsigned prime(unsigned n);
+See also: lprime
+@printf
+printf (ANSI) Format output
+#include <stdio.h>
+short printf(const char *format,...);
+See also: cprintf,fprintf,sprintf,vfprintf,vprintf,vsprintf
+@pushf
+pushf (THEOS) Push flag register
+#include <driver.h>
+void pushf(void);
+@ptrdiff_t
+ptrdiff_t (ANSI) Result type of the substraction of two pointers
+#include <stddef.h>
+typedef long ptrdiff_t;
+@putc
+putc (ANSI) Write a character to a stream
+#include <stdio.h>
+short putc(char c,FILE *fp);
+See also: fputc,putchar
+@putch
+putch (MSC) Write a character to the console
+#include <conio.h>
+short putch(short c);
+See also: fputc,putc,putchar
+@putchar
+putchar (ANSI) Write a character to standard output
+#include <stdio.h>
+short putchar(short c);
+@putenv
+putenv (MSC) Set an environment variable
+#include <stdlib.h>
+short putenv(const char *s);
+See also: getenv
+@putmem
+putmem (THEOS) Release memory allocated by getmem
+#include <getmem.h>
+void putmem(unsigned seg);
+See also: getmem
+@putmsg
+putmsg (THEOS) Display a message with parameter substitution
+#include <stdlib.h>
+void putmsg(const char *text,const char *arg[]);
+See also: errbot,errmsg,getmsg,perror,syserr
+@puts
+puts (ANSI) Write a string to standard output
+#include <stdio.h>
+void puts(const char *string);
+See also: cputs,fputs
+@putw
+putw (ANSI) Write a word to a stream
+#include <stdio.h>
+short putw(short word,FILE *fp);
+See also: getw,fgetw,fputw
+@qsort
+qsort (ANSI) Sort arrays in memory
+void qsort(const void **array,size_t nbr,size_t size,
+	short (*compar)(const void *,const void *));
+See also: bsearch,sort
+@quitoff
+quitoff (THEOS) Mask the system quit key
+#include <driver.h>
+void quitoff(void);
+See also: quiton
+@quiton
+quiton (THEOS) Re-enable the system quit key
+#include <driver.h>
+void quiton(void);
+See also: quitoff
+@raise
+raise (ANSI) Force a signal interrupt
+#include <signal.h>
+short raise(short sig);
+See also: signal
+@rand
+rand (ANSI) Generate pseudo-random numbers
+#include <stdlib.h>
+short rand(void);
+See also: srand
+@rbrk
+rbrk (THEOS) Internal function
+@read
+read (ANSI) Read data from a file
+#include <stdio.h>
+short read(short fd,void *buffer,size_t n);
+See also: close,creat,filelength,flush,lseek,open,_read,tell,_write,write
+@readdir
+readdir (+UNIX) Read a directory entry
+#include <dirent.h>
+struct dirent* readdir(DIR*);
+See also: opendir,closedir,seekdir,telldir,rewinddir
+Set	: errno
+@readk
+readk (THEOS) Read a record from an indexed or keyed file
+#include <stdio.h>
+short readk(FILE *fp,const char *key,void *rec);
+See also: deletek,readn,readp,writek
+@readn
+readn (THEOS) Read next record from an indexed or keyed file
+#include <stdio.h>
+short readn(FILE *fp,char *key,void *rec);
+See also: deletek,readk,readp,writek
+@readp
+readp (THEOS) Read previous record from an indexed or keyed file
+#include <stdio.h>
+short readp(FILE *fp,char *key,void *rec);
+See also: deletek,readk,readn,writek
+@realloc
+realloc (ANSI) Reallocate dynamic memory
+#include <stdlib.h>
+char *realloc(void *ptr,size_t size);
+See also: calloc,free,malloc,max_alloc,tot_alloc
+@reclock
+reclock (THEOS) Try to lock a record in a file stream or direct file
+#include <stdio.h>
+short reclock(FILE *fp,fpos_t pos);
+See also: filelock,locking,recunlock,unlock
+@recunlock
+recunlock (THEOS) Try to lock a record in a file stream or direct file
+#include <stdio.h>
+short recunlock(FILE *fp,fpos_t pos);
+See also: filelock,locking,reclock,unlock
+@regcmp
+regcmp (UNIX) Compile a search pattern to be used by the regex search function
+#include <string.h>
+char *regcmp(char *pattern,...);
+See also: regex,strchr,strstr
+@regex
+regex (UNIX) Perform a search on a string using a pattern compiled by regcmp
+#include <string.h>
+char *regex(char *cpattern,char *object,...);
+See also: regcmp,strchr,strstr
+@remote
+remote (THEOS) Call a function in another code segment
+#include <stdlib.h>
+remote(unsigned ofs,unsigned seg,...);
+@remove
+remove (ANSI) Erase a file
+#include <stdio.h>
+short remove(const char *filename);
+Set	: errno,_errnum
+See also: unlink
+@rename
+rename (ANSI) Change the name of a file
+#include <stdio.h>
+short rename(const char *old,const char *new);
+Set	: errno,_errnum
+@rewind
+rewind (ANSI) Reset file pointer
+#include <stdio.h>
+short rewind(FILE *fp);
+See also: fseek,fsetpos,seek
+@rewinddir
+rewinddir (+UNIX) Sets the directory entry location to the beginning
+#include <dirent.h>
+void rewinddir(DIR*);
+See also: opendir,closedir,readdir,telldir,seekdir
+@rmdir
+rmdir (MSC) Removes a directory
+#include <stdio.h>
+short rmdir(const char*dirname);
+Set	: errno,_errnum
+See also: remove,unlink
+@round
+round (+THEOS) Round a value to the nearest integer
+#include <_math.h>
+double round(double value, int position)
+See also: ceil, floor
+@rsema
+rsema (THEOS) Return the status of a remote semaphore
+#include <semaphor.h>
+short rsema(short pid,short sema_nbr);
+See also: rsemaname,rsemares,rsemaset,rsemawait,sema,semaphore,semares,semaset,
+	  semawait
+@rsemaname
+rsemaname (THEOS) Return the number of a remote semaphore
+#include <semaphor.h>
+short rsemaname(short pid,char *name);
+See also: rsema,rsemares,rsemaset,rsemawait,sema,semaphore,semares,semaset,
+	  semawait
+@rsemares
+rsemares (THEOS) Reset a remote semaphore
+#include <semaphor.h>
+short rsemares(short pid,short sema_nbr);
+See also: rsema,rsemaname,rsemaset,rsemawait,sema,semaphore,semares,semaset,
+	  semawait
+@rsemaset
+rsemaset (THEOS) Set a remote semaphore
+#include <semaphor.h>
+short rsemaset(short pid,short sema_nbr);
+See also: rsema,rsemaname,rsemares,rsemawait,sema,semaphore,semares,semaset,
+	  semawait
+@rsemawait
+rsemawait (THEOS) Wait until a remote semaphore is set
+#include <semaphor.h>
+short rsemawait(short pid,short sema_nbr);
+See also: rsema,rsemaname,rsemaset,rsemares,sema,semaphore,semares,semaset,
+	  semawait
+@sbrk
+sbrk (THEOS) Increase a program's data space
+void *sbrk(short increment);
+@scanf
+scanf (ANSI) Accept and format input
+#include <stdio.h>
+short scanf(char *format,...);
+See also: fscanf,sscanf
+@schedint
+schedint (THEOS) Set or reset an interrupt service routine vector
+#include <driver.h>
+void schedint(long num,short (*isr)());
+@sec
+sec (THEOS) Calculate secant
+#include <math.h>
+double sec(double x);
+@sech
+sech (THEOS) Calculate hyperbolic secant
+#include <math.h>
+double sech(double x);
+@seek
+seek (ANSI) Change a stream position pointer
+#include <stdio.h>
+short seek(FILE *fp,short pos,short base);
+See also: fsetpos,rewind,seek
+@seekdir
+seekdir (+UNIX) Sets the directory entry location
+#include <dirent.h>
+void seekdir(DIR*,long);
+See also: opendir,closedir,readdir,telldir,rewinddir
+@sema
+sema (THEOS) Return the status of a semaphore
+#include <semaphor.h>
+short rsema(short pid,short sema_nbr);
+See also: rsema,rsemaname,rsemares,rsemaset,rsemawait,semaphore,semares,
+	  semaset,semawait
+@semaphore
+semaphore (THEOS) Return the number of a semaphore
+#include <semaphor.h>
+short semaphore(char *name);
+See also: rsema,rsemaname,rsemares,rsemaset,rsemawait,sema,semares,semaset,
+	  semawait
+@semares
+semares (THEOS) Reset a semaphore
+#include <semaphor.h>
+short semares(short pid,short sema_nbr);
+See also: rsema,rsemaname,rsemares,rsemaset,rsemawait,sema,semaphore,semaset,
+	  semawait
+@semaset
+semaset (THEOS) Set a semaphore
+#include <semaphor.h>
+short semaset(short pid,short sema_nbr);
+See also: rsema,rsemaname,rsemares,rsemaset,rsemawait,sema,semaphore,semares,
+	  semawait
+@semawait
+semawait (THEOS) Wait until a semaphore is set
+#include <semaphor.h>
+short semawait(short pid,short sema_nbr);
+See also: rsema,rsemaname,rsemaset,rsemares,rsemawait,sema,semaphore,semares,
+	  semaset
+@setbuf
+setbuf (ANSI) Allocate an i/o buffer for an open file
+#include <stdio.h>
+void setbuf(FILE *fp,char *buffer);
+See also: fbuf,setvbuf,vbuf
+@setjmp
+setjmp (ANSI) Save or restore the current execution environment for a longjmp
+#include <setjmp.h>
+short setjmp(jmp_buf env);
+See also: longjmp
+@setlocale
+setlocale (ANSI) Change or return the current locale switches
+#include <locale.h>
+char *setlocale(short category,const char *locale);
+See also: strcoll,strxfrm,is... and to... functions
+@setprty
+setprty (THEOS) Change the current process priority
+#include <sc.h>
+void setprty(short priority);
+Set also: setslice,snu
+@setvbuf
+setvbuf (ANSI) Allocate an i/o buffer for an open file
+#include <stdio.h>
+void setvbuf(FILE *fp,char *buffer,short mode,size_t len);
+See also: fbuf,setbuf,vbuf
+@sgetl
+sgetl (THEOS) Retrieve a long integer stored with sputl
+#include <stdlib.h>
+long sgetl(char *buf);
+See also: sputl
+@shared
+shared (THEOS) Define or access memory shared with other process
+unsigned shared(char *name,size_t len);
+See also: far...,getlimit,add...,and...,dec...,inc...,or...,peek...,poke...,
+	  xor...
+@sig_atomic_t
+sig_atomic_t (ANSI) Used by signal
+#include <signal.h>
+typedef short sig_atomic_t;
+@signal
+signal (ANSI) Set the answer to an interrupt
+#include <signal.h>
+void *signal(short sig,void (*action());
+Set	: errno
+See also: alarm,msalarm,raise
+@sin
+sin (ANSI) Calculate sine
+#include <math.h>
+double sin(double radian);
+Set	: errno
+@sinh
+sinh (ANSI) Calculate hyperbolic sine
+#include <math.h>
+double sinh(double radian);
+@size_t
+size_t (ANSI) Result type of sizeof
+#include <stddef.h>
+typedef unsigned long size_t;
+@skipsp
+skipsp (THEOS) Locate the next non-space character in a string
+#include <string.h>
+char *skipsp(char *s);
+See also: strpbrk
+@sleep
+sleep (UNIX) Suspend execution for a specified time
+#include <time.h>
+void sleep(long msecs);
+See also: alarm,clock,delay,msalarm,signal
+@snu
+snu (THEOS) Release any remaining time in this program's slice time
+#include <process.h>
+void snu(void);
+@sort
+sort (THEOS) Sort an array in memory by rearranging an array of pointers
+void sort(void **array,size_t nbr,short (*compar)(const void *,const void *));
+See also: qsort
+@spawnl
+spawnl (MSC) Spawn another program as a subtask
+#include <process.h>
+short spawnl(short mode,const char *program,const char *arg,...,NULL);
+Set	: errno
+See also: execl,execlp,execv,execvp,spawnlp,spawnv,spawnvp
+@spawnlp
+spawnlp (MSC) Spawn another program as a subtask
+#include <process.h>
+short spawnlp(short mode,const char *path,const char *arg,...,NULL);
+Set	: errno
+See also: execl,execlp,execv,execvp,fork,spawn,spawnv,spawnvp
+@spawnv
+spawnv (MSC) Spawn another program as a subtask
+#include <process.h>
+short spawnv(short mode,const char *program,const char *arg[]);
+Set	: errno
+See also: execl,execlp,execv,execvp,fork,spawn,spawnlp,spawnvp
+@spawnvp
+spawnvp (MSC) Spawn another program as a subtask
+#include <process.h>
+short spawnvp(short mode,const char *program,const char *arg[]);
+Set	: errno
+See also: execl,execlp,execv,execvp,fork,spawn,spawnlp,spawnv
+@sprintf
+sprintf (ANSI) Format output
+#include <stdio.h>
+short sprintf(char *string,const char *format,...);
+See also: cprintf,fprintf,printf,vfprintf,vprintf,vsprintf
+@sputl
+sputl (THEOS) Store a long in an hardware independent format
+#include <stdlib.h>
+long sputl(long l,char *buf);
+See also: sgetl
+@sqrt
+sqrt (ANSI) Compute square root
+#include <math.h>
+double sqrt(double z);
+Set	: errno
+@srand
+srand (ANSI) Seed pseudo-random number generator
+#include <stdlib.h>
+void srand(unsigned seed);
+See also: rand
+@sscanf
+sscanf (ANSI) Format input from a string
+#include <stdio.h>
+short sscanf(const char *string,const char *format,...);
+@stat
+stat (ANSI) Find file attributes
+#include <stat.h>
+short stat(char *file,struct stat *statptr);
+Return	: EOF or 0
+Set	: errno
+
+struct stat {
+	dev_t	st_dev;		/* p�riph�rique	*/
+	ino_t	st_ino;		/* num�ro d'Inode = 0 */
+	mode_t	st_mode;	/* lsb = protections, msb = filestat */
+	nlink_t	st_nlink;	/* nombre de links = 1 */
+	uid_t	st_uid;		/* identificateur de propri�taire */
+	gid_t	st_gid;		/* identificateur de groupe = st_uid */
+	dev_t	st_rdev;	/* p�riph�rique physique */
+	size_t	st_size;	/* taille du fichier en octets */
+	time_t	st_atime;	/* date et heure de dernier acc�s ** */
+	time_t	st_mtime;	/* date et heure de derni�re modif ** */
+	time_t	st_ctime;	/* date et heure de cr�ation ** */
+	unsigned short st_org;	/* organisation : s�q, key, ind, dir, prg */
+	unsigned short st_rlen;	/* largeur des enregistrements */
+	unsigned short st_klen;	/* largeur des cl�s			*/
+	char st_grow;		/* taux d'agrandissement		*/
+};
+
+/*	** date de derni�re modification		*/
+@std
+std (THEOS) Set direction flag
+#include <driver.h>
+void std(void);
+See also: cld
+@sti
+sti (THEOS) Set interrupt
+#include <driver.h>
+void sti(void);
+See also: cli
+@strcat
+strcat (ANSI) Append one string to another
+#include <string.h>
+char *strcat(char *to,const char *from);
+See also: farcat,strncat
+@strchr
+strchr (ANSI) Locate the first occurence of a character in a string
+#include <string.h>
+char *strchr(const char *string1,short c);
+See also: farchr,memchr,strpbrk,strrchr,strstr
+@strcmp
+strcmp (ANSI) Compare two strings
+#include <string.h>
+short strcmp(const char *string1,const char *string2);
+See also: farcmp,fareq,memcmp,memeq,memicmp,streq,stricmp,strncmp,strneq,
+	  strnicmp
+@strcoll
+strcoll (ANSI) Compare two strings according to the current collating sequence
+#include <string.h>
+short strcoll(const char *s1, const char *s2);
+See also: setlocale,strlwr,strupr,strxfrm
+@strcpy
+strcpy (ANSI) Copy one string into another
+#include <string.h>
+char *strcpy(char *to,const char *from);
+See also: farcpy,memccpy,memcpy,memmove,memrcpy,strdup,strmake,strncpy
+@strcrypt
+strcrypt (JMD) Crypt a string
+#include <_string.h>
+char *strcrypt(char *s);
+@strcspn
+strcspn (ANSI) Return length for which one string excludes characters in another
+#include <string.h>
+unsigned short strcspn(const char *string1,const char *string2);
+See also: strpbrk,strspn,strtok
+@strdup
+strdup (MSC) Makes a copy of a string in previously unallocated memory
+#include <string.h>
+char *strdup(const char *from);
+See also: farcpy,memccpy,memcpy,memmove,memrcpy,strcpy,strmake,strncpy
+@strend
+strend (THEOS) Locate the end of a string
+#include <string.h>
+char *strend(const char *string);
+@streq
+streq (THEOS) Compare two strings for equality
+#include <string.h>
+short streq(const char *string1,const char *string2);
+See also: farcmp,fareq,memcmp,memeq,memicmp,strcmp,stricmp,strncmp,strneq,
+	  strnicmp
+@strerror
+strerror (ANSI) Return a system message with the arguments pointed by _errarg
+#include <string.h>
+char *strerror(short num);
+See also: _errarg,errmsg,fperror,getmsg,perror,syserr
+@strftime
+strftime (ANSI) Convert a time structure into a formatted string
+#include <string.h>
+size_t strftime(char *s,size_t len,const char *fmt,const struct tm *tp);
+See also: asctime,ctime,gmtime,localtime,mktime,time
+@stricmp
+stricmp (MSC) Compare two buffers,ignoring the casemode of the characters
+#include <string.h>
+short stricmp(const void *string1,const void *string2);
+See also: farcmp,fareq,memcmp,memeq,memicmp,strcmp,streq,strncmp,strneq,
+	  strnicmp
+@strlen
+strlen (ANSI) Return the length of a string
+#include <string.h>
+short strlen(const char *string);
+See also: farlen,strend
+@strlwr
+strlwr (MSC) Convert the alphabetic characters in a string to lower case
+#include <string.h>
+char *strlwr(char *s);
+See also: strupr,tolower,setlocale
+@strmake
+strmake (THEOS) Copy a memory buffer to a string,adding the nul terminator
+#include <string.h>
+char *strmake(char *to,const char *from,size_t len);
+See also: farcpy,memccpy,memcpy,memmove,memrcpy,strcpy,strdup,strncpy
+@strncat
+strncat (ANSI) Append one string onto another
+#include <string.h>
+char *strncat(char *to,const char *from,size_t len);
+See also: farcat,strcat
+@strncmp
+strncmp (ANSI) Compare two strings
+#include <string.h>
+short strncmp(const char *string1,const char *string2,size_t len);
+See also: farcmp,fareq,memcmp,memeq,memicmp,strcmp,streq,stricmp,strneq,strnicmp
+@strncpy
+strncpy (ANSI) Copy one string into another
+#include <string.h>
+char *strncpy(char *to,const char *from,size_t len);
+See also: farcpy,memccpy,memcpy,memmove,memrcpy,strcpy,strdup,strmake
+@strneq
+strneq (THEOS) Compare two strings for equality
+#include <string.h>
+short strneq(const char *string1,const char *string2,size_t len);
+See also: farcmp,fareq,memcmp,memeq,memicmp,strcmp,streq,stricmp,strncmp,
+	  strnicmp
+@strnfill
+strnfill (THEOS) Fill a buffer with a character
+#include <string.h>
+char *strnfill(char *buffer,size_t len,short character);
+See also: farset,memset,strset,strnset
+@strnicmp
+strnicmp (MSC) Compare two buffers,ignoring the casemode of the characters
+#include <string.h>
+short stricmp(const void *string1,const void *string2,size_t len);
+See also: farcmp,fareq,memcmp,memeq,memicmp,strcmp,streq,stricmp,strncmp,strneq
+@strnset
+strnset (MSC) Fill a string with a character
+void *strnset(char *buffer,short character,size_t len);
+See also: farset,memset,strnfill,strset
+@strpbrk
+strpbrk (ANSI) Find first occurrence in a string of any character from another
+#include <string.h>
+char *strpbrk(const char *string1,const char *string2);
+See also: farchr,memchr,strchr,strrchr,strstr
+@strrchr
+strrchr (ANSI) Locate the last occurence of a character in a string
+#include <string.h>
+char *strrchr(const char *string1,short c);
+See also: farchr,memchr,strpbrk,strchr,strstr
+@strsave
+strsave (THEOS) See strdup
+@strset
+strset (MSC) Fill a string with a character
+void *strset(char *buffer,short character);
+See also: farset,memset,strnfill,strnset
+@strspn
+strspn (ANSI) Return length for which one string includes characters in another
+#include <string.h>
+unsigned short strspn(const char *string1,const char *string2);
+See also: strpbrk,strcspn,strtok
+@strstr
+strstr (ANSI) Locate the first occurence of one string within another
+#include <string.h>
+char *strstr(const char *string1,const char *string2);
+See also: farchr,memchr,strpbrk,strchr,strrchr
+@strtod
+strtod (ANSI) Convert string to floating point value
+#include <stdlib.h>
+double strtod(const char *s,char **es);
+See also: atof,ftoa
+@strtok
+strtok (ANSI) Extract a token from a string
+#include <string.h>
+char *strtok(char *string,char *delim);
+See also: strcspn,srtrspn
+@strtol
+strtol (ANSI) Convert string in a specified base a to long integer
+#include <stdlib.h>
+double strtol(const char *s,char **es,short base);
+See also: atol,ltoa,strtoul,ultoa
+@strtoul
+strtoul (ANSI) Convert string in a specified base a to unsigned long integer
+#include <stdlib.h>
+double strtoul(const char *s,char **es,short base);
+See also: atol,ltoa,strtol,ultoa
+@strupr
+strupr (MSC) Convert the alphabetic characters in a string to upper case
+#include <string.h>
+char *strupr(char *s);
+See also: strlwr,tolower,setlocale
+@strxfrm
+strxfrm (ANSI) Convert a string according to the current collating sequence
+#include <string.h>
+size_t strxfrm(char* to,char* from,size_t maxsize);
+See also: setlocale,strcoll
+@subb
+subb (THEOS) Substract a value to a byte in another memory segment
+#include <peek.h>
+void subb(void *ofs,unsigned seg,char val);
+See also: Other sub functions
+@subcs
+subcs (THEOS) Substract a value to a byte in the code segment
+#include <peek.h>
+void subcs(void *ofs,char val);
+See also: Other sub functions
+@subl
+subl (THEOS) Substract a value to a long in another memory segment
+#include <peek.h>
+void subl(void *ofs,unsigned seg,long val);
+See also: Other sub functions
+@sublcs
+sublcs (THEOS) Substract a value to a long in the code segment
+#include <peek.h>
+void sublcs(void *ofs,long val);
+See also: Other sub functions
+@subw
+subw (THEOS) Substract a value to a word in another memory segment
+#include <peek.h>
+void subw(void *ofs,unsigned seg,short val);
+See also: Other sub functions
+@subwcs
+subwcs (THEOS) Substract a value to a word in the code segment
+#include <peek.h>
+void subwcs(void *ofs,short val);
+See also: Other sub functions
+@suicide
+suicide (THEOS) Kill the current sub-task
+#include <process.h>
+void suicide(void);
+See also: killtask
+@swab
+swab (THEOS) Swap a pair of bytes
+#include <stdlib.h>
+void swab(char *src,char *dest,unsigned nb);
+@syserr
+syserr (THEOS) Display a system message on stderr and exit the program
+#include <stdlib.h>
+void syserr(short rc,short num,char *arg[]);
+See also: errmsg,exit,putmsg
+@system
+system (ANSI) Pass a command to the CSI shell for execution
+#include <stdlib.h>
+short system(const char *commandline);
+@tan
+tan (ANSI) Calculate tangent
+#include <math.h>
+double tan(double radian);
+@tanh
+tanh (ANSI) Calculate hyperbolic cosine
+#include <math.h>
+double tanh(double radian);
+@tell
+tell (MSC) Return current position of file's data pointer
+#include <stdio.h>
+long tell(short filenum);
+See also: close,creat,filelength,flush,lseek,open,_read,read,_write,write
+@telldir
+telldir (+UNIX) Return the current directory entry location
+#include <dirent.h>
+long telldir(DIR*);
+See also: opendir,closedir,readdir,seekdir,rewinddir
+@tempnam
+tempnam (ANSI) Generate a unique name for a temporary file
+#include <stdio.h>
+char *tempnam(const char *directory,const char *name);
+@termname
+termname (+THEOS) Return the class name of a terminal or printer
+#include <_stdio.h>
+char* termname(int class);
+See also: devname,termname,ttyname
+@testarg
+testarg (THEOS) Compare a string to a system keyword
+#include <stdlib.h>
+short testarg(char *arg,short keynbr);
+See also: getkey,keyclose,matcharg
+@testhead
+testhead (THEOS) Control page heading and page wait for stdout
+#include <stdlib.h>
+void testhead(char *heading);
+See also: datehdng,getll,getpl,pagewait
+@testwild
+testwild (THEOS) Test if a string include "wild cards"
+#include <stdlib.h>
+short testwild(char *s);
+@tetd_t
+tetd_t (MWC) Type to represent file time and date format
+#include <ftime.h>
+typedef unsigned long tetd_t;
+@tetd_to_tm
+tetd_to_tm (MWC) Convert file time and date to system calendar format
+#include <time.h>
+tm_t *tetd_to_tm(tetd_t time);
+See also: tetd_to_time,time_to_tetd,tm_to_tetd
+@tetd_to_time
+tetd_to_time (MWC) Convert file time and date to a number of seconds
+#include <ftime.h>
+time_t tetd_to_time(tetd_t time);
+See also: tetd_to_tm,time_to_tetd,tm_to_tetd
+@time
+time (ANSI) Get current time in seconds since 01-01-1970 00:00:00 GMT
+#include <time.h>
+time_t time(time_t *tp);
+@time_t
+time_t (ANSI) Type to represent time in seconds since 01-01-1970 00:00:00 GMT
+#include <time.h>
+typedef long time_t;
+@time_to_tetd
+time_to_tetd (MWC) Convert a number of seconds to file time and date format
+#include <ftime.h>
+tetd_t time_to_tetd(time_t t);
+See also: tetd_to_tm,tetd_to_time,tm_to_tetd
+@timeout
+timeout (THEOS) Test if previous read failed because of a lock timeout
+#include <_stdio.h>
+short timeout();
+See also: lock_time
+@timer
+timer (THEOS) Set a semaphore on after a given time or a defined time of day
+#include <time.h>
+void *timer(short sema_nbr,short type,long msec);
+See also: alarm,msalarm,sema,semaphore,semares,semaset,semawait
+@timezone
+timezone (ANSI) Difference in seconds between GMT time and local time
+#include <time.h>
+extern long timezone;
+See also: daylight,tzset,tzname
+@tm_to_tetd
+tm_to_tetd (MWC) Convert system calendar format to file date and time
+#include <time.h>
+tetd_t tm_to_tetd(tm_t *time);
+See also: tetd_to_tm,tetd_to_time,time_to_tetd
+@tmpfile
+tmpfile (ANSI) Create and open a temporary file
+#include <stdio.h>
+FILE *tmpfile(void);
+See also: fopen,mktemp,lempnam,tmpnam
+@tmpnam
+tmpnam (ANSI) Generate a unique name for a temporary file
+#include <stdio.h>
+char *tmpnam(char *name);
+@toascii
+#include <ctype.h>
+toascii (UNIX) Convert characters to ASCII
+#include <ctype.h>
+short toascii(short c);
+@toibmpc
+toibmpc (+THEOS) Translate THEOS character to native IBM PC extended ASCII
+#include <ctype.h>
+short toibmpc(short c);
+See also: totheos
+@tolower
+tolower (ANSI) Convert characters to lower case
+#include <ctype.h>
+short tolower(short c);
+@topen
+topen (THEOS) ???
+#include <stdio.h>
+FILE *topen(char *fname,char *mode,unsigned reclen,size_t blklen);
+Set	: _errnum
+@tot_alloc
+tot_alloc (THEOS) Compute the total amount of available memory
+#include <malloc.h>
+size_t tot_alloc(void);
+See also: calloc,free,malloc,max_alloc,realloc
+@totheos
+totheos (+THEOS) Translate IBM PC extended ASCII character to THEOS character
+#include <ctype.h>
+short totheos(short c);
+See also: toibmpc
+@toupper
+toupper (ANSI) Convert characters to upper case
+#include <ctype.h>
+short toupper(short c);
+@trim
+trim (THEOS) Remove leading,trailing and multiple spaces
+#include <string.h>
+char *trim(char *s);
+@ttyname
+ttyname (+UNIX) Return the name of the console physical device
+#include <_stdio.h>
+char* ttyname(FILE* stream);
+See also: devname,termname,vdiname
+@tzname
+tzname (ANSI) Time zones names
+#include <time.h>
+extern char *tzname[2];
+See also: daylight,timezone,tzset
+@tzset
+tzset (UNIX) Determine the time zone name for local time
+#include <time.h>
+void tzset(void);
+See also: daylight,timezone,tzname
+@undef
+#undef (ANSI) Undefine a manifest constant
+#undef variable
+@ungetc
+ungetc (ANSI) Return character to input stream
+#include <stdio.h>
+short ungetc(short c,FILE *fp);
+See also: ungetch
+@ungetch
+ungetc (MSC) Return character to standard input
+#include <stdio.h>
+short ungetch(short c);
+See also: ungetc
+@unlink
+unlink (ANSI) Remove a file
+#include <stdio.h>
+short unlink(const char *name);
+Set	: errno,_errnum
+See also: remove
+@unload
+unload (THEOS) Unload a file from memory
+#include <process.h>
+void unload(unsigned seg);
+See also: load
+@unlock
+unlock (THEOS) Unlock a record
+#include <stdio.h>
+void unlock(FILE *file);
+See also: filelock,locking,reclock,recunlock
+@unwait
+unwait (THEOS) Awaken a program waiting for an interrupt
+#include <driver.h>
+void unwait(short pid);
+See also: wait
+@upcase
+upcase (THEOS) See strupr
+@utime
+utime (+UNIX) Change the date and time of a file
+#include <utime.h>
+short utime(const char *filename,struct utimbuf *times);
+Set	: errno
+See also: asctime,ctime,gmtime,localtime,stat,time
+@utoa
+utoa (THEOS) Convert an unsigned integer into an ASCII string
+#include <stdlib.h>
+char *utoa(char *s,unsigned i);
+See also: ftoa,itoa,ltoa
+@va_arg
+va_arg (ANSI) Used to access erguments in a variable argument functions
+#include <stdarg.h>
+.... va_arg(va_list *arg_ptr,type);
+See also: va_start,va_end
+@va_end
+va_end (ANSI) End variable argument processing
+#include <stdarg.h>
+void va_end(va_list *aptr);
+See also: va_arg,va_start
+@va_list
+va_list (ANSI) Used in variable argument processing
+#include <stdarg.h>
+typedef long va_list[1];
+@va_start
+va_start (ANSI) Start variable argument processing
+#include <stdarg.h>
+void va_start(va_list *arg_ptr,void *ptr);
+See also: va_arg,va_end
+@vdi
+vdi (THEOS) Primitive access to the Virtual Device Interface
+#include <vdi.h>
+void vdi(short vidnum,VDIPB *vdipb);
+See also: vdiopen
+@vdialpha
+vdialpha( THEOS) Switch VDI to text mode
+#include <vdi.h>
+void vdialpha(VDIPB *vdipb);
+See also: vdigraph,vdiopen
+@vdiarc
+vdiarc (THEOS) Draw an arc
+#include <vdi.h>
+void vdiarc(VDIPB *vdipb,short x,short y,short radius,short angle1,short angle2);
+See also: vdicircle,vdiopen,vdipie
+@vdibar
+vdibar (THEOS) Draw a rectangle
+#include <vdi.h>
+void vdibar(VDIPB *vdipb,short llx,short lly,short urx,short ury);
+See also: vdiopen
+@vdicircle
+vdicircle (THEOS) Draw a circle
+#include <vdi.h>
+void vdicircle(VDIPB *vdipb,short x,short y,short radius);
+See also: vdiarc,vdiopen,vdipie
+@vdiclear
+vdiclear (THEOS) Clear the graphics page or perform a form feed
+#include <vdi.h>
+void vdiarc(VDIPB *vdipb);
+See also: vdiopen
+@vdiclose
+vdiclose (THEOS) Close a VDI file
+#include <vdi.h>
+void vdiclose(VDIPB *vdipb);
+See also: vdiopen
+@vdigraph
+vdigraph (THEOS) Swith to graphics mode
+#include <vdi.h>
+void vdigraph(VDIPB *vdipb);
+See also: vdialpha,vdiopen
+@vdiline
+vdiline (THEOS) Draw a line
+#include <vdi.h>
+void vdiline(VDIPB *vdipb,short x1,short y1,short x2,short y2);
+See also: vdiopen
+@vdimark
+vdimark (THEOS) Draw a marker
+#include <vdi.h>
+void vdimark(VDIPB *vdipb,short x,short y);
+See also: vdiopen
+@vdiname
+vdiname (+THEOS) Return the name of a VDI physical device
+#include <_stdio.h>
+char* vdiname(int vdiclass);
+See also: devname,termname,ttyname
+@vdiopen
+vdiopen (THEOS) Open a graphics device
+#include <vdi.h>
+VDIPB *vdiopen(short num);
+See also: vdiclose
+@vdipie
+vdipie (THEOS) Draw a pie section
+#include <vdi.h>
+void vdipie(VDIPB *vdipb,short x,short y,short radius,short angle1,short angle2);
+See also: vdiarc,vdicircle,vdiopen
+@vdisetfc
+vdisetfc (THEOS) Set fill color
+#include <vdi.h>
+void vdisetfc(VDIPB *vdipb,short color);
+See also: vdibar,vdicircle,vdiopen,vdipie
+@vdisetfs
+vdisetfs (THEOS) Set fill style
+#include <vdi.h>
+void vdisetfs(VDIPB *vdipb,short style);
+See also: vdibar,vdicircle,vdiopen,vdipie
+@vdisetlc
+vdisetlc (THEOS) Set line color
+#include <vdi.h>
+void vdisetlc(VDIPB *vdipb,short color);
+See also: vdiarc,vdibar,vdicircle,vdiline,vdiopen,vdipie
+@vdisetlh
+vdisetlh (THEOS) Set line width or height
+#include <vdi.h>
+void vdisetlh(VDIPB *vdipb,short size);
+See also: vdiline,vdiopen
+@vdisetls
+vdisetls (THEOS) Set line style
+#include <vdi.h>
+void vdisetls(VDIPB *vdipb,short style);
+See also: vdiarc,vdibar,vdicircle,vdiline,vdiopen,vdipie
+@vdisetmc
+vdisetmc (THEOS) Set marker color
+#include <vdi.h>
+void vdisetmc(VDIPB *vdipb,short color);
+See also: vdimark,vdiopen
+@vdisetmh
+vdisetmh (THEOS) Set marker size or height
+#include <vdi.h>
+void vdisetmh(VDIPB *vdipb,short size);
+See also: vdimark,vdiopen
+@vdisetms
+vdisetms (THEOS) Set marker style
+#include <vdi.h>
+void vdisetms(VDIPB *vdipb,short style);
+See also: vdimark,vdiopen
+@vdisetta
+vdisetta (THEOS) Set text angle
+#include <vdi.h>
+void vdisetta(VDIPB *vdipb,short color);
+See also: vdiopen,vditext
+@vdisettc
+vdisettc (THEOS) Set text color
+#include <vdi.h>
+void vdisettc(VDIPB *vdipb,short color);
+See also: vdiopen,vditext
+@vdisetth
+vdisetth (THEOS) Set text size or height
+#include <vdi.h>
+void vdisetth(VDIPB *vdipb,short size);
+See also: vdiopen,vditext
+@vdisettp
+vdisettp (THEOS) Set text path
+#include <vdi.h>
+void vdisettp(VDIPB *vdipb,short path);
+See also: vdiopen,vditext
+@vdisetts
+vdisetts (THEOS) Set text style
+#include <vdi.h>
+void vdisetts(VDIPB *vdipb,short style);
+See also: vdiopen,vditext
+@vditext
+vditext (THEOS) Display a text string
+#include <vdi.h>
+void vditext(VDIPB *vdipb,short x,short y,char *s);
+See also: vdiopen
+@vfprintf
+vfprintf (ANSI) Print formatted output to a stream
+#include <stdio.h>
+short vfprintf(const FILE *stream,const char *FORMAT,va_list arg);
+See also: cprintf,fprintf,printf,sprintf,vprintf,vsprintf
+@vprintf
+vprintf (ANSI) Print formatted output to standard output
+#include <stdio.h>
+short vprintf(const char *FORMAT,va_list arg);
+See also: cprintf,fprintf,printf,sprintf,vfprintf,vsprintf
+@vsprintf
+vsprintf (ANSI) Print formatted output to a string
+#include <stdio.h>
+short vsprintf(char *s,const char *FORMAT,va_list arg);
+See also: cprintf,fprintf,printf,sprintf,vfprintf,vprintf
+@wait (THEOS) Suspend a program until an interrupt occurs
+#include <driver.h>
+void wait(void);
+See also: unwait
+@write
+write (ANSI) Write data to a file
+#include <stdio.h>
+size_t write(short fd,void *buffer,size_t len);
+See also: close,creat,filelength,flush,lseek,open,_read,read,tell,_write
+@writek
+writek (THEOS) Write a record to an indexed or keyed file
+#include <stdio.h>
+short writek(FILE *fp,const char *key,const void *rec);
+See also: deletek,readk,readn,readp
+@xorb
+xorb (THEOS) Xor a byte in another memory segment
+#include <peek.h>
+void xorb(void *ofs,unsigned seg,char mask);
+See also: Other xor functions
+@xorcs
+xorcs (THEOS) Xor a byte in the code segment
+#include <peek.h>
+void xorcs(void *ofs,char mask);
+See also: Other xor functions
+@xorl
+xorl (THEOS) Xor a long in another memory segment
+#include <peek.h>
+void xorl(void *ofs,unsigned seg,long mask);
+See also: Other xor functions
+@xorlcs
+xorlcs (THEOS) Xor a long in the code segment
+#include <peek.h>
+void xorlcs(void *ofs,long mask);
+See also: Other xor functions
+@xorw
+xorw (THEOS) Xor a word in another memory segment
+#include <peek.h>
+void xorw(void *ofs,unsigned seg,short mask);
+See also: Other xor functions
+@xorwcs
+xorwcs (THEOS) Xor a word in the code segment
+#include <peek.h>
+void xorwcs(void *ofs,short mask);
+See also: Other xor functions
+#include <_time.h>
+short _yday(short month,short day,short year);
+See also: leapyear,_weekday
+@yes_val
+yes_val (THEOS) Value of yes answer
+extern char yes_val;
+@yesno
+yesno (THEOS) Accept the answer yes or no according to the system keyword file
+#include <stdio.h>
+short yesno(void);
+See also: load_yn
+@yield
+yield (THEOS) See snu
+@account
+account (THEOS) Format of SYSTEM.ACCOUNT
+#include <account.h>
+struct account {
+	char name[8];			/* [00] - logon id */
+	char password[8];		/* [08] - password (spaces if none) */
+	char id[2];			/* [10] - account number:
+						  ascii-hex if 00-FE
+						  else: 76543210-76543210
+                                                        *3210987 *6543210
+						  * = always set
+					          if number >= 0x2000,
+						  then synonym to account
+						  & 0x1fff */
+	char priv;			/* [14] - privlege level */
+	char mail_sw;			/* [13] - you have mail */
+	char abbrev_sw;			/* [14] - CSI abbreviation switch */
+	char stdsyn_sw;			/* [15] - CSI synonym switch */
+	char synonym[9];		/* [16] - CSI synonym fn______d */
+	char rdy_sw;			/* [1F] - CSI ready switch */ 
+	char msg_sw;			/* [20] - MSG switch */
+	char break_chr[2];		/* [21] - break value (ascii-hex) */
+	char work_drv;			/* [23] - work drive code */
+	char lang_code;			/* [24] - default language code */
+	char dec_is_comma;		/* [25] - decimal is comma switch */
+	char def_lib[19];		/* [26] - default library fn.ft:d */
+	char mac_lib[9];		/* [39] - macro library fn______d */
+	char obj_lib[9];		/* [42] - object library fn______d */
+	char copy_lib[9];		/* [4B] - include library fn______d */
+	char search[26];		/* [54] - search sequence */
+	char cmd_lib[9];		/* [6E] - command library fn______d */
+	char link_lib[9];		/* [77] - link library fn______d */
+	char csi_case_sw;		/* [80] - CSI lower case mode */
+	char prompt[50];		/* [81] - CSI prompt */
+};
+@acb
+acb (THEOS) Format of accseg in memory
+#include <account.h>
+struct acb {
+	char name[8];			/* [00] - account name */
+	short id;				/* [08] - account number */
+	char msgname[8];		/* [0A] - msg name */
+};
+@TERMINAL_FD
+TERMINAL_FD (THEOS) Translate table used by international terminals
+#include <classgen.h>
+struct TERMINAL_FD {
+	char type_code;
+	char terminal_name[25];	
+	near char *home;
+	near char *fon;
+	near char *foff;
+	near char *hon;
+	near char *hoff;
+	near char *right;
+	near char *left;
+	near char *down;
+	near char *ulon;
+	near char *clear;
+	near char *rvon;
+	near char *rvoff;
+	near char *dca;
+	near char *il;
+	near char *dl;
+	near char *setup;
+	near char *ic;
+	near char *dc;
+	near char *uloff;
+	near char *eol;
+	near char *eos;
+	near char *up;
+	near char *eu;
+	near char *bon;
+	near char *boff;
+	near char *mon;
+	near char *moff;
+	near char *color;
+	near char *koff;
+	near char *kon;
+	near char *son;
+	near char *soff;
+	near char *ISO_23;
+	near char *ISO_40;
+	near char *ISO_5B;
+	near char *ISO_5C;
+	near char *down_key;
+	near char *up_key;
+	near char *left_key;
+	near char *right_key;
+	near char *esc_key;
+	near char *top_key;
+	near char *bottom_key;
+	near char *delchar_key;
+	near char *page_fwd_key;
+	near char *page_bck_key;
+	near char *word_right_key;
+	near char *word_left_key;
+	near char *sch_fwd_key;
+	near char *sch_bck_key;
+	near char *again_key;
+	near char *file_key;
+	near char *erase_key;
+	near char *beg_line_key;
+	near char *end_line_key;
+	near char *case_key;
+	near char *save_key;
+	near char *quit_key;
+	near char *find_key;
+	near char *replace_key;
+	near char *del_left_key;
+	near char *transpose_key;
+	near char *ins_line_key;
+	near char *del_line_key;
+	near char *help_key;
+	near char *ulc;
+	near char *urc;
+	near char *lrc;
+	near char *llc;
+	near char *fwi;
+	near char *li;
+	near char *ri;
+	near char *ui;
+	near char *di;
+	near char *horiz;
+	near char *vert;
+	near char *rulc;
+	near char *rurc;
+	near char *rlrc;
+	near char *rllc;
+	near char *dulc;
+	near char *durc;
+	near char *dlrc;
+	near char *dllc;
+	near char *dfsi;
+	near char *dli;
+	near char *dri;
+	near char *dui;
+	near char *ddi;
+	near char *dhoriz;
+	near char *dvert;
+	near char *slave_enable;
+	near char *slave_disable;
+	near char *A_umlaut;
+	near char *a_umlaut;
+	near char *a_circumflex;
+	near char *a_grave;
+	near char *a_acute;
+	near char *E_acute;
+	near char *e_umlaut;
+	near char *e_circumflex;
+	near char *e_grave;
+	near char *e_acute;
+	near char *i_umlaut;
+	near char *i_circumflex;
+	near char *i_grave;
+	near char *i_acute;
+	near char *O_umlaut;
+	near char *o_umlaut;
+	near char *o_circumflex;
+	near char *o_grave;
+	near char *o_acute;
+	near char *U_umlaut;
+	near char *u_umlaut;
+	near char *u_circumflex;
+	near char *u_grave;
+	near char *u_acute;
+	near char *C_tail;
+	near char *c_tail;
+	near char *N_squiggle;
+	near char *n_squiggle;
+	near char *AE;
+	near char *ae;
+	near char *A_degree;
+	near char *a_degree;
+	near char *German_esset;
+	near char *invert_question;
+	near char *invert_exclaim;
+	near char *cent;
+	near char *english_pound;
+	near char *japenese_yen;
+	near char *spanish_pentada;
+	near char *dutch_guilder;
+	near char *one_quarter;
+	near char *one_half;
+	near char *y_umlaut;
+	near char *section;
+	near char *degree;
+	near char *bullet;
+	near char *A_umlaut_key;
+	near char *a_umlaut_key;
+	near char *a_circumflex_key;
+	near char *a_grave_key;
+	near char *a_acute_key;
+	near char *E_acute_key;
+	near char *e_umlaut_key;
+	near char *e_circumflex_key;
+	near char *e_grave_key;
+	near char *e_acute_key;
+	near char *i_umlaut_key;
+	near char *i_circumflex_key;
+	near char *i_grave_key;
+	near char *i_acute_key;
+	near char *O_umlaut_key;
+	near char *o_umlaut_key;
+	near char *o_circumflex_key;
+	near char *o_grave_key;
+	near char *o_acute_key;
+	near char *U_umlaut_key;
+	near char *u_umlaut_key;
+	near char *u_circumflex_key;
+	near char *u_grave_key;
+	near char *u_acute_key;
+	near char *C_tail_key;
+	near char *c_tail_key;
+	near char *N_squiggle_key;
+	near char *n_squiggle_key;
+	near char *AE_key;
+	near char *ae_key;
+	near char *A_degree_key;
+	near char *a_degree_key;
+	near char *German_esset_key;
+	near char *invert_question_key;
+	near char *invert_exclaim_key;
+	near char *cent_key;
+	near char *english_pound_key;
+	near char *japenese_yen_key;
+	near char *spanish_pentada_key;
+	near char *dutch_guilder_key;
+	near char *one_quarter_key;
+	near char *one_half_key;
+	near char *y_umlaut_key;
+	near char *section_key;
+	near char *degree_key;
+	near char *bullet_key;
+	near char *ISO_5D;
+	near char *ISO_5E;
+	near char *ISO_60;
+	near char *ISO_7B;
+	near char *ISO_7C;
+	near char *ISO_7D;
+	near char *ISO_7E;
+	near char *ISO_23_key;
+	near char *ISO_40_key;
+	near char *ISO_5B_key;
+	near char *ISO_5C_key;
+	near char *ISO_5D_key;
+	near char *ISO_5E_key;
+	near char *ISO_60_key;
+	near char *ISO_7B_key;
+	near char *ISO_7C_key;
+	near char *ISO_7D_key;
+	near char *ISO_7E_key;
+};
+@TERMINAL_FE
+TERMINAL_FE (THEOS) Translate table used by US terminals
+#include <classgen.h>
+struct TERMINAL_FE {
+	char type_code;
+	char terminal_name[25];
+	near char *home;
+	near char *fon;
+	near char *foff;
+	near char *hon;
+	near char *hoff;
+	near char *right;
+	near char *left;
+	near char *down;
+	near char *ulon;
+	near char *clear;
+	near char *rvon;
+	near char *rvoff;
+	near char *dca;
+	near char *il;
+	near char *dl;
+	near char *setup;
+	near char *ic;
+	near char *dc;
+	near char *uloff;
+	near char *eol;
+	near char *eos;
+	near char *up;
+	near char *eu;
+	near char *bon;
+	near char *boff;
+	near char *mon;
+	near char *moff;
+	near char *color;
+	near char *koff;
+	near char *kon;
+	near char *son;
+	near char *soff;
+	char filler[8];
+	near char *down_key;
+	near char *up_key;
+	near char *left_key;
+	near char *right_key;
+	near char *esc_key;
+	near char *top_key;
+	near char *bottom_key;
+	near char *delchar_key;
+	near char *page_fwd_key;
+	near char *page_bck_key;
+	near char *word_right_key;
+	near char *word_left_key;
+	near char *sch_fwd_key;
+	near char *sch_bck_key;
+	near char *again_key;
+	near char *file_key;
+	near char *erase_key;
+	near char *beg_line_key;
+	near char *end_line_key;
+	near char *case_key;
+	near char *save_key;
+	near char *quit_key;
+	near char *find_key;
+	near char *replace_key;
+	near char *del_left_key;
+	near char *transpose_key;
+	near char *ins_line_key;
+	near char *del_line_key;
+	near char *help_key;
+	near char *ulc;
+	near char *urc;
+	near char *lrc;
+	near char *llc;
+	near char *fwi;
+	near char *li;
+	near char *ri;
+	near char *ui;
+	near char *di;
+	near char *horiz;
+	near char *vert;
+	near char *rulc;
+	near char *rurc;
+	near char *rlrc;
+	near char *rllc;
+	near char *dulc;
+	near char *durc;
+	near char *dlrc;
+	near char *dllc;
+	near char *dfsi;
+	near char *dli;
+	near char *dri;
+	near char *dui;
+	near char *ddi;
+	near char *dhoriz;
+	near char *dvert;
+	near char *slave_enable;
+	near char *slave_disable;
+};
+@PRINTER_FC
+PRINTER_FC (THEOS) Translate table used by printers
+#include <classgen.h>
+struct PRINTER_FC {
+	char type_code;
+	char printer_name[25];
+	near char *bold_on;
+	near char *bold_off;
+	near char *ul_on;
+	near char *ul_off;
+	near char *ital_on;
+	near char *ital_off;
+	near char *color_on;
+	near char *color_off;
+	near char *compress_on;
+	near char *compress_off;
+	near char *wide_on;
+	near char *wide_off;
+	near char *high_on;
+	near char *high_off;
+	near char *ulc;
+	near char *urc;
+	near char *lrc;
+	near char *llc;
+	near char *fwi;
+	near char *li;
+	near char *ri;
+	near char *ui;
+	near char *di;
+	near char *horiz;
+	near char *vert;
+	near char *rulc;
+	near char *rurc;
+	near char *rlrc;
+	near char *rllc;
+	near char *dulc;
+	near char *durc;
+	near char *dlrc;
+	near char *dllc;
+	near char *dfsi;
+	near char *dli;
+	near char *dri;
+	near char *dui;
+	near char *ddi;
+	near char *dhoriz;
+	near char *dvert;
+	near char *slave_enable;
+	near char *slave_disable;
+	near char *A_umlaut;
+	near char *a_umlaut;
+	near char *a_circumflex;
+	near char *a_grave;
+	near char *a_acute;
+	near char *E_acute;
+	near char *e_umlaut;
+	near char *e_circumflex;
+	near char *e_grave;
+	near char *e_acute;
+	near char *i_umlaut;
+	near char *i_circumflex;
+	near char *i_grave;
+	near char *i_acute;
+	near char *O_umlaut;
+	near char *o_umlaut;
+	near char *o_circumflex;
+	near char *o_grave;
+	near char *o_acute;
+	near char *U_umlaut;
+	near char *u_umlaut;
+	near char *u_circumflex;
+	near char *u_grave;
+	near char *u_acute;
+	near char *C_tail;
+	near char *c_tail;
+	near char *N_squiggle;
+	near char *n_squiggle;
+	near char *AE;
+	near char *ae;
+	near char *A_degree;
+	near char *a_degree;
+	near char *German_esset;
+	near char *invert_question;
+	near char *invert_exclaim;
+	near char *cent;
+	near char *english_pound;
+	near char *japenese_yen;
+	near char *spanish_pentada;
+	near char *dutch_guilder;
+	near char *one_quarter;
+	near char *one_half;
+	near char *y_umlaut;
+	near char *section;
+	near char *degree;
+	near char *bullet;
+	near char *ISO_23;
+	near char *ISO_40;
+	near char *ISO_5B;
+	near char *ISO_5C;
+	near char *ISO_5D;
+	near char *ISO_5E;
+	near char *ISO_60;
+	near char *ISO_7B;
+	near char *ISO_7C;
+	near char *ISO_7D;
+	near char *ISO_7E;
+};
+@elt
+elt (THEOS) Exclusive Lock Table
+#include <elt.h>
+struct elt {
+	void *lock_ofs;			/* [00] - offset address */
+	unsigned lock_seg;		/* [04] - segment address */
+	unsigned char lock_own;		/* [06] - pid of owner */
+	char lock_flag;			/* [07] - set if waiting */
+};
+
+#define ELT ((struct elt *)0)
+#define ELTLEN 	 8
+#define ELTSEG	 0x0078
+@fcb
+fcb (THEOS) File Control Block
+See FILE
+@FILE
+FILE (THEOS) File Control Block
+#include <fcb.h>
+typedef struct fcb {
+	char _fst;		/* [00] - 1 - file status:
+					   76543210
+					   ��������� = disk full on last write
+					   ��������� = tape no HDR2 labels
+					   ��������� = tape end of file
+					   ��������� = printer needs close
+					   ��������� = printer
+					   ��������� = buffer has write data
+					   ��������� = buffer allocated
+					   ��������� = opened */
+	char _flub;		/* [01] - 5 - logical unit,255 = null */
+	short _faccess;		/* [02] - 11 - access mode:
+					111111
+					5432109876543210
+					����������������� = input
+					����������������� = output
+					����������������� = lock
+					����������������� = temp file (erase)
+					����������������� = stream
+					����������������� = relative
+					����������������� = indexed
+					����������������� = keyed
+					����������������� = append mode
+					����������������� = private 
+					����������������� = last prt FF
+					����������������� = pipe file 
+					����������������� = printer pass-thru
+					����������������� = last prt FE 
+					����������������� = lock writes
+					����������������� = ix node rd/wr */
+	short _freclen;		/* [04] - 19 - record length */
+	short _fkeylen;		/* [06] - 27 - key length */
+	char *_fbufbase;	/* [08] - 801 - location of buffer */
+	long _fbufsize;		/* [0C] - 817 - buffer size */
+	char *_fbufptr;		/* [10] - 833 - next char position */
+	long _fcount;		/* [14] - 849 - number of chars left */
+	long _floc;		/* [18] - 865 - location next read or write */
+	short _fsa;		/* [1C] - 371 - slot number of fsa */
+	char *_fnxtkey;		/* [1E] - 889 - pointer to IX key storage */
+	short _fnxt;		/* [22] - 395 - type of IX key */
+	long _fixnxt;		/* [24] - 913 - disk address of IX key */
+	char *_ftapefn;		/* [28] - 929 - pointer to tape file name */
+	char _filler[10];	/* [2C] - filler */
+} FILE;				/*	  len of fcb = 54 bytes */
+
+struct fcb_286 {
+	char _fst;		/* [00] - 1 - file status:
+					   76543210
+					   ��������� = disk full on last write
+					   ��������� = tape no HDR2 labels
+					   ��������� = tape end of file
+					   ��������� = printer needs close
+					   ��������� = printer
+					   ��������� = buffer has write data
+					   ��������� = buffer allocated
+					   ��������� = opened */
+	char _flub;		/* [01] - 5 - logical unit,255 = null */
+	short _faccess;		/* [02] - 11 - access mode:
+					111111
+					5432109876543210
+					      ����������� = input
+					      ����������� = output
+					      ����������� = lock
+					      ����������� = temp file (erase)
+					      ����������� = stream
+					      ����������� = relative
+					      ����������� = indexed
+					      ����������� = keyed
+					      ����������� = append mode
+					      ����������� = private */
+	short _freclen;		/* [04] - 19 - record length */
+	short _fkeylen;		/* [06] - 27 - key length */
+	near char *_fbufbase;	/* [08] - 35 - location of buffer */
+	unsigned _fbufsize;	/* [0A] - 43 - buffer size */
+	near char *_fbufptr;	/* [0C] - 51 - next char position */
+	unsigned _fcount;	/* [0E] - 59 - number of chars left */
+	long _floc;		/* [10] - 67 - location next read or write */
+	short _fsa;		/* [14] - 83 - slot number of fsa in nucleus */
+};				/*	  len of fcb_286 = 22 bytes */
+@fdb
+fdb (THEOS) File Directory Block
+#include <fdb.h>
+struct fdb {
+	char filename[8];	/* [00] - filename or member name */
+	char filetype[8];	/* [08] - filetype */
+	char filestat;		/* [10] - file status:
+					76543210
+					00000000 empty
+					11111111 erased
+					10000000 library
+					01000000 sub directory
+					00010000 normal stream
+					00001000 relative
+					00000100 keyed
+					00000010 indexed
+					xxx00001 program
+						xxx = 000 8086 & 80286 real
+						xxx = 001 80286 protected
+						xxx = 010 80386 */
+	unsigned short fileowner; /* [11] - owner id */
+	char protect;		/* [13] - protection code:
+					76543210
+					��������� = read protect 
+					��������� = write protect
+					��������� = execute protect
+					��������� = erase protect
+					��������� = shared read protect
+					��������� = shared write protect
+					��������� = shared execute protect
+					��������� = shared erase protect */
+	union {
+	    struct {
+		year  : 6;	/* years since 1986 [0-31] = [1986 - 2017] */ 
+		month : 4;	/* month [1 - 12] */
+		day   : 5;	/* day [1 - 31] */
+		hour  : 5;	/* hour [0 - 23] */
+		min   : 6;	/* minute [0 - 59] */
+		sec   : 6;	/* second [0 - 59] */
+		} new;
+	    struct {
+		char type;	/* code 0=old,!0=new */
+		year  : 4;	/* years since 1980 [0-15] = [1980 - 1995] */
+		month : 4;	/* month [1 - 12] */
+		day   : 5;	/* day [1 - 31] */
+		hour  : 5;	/* hour [0 - 23] */
+		min   : 6;	/* minute [0 - 59] */
+		      : 0;
+		} old;
+	    unsigned long datetime;
+	    } filedate;		/* [14] - date & time of last write */
+	long filesize;		/* [18] - file size in bytes */
+	unsigned short reclen;	/* [1C] - record length */
+	unsigned short keylen;	/* [1E] - key len */
+	struct {
+	    unsigned short ext_ct; /* [20] - sector count */
+	    char ext_addr[3];	/* [22] - sector address */
+	    } extlev1[5];	/* [20] - 5 level 1 extents */
+	char extlev2a[3];	/* [39] - address of sector contain 51 exts */
+	char extlev2b[3];	/* [3C] - address of sector contain 51 exts */
+	char filegrow;		/* [3F] - extent increase amount;
+					  0 = dynamic,chop at close
+					  n = filesize/n,no chop */
+};				/*        (fdb len = 64) */
+@fsa
+fsa (THEOS) File Save Area
+#include <fsa.h>
+struct fsa {
+	near struct diskucb *fsa_ucb; 	/* [00] - file ucb */
+	long fsa_sect;			/* [02] - fdb sector address */
+	near struct fdb *fsa_ofs;	/* [06] - fdb offset within sector */
+	short fsa_count;		/* [08] - open fcb count */
+	char fsa_lock;			/* [0A] - file locked:
+						76543210
+						      ��� deny read
+						      ��� deny write */
+	char fsa_write;			/* [0B] - file modified if non zero */
+	char fsa_temp;			/* [0C] - erase at final close */
+	char fsa_1[3];			/* [0D] - not used */
+	char filestat;			/* [10] - file status:
+					   0x10 normal stream
+					   0x08 direct
+					   0x04 keyed
+					   0x02 indexed */
+	unsigned short fileowner;	/* [11] - owner id */
+	char protect;			/* [13] - protection code:
+					   0x8? shared erase protect
+					   0x4? shared execute protect
+					   0x2? shared write protect
+					   0x1? shared read protect
+					   0x?8 erase protect
+					   0x?4 execute protect
+					   0x?2 write protect
+					   0x?1 read protect  */
+	union {
+	    struct {
+		year  : 6;	/* years since 1986 [0 - 31] */ 
+		month : 4;	/* month [1 - 12] */
+		day   : 5;	/* day [1 - 31] */
+		hour  : 5;	/* hour [0 - 23] */
+		min   : 6;	/* minute [0 - 59] */
+		sec   : 6;	/* second [0 - 59] */
+		} new;
+	    struct {
+		char type;	/* code 0=old,!0=new */
+		year  : 4;	/* years since 1980 [0 - 15] */
+		month : 4;	/* month [1 - 12] */
+		day   : 5;	/* day [1 - 31] */
+		hour  : 5;	/* hour [0 - 23] */
+		min   : 6;	/* minute [0 - 59] */
+		      : 0;
+		} old;
+	    unsigned long datetime;
+	    } filedate;		/* [14] - date & time of last write */
+	long filesize;			/* [18] - file size in bytes */
+	unsigned short reclen;		/* [1C] - record length */
+	unsigned short keylen;		/* [1E] - key len */
+	struct {
+	    unsigned short ext_ct; 	/* [20] - sector count */
+	    char ext_addr[3];		/* [22] - sector address */
+	    } extlev1[5];
+	char extlev2a[3];		/* [39] - addr of sector with 51 ext */
+	char extlev2b[3];		/* [3C] - addr of sector with 51 ext */
+	char filegrow;			/* [3F] - extent growth factor */
+};					/*        (fsa len = 64) */
+
+#define FSASEG	 0x0088
+@filedate
+filedate (JMD) File's date and time structure
+#include <ftime.h>
+typedef union filedate {	/* date & time of last write */
+	struct {
+		year  : 6;	/* years since 1986 [0-31] = [1986-2017] */
+		month : 4;	/* month [1-12] */
+		day   : 5;	/* day [1-31] */
+		hour  : 5;	/* hour [0-23] */
+		min   : 6;	/* minute [0-59] */
+		sec   : 6;	/* second [0-59] */
+	} new;
+	struct {
+		type  : 8;	/* Type 0=old,!0=new */	
+		year  : 4;	/* years since 1980 [0-15] = [1980-1995] */
+		month : 4;	/* month [1-12] */
+		day   : 5;	/* day [1-31] */
+		hour  : 5;	/* hour [0-23] */
+		min   : 6;	/* minute [0-59] */
+	} old; 
+	tetd_t datetime;
+} FILEDATE;
+@tetd_t
+tetd_t (JMD) Packed file's date and time
+#include <ftime.h>
+typedef unsigned long tetd_t;
+@lconv
+lconv (ANSI) Locale structure
+#include <locale.h>
+struct lconv {
+	char *decimal_point;
+	char *thousands_sep;
+	char *grouping;
+	char *int_curr_symbol;
+	char *currency_symbol;
+	char *mon_decimal_point;
+	char *mon_thousands_sep;
+	char *mon_grouping;
+	char *positive_sign;
+	char *negative_sign;
+	char int_frac_digits;
+	char frac_digits;
+	char p_cs_precedes;
+	char p_sep_by_space;
+	char n_cs_precedes;
+	char n_sep_by_space;
+	char p_sign_posn;
+	char n_sign_posn;
+};
+
+#define LC_ALL		31
+#define LC_COLLATE	1
+#define LC_CTYPE	2
+#define LC_NUMERIC	4
+#define LC_TIME		8
+#define LC_MONETARY	16
+@complex
+complex (UNIX) Complex number
+#include <math.h>
+struct complex {
+	double x;
+	double y;
+};
+@nuc
+nuc (THEOS) Nucleus data structure
+#include <nuc.h>
+struct nuc {
+        char pad1[4];           /* [00] filler */
+        struct {
+                char year;      /* [04] year - 1900 */
+                char month;     /* [05] month (1 - 12) */
+                char day;       /* [06] day of month (1 - 31) */
+                char hour;      /* [07] hour of day (0 - 23) */
+                char min;       /* [08] minute of hour (0 - 59) */
+                char sec;       /* [09] second of minute (0 - 59) */
+                } time_of_day;  /* [04] system date & time */
+        char dateopt;           /* [0A] date option: */
+                #define kanji    1      /* 16 bit Japanese Kanji */
+                #define extime   2      /* external clock chip */
+                #define exdate   4      /* external date chip */
+                #define havusr   8      /* have USER module */
+                #define aform    16     /* American MM/DD/YY */
+                #define eform    32     /* European DD-MM-YY */
+                #define iform    64     /* International YY.MM.DD */
+                #define whist    128    /* write history records */
+        char curpid;            /* [0B] current process number */
+        char cpu[4];            /* [0C] cpu */
+        near char *curpcb;      /* [10] current PCB pointer */
+        unsigned short slice;   /* [12] slice interval (msec) */
+        near char *mstick;      /* [14] address of msec tick */
+        near char *snutick;     /* [16] address of snu tick */
+        unsigned short spoolseg; /* [18] DESPOOL segment */
+        char version[5];        /* [1A] version number */
+        char mfgnum;            /* [1F] manufacturer number */
+        unsigned short sernum;  /* [20] serial number */
+        long csisize;           /* [22] SYSTEM.THEOS386.CSI filesize */
+        struct  {
+                unsigned short size;
+                char addr[3];
+                } csiext[4];    /* [26] SYSTEM.THEOS386.CSI extent info */
+        unsigned short csistack; /* [3A] SYSTEM.THEOS386.CSI stack len */
+        char errmsg[3];         /* [3C] SYSTEM.THEOS386.MESSAGE extent info */
+        unsigned short pdlseg;  /* [3F] segment of PDL */
+        unsigned pipenum;       /* [41] next pipe number */
+        char npxpid;            /* [43] 80287/80387 owner pid */
+        char slpcnt;            /* [44] number of sleepers */
+        char spdrv;             /* [45] SYSTEM.SPOOLER drive */
+        char sppid;             /* [46] spooler pid */
+        char snu_val[3];        /* [47] select next user */
+        long cputime;           /* [4A] time of day in msec (software) */
+        short cache_seg;        /* [4E] directory cache head segment */
+        char srlo;              /* [50] SunRiver */
+        char public[26];        /* [51] public drive list A-Z */
+        near char *rpb;         /* [6B] RPB head seg address */
+        char srhi;              /* [6D] SunRiver */
+        near char *rlt;         /* [6E] RLT head offset address */
+        unsigned pipe_hd;       /* [70] PIPE head segment */
+        near char *teb;         /* [72] TEB head offset address */
+        char tz[12];            /* [74] time zone info */
+        unsigned short svdeb;   /* [80] DEBUG386 use */
+        long csicode;           /* [82] SYSTEM.THEOS386.CSI code length */
+        unsigned short msgseg;  /* [86] SYSTEM.THEOS386.MESSAGE segment */
+        char msgnum;            /* [88] SYSTEM.THEOS386.MESSAGE suffix */
+        char sync_pid;          /* [89] process id of sync'er */
+        unsigned short keyseg;  /* [8A] SYSTEM.THEOS386.KEYWORD segment */
+        char keynum;            /* [8C] SYSTEM.THEOS386.KEYWORD suffix */
+        char mca;               /* [8D] cpu flags: */
+
+                #define MCA_BUS         1
+                #define EISA_BUS        2
+                #define ISA_BUS         32
+
+                #define CPU_286         64
+                #define CPU_386         16
+                #define CPU_486         4
+
+                #define FPU             8
+
+                #define MDOS_VER        128
+
+        unsigned mem_size;      /* [8E] memory size at bootup */
+        unsigned shmemseg;      /* [90] shared memory segment */
+        char sysname[16];       /* [92] system identification */
+        unsigned short synseg;  /* [A2] SYSTEM.THEOS386.SYNONYM segment */
+        char synnum;            /* [A4] SYSTEM.THEOS386.SYNONYM suffix */
+        unsigned short devseg;  /* [A5] SYSTEM.THEOS386.DEVNAMES segment */
+        unsigned short gucb;    /* [A7] VDI UCB segment address */
+        char dflang;            /* [A9] default language code */
+        short cache_delay;      /* [AA] cache write delay in .1 seconds */
+        unsigned short accseg;  /* [AC] ACCOUNT segment address */
+        unsigned short csidata; /* [AE] SYSTEM.THEOS386.CSI data length */
+        unsigned short csiheap; /* [B0] SYSTEM.THEOS386.CSI heap length */
+        unsigned long pdbr;     /* [B2] Page Descriptor Base reg */
+        unsigned short ptseg;   /* [B6] Page Table Selector */
+        unsigned short v86seg;  /* [B8] V86 Monitor segment */
+        char v86pids[32];       /* [BA] V86 pid masks */
+        unsigned char v86count; /* [DA] V86 Monitor count */
+        char v86_inuse;         /* [DB] set while loading V86 */
+        unsigned short network; /* [DC] Network phantom pid */
+        unsigned short ncb_seg; /* [DE] Network socket control block segment */
+        short v86reserve;         /* [E0] V86 reserve I/O segment */
+        unsigned short flt_seg; /* [E2] File Lock Table */
+        char copyright[28];     /* [E4] copyright notice */
+        char ucb[1];            /* [100] Unit control blocks */
+};
+@pcb
+pcb (THEOS) Process Control Block
+#include <pcb.h>
+struct pcb {
+        unsigned short pstat;           /* [00] - process status: */
+                #define WAITING  0x00ff /* if non zero,waiting,else either \
+                                           running or ready to run */
+                #define W_INT    0x0001 /* set if waiting for interrupt */
+                #define W_LOCK   0x0002 /* set if waiting for resource lock */
+                #define W_SCREEN 0x0004 /* waiting for screen switch */
+                #define SLEEPING 0x0008 /* set if sleeping */
+                #define STOPPED  0x0010 /* set if stopped */
+                #define W_PAUSE  0x0020 /* set if BREAK-S */
+                #define W_SEMA   0x0040 /* set if waiting for semaphore */
+                #define SR_PAGE  0x0100 /* set if need cntx swtch THEO+Grafx */
+                #define MUST_COMPLETE 0x0200 /* set if task cannot be context
+                                           switched away */
+
+        unsigned short tib;             /* [02] - TSS selector */
+
+        unsigned short pending;         /* [04] - traps pending */
+                #define QUITPEND 0x0001 /* set if BREAK-Q pending */
+                #define CANPEND  0x0002 /* set if BREAK-C pending */
+                #define ALRMPEND 0x0004 /* set if alarm pending */
+                #define OVFPEND  0x0008 /* set if overflow/underflow pending */
+                #define DIV0PEND 0x0010 /* set if divide by zero pending */
+                #define FUNPEND  0x0020 /* set if function error pending */
+                #define BOUNDPEN 0x0040 /* set if array bounds pending */
+                #define FPEPEND  0x0080 /* set if floating point exception */
+                #define SESSPEND 0x0200 /* set if need to switch sessions */
+                #define FORCPEND 0x1000 /* set if FORCE pending */
+                #define DEBPEND  0x2000 /* set if BREAK-D pending */
+                #define KILLPEND 0x4000 /* set if kill syscall pending */
+                #define STAGE    0x8000 /* set if staging the trap */
+
+        char taskprty;                  /* [06] - priority level */
+        char tasklev;                   /* [07] - task level,0 == main task */
+        unsigned long cputime;          /* [08] - amount of CPU time */
+        unsigned long sleeptime;        /* [0C] - sleep time remain */
+        near struct pcb *prtylink;      /* [10] - link to next PID same prty */
+        unsigned char taskfath;         /* [12] - PID of parent task */
+        char waitsema;                  /* [13] - semaphore if W_SEMA */
+};
+@pdl
+pdl (THEOS) Public Device List
+#include <pdl.h>
+struct pdl {
+	char ucbnum;			/* ucb index */
+	char pid;			/* owner pid + 1 */
+	short open_ct;			/* number of opens */
+};
+@pipehdr
+pipehdr (THEOS) PIPE control structure
+#include <pipe.h>
+struct pipehdr {
+	unsigned pnext;		/* fwd link to next pipe */
+	unsigned pprev;		/* back link to prev pipe */
+	char pname[16];		/* pipe name (space pad) */
+	char prd_ct;		/* reader count */
+	char pwr_ct;		/* writer count */
+	char prd_pid;		/* pid of read waiter */
+	char pwr_pid;		/* pid of write waiter */
+	unsigned psize;		/* size of pipe buffer (exclude header) */
+	unsigned pcount;	/* number of chars in buffer */
+	unsigned phead;		/* read offset */
+	unsigned ptail;		/* write offset */
+	char pbuf[];		/* pipe circular buffer */
+};
+@rlt
+rlt (THEOS) Rocord Lock Table
+#include <rlt.h>
+struct rlt {
+	short fsa_num;			/* [00] - fsa number */
+	unsigned char lockpid;		/* [02] - locking pid plus one */
+	long lockad;			/* [03] - byte address */
+	near struct rlt *fwd_rlt;	/* [07] - fwd ptr to next */
+};					/*      rlt len = 9 bytes */
+@scr
+scr (THEOS) System Communication Region
+#include <scr.h>
+struct scr {
+	char logonname[8];		/* [00] - user name */
+	unsigned short usernum;		/* [08] - user number */
+	char logdate[3];		/* [0A] - logon date */
+	char logtime[3];		/* [0D] - logon time */
+	unsigned char conmask;		/* [10] - console mask:
+					76543210
+					�������� = 1st char ctl is ok
+					�������� = suppress output if stack
+					�������� = stacked lines
+					�������� = no page wait
+					�������� = output suppress
+					�������� = inverted case
+					�������� = upper case
+					�������� = echo mode */
+	unsigned char csisw;		/* [11] - csi switch:
+					76543210
+					�������� = return from logon 
+					�������� = execute csi command
+					�������� = from exec
+					�������� = nomsg
+					�������� = rdymsg
+					�������� = usersyn
+					�������� = stdsyn
+					�������� = abbrev */
+	unsigned char execsw;		/* [12] - exec switch:
+					76543210
+					�������� = CSI lower case
+					�������� = error 
+					�������� = noecho
+					�������� = trace
+					�������� = ctl on */
+	char pgmtime[3];		/* [13] - program start time */
+	char pgmname[8];		/* [16] - program name */
+	unsigned short execloc;		/* [1E] - location in system.exec */
+	near char *slofs;		/* [20] - stacked line offset */
+	unsigned short slseg;		/* [22] - stacked line segment */
+	near char *memhead;		/* [24] - malloc head */
+	char pipenr;			/* [26] - next pipe number (0-25) */
+	char privlev;			/* [27] - privlege level */
+	char lub[52];			/* [28] - lub table
+	unsigned short trapseg;		/* [5C] - signal code segment */
+	near void *quittrap;		/* [5E] - break,q trap */
+	near void *cantrap;		/* [60] - break,c trap */
+	near void *alrmtrap;		/* [62] - alarm trap */
+	near void *ovftrap;		/* [64] - overflow/underflow trap */
+	near void *div0trap;		/* [66] - divide by zero trap */
+	near void *funtrap;		/* [68] - function argument trap */
+	near void *boundtrap;		/* [6A] - array bounds trap */
+	near void *fpetrap;		/* [6C] - floating point except trap */
+	long cputimes;			/* [6E] - cpu time start */
+	char err_ext[3];		/* [72] - SYSTEM.THEOS.MESSAGE xtent */
+	char workdrive;			/* [75] - default work drive */
+	char searchseq[26];		/* [76] - search sequence */
+	unsigned char foreign;		/* [90] - Foreign language switch
+					76543210
+					����.... = language code
+					�������� = not used
+					�������� = THEOS/Z80 style modify
+					�������� = no quit
+					�������� = decimal is comma */
+	char deflib[19];		/* [91] - default library */
+	char cmdlib[9];			/* [A4] - cmd library */
+	char maclib[9];			/* [AD] - macro library */
+	char objlib[9];			/* [B6] - object library */
+	char copylib[9];		/* [BF] - copy library */
+	char linklib[9];		/* [C8] - link library */
+	char synfile[9];		/* [D1] - synonym file */
+	unsigned short comad;		/* [DA] - BASIC286 common seg addr */
+	char conbuf[8];			/* [DC] - console buffer (ungetch) */
+	char tsb[16];			/* [E4] - tab set block */
+	char cmdbuf[140];		/* [F4] - cmd storage */
+	unsigned short quittraphi;	/* [180] - high word */
+	unsigned short cantraphi;	/* [182] - high word */
+	unsigned short alrmtraphi;	/* [184] - high word */
+	unsigned short ovftraphi;	/* [186] - high word */
+	unsigned short div0traphi;	/* [188] - high word */
+	unsigned short funtraphi;	/* [18A] - high word */
+	unsigned short boundtraphi;	/* [18C] - high word */
+	unsigned short fpetraphi;	/* [18E] - high word */
+	unsigned short memheadhi;	/* [190] - high word */
+	unsigned short cebphi;		/* [192] - high word */
+	unsigned short clev;		/* [194] - call csi level */
+	unsigned short cexec;		/* [196] - execloc at call csi */
+	near void *cebp;		/* [198] - ebp at call csi */
+	unsigned short cnlev;		/* [19A] - next call csi level */
+	char echo;			/* [19C] - set if echoing */
+	char echolub;			/* [19D] - echo device */
+	short echobuf;			/* [19E] - buffer seg,if disk echo */
+	short echofsa;			/* [1A0] - fsa number */
+	short echokl;			/* [1A2] - offset if echo to spool */
+	short echorl;			/* [1A4] - page# if echo to spool */
+	unsigned char echoct;		/* [1A6] - buffer char ct */
+	char loadtrap;			/* [1A7] - debug trap on load */
+	unsigned short snbseg;		/* [1A8] - sema name block seg */
+	char semaphor[8];		/* [1AA] - 64 semaphore bits */
+	char sp_ll[4];			/* [1B2] - spool prt line len */
+	char sp_pl[4];			/* [1B6] - spool prt page len */
+	char sp_que[4];			/* [1BA] - spool prt que number */
+	char sp_copies[4];		/* [1BE] - spool prt # copies */
+	char sp_class[4];		/* [1C2] - spool prt class */
+	char graphlub[4];		/* [1C6] - graphic lub number */
+	unsigned short graphwork[4];	/* [1CA] - graphic work buffer */ 
+	char graphdev[4];		/* [1D2] - graphic device number */
+	char peeker;			/* [1D6] - peeker pid number + 1 */
+	char peekch;			/* [1D7] - char to be peeked */
+	char forcech;			/* [1D8] - char from FORCE command */
+	char cache_write_thru;		/* [1D9] - set if write thru cache */
+	unsigned short main_scr;	/* [1DA] - alias to main task SCR */
+	unsigned short main_data;	/* [1DC] - alias to main task DATA */
+	unsigned short atexit_ofshi;	/* [1DE] - high word */
+	char fill2[6];			/* [1E0] - filler */
+	unsigned char lock_wait;	/* [1E6] - seconds to wait for lock */
+	unsigned char lock_remain;	/* [1E7] - number seconds remain */
+	char slave_ll;			/* [1E8] - slave printer line length */
+	char slave_pl;			/* [1E9] - slave printer page length */
+	char slave_ol;			/* [1EA] - slave printer overflow */
+	char slave_cl;			/* [1EB] - slave printer cur line */
+	char slave_cc;			/* [1EC] - slave printer class code */
+	unsigned short slave_seg;	/* [1ED] - slave printer class seg */
+	unsigned short environ_seg;	/* [1EF] - segment of environment */
+	near char *atexit_ofs;		/* [1F1] - at exit offset */
+	unsigned short atexit_seg;	/* [1F3] - at exit segment */
+	char csi_color[4];		/* [1F5] - normal crt color */
+	unsigned cmdnum;		/* [1F9] - command number */
+	char fill3[5];			/* [1FB] - filler */
+};					/* length = 512 */
+@jmp_buf
+jmp_buf (THEOS) Non-Local Jumps
+#include <setjmp.h>
+struct FarPointer {
+	void *ptr;
+	short seg;
+};
+
+typedef struct jmp_buf {
+	struct FarPointer _jmp_eip;	/* return pointer */
+	struct FarPointer _jmp_esp;	/* stack pointer */
+	void *_jmp_ebp;			/* frame pointer */
+	long _jmp_reg[3];		/* registers */
+} jmp_buf;
+@tm
+tm (ANSI) Date and time structure
+#include <time.h>
+struct tm {
+	short tm_sec;		/* seconds after the minute	[0,60] */
+	short tm_min;		/* minutes after the hour	[0,59] */
+	short tm_hour;		/* hours since midnight		[0,23] */
+	short tm_mday;		/* day of the month		[1,31] */
+	short tm_mon;		/* months since January		[0,11] */
+	short tm_year;		/* years since 1900 */
+	short tm_wday;		/* days since Sunday		[0,6] */
+	short tm_yday;		/* days since January 1		[0,365] */
+	short tm_isdst;		/* Daylight Savings Time flag */
+};
+@ucb
+ucb (THEOS) Unit Control Block for character devices
+#include <ucb.h>
+struct ucb {
+	unsigned short devaddr;	  /* [00] - memory address,offset always 0 */
+	unsigned short iobuff1;	  /* [02] - i/o buffer 1 */
+	char devnr;		  /* [04] - device number */
+	char devunit;		  /* [05] - unit within device */
+	unsigned short ubuf_ofs2; /* [06] - high ubuf_ofs pointer */
+	char devtype;		  /* [08] - device type:
+					76543210
+					�����100 byte i/o
+					�������� = console
+					�������� = 2nd char of DCA
+					�������� = 3rd char of DCA
+					�������� = keyboard off
+					�������� = 2nd char of BREAK */
+	char devowner;		  /* [09] - owner process id */
+	char classnr;	     	  /* [0A] - class number */
+	char ll;		  /* [0B] - line length */
+	char pl;		  /* [0C] - page length */
+	char ol;		  /* [0D] - overflow lines */
+	char baud;		  /* [0E] - baud rate:
+					76543210
+					xxxx.... If Sync option bit:
+					0001.... BSC
+					0010.... SDLC
+					0011.... HDLC
+					0100.... X.25
+					0101.... SNA
+					0110.... GPIB
+					0111.... thru 1111.... user defined
+					....xxxx ASYNC baud rates:
+					    0 = no software baud
+					    1 = 56000
+					    2 = 38400
+					    3 =   110
+					    4 =   135
+					    5 =   150
+					    6 =   300
+					    7 =   600
+					    8 =  1200
+					    9 =  1800
+					   10 =  2400
+					   11 =  3600
+					   12 =  4800
+					   13 =  7200
+					   14 =  9600
+					   15 = 19200
+					....xxxx SYNC baud rates:
+					    1 =   1200
+					    2 =   2400
+					    3 =   4800
+					    4 =   9600
+					    5 =  19200
+					    6 =  38400
+					    7 =  48000
+					    8 =  56000
+					    9 =  64000
+					   10 = 100000
+					   11 = 200000
+					   12 = 500000
+					   13 = 800000 */
+	char lfdly;		  /* [0F] - line feed delay */
+	char ffdly;		  /* [10] - form feed delay */
+	char option;	      	  /* [11] - option byte:
+					   76543210
+					   00...... no parity
+					   01...... parity zero
+					   10...... parity odd
+					   11...... parity even
+					   ..1..... synchronous
+					   ...1.... alf
+					   ....1... 8 bit words
+					   .....001 dtr enable (1)
+					   .....010 xon/xoff enable (2)
+					   .....011 etx/ack enable (3)
+					   .....100 cts enable (4)
+					   .....101 xpc (5) */
+	char curline;		  /* [12] - current line system use */
+	char curcol;		  /* [13] - current column system use */
+	unsigned short transeg;	  /* [14] - translate segment addr */
+	near void *ubuf_ofs;	  /* [16] - user buffer offset */
+	unsigned short ubuf_seg;  /* [18] - user buffer segment */
+	char scantmp;		  /* [1A] - scan code temporary */
+	char prot_st;		  /* [1B] - protocol (XON/XOFF) status */
+	char scan_st;		  /* [1C] - scan code status:
+					   76543210
+					   ��������� = shift
+					   ��������� = compose
+					   ��������� = ctl
+					   ��������� = alt
+					   ��������� = scroll lock
+					   ��������� = num lock
+					   ��������� = caps lock 
+					   ��������� = Kanji mode */
+	char brk_chr;		  /* [1D] - break character */
+	short attrib;		  /* [1E] - system use (saves crt attribute)
+					5432109876543210
+					 ��������������� = protect
+					 ��������������� = format
+					 ��������������� = reverse
+					 ��������������� = blink
+					 ��������������� = underline
+					 ��������������� = takes space
+					 ��������������� = last was attr
+					 ��������������� = caused newline
+					 ��������������� = slave prt attached
+					 ��������������� = slave prt enabled
+					 ��������������� = esc mode
+					 ��������������� = status mode
+					 ��������������� = status ignore 
+					 ��������������� = last was prt cr
+					 ��������������� = line graphic mode */
+				  /*        ucb len = 32 */
+};
+@diskucb
+diskucb (THEOS) Unit Control Block for disk devices
+#include <ucb.h>
+struct diskucb {
+	unsigned short devaddr;	  /* [00] - memory address,offset always 0 */
+	unsigned short iobuff1;	  /* [02] - i/o buffer 1 */
+	char devnr;		  /* [04] - device number */
+	char devunit;		  /* [05] - unit within device */
+	unsigned short iobuff2;	  /* [06] - i/o buffer 2 */
+	char devtype;		  /* [08] - device type:
+					  76543210
+					  .....001 = disk
+					  ....1001 = disk,need label
+					  .001.... = single density
+					  .010.... = double density
+					  .011.... = cyl0 = single,other dbl
+					  .100.... = cyl0,hd0=128 other 256
+					  .101.... = 2048 byte sects
+					  .110.... = 1024 byte sects
+					  .111.... = 512 byte sects (IBM PC)
+					  0....... = removable volume
+					  1....... = fixed volume */
+	char devowner;		  /* [09] - owner process id 0xff = public */
+	char volname[8];	  /* [0A] - volume id */
+	unsigned short dirsize;   /* [12] - directory size */
+	short cyls;		  /* [14] - number of cylinders */
+	char heads;		  /* [16] - number of heads */
+	char sects;		  /* [17] - number of sectors */
+	char hdldly;	     	  /* [18] - head load delay */
+	char stpdly;	     	  /* [19] - step delay */
+	char stsdly;	   	  /* [1A] - step settle delay */
+	short curcyl;		  /* [1B] - current cylinder */
+	char diskfill[3];	  /* [1D] - work space 3 bytes */
+				  /*        diskucb len = 32 */
+};
+@tapeucb
+tapeucb (THEOS) Unit Control Block for tape devices
+#include <ucb.h>
+struct tapeucb {
+	unsigned short devaddr;	  /* [00] - memory address,offset always 0 */
+	unsigned short iobuff1;	  /* [02] - i/o buffer 1 */
+	char devnr;		  /* [04] - device number */
+	char devunit;		  /* [05] - unit within device */
+	unsigned short iobuff2;	  /* [06] - i/o buffer 2 */
+	char devtype;		  /* [08] - device type:
+					76543210
+					.....010 = tape */
+	char devowner;		  /* [09] - owner process id */
+	char volname[8];	  /* [0A] - volume id */
+	short blocknr;	      	  /* [12] - block count */
+	short filenr;		  /* [14] - file number */
+	short volnr;		  /* [16] - volume number */
+	char devtrack;		  /* [18] - tape track or channel number */
+	unsigned short iostat;	  /* [19] - status of last I/O */
+	unsigned short rdlen;	  /* [1B] - length of last read */
+	char tapefill[3];	  /* [1D] - filler,tapeucb len = 32 */
+};
+@diskcntl
+diskcntl (THEOS) Extended I/O structure for disk devices
+#include <ucb.h>
+struct	diskcntl {
+	short c_cmd;		/* command code:
+				   0 = home heads to cylinder 0
+				   1 = return drive status (MFG dependent)
+				   2 = read sectors
+				   3 = write sectors
+				   4 = format (MFG dependent)
+				   99 = land heads to safe landing zone */
+	long c_sect;		/* sector number */
+	char *c_buf;		/* buffer offset */
+	unsigned short c_seg;	/* buffer segment */
+	short c_count;		/* sector count */
+	short c_cyl;		/* cylinder number (format) */
+	short c_head;		/* head number (format) */
+	short c_den;		/* density (format) */
+};
+@bytecntl
+bytecntl (THEOS) Extended I/O structure for character devices
+#include <ucb.h>
+struct	bytecntl {
+	short c_cmd;		/* command code:
+				   1 = buffer status:
+					76543210
+					      ��� = TxBUF not full
+					      ��� = RxBUF not empty
+				   2 = modem status:
+					5432109876543210
+					111100001111����� = DSR
+					111100001111����� = CTS
+					111100001111����� = RI
+					111100001111����� = DCD
+				   3 = send break
+				   4 = use c_seg:c_buf input buffer:
+					struct {
+					    short buf_len;
+					    short buf_count;
+					    short next_store;
+					    short next_fetch;
+					    char buf[buf_len];
+					    };
+				   5 = raise DTR modem control
+				   6 = drop DTR modem control
+				   7 = raise RTS modem control
+				   8 = drop RTS modem control */
+	short c_word1;
+	short c_word2;
+	char *c_buf;		/* offset to buffer */
+	unsigned short c_seg;	/* selector for buffer */
+};
+@tapecntl
+tapecntl (THEOS) Extended I/O structure for tape devices
+#include <ucb.h>
+struct	tapecntl {
+	short c_cmd;		/* command code:
+				   1 = status:
+					76543210
+					   ������ = BOT
+					   ������ = EOT
+					   ������ = Write Protect
+					   ������ = Ready
+					   ������ = Streamer
+				   2 = rewind
+				   3 = rewind & unload
+				   4 = write tape mark
+				   7 = erase tape (format)
+				   8 = re-tension
+				   9 = get length of last read
+				 110 = read
+				 111 = write */
+	unsigned short c_tseg;	/* read/write segment */
+	char *c_tbuf;		/* read/write offset */
+	unsigned short c_tlen;	/* read/write length */
+};
+@utimbuf
+utimbuf (UNIX) File time modification structure
+#include <utime.h>
+struct utimbuf {
+	time_t actime;
+	time_t modtime;
+};
+@VDIPB
+VDIPB (THEOS) Vdi Parameters Block
+#include <vdi.h>
+typedef struct {
+	short *control;
+	short *intin;
+	short *ptsin;
+	short *intout;
+	short *ptsout;
+	short vdinum;
+	unsigned vdiseg;
+} VDIPB;
+@UBUFFER
+UBUFFER (THEOS) User Buffering
+#include <_ucb.h>
+typedef struct ubuffer {
+	short buf_len;
+	volatile short buf_count;
+	volatile short next_store;
+	volatile short next_fetch;
+	char buf[];
+} UBUFFER;
+@lub
+lub (THEOS) Device Logical Unit Blocks Numbers
+#include <lub.h>
+enum lub {
+	ADISK,BDISK,CDISK,DDISK,EDISK,FDISK,GDISK,HDISK,IDISK,JDISK,
+	KDISK,LDISK,MDISK,NDISK,ODISK,PDISK,QDISK,RDISK,SDISK,TDISK,
+	UDISK,VDISK,WDISK,XDISK,YDISK,ZDISK,
+	CONI,CONO,
+	PRT1,PRT2,PRT3,PRT4,
+	COM1,COM2,COM3,COM4,
+	TAP1,TAP2,TAP3,TAP4,
+	COM5,COM6,COM7,COM8,COM9,COM10,COM11,COM12,COM13,COM14,COM15,
+	COM16
+};
+@

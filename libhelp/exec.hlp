@@ -1,0 +1,112 @@
+@begstack			
+&begstack			empiler des lignes dans la pile clavier
+@begtype			
+&begtype			afficher des lignes.
+@break
+&break				sortir d'une boucle &for ou &while
+@call
+&call <label>			ex…cuter le sous-programme label.
+@continue
+&continue			repartir du d…but de la boucle.
+@control
+&control autocr nn		entr…e automatique au bout de nn car.
+&control case u|l|m		modifier la casse du clavier.
+&control nostack		ne pas afficher les entr…es de la pile.
+&control notrace		ne pas afficher les lignes ex…cut…es.
+&control off			ne pas afficher les commandes csi.
+&control on			afficher les commandes csi.
+&control prompt <texte>		afficher <texte> avant une saisie.
+&control stack			afficher les entr…es de la pile.
+&control trace			afficher les lignes ex…cut…es.
+	note: &control peut «tre suivi de plusieurs options.
+@crt
+&crt xx,yy			positionner le curseur.
+&crt atriboff			d…but d'attribut vid…o.
+&crt atribon			fin d'attribut vid…o.
+&crt bell			sonnerie.
+&crt clear			effacer l'…cran.
+&crt down			descendre d'une ligne.
+&crt eol			effacer la fin de la ligne.
+&crt eos			effacer la fin de l'…cran.
+&crt left			reculer d'un caract»re.
+&crt right			avancer d'un caract»re.
+&crt up				monter d'une ligne.
+@esc
+&esc [o|p|w] [on|off]		simuler la frappe de s…quences escape.
+@end
+&end				fin de &begstack, &begtype, &menu
+@error
+&error <instruction>		en cas d'erreur ex…cuter <instruction>.
+@for
+&for variable = expression-debut, expression-fin
+@next
+&next				fin de boucle &for ... &next
+@goto
+&goto label			continuer √ la ligne <label>.
+@if
+&if condition			test √ branchements multiples.
+&elseif condition
+&else
+&ifend ou &endif
+&if condition <instruction>	test simple.
+@menu
+&menu				effacer l'…cran, afficher le menu contenu dans
+				les lignes suivantes avec un titre, encadrer
+				les lignes, retourner l'option choisie dans la
+				variable &menuix.
+@menu
+&menu &variable			afficher le menu, retourner l'option choisie
+				dans la variable &variable.
+@read
+&read [<variables>]		saisir des variables.
+@return
+&return				retourner au programme principal.
+@sleep
+&sleep <secondes>|<heure>	attendre un d…lai ou l'heure.
+@skip
+&skip [nombre de lignes]	sauter des lignes.
+@space
+&space [compte]			afficher des espaces.
+@stack
+&stack [<expressions>][\]	evaluer et empiler les expressions dans
+				la pile clavier.
+@type
+&type [<expressions>][\] 	evaluer et afficher les expressions.
+@wait
+&wait				attendre la frappe d'une touche.
+@until
+&until condition		r…p…ter jusqu'√ ce que la condition soit vraie.
+&loop
+@while
+&while condition		r…p…ter tant que la condition est vraie.
+&wend
+@cat
+&cat <expression> <expression>	concat…ner.
+@index
+&index		    		nombre d'arguments de la ligne de commande,
+				nom de la commande exclu.
+@len
+&len <argument>			longueur de <argument>.
+@lit
+&lit <argument>			<argument> est trait… comme un litt…ral
+				et peut contenir '&'.
+@retcode
+&retcode	    		code retour du dernier programme csi
+				appel… depuis l'exec.
+@system
+&system account			nom du compte.
+&system	cwd			nom du r…pertoire courant.
+&system date			date num…rique.
+&system day			num…ro du jour de la semaine. lundi=1.
+&system pid			num…ro de partition (t¬che).
+&system port			num…ro de port.
+&system priv			privil»ge du compte.
+&system serial			num…ro de s…rie du syst»me.
+&system tasks			nombre de t¬ches actives.
+&system time			heure.
+&system today			date alphab…tique.
+&system uid			num…ro de compte.
+&system weekday			nom du jour.
+&system users			nombre de postes actifs.
+@typ
+&typ <argument>			n si <argument> est num…rique, sinon a.
