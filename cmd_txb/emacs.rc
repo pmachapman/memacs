@@ -88,6 +88,8 @@ bind-to-key previous-window		FN8
 bind-to-key exit-emacs			FN9
 bind-to-key save-file			FN0
 
+bind-to-key	menu-drop		FNb
+
 store-procedure toggle-insert
 	!if &gre &mod $cmode 64 31
 		delete-mode "over"

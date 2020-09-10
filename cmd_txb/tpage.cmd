@@ -307,8 +307,6 @@ macro-to-menu b-new-select	"TxBasic>SELECT"
 macro-to-menu b-new-for		"TxBasic>FOR"
 macro-to-menu b-new-while	"TxBasic>WHILE"
 
-bind-to-key	menu-drop		FNb
-
 ; Set up CMODE
 add-mode CMODE
 add-global-mode CMODE
