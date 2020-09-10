@@ -37,7 +37,7 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{CTRL|'J',		BINDFNC,	{ indent } },
 	{CTRL|'K',		BINDFNC,	{ killtext } },
 	{CTRL|'L',		BINDFNC,	{ uerefresh } },
-	{CTRL|'M',		BINDFNC,	{ new_line } },
+	{CTRL|'M',		BINDFNC,	{ uenewline } },
 	{CTRL|'N',		BINDFNC,	{ forwline } },
 	{CTRL|'O',		BINDFNC,	{ openline } },
 	{CTRL|'P',		BINDFNC,	{ backline } },

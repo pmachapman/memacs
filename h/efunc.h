@@ -189,6 +189,9 @@ NOSHARE NBIND	names[] = {
 #else
 	{"maximize-screen",		notavail},
 #endif
+#if CURSES
+	{"menu-drop",			menudrop},
+#endif
 	{"meta-prefix", 		uemeta},
 #if	WINDOW_MSWIN
 	{"minimize-screen",		minimizescreen},
@@ -216,7 +219,7 @@ NOSHARE NBIND	names[] = {
 	{"move-window-up",		mvupwind},
 	{"name-buffer",			namebuffer},
 	{"narrow-to-region",		narrow},
-	{"newline",			new_line},
+	{"newline",			uenewline},
 	{"newline-and-indent",		indent},
 	{"next-buffer",			nextbuffer},
 	{"next-line",			forwline},

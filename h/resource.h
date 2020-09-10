@@ -312,7 +312,7 @@
 #define ISOLATIONAWARE_NOSTATICIMPORT_MANIFEST_RESOURCE_ID 3
 #define SW_SHOWMAXIMIZED                3
 #define SW_MAXIMIZE                     3
-#define SHOW_FULLESCREEN                 3
+#define SHOW_FULLSCREEN                 3
 #define SW_PARENTOPENING                3
 #define VK_CANCEL                       0x03
 #define WM_MOVE                         0x0003
@@ -1157,7 +1157,7 @@
 #define TVS_EX_EXCLUSIONCHECKBOXES      0x0100
 #define TCS_BUTTONS                     0x0100
 #define MCS_NOSELCHANGEONNAV            0x0100
-#define IDM_FIND_ESCREEN                 0x100
+#define IDM_FIND_SCREEN                 0x100
 #define WM_KEYUP                        0x0101
 #define IDM_NEWSIZE                     0x101
 #define WM_CHAR                         0x0102
@@ -1167,7 +1167,7 @@
 #define WM_SYSKEYDOWN                   0x0104
 #define IDM_FONT                        0x104
 #define WM_SYSKEYUP                     0x0105
-#define IDM_RENAME_ESCREEN               0x105
+#define IDM_RENAME_SCREEN               0x105
 #define WM_SYSCHAR                      0x0106
 #define WM_SYSDEADCHAR                  0x0107
 #define WM_UNICHAR                      0x0109
@@ -1748,7 +1748,7 @@
 #define SC_ARRANGE                      0xF110
 #define SC_RESTORE                      0xF120
 #define SC_TASKLIST                     0xF130
-#define SC_ESCREENSAVE                   0xF140
+#define SC_SCREENSAVE                   0xF140
 #define SC_HOTKEY                       0xF150
 #define SC_DEFAULT                      0xF160
 #define SC_MONITORPOWER                 0xF170

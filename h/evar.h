@@ -16,7 +16,7 @@ NOSHARE char *envars[] = {
 	"asave",		/* # of chars between auto-saves */
 	"bufhook",		/* enter buffer switch hook */
 	"cbflags",		/* current buffer flags */
-	"cbufname",	 	/* current buffer name */
+	"cbufname",		/* current buffer name */
 	"cfname",		/* current file name */
 	"class",		/* screen class code */
 	"cmdhook",		/* command loop hook */
@@ -26,19 +26,19 @@ NOSHARE char *envars[] = {
 	"curcol",		/* current column pos of cursor */
 	"curline",		/* current line in file */
 	"curoffs",		/* current offset in line */
-	"curwidth", 		/* current screen width */
+	"curwidth",		/* current screen width */
 	"curwind",		/* current window ordinal on current screen */
 	"cwline",		/* current screen line in window */
 	"debug",		/* macro debugging */
 	"deskcolor",		/* desktop color */
-	"diagflag",	 	/* diagonal mouse movements enabled? */
+	"diagflag",		/* diagonal mouse movements enabled? */
 	"discmd",		/* display commands on command line */
 	"disinp",		/* display command line input characters */
-	"disphigh", 		/* display high bit characters escaped */
-	"dispundo",	 	/* display undo depth on command line */
+	"disphigh",		/* display high bit characters escaped */
+	"dispundo",		/* display undo depth on command line */
 	"exbhook",		/* exit buffer switch hook */
-	"exithook", 		/* exiting emacs hook */
-	"fcol", 		/* first displayed column in current window */
+	"exithook",		/* exiting emacs hook */
+	"fcol",			/* first displayed column in current window */
 	"fillcol",		/* current fill column */
 	"flicker",		/* flicker suppression */
 	"fmtlead",		/* format command lead characters */
@@ -48,7 +48,7 @@ NOSHARE char *envars[] = {
 	"hardtab",		/* current hard tab size */
 	"hilight",		/* region # to hilight (255 to turn off) */
 	"hjump",		/* horizontal screen jump size */
-	"hscrlbar",	 	/* horizontal scroll bar flag */
+	"hscrlbar",		/* horizontal scroll bar flag */
 	"hscroll",		/* horizontal scrolling flag */
 	"isterm",		/* incremental-search terminator character */
 	"kill", 		/* kill buffer (read only) */
@@ -63,7 +63,7 @@ NOSHARE char *envars[] = {
 	"mcol", 		/* mark column */
 	"mline",		/* mark line */
 	"mmove",		/* mouse moves events style */
-	"modeflag",		/* Mode lines displayed flag */
+	"modeflag",		/* Modelines displayed flag */
 	"msflag",		/* activate mouse? */
 	"newscreen",		/* new screen with new buffer? */
 	"numwind",		/* number of windows on current screen */
@@ -79,7 +79,7 @@ NOSHARE char *envars[] = {
 	"pid",			/* process id */
 	"popflag",		/* pop-up windows active? */
 	"popwait",		/* user wait on end of pop-up window? */
-	"posflag",		/* display point position on mode line? */
+	"posflag",		/* display point position on modeline? */
 	"progname",		/* returns current prog name - "MicroEMACS" */
 	"ram",			/* ram in use by malloc */
 	"readhook",		/* read file execution hook */
@@ -99,7 +99,7 @@ NOSHARE char *envars[] = {
 	"sterm",		/* search terminator character */
 	"syslang",		/* system language */
 	"target",		/* target for line moves */
-	"time", 		/* date and time */
+	"time",			/* date and time */
 	"timeflag",		/* display time? */
 	"tmpnam",		/* temporary file name */
 	"tpause",		/* length to pause for fences matching */
@@ -112,7 +112,7 @@ NOSHARE char *envars[] = {
 	"writehook",		/* write file hook */
 	"xpos", 		/* current mouse X position */
 	"yankflag",		/* point placement at yanked/included text */
-	"ypos", 		/* current mouse Y position */
+	"ypos"	 		/* current mouse Y position */
 };
 
 #define NEVARS	sizeof(envars) / sizeof(char *)
@@ -120,7 +120,7 @@ NOSHARE char *envars[] = {
 /*	and its preprocessor definitions	*/
 
 #define EVABBELL	0
-#define EVABCAP 	1
+#define EVABCAP		1
 #define EVABQUICK	2
 #define EVACOUNT	3
 #define EVASAVE 	4
@@ -313,17 +313,17 @@ NOSHARE UFUNC funcs[] = {
 #define UFEXIST 	16
 #define UFFIND		17
 #define UFGREATER	18
-#define UFGROUP 	19
+#define UFGROUP		19
 #define UFGTCMD 	20
 #define UFGTKEY 	21
 #define UFIND		22
-#define UFISNUM 	23
+#define UFISNUM		23
 #define UFLEFT		24
 #define UFLENGTH	25
 #define UFLESS		26
 #define UFLOWER 	27
 #define UFMID		28
-#define UFMKCOL 	29
+#define UFMKCOL		29
 #define UFMKLINE	30
 #define UFMOD		31
 #define UFNEG		32
