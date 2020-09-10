@@ -1,0 +1,200 @@
+
+PKG:MicroEMACS:
+description        = "MicroEMACS package"
+dependencies       = 
+distTreeRootSHARED = $MicroEMACS_DIR
+distTreeRootCLIENT = $MicroEMACS_DIR
+
+DIR:MicroEMACS:SHARED:.:
+mode  = 0755
+owner = bin
+group = bin
+flags = 
+
+DIR:MicroEMACS:SHARED:usr:
+mode  = 0755
+owner = bin
+group = bin
+flags = 
+
+DIR:MicroEMACS:SHARED:usr/local:
+mode  = 0755
+owner = bin
+group = bin
+flags = 
+
+DIR:MicroEMACS:SHARED:usr/local/bin:
+mode  = 0755
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/bin/me:
+mode  = 0755
+owner = bin
+group = bin
+flags = 
+exportPath = /usr/local/bin/me
+
+DIR:MicroEMACS:SHARED:usr/local/lib:
+mode  = 0755
+owner = bin
+group = bin
+flags = 
+
+DIR:MicroEMACS:SHARED:usr/local/lib/emacs:
+mode  = 0755
+owner = bin
+group = bin
+flags = 
+exportPath = /usr/local/lib/emacs
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/bpage.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/cpage.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/cua.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/dev.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/ehelp.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/ehelp1.txt:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/ehelp2.txt:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/emacs.msg:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/emacs.rc:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/epage.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/error.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/filter.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/libc.hlp:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/lpage.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/mdi.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/mewin.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/newpage.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/opage.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/ppage.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/shell.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/wpage.cmd:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/.emacsmsg.english:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/.emacsmsg.french:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/.emacsrc:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
+
+FILE:MicroEMACS:SHARED:usr/local/lib/emacs/.emacsrc.linux:
+mode  = 0644
+owner = bin
+group = bin
+flags = 
