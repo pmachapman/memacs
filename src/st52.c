@@ -732,8 +732,8 @@ stgetc()	/* get a char from the keyboard */
 			0, menu[1].ob_x, menu[1].ob_y,
 			menu[1].ob_width, menu[1].ob_height,
 			0, 0, 0, 0, 0,	/* enter/exit, x, y, w, h for rect 2 */
-			mes,		/* Buffer to receive message */
-			/* Low and high order milliseconds of counter */
+			mes,		/* Buffer to receive mesasge */
+			/* Low and high order miliseconds of counter */
 			100, 0,
 			&mx, &my,	/* Mouse location */
 			&bstate,	/* State of the mouse buttons */

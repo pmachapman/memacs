@@ -433,16 +433,16 @@ static int * inbuft = inbuf;		/* Tail of input buffer		*/
 
 
 /* Forward references.          */
-extern int smgmove();
-extern int smgeeol();
-extern int smgeeop();
-extern int smgbeep();
-extern int smgopen();
-extern int smgrev();
-extern int smgcres();
-extern int smgparm();
-extern int smggetc();
-extern int smgclose();
+extern int PASCAL NEAR smgmove();
+extern int PASCAL NEAR smgeeol();
+extern int PASCAL NEAR smgeeop();
+extern int PASCAL NEAR smgbeep();
+extern int PASCAL NEAR smgopen();
+extern int PASCAL NEAR smgrev();
+extern int PASCAL NEAR smgcres();
+extern int PASCAL NEAR smgparm();
+extern int PASCAL NEAR smggetc();
+extern int PASCAL NEAR smgclose();
 
 /** Terminal dispatch table **/
 NOSHARE TERM term = {

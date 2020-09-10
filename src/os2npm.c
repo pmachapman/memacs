@@ -54,23 +54,23 @@ char drvname[][8] = {			/* names of video modes	*/
 
 /* Forward references.          */
 
-os2move();
-os2eeol();
-os2eeop();
-os2beep();
-os2open();
-os2close();
-os2getc();
-os2putc();
-os2flush();
-os2rev();
-os2kclose();
-os2kopen();
-os2cres();
-os2parm();
+PASCAL NEAR os2move();
+PASCAL NEAR os2eeol();
+PASCAL NEAR os2eeop();
+PASCAL NEAR os2beep();
+PASCAL NEAR os2open();
+PASCAL NEAR os2close();
+PASCAL NEAR os2getc();
+PASCAL NEAR os2putc();
+PASCAL NEAR os2flush();
+PASCAL NEAR os2rev();
+PASCAL NEAR os2kclose();
+PASCAL NEAR os2kopen();
+PASCAL NEAR os2cres();
+PASCAL NEAR os2parm();
 #if	COLOR
-os2fcol();
-os2bcol();
+PASCAL NEAR os2fcol();
+PASCAL NEAR os2bcol();
 #endif
 
 struct {			/* Current screen attribute for ORing	*/
@@ -201,7 +201,7 @@ int in_get()	/* get an event from the input buffer */
 /* Set the current foreground color.					*/
 /*----------------------------------------------------------------------*/
 
-os2fcol(
+PASCAL NEAR os2fcol(
 	int color)			/* color to set */
 {
 	if (dtype != CDMONO)
@@ -223,7 +223,7 @@ os2fcol(
 /* Set the current background color.					*/
 /*----------------------------------------------------------------------*/
 
-os2bcol(
+PASCAL NEAR os2bcol(
 	int color)		/* color to set */
 {
 	if (dtype != CDMONO)
@@ -247,7 +247,7 @@ os2bcol(
 /* Move the cursor.							*/
 /*----------------------------------------------------------------------*/
 
-os2move(
+PASCAL NEAR os2move(
 	int row,
 	int col)
 {
@@ -262,7 +262,7 @@ os2move(
 /* Update the physical video buffer from the logical video buffer.	*/
 /*----------------------------------------------------------------------*/
 
-os2flush(void)
+PASCAL NEAR os2flush(void)
 {
 	if (lvbMin <= lvbMax) {		/* did anything change?	*/
 		VioShowBuf(lvbMin * 2, (lvbMax - lvbMin + 1) * 2, 0);
@@ -280,7 +280,7 @@ os2flush(void)
 /* input queue.
 /*----------------------------------------------------------------------*/
 
-os2char()
+PASCAL NEAR os2char()
 {
 	register c;		/* extended key code for special keys */
 	KBDKEYINFO keyInfo;
@@ -301,7 +301,7 @@ os2char()
  * Read a character from the terminal, performing no editing and doing no echo
  * at all. Also mouse events are forced into the input stream here.
  */
-os2getc()
+PASCAL NEAR os2getc()
 
 {
 	register int c;		/* character read */
@@ -465,7 +465,7 @@ checkmouse()
 /* Returns true if a key has been pressed.				*/
 /*----------------------------------------------------------------------*/
 
-typahead()
+PASCAL NEAR typahead()
 
 {
 	KBDKEYINFO kbdinfo;
@@ -488,7 +488,7 @@ typahead()
 /* a problem.								*/
 /*----------------------------------------------------------------------*/
 
-os2putc(int c)
+PASCAL NEAR os2putc(int c)
 {
 	USHORT	cell;
 	USHORT	i;
@@ -519,7 +519,7 @@ os2putc(int c)
 /* Erase to end of line.						*/
 /*----------------------------------------------------------------------*/
 
-os2eeol()
+PASCAL NEAR os2eeol()
 {
 	USHORT	cell = ' ';
 	USHORT  i;
@@ -541,7 +541,7 @@ os2eeol()
 /* Erase to end of page.						*/
 /*----------------------------------------------------------------------*/
 
-os2eeop()
+PASCAL NEAR os2eeop()
 {
 	USHORT	cell = ' ';
 	USHORT  i;
@@ -569,7 +569,7 @@ os2eeop()
 /* Change reverse video state.  					*/
 /*----------------------------------------------------------------------*/
 
-os2rev(state)
+PASCAL NEAR os2rev(state)
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -582,7 +582,7 @@ int state;	/* TRUE = reverse, FALSE = normal */
 /* Change the screen resolution.					*/
 /*----------------------------------------------------------------------*/
 
-os2cres(char *res)		/* name of desired video mode	*/
+PASCAL NEAR os2cres(char *res)		/* name of desired video mode	*/
 {
 	USHORT	err;
 	int	type;			/* video mode type	*/
@@ -630,7 +630,7 @@ os2cres(char *res)		/* name of desired video mode	*/
 /* Change pallette settings.  (Does nothing.)				*/
 /*----------------------------------------------------------------------*/
 
-spal(char *dummy)
+PASCAL NEAR spal(char *dummy)
 {
 }
 
@@ -639,7 +639,7 @@ spal(char *dummy)
 /*	os2beep()							*/
 /*----------------------------------------------------------------------*/
 
-os2beep()
+PASCAL NEAR os2beep()
 {
 	DosBeep(1200, 175);
 }
@@ -652,7 +652,7 @@ os2beep()
 /* in use, we still use the current mode.				*/
 /*----------------------------------------------------------------------*/
 
-os2open()
+PASCAL NEAR os2open()
 {
 #if	MOUSE
 	PTRLOC mouse_pos;	/* position to place mouse */
@@ -724,7 +724,7 @@ os2open()
 /* Restore the original video settings.					*/
 /*----------------------------------------------------------------------*/
 
-os2close()
+PASCAL NEAR os2close()
 {
 #if	MOUSE
 	/* close our use of the mouse */
@@ -743,7 +743,7 @@ os2close()
 /* Open the keyboard.							*/
 /*----------------------------------------------------------------------*/
 
-os2kopen()
+PASCAL NEAR os2kopen()
 {
 	KBDINFO	kbdInfo;
 
@@ -764,13 +764,13 @@ os2kopen()
 /* Close the keyboard.							*/
 /*----------------------------------------------------------------------*/
 
-os2kclose()
+PASCAL NEAR os2kclose()
 {
 	KbdSetStatus(&initial.kbdInfo, 0); /* restore original state	*/
 }
 
 #if	FLABEL
-fnclabel(f, n)	/* label a function key */
+PASCAL NEAR fnclabel(f, n)	/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

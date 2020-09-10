@@ -15,17 +15,17 @@
 #include	<dos.h>
 
 #if	PROTO
-int fnclabel(int f, int n);
-int readparam( int *v);
-void dobbnmouse(void);
-void docsi( int oh);
-void ttputs(char *string);
+int PASCAL NEAR fnclabel(int f, int n);
+int PASCAL NEAR readparam( int *v);
+void PASCAL NEAR dobbnmouse(void);
+void PASCAL NEAR docsi( int oh);
+void PASCAL NEAR ttputs(char *string);
 #else
-int fnclabel();
-int readparam();
-void dobbnmouse();
-void docsi();
-void ttputs();
+int PASCAL NEAR fnclabel();
+int PASCAL NEAR readparam();
+void PASCAL NEAR dobbnmouse();
+void PASCAL NEAR docsi();
+void PASCAL NEAR ttputs();
 #endif
 
 #define NROW    24                      /* Screen size.                 */
@@ -37,26 +37,26 @@ void ttputs();
 #define ESC     0x1B                    /* ESC character.               */
 
 /* Forward references.          */
-extern int necmove();
-extern int neceeol();
-extern int neceeop();
-extern int necbeep();
-extern int necopen();
-extern int necrev();
-extern int necclose();
-extern int neckopen();
-extern int neckclose();
-extern int neccres();
-extern int necparm();
-extern int necgetc();
+extern int PASCAL NEAR necmove();
+extern int PASCAL NEAR neceeol();
+extern int PASCAL NEAR neceeop();
+extern int PASCAL NEAR necbeep();
+extern int PASCAL NEAR necopen();
+extern int PASCAL NEAR necrev();
+extern int PASCAL NEAR necclose();
+extern int PASCAL NEAR neckopen();
+extern int PASCAL NEAR neckclose();
+extern int PASCAL NEAR neccres();
+extern int PASCAL NEAR necparm();
+extern int PASCAL NEAR necgetc();
 #if	INSDEL
-extern int necins();
-extern int necdel();
+extern int PASCAL NEAR necins();
+extern int PASCAL NEAR necdel();
 #endif
 
 #if	COLOR
-extern int necfcol();
-extern int necbcol();
+extern int PASCAL NEAR necfcol();
+extern int PASCAL NEAR necbcol();
 
 static int cfcolor = -1;	/* current forground color */
 static int cbcolor = -1;	/* current background color */
@@ -152,7 +152,7 @@ NOSHARE TERM term    = {
 };
 
 #if	COLOR
-necfcol(color)		/* set the current output color */
+PASCAL NEAR necfcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -166,7 +166,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-necbcol(color)		/* set the current background color */
+PASCAL NEAR necbcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -184,7 +184,7 @@ int color;	/* color to set */
 #endif
 
 #if	INSDEL
-necins(lines)		/* insert some screen lines */
+PASCAL NEAR necins(lines)		/* insert some screen lines */
 
 int lines;	/* number of lines to insert */
 
@@ -197,7 +197,7 @@ int lines;	/* number of lines to insert */
 	ttputc('L');
 }
 
-necdel(lines)		/* delete some screen lines */
+PASCAL NEAR necdel(lines)		/* delete some screen lines */
 
 int lines;	/* number of lines to delete */
 
@@ -211,7 +211,7 @@ int lines;	/* number of lines to delete */
 }
 #endif
 
-necmove(row, col)
+PASCAL NEAR necmove(row, col)
 {
         ttputc(ESC);
         ttputc('[');
@@ -221,14 +221,14 @@ necmove(row, col)
         ttputc('H');
 }
 
-neceeol()
+PASCAL NEAR neceeol()
 {
         ttputc(ESC);
         ttputc('[');
         ttputc('K');
 }
 
-neceeop()
+PASCAL NEAR neceeop()
 {
 #if	COLOR
 	necfcol(gfcolor);
@@ -239,7 +239,7 @@ neceeop()
         ttputc('J');
 }
 
-necrev(state)		/* change reverse video state */
+PASCAL NEAR necrev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -264,25 +264,25 @@ int state;	/* TRUE = reverse, FALSE = normal */
 #endif
 }
 
-neccres()	/* change screen resolution */
+PASCAL NEAR neccres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
-spal(char *dummy)		/* change pallette settings */
+PASCAL NEAR spal(char *dummy)		/* change pallette settings */
 
 {
 	/* none for now */
 }
 
-necbeep()
+PASCAL NEAR necbeep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-necparm(n)
+PASCAL NEAR necparm(n)
 register int    n;
 {
         register int q,r;
@@ -298,7 +298,7 @@ register int    n;
         ttputc((n%10) + '0');
 }
 
-necopen()
+PASCAL NEAR necopen()
 {
 	strcpy(sres, "NORMAL");
 	revexist = TRUE;
@@ -311,7 +311,7 @@ necopen()
 #endif
 }
 
-necclose()
+PASCAL NEAR necclose()
 
 {
 #if	COLOR
@@ -321,7 +321,7 @@ necclose()
 	ttclose();
 }
 
-neckopen()	/* open the keyboard (a noop here) */
+PASCAL NEAR neckopen()	/* open the keyboard (a noop here) */
 
 {
 #if	FLABEL
@@ -329,7 +329,7 @@ neckopen()	/* open the keyboard (a noop here) */
 #endif
 }
 
-neckclose()	/* close the keyboard (a noop here) */
+PASCAL NEAR neckclose()	/* close the keyboard (a noop here) */
 
 {
 #if	FLABEL
@@ -337,14 +337,14 @@ neckclose()	/* close the keyboard (a noop here) */
 #endif
 }
 
-necgetc()
+PASCAL NEAR necgetc()
 
 {
 	return(ttgetc());
 }
 
 #if	FLABEL
-int fnclabel(f, n)		/* label a function key */
+int PASCAL NEAR fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

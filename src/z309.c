@@ -39,28 +39,28 @@ int *scptr[NROW];			/* pointer to screen lines	*/
 int sline[NCOL];			/* screen line image		*/
 extern union REGS rg;			/* cpu register for use of DOS calls */
 
-extern ttopen();               /* Forward references.          */
-extern ttgetc();
-extern ttputc();
-extern ttflush();
-extern ttclose();
-extern z309move();
-extern z309eeol();
-extern z309eeop();
-extern z309beep();
-extern z309open();
-extern z309rev();
-extern z309cres();
-extern z309close();
-extern z309putc();
-extern z309kopen();
-extern z309kclose();
-extern scinit();
-extern spal();
+extern PASCAL NEAR ttopen();               /* Forward references.          */
+extern PASCAL NEAR ttgetc();
+extern PASCAL NEAR ttputc();
+extern PASCAL NEAR ttflush();
+extern PASCAL NEAR ttclose();
+extern PASCAL NEAR z309move();
+extern PASCAL NEAR z309eeol();
+extern PASCAL NEAR z309eeop();
+extern PASCAL NEAR z309beep();
+extern PASCAL NEAR z309open();
+extern PASCAL NEAR z309rev();
+extern PASCAL NEAR z309cres();
+extern PASCAL NEAR z309close();
+extern PASCAL NEAR z309putc();
+extern PASCAL NEAR z309kopen();
+extern PASCAL NEAR z309kclose();
+extern PASCAL NEAR scinit();
+extern PASCAL NEAR spal();
 
 #if	COLOR
-extern z309fcol();
-extern z309bcol();
+extern PASCAL NEAR z309fcol();
+extern PASCAL NEAR z309bcol();
 
 int	cfcolor = -1;		/* current forground color */
 int	cbcolor = -1;		/* current background color */
@@ -103,7 +103,7 @@ TERM    term    = {
 extern union REGS rg;
 
 #if	COLOR
-z309fcol(color)		/* set the current output color */
+PASCAL NEAR z309fcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -111,7 +111,7 @@ int color;	/* color to set */
 	cfcolor = ctrans[color];
 }
 
-z309bcol(color)		/* set the current background color */
+PASCAL NEAR z309bcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -119,7 +119,7 @@ int color;	/* color to set */
         cbcolor = ctrans[color];
 }
 #endif
-z309move(row, col)
+PASCAL NEAR z309move(row, col)
 {
 	rg.h.ah = 2;		/* set cursor position function code */
 	rg.h.dl = col;
@@ -128,7 +128,7 @@ z309move(row, col)
 	int86(0x10, &rg, &rg);
 }
 
-z309eeol()	/* erase to the end of the line */
+PASCAL NEAR z309eeol()	/* erase to the end of the line */
 
 {
 	int attr;	/* attribute byte mask to place in RAM */
@@ -174,7 +174,7 @@ z309eeol()	/* erase to the end of the line */
 
 }
 
-z309putc(ch)	/* put a character at the current position in the
+PASCAL NEAR z309putc(ch)	/* put a character at the current position in the
 		   current colors */
 
 int ch;
@@ -193,7 +193,7 @@ int ch;
 	int86(0x10, &rg, &rg);
 }
 
-z309eeop()
+PASCAL NEAR z309eeop()
 {
 	int attr;		/* attribute to fill screen with */
 
@@ -213,7 +213,7 @@ z309eeop()
 	int86(0x10, &rg, &rg);
 }
 
-z309rev(state)		/* change reverse video state */
+PASCAL NEAR z309rev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -221,7 +221,7 @@ int state;	/* TRUE = reverse, FALSE = normal */
 	/* This never gets used under the z309-PC driver */
 }
 
-z309cres(res)	/* change screen resolution */ 
+PASCAL NEAR z309cres(res)	/* change screen resolution */ 
 
 char *res;	/* resolution to change to */
 
@@ -236,7 +236,7 @@ char *res;	/* resolution to change to */
 		return(FALSE);
 }
 
-z309beep()
+PASCAL NEAR z309beep()
 {
 #if	MWC
 	putcnb(BEL);
@@ -245,14 +245,14 @@ z309beep()
 #endif
 }
 
-z309open()
+PASCAL NEAR z309open()
 {
 	scinit(CDSENSE);
 	revexist = TRUE;
         ttopen();
 }
 
-z309close()
+PASCAL NEAR z309close()
 
 {
 	rg.h.ah = 101;
@@ -265,23 +265,23 @@ z309close()
 	ttclose();
 }
 
-spal()	/* reset the pallette registers */
+PASCAL NEAR spal()	/* reset the pallette registers */
 
 {
 	/* nothin here now..... */
 }
 
-z309kopen()	/* open the keyboard */
+PASCAL NEAR z309kopen()	/* open the keyboard */
 
 {
 }
 
-z309kclose()	/* close the keyboard */
+PASCAL NEAR z309kclose()	/* close the keyboard */
 
 {
 }
 
-scinit(type)	/* initialize the screen head pointers */
+PASCAL NEAR scinit(type)	/* initialize the screen head pointers */
 
 int type;	/* type of adapter to init for */
 
@@ -316,7 +316,7 @@ int type;	/* type of adapter to init for */
 	}
 }
 
-scwrite(row, outstr, forg, bacg)	/* write a line out*/
+PASCAL NEAR scwrite(row, outstr, forg, bacg)	/* write a line out*/
 
 int row;	/* row of screen to place outstr on */
 char *outstr;	/* string to write out (must be term.t_ncol long) */
@@ -358,7 +358,7 @@ int bacg;	/* background color */
 }
 
 #if	FLABEL
-fnclabel(f, n)		/* label a function key */
+PASCAL NEAR fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 
@@ -368,7 +368,7 @@ int f,n;	/* default flag, numeric argument [unused] */
 }
 #endif
 #else
-z309hello()
+PASCAL NEAR z309hello()
 {
 }
 #endif

@@ -20,26 +20,26 @@
 #define BEL     0x07                    /* BEL character.               */
 #define ESC     0x1B                    /* ESC character.               */
 
-extern ttopen();               /* Forward references.          */
-extern ttgetc();
-extern ttputc();
-extern ttflush();
-extern ttclose();
-extern h110move();
-extern h110eeol();
-extern h110eeop();
-extern h110beep();
-extern h110open();
-extern h110rev();
-extern h110cres();
-extern h110close();
-extern h110kopen();
-extern h110kclose();
-extern h110parm();
+extern PASCAL NEAR ttopen();               /* Forward references.          */
+extern PASCAL NEAR ttgetc();
+extern PASCAL NEAR ttputc();
+extern PASCAL NEAR ttflush();
+extern PASCAL NEAR ttclose();
+extern PASCAL NEAR h110move();
+extern PASCAL NEAR h110eeol();
+extern PASCAL NEAR h110eeop();
+extern PASCAL NEAR h110beep();
+extern PASCAL NEAR h110open();
+extern PASCAL NEAR h110rev();
+extern PASCAL NEAR h110cres();
+extern PASCAL NEAR h110close();
+extern PASCAL NEAR h110kopen();
+extern PASCAL NEAR h110kclose();
+extern PASCAL NEAR h110parm();
 
 #if	COLOR
-extern h110fcol();
-extern h110bcol();
+extern PASCAL NEAR h110fcol();
+extern PASCAL NEAR h110bcol();
 
 int	cfcolor = -1;		/* current forground color */
 int	cbcolor = -1;		/* current background color */
@@ -78,7 +78,7 @@ TERM    term    = {
 };
 
 #if	COLOR
-h110fcol(color)		/* set the current output color */
+PASCAL NEAR h110fcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -92,7 +92,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-h110bcol(color)		/* set the current background color */
+PASCAL NEAR h110bcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -107,7 +107,7 @@ int color;	/* color to set */
 }
 #endif
 
-h110move(row, col)
+PASCAL NEAR h110move(row, col)
 {
         ttputc(ESC);
         ttputc('[');
@@ -117,7 +117,7 @@ h110move(row, col)
         ttputc('H');
 }
 
-h110eeol()
+PASCAL NEAR h110eeol()
 {
         ttputc(ESC);
         ttputc('[');
@@ -125,7 +125,7 @@ h110eeol()
         ttputc('K');
 }
 
-h110eeop()
+PASCAL NEAR h110eeop()
 {
 #if	COLOR
 	h110fcol(gfcolor);
@@ -137,7 +137,7 @@ h110eeop()
         ttputc('J');
 }
 
-h110rev(state)		/* change reverse video state */
+PASCAL NEAR h110rev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -162,25 +162,25 @@ int state;	/* TRUE = reverse, FALSE = normal */
 #endif
 }
 
-h110cres()	/* change screen resolution */
+PASCAL NEAR h110cres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
-spal()		/* change pallette register */
+PASCAL NEAR spal()		/* change pallette register */
 
 {
 	/*   not here */
 }
 
-h110beep()
+PASCAL NEAR h110beep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-h110parm(n)
+PASCAL NEAR h110parm(n)
 register int    n;
 {
         register int q,r;
@@ -196,7 +196,7 @@ register int    n;
         ttputc((n%10) + '0');
 }
 
-h110open()
+PASCAL NEAR h110open()
 {
 	strcpy(sres, "15LINE");
 	strcpy(os, "MSDOS);
@@ -204,7 +204,7 @@ h110open()
         ttopen();
 }
 
-h110close()
+PASCAL NEAR h110close()
 
 {
 #if	COLOR
@@ -214,18 +214,18 @@ h110close()
 	ttclose();
 }
 
-h110kopen()
+PASCAL NEAR h110kopen()
 
 {
 }
 
-h110kclose()
+PASCAL NEAR h110kclose()
 
 {
 }
 
 #if	FLABEL
-fnclabel(f, n)		/* label a function key */
+PASCAL NEAR fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

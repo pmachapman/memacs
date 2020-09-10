@@ -15,17 +15,17 @@
 #if     I55
 
 #if	PROTO
-int fnclabel(int f, int n);
-int readparam( int *v);
-void dobbnmouse(void);
-void docsi( int oh);
-void ttputs(char *string);
+int PASCAL NEAR fnclabel(int f, int n);
+int PASCAL NEAR readparam( int *v);
+void PASCAL NEAR dobbnmouse(void);
+void PASCAL NEAR docsi( int oh);
+void PASCAL NEAR ttputs(char *string);
 #else
-int fnclabel();
-int readparam();
-void dobbnmouse();
-void docsi();
-void ttputs();
+int PASCAL NEAR fnclabel();
+int PASCAL NEAR readparam();
+void PASCAL NEAR dobbnmouse();
+void PASCAL NEAR docsi();
+void PASCAL NEAR ttputs();
 #endif
 
 #define NROW    24                      /* Screen size.                 */
@@ -37,22 +37,22 @@ void ttputs();
 #define ESC     0x1B                    /* ESC character.               */
 
 /* Forward references.          */
-extern int i55move();
-extern int i55eeol();
-extern int i55eeop();
-extern int i55beep();
-extern int i55open();
-extern int i55rev();
-extern int i55close();
-extern int i55kopen();
-extern int i55kclose();
-extern int i55cres();
-extern int i55parm();
-extern int i55getc();
+extern int PASCAL NEAR i55move();
+extern int PASCAL NEAR i55eeol();
+extern int PASCAL NEAR i55eeop();
+extern int PASCAL NEAR i55beep();
+extern int PASCAL NEAR i55open();
+extern int PASCAL NEAR i55rev();
+extern int PASCAL NEAR i55close();
+extern int PASCAL NEAR i55kopen();
+extern int PASCAL NEAR i55kclose();
+extern int PASCAL NEAR i55cres();
+extern int PASCAL NEAR i55parm();
+extern int PASCAL NEAR i55getc();
 
 #if	COLOR
-extern int i55fcol();
-extern int i55bcol();
+extern int PASCAL NEAR i55fcol();
+extern int PASCAL NEAR i55bcol();
 
 static int cfcolor = -1;	/* current forground color */
 static int cbcolor = -1;	/* current background color */
@@ -92,7 +92,7 @@ NOSHARE TERM term    = {
 };
 
 #if	COLOR
-i55fcol(color)		/* set the current output color */
+PASCAL NEAR i55fcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -107,7 +107,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-i55bcol(color)		/* set the current background color */
+PASCAL NEAR i55bcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -123,7 +123,7 @@ int color;	/* color to set */
 }
 #endif
 
-i55move(row, col)
+PASCAL NEAR i55move(row, col)
 {
         ttputc(ESC);
         ttputc('[');
@@ -133,14 +133,14 @@ i55move(row, col)
         ttputc('H');
 }
 
-i55eeol()
+PASCAL NEAR i55eeol()
 {
         ttputc(ESC);
         ttputc('[');
         ttputc('K');
 }
 
-i55eeop()
+PASCAL NEAR i55eeop()
 {
 #if	COLOR
 	i55fcol(gfcolor);
@@ -151,7 +151,7 @@ i55eeop()
         ttputc('J');
 }
 
-i55rev(state)		/* change reverse video state */
+PASCAL NEAR i55rev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -176,16 +176,16 @@ int state;	/* TRUE = reverse, FALSE = normal */
 #endif
 }
 
-i55cres()	/* change screen resolution */
+PASCAL NEAR i55cres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
 #if	PROTO
-spal(char *dummy)		/* change pallette settings */
+PASCAL NEAR spal(char *dummy)		/* change pallette settings */
 #else
-spal(dummy)		/* change pallette settings */
+PASCAL NEAR spal(dummy)		/* change pallette settings */
 
 char *dummy;
 #endif
@@ -194,13 +194,13 @@ char *dummy;
 	/* none for now */
 }
 
-i55beep()
+PASCAL NEAR i55beep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-i55parm(n)
+PASCAL NEAR i55parm(n)
 register int    n;
 {
         register int q,r;
@@ -216,7 +216,7 @@ register int    n;
         ttputc((n%10) + '0');
 }
 
-i55open()
+PASCAL NEAR i55open()
 {
 	strcpy(sres, "NORMAL");
 	revexist = TRUE;
@@ -228,7 +228,7 @@ i55open()
 #endif
 }
 
-i55close()
+PASCAL NEAR i55close()
 
 {
 #if	COLOR
@@ -242,24 +242,24 @@ i55close()
 	ttclose();
 }
 
-i55kopen()	/* open the keyboard (a noop here) */
+PASCAL NEAR i55kopen()	/* open the keyboard (a noop here) */
 
 {
 }
 
-i55kclose()	/* close the keyboard (a noop here) */
+PASCAL NEAR i55kclose()	/* close the keyboard (a noop here) */
 
 {
 }
 
- i55getc()
+PASCAL NEAR  i55getc()
 
 {
 	return(ttgetc());
 }
 
 #if	FLABEL
-int fnclabel(f, n)		/* label a function key */
+int PASCAL NEAR fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 
