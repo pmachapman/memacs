@@ -50,7 +50,7 @@ static int oldbut;	/* Previous state of mouse buttons */
 static int oldcol;	/* previous x position of mouse */
 static int oldrow;	/* previous y position of mouse */
 
-execprog(char *cmd);
+PASCAL NEAR execprog(char *cmd);
 
 /*	input buffers and pointers	*/
 
@@ -98,7 +98,7 @@ int in_get()	/* get an event from the input buffer */
  * This function is called once to set up the terminal device streams.
  */
 
-ttopen()
+PASCAL NEAR ttopen()
 
 {
 #if	MOUSE
@@ -165,7 +165,7 @@ int lines;	/* # of vertical lines */
  * interpreter. On VMS it puts the terminal back in a reasonable state.
  * Another no-operation on CPM.
  */
-ttclose()
+PASCAL NEAR ttclose()
 {
 }
 
@@ -176,7 +176,7 @@ ttclose()
  * MS-DOS (use the very very raw console output routine).
  */
 
-ttputc(c)
+PASCAL NEAR ttputc(c)
 
 int c;
 
@@ -194,7 +194,7 @@ int c;
  * Flush terminal buffer. Does real work where the terminal output is buffered
  * up. A no-operation on systems where byte at a time terminal I/O is done.
  */
-ttflush()
+PASCAL NEAR ttflush()
 {
 }
 
@@ -213,7 +213,7 @@ int doschar()	/* call the dos to get a char */
  * Read a character from the terminal, performing no editing and doing no echo
  * at all. Also mouse events are forced into the input stream here.
  */
-ttgetc()
+PASCAL NEAR ttgetc()
 
 {
 	register int c;		/* character read */
@@ -346,7 +346,7 @@ checkmouse()
 		keyboard buffer
 */
 
-typahead()
+PASCAL NEAR typahead()
 
 {
 	int flags;	/* cpu flags from dos call */
@@ -384,7 +384,7 @@ typahead()
  * repaint. Bound to "^X C".
  */
 
-spawncli(f, n)
+PASCAL NEAR spawncli(f, n)
 
 int f, n;
 
@@ -407,7 +407,7 @@ int f, n;
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X !".
  */
-spawn(f, n)
+PASCAL NEAR spawn(f, n)
 
 int f, n;
 
@@ -441,7 +441,7 @@ int f, n;
  * done. Bound to "C-X $".
  */
 
-execprg(f, n)
+PASCAL NEAR execprg(f, n)
 
 {
         register int s;
@@ -471,7 +471,7 @@ execprg(f, n)
  * Pipe a one line command into a window
  * Bound to ^X @
  */
-pipecmd(f, n)
+PASCAL NEAR pipecmd(f, n)
 
 int f, n;
 
@@ -559,7 +559,7 @@ int f, n;
  * filter a buffer through an external DOS program
  * Bound to ^X #
  */
-uefilter(f, n)
+PASCAL NEAR uefilter(f, n)
 
 int f, n;
 
@@ -639,7 +639,7 @@ extern int _doserrno;
 
 /*	SHELLPROG: Execute a command in a subshell		*/
 
-shellprog(cmd)
+PASCAL NEAR shellprog(cmd)
 
 char *cmd;	/*  Incoming command line to execute  */
 
@@ -688,7 +688,7 @@ char *cmd;	/*  Incoming command line to execute  */
 #define	CFLAG	1
 #endif
 
-execprog(cmd)
+PASCAL NEAR execprog(cmd)
 
 char *cmd;	/*  Incoming command line to execute  */
 
@@ -796,7 +796,7 @@ char *cmd;	/*  Incoming command line to execute  */
 
 /* return a system dependent string with the current time */
 
-char *timeset()
+char *PASCAL NEAR timeset()
 
 {
 #if	MWC | TURBO | IC | MSC
@@ -870,7 +870,7 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
 	register int index;		/* index into various strings */
@@ -899,7 +899,7 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *getffile(fspec)
+char *PASCAL NEAR getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
@@ -948,7 +948,7 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
 	register int index;		/* index into various strings */
@@ -969,7 +969,7 @@ char *getnfile()
 	return(rbuf);
 }
 #else
-char *getffile(fspec)
+char *PASCAL NEAR getffile(fspec)
 
 char *fspec;	/* file to match */
 
@@ -977,7 +977,7 @@ char *fspec;	/* file to match */
 	return(NULL);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
 	return(NULL);

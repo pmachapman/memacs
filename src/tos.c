@@ -362,7 +362,7 @@ char *newname;		/* new file name */
 
 /* return a system dependent string with the current time */
 
-char *timeset()
+char *PASCAL NEAR timeset()
 
 {
 	register char *sp;	/* temp string pointer */
@@ -382,7 +382,7 @@ char rbuf[NFILEN];		/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *getffile(fspec)
+char *PASCAL NEAR getffile(fspec)
 
 char *fspec;	/* file to match */
 
@@ -432,7 +432,7 @@ char *fspec;	/* file to match */
 	return(rbuf);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
 

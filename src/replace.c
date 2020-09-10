@@ -17,7 +17,7 @@ static char	*oldpatmatch = NULL;	/* allocated memory for un-do.*/
 /*
  * sreplace -- Search and replace.
  */
-int sreplace(f, n)
+int PASCAL NEAR sreplace(f, n)
 int f;					/* default flag */
 int n;					/* # of repetitions wanted */
 {
@@ -27,7 +27,7 @@ int n;					/* # of repetitions wanted */
 /*
  * qreplace -- search and replace with query.
  */
-int qreplace(f, n)
+int PASCAL NEAR qreplace(f, n)
 int f;					/* default flag */
 int n;					/* # of repetitions wanted */
 {
@@ -38,7 +38,7 @@ int n;					/* # of repetitions wanted */
  * replaces -- Search for a string and replace it with another
  *	string.  Query might be enabled (according to kind).
  */
-int NEAR	replaces(kind, f, n)
+int PASCAL NEAR	replaces(kind, f, n)
 int	kind;			/* Query enabled flag */
 int	f;			/* default flag */
 int	n;			/* # of repetitions wanted */
@@ -291,7 +291,7 @@ qprompt:
 /*
  * mlrquery -- The prompt for query-replace-string.
  */
-VOID mlrquery()
+VOID PASCAL NEAR mlrquery()
 {
 	register int	tcol;
 #if	MAGIC
@@ -334,7 +334,7 @@ VOID mlrquery()
  *	then either insert the string directly, or make use of
  *	replacement meta-array.
  */
-int delins(dlength, instr, use_rmc)
+int PASCAL NEAR delins(dlength, instr, use_rmc)
 int	dlength;
 char	*instr;
 int	use_rmc;
@@ -384,7 +384,7 @@ int	use_rmc;
  *	the array is never actually created - we will just use the
  *	character array rpat[] as the replacement string.
  */
-int rmcstr()
+int PASCAL NEAR rmcstr()
 {
 	RMC	*rmcptr;
 	char	*patptr;
@@ -502,7 +502,7 @@ int rmcstr()
 /*
  * rmcclear -- Free up any strings, and MCNIL the RMC array.
  */
-VOID rmcclear()
+VOID PASCAL NEAR rmcclear()
 {
 	register RMC	*rmcptr;
 

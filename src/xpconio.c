@@ -33,26 +33,26 @@
 
 /* Forward references.          */
 
-ntmove();
-nteeol();
-nteeop();
-ntbeep();
-ntopen();
-ntclose();
-ntgetc();
-ntputc();
-ntflush();
-ntrev();
-ntkclose();
-ntkopen();
-ntcres();
-ntparm();
+PASCAL NEAR ntmove();
+PASCAL NEAR nteeol();
+PASCAL NEAR nteeop();
+PASCAL NEAR ntbeep();
+PASCAL NEAR ntopen();
+PASCAL NEAR ntclose();
+PASCAL NEAR ntgetc();
+PASCAL NEAR ntputc();
+PASCAL NEAR ntflush();
+PASCAL NEAR ntrev();
+PASCAL NEAR ntkclose();
+PASCAL NEAR ntkopen();
+PASCAL NEAR ntcres();
+PASCAL NEAR ntparm();
 #if     COLOR
-ntfcol();
-ntbcol();
+PASCAL NEAR ntfcol();
+PASCAL NEAR ntbcol();
 #endif
-fnclabel();
-static WORD ntAttribute(void);
+PASCAL NEAR fnclabel();
+static WORD NEAR ntAttribute(void);
 
 /* Screen buffer to write to. */
 static CHAR_INFO ciScreenBuffer[NROW * NCOL];
@@ -173,7 +173,7 @@ int in_get()	/* get an event from the input buffer */
 /* Set the current foreground color.					*/
 /*----------------------------------------------------------------------*/
 
-ntfcol(
+PASCAL NEAR ntfcol(
 	int color)			/* color to set */
 {
 	cfcolor = ctrans[color];
@@ -184,14 +184,14 @@ ntfcol(
 /* Set the current background color.					*/
 /*----------------------------------------------------------------------*/
 
-ntbcol(
+PASCAL NEAR ntbcol(
 	int color)		/* color to set */
 {
 	cbcolor = ctrans[color];
 }
 #endif
 
-static void ntSetUpdateValues(void)
+static void near ntSetUpdateValues(void)
 {
 	if (ntrow < ntMin)
 		ntMin = ntrow;
@@ -210,7 +210,7 @@ static void ntSetUpdateValues(void)
 /* Move the cursor. 						*/
 /*----------------------------------------------------------------------*/
 
-ntmove(
+PASCAL NEAR ntmove(
 	int row,
 	int col)
 {
@@ -227,7 +227,7 @@ ntmove(
 /* Update the physical video buffer from the logical video buffer.	*/
 /*----------------------------------------------------------------------*/
 
-ntflush(void)
+PASCAL NEAR ntflush(void)
 {
 	SMALL_RECT srWriteRegion;
 	COORD coordUpdateBegin, coordBufferSize;
@@ -265,7 +265,7 @@ ntflush(void)
 	return(TRUE);
 }
 
-static void MouseEvent(void)
+static void near MouseEvent(void)
 
 {
 	register int k;		/* current bit/button of mouse */
@@ -348,7 +348,7 @@ static void MouseEvent(void)
 	return(FALSE);
 }
 
-static void WindowSizeEvent(void)
+static void near WindowSizeEvent(void)
 {
 	CONSOLE_SCREEN_BUFFER_INFO Console;
 
@@ -367,7 +367,7 @@ static void WindowSizeEvent(void)
 
 /* handle the current keyboard event */
 
-static void KeyboardEvent()
+static void near KeyboardEvent()
 
 {
 	int c;		/* ascii character to examine */
@@ -512,7 +512,7 @@ int PendingScreenResize()
 /* Get a character from the keyboard.					*/
 /*----------------------------------------------------------------------*/
 
-ntgetc()
+PASCAL NEAR ntgetc()
 {
 
 	long dw;
@@ -566,7 +566,7 @@ ttc:	ntflush();
 /* Returns true if a key has been pressed.				*/
 /*----------------------------------------------------------------------*/
 
-typahead()
+PASCAL NEAR typahead()
 
 {
 	/* anything waiting in the input queue? */
@@ -577,7 +577,7 @@ typahead()
 }
 #endif
 
-static WORD ntAttribute(void)
+static WORD near ntAttribute(void)
 {
 	return(revflag ? (cbcolor | (cfcolor << 4)) : ((cbcolor << 4) | cfcolor));
 }
@@ -594,7 +594,7 @@ static WORD ntAttribute(void)
 /* a problem.								*/
 /*----------------------------------------------------------------------*/
 
-ntputc(int c)
+PASCAL NEAR ntputc(int c)
 {
 	WORD wScreenPos;
 
@@ -631,7 +631,7 @@ ntputc(int c)
 /* Erase to end of line.						*/
 /*----------------------------------------------------------------------*/
 
-nteeol()
+PASCAL NEAR nteeol()
 {
 	WORD wNum;
 	WORD wScreenPos;
@@ -662,7 +662,7 @@ nteeol()
 /* Erase to end of page.						*/
 /*----------------------------------------------------------------------*/
 
-nteeop()
+PASCAL NEAR nteeop()
 {
 	WORD wNum;
 	WORD wScreenPos;
@@ -693,7 +693,7 @@ nteeop()
 /* Change reverse video state.						*/
 /*----------------------------------------------------------------------*/
 
-ntrev(state)
+PASCAL NEAR ntrev(state)
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -706,7 +706,7 @@ int state;	/* TRUE = reverse, FALSE = normal */
 /* Change the screen resolution.					*/
 /*----------------------------------------------------------------------*/
 
-ntcres(char *res)		/* name of desired video mode	*/
+PASCAL NEAR ntcres(char *res)		/* name of desired video mode	*/
 {
 	return TRUE;
 }
@@ -717,7 +717,7 @@ ntcres(char *res)		/* name of desired video mode	*/
 /* Change pallette settings.  (Does nothing.)				*/
 /*----------------------------------------------------------------------*/
 
-spal(char *dummy)
+PASCAL NEAR spal(char *dummy)
 {
 	return(TRUE);
 }
@@ -727,7 +727,7 @@ spal(char *dummy)
 /*	ntbeep()							*/
 /*----------------------------------------------------------------------*/
 
-ntbeep()
+PASCAL NEAR ntbeep()
 {
 	Beep(750, 300);
 	return(TRUE);
@@ -737,7 +737,7 @@ ntbeep()
 /*	ntopen()							*/
 /*----------------------------------------------------------------------*/
 
-ntopen()
+PASCAL NEAR ntopen()
 {
 	CONSOLE_SCREEN_BUFFER_INFO Console;
 
@@ -806,7 +806,7 @@ ntopen()
 /* Restore the original video settings. 				*/
 /*----------------------------------------------------------------------*/
 
-ntclose()
+PASCAL NEAR ntclose()
 {
 	/* reset the title on the window */
 	SetConsoleTitleA(chConsoleTitle);
@@ -820,7 +820,7 @@ ntclose()
 /* Open the keyboard.							*/
 /*----------------------------------------------------------------------*/
 
-ntkopen()
+PASCAL NEAR ntkopen()
 {
 	/* save the original console mode to restore on exit */
 	GetConsoleMode(hInput, &OldConsoleMode);
@@ -841,7 +841,7 @@ ntkopen()
 /* Close the keyboard.							*/
 /*----------------------------------------------------------------------*/
 
-ntkclose()
+PASCAL NEAR ntkclose()
 {
 	/* restore the console mode from entry */
 	SetConsoleMode(hInput, OldConsoleMode);
@@ -849,7 +849,7 @@ ntkclose()
 }
 
 #if FLABEL
-fnclabel(f, n)	/* label a function key */
+PASCAL NEAR fnclabel(f, n)	/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

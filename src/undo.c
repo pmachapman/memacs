@@ -202,7 +202,7 @@ BUFFER *bp;
 
 /* Undo last done command */
 
-int undo(f, n)
+int PASCAL NEAR undo(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -239,7 +239,7 @@ int f,n;	/* prefix flag and argument */
 
 /* delete current buffer's undo stack */
 
-int undo_delete(f, n)
+int PASCAL NEAR undo_delete(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -251,7 +251,7 @@ int f,n;	/* prefix flag and argument */
 
 /* pop up a list of the current buffer's undo stack */
 
-int undo_list(f, n)
+int PASCAL NEAR undo_list(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -263,7 +263,7 @@ int f,n;	/* prefix flag and argument */
 	return(wpopup(ulistp));
 }
 
-int undolist()
+int PASCAL NEAR undolist()
 
 {
 	register char *cp1;	/* scanning pointer into line to build */

@@ -3,6 +3,7 @@
  * commands. There is no functional grouping here, for sure.
  *
  * Unicode support by Jean-Michel Dubois
+ * Theos port by Jean-Michel Dubois
  */
 
 #include <stdio.h>
@@ -23,7 +24,7 @@
  * Normally this is bound to "C-X =".
  */
 
-int showcpos(f, n)
+int PASCAL NEAR showcpos(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -127,7 +128,7 @@ int f, n;				/* prefix flag and argument */
 	return(TRUE);
 }
 
-long getlinenum(bp, sline)	/* get the a line number */
+long PASCAL NEAR getlinenum(bp, sline)	/* get the a line number */
 
 BUFFER *bp;			/* buffer to get current line from */
 LINE *sline;			/* line to search for */
@@ -156,7 +157,7 @@ LINE *sline;			/* line to search for */
  * Return current column.  Stop at first non-blank given TRUE argument.
  */
 
-int getccol(bflg)
+int PASCAL NEAR getccol(bflg)
 int bflg;
 
 {
@@ -193,7 +194,7 @@ int bflg;
 
 /*	findcol: Return display column in line at char position	*/
 
-int findcol(lp, pos)
+int PASCAL NEAR findcol(lp, pos)
 
 LINE * lp;				/* line to scan */
 int pos;				/* character offset */
@@ -236,7 +237,7 @@ int pos;				/* character offset */
  * Set current column.
  */
 
-int setccol(pos)
+int PASCAL NEAR setccol(pos)
 
 int pos;				/* position to set cursor */
 {
@@ -300,7 +301,7 @@ int pos;				/* position to set cursor */
  * to keep this working as it always has.
  */
 
-int twiddle(f, n)
+int PASCAL NEAR twiddle(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -355,7 +356,7 @@ int f, n;				/* prefix flag and argument */
  * function key is pressed, its symbolic MicroEMACS name gets inserted!
  */
 
-int quote(f, n)
+int PASCAL NEAR quote(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
@@ -400,7 +401,7 @@ int f, n;				/* prefix flag and argument */
  * into "C-I" (in 10 bit code) already. Bound to "C-I".
  */
 
-int uetab(f, n)
+int PASCAL NEAR uetab(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
@@ -415,7 +416,7 @@ int f, n;				/* prefix flag and argument */
 	return (linsert(stabsize - (getccol(FALSE) % stabsize), ' '));
 }
 
-int detab(f, n) 	/* change tabs to spaces */
+int PASCAL NEAR detab(f, n) 	/* change tabs to spaces */
 
 int f, n;				/* default flag and numeric repeat count */
 {
@@ -464,7 +465,7 @@ int f, n;				/* default flag and numeric repeat count */
 }
 
 
-int entab(f, n) 	/* change spaces to tabs where posible */
+int PASCAL NEAR entab(f, n) 	/* change spaces to tabs where posible */
 
 int f, n;				/* default flag and numeric repeat count */
 {
@@ -541,7 +542,7 @@ int f, n;				/* default flag and numeric repeat count */
 		with no arguments, it trims the current region
  */
 
-int trim(f, n)
+int PASCAL NEAR trim(f, n)
 
 int f, n;				/* default flag and numeric repeat count */
 {
@@ -589,7 +590,7 @@ int f, n;				/* default flag and numeric repeat count */
  * procerssors. They even handle the looping. Normally this is bound to "C-O".
  */
 
-int openline(f, n)
+int PASCAL NEAR openline(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
@@ -617,7 +618,7 @@ int f, n;				/* prefix flag and argument */
  * indentation as specified.
  */
 
-int new_line(f, n)
+int PASCAL NEAR uenewline(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
@@ -652,7 +653,7 @@ int f, n;				/* prefix flag and argument */
 	return(TRUE);
 }
 
-int cinsert()	/* insert a newline and indentation for C */
+int PASCAL NEAR cinsert()	/* insert a newline and indentation for C */
 {
 	register char *cptr;	/* string pointer into text to copy */
 	register int i;		/* index into line to copy indent from */
@@ -713,7 +714,7 @@ int cinsert()	/* insert a newline and indentation for C */
 	return(TRUE);
 }
 
-int insbrace(n, c)	/* insert a brace into the text here...we are in CMODE */
+int PASCAL NEAR insbrace(n, c)	/* insert a brace into the text here...we are in CMODE */
 
 int n;					/* repeat count */
 int c;					/* brace to insert (always } for now) */
@@ -809,7 +810,7 @@ int c;					/* brace to insert (always } for now) */
 	return(linsert(n, c));
 }
 
-int inspound()	/* insert a # into the text here...we are in CMODE */
+int PASCAL NEAR inspound()	/* insert a # into the text here...we are in CMODE */
 
 {
 	register int ch;	/* last character before input */
@@ -844,7 +845,7 @@ int inspound()	/* insert a # into the text here...we are in CMODE */
  * ignored.
  */
 
-int deblank(f, n)
+int PASCAL NEAR deblank(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
@@ -877,7 +878,7 @@ int f, n;				/* prefix flag and argument */
  * subcomands failed. Normally bound to "C-J".
  */
 
-int indent(f, n)
+int PASCAL NEAR indent(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
@@ -925,7 +926,7 @@ int f, n;				/* prefix flag and argument */
  * of text if typed with a big argument. Normally bound to "C-D".
  */
 
-int forwdel(f, n)
+int PASCAL NEAR forwdel(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -958,7 +959,7 @@ int f, n;				/* prefix flag and argument */
  * both "RUBOUT" and "C-H".
  */
 
-int backdel(f, n)
+int PASCAL NEAR backdel(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -1002,7 +1003,7 @@ int f, n;	/* prefix flag and argument */
  * that number of newlines. Normally bound to "C-K".
  */
 
-int killtext(f, n)
+int PASCAL NEAR killtext(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -1050,35 +1051,35 @@ int f, n;	/* prefix flag and argument */
 	return(ldelete(chunk, TRUE));
 }
 
-int setmod(f, n)	/* prompt and set an editor mode */
+int PASCAL NEAR setmod(f, n)	/* prompt and set an editor mode */
 
 int f, n;				/* default and argument */
 {
 	return(adjustmode(TRUE, FALSE));
 }
 
-int delmode(f, n)	/* prompt and delete an editor mode */
+int PASCAL NEAR delmode(f, n)	/* prompt and delete an editor mode */
 
 int f, n;				/* default and argument */
 {
 	return(adjustmode(FALSE, FALSE));
 }
 
-int setgmode(f, n)	/* prompt and set a global editor mode */
+int PASCAL NEAR setgmode(f, n)	/* prompt and set a global editor mode */
 
 int f, n;				/* default and argument */
 {
 	return(adjustmode(TRUE, TRUE));
 }
 
-int delgmode(f, n)	/* prompt and delete a global editor mode */
+int PASCAL NEAR delgmode(f, n)	/* prompt and delete a global editor mode */
 
 int f, n;				/* default and argument */
 {
 	return(adjustmode(FALSE, TRUE));
 }
 
-int adjustmode(kind, global)	/* change the editor mode status */
+int PASCAL NEAR adjustmode(kind, global)	/* change the editor mode status */
 
 int kind;				/* true = set,		false = delete */
 int global;				/* true = global flag,	false = current buffer flag */
@@ -1207,7 +1208,7 @@ int global;				/* true = global flag,	false = current buffer flag */
 /*	This function simply clears the message line,
 		mainly for macro usage			*/
 
-int clrmes(f, n)
+int PASCAL NEAR clrmes(f, n)
 
 int f, n;				/* arguments ignored */
 {
@@ -1218,7 +1219,7 @@ int f, n;				/* arguments ignored */
 /*	This function writes a string on the message line
 		mainly for macro usage			*/
 
-int writemsg(f, n)
+int PASCAL NEAR writemsg(f, n)
 
 int f, n;				/* arguments ignored */
 {
@@ -1236,7 +1237,7 @@ int f, n;				/* arguments ignored */
 
 /*	the cursor is moved to a matching fence */
 
-int getfence(f, n)
+int PASCAL NEAR getfence(f, n)
 
 int f, n;				/* not used */
 {
@@ -1356,9 +1357,9 @@ int f, n;				/* not used */
 	on screen the cursor briefly lights there		*/
 
 #if	PROTO
-int fmatch(char ch)
+int PASCAL NEAR fmatch(char ch)
 #else
-int fmatch(ch)
+int PASCAL NEAR fmatch(ch)
 
 char ch;	/* fence type to match against */
 #endif
@@ -1466,7 +1467,7 @@ char ch;	/* fence type to match against */
 /* ask for and insert a string into the current
    buffer at the current point */
 
-int istring(f, n)
+int PASCAL NEAR istring(f, n)
 
 int f, n;				/* ignored arguments */
 
@@ -1492,7 +1493,7 @@ int f, n;				/* ignored arguments */
 	return(status);
 }
 
-int ovstring(f, n) 	/* ask for and overwite a string into the current
+int PASCAL NEAR ovstring(f, n) 	/* ask for and overwite a string into the current
 		   buffer at the current point */
 
 int f, n;				/* ignored arguments */
@@ -1518,7 +1519,7 @@ int f, n;				/* ignored arguments */
 	return(status);
 }
 
-int lookup_color(sp)
+int PASCAL NEAR lookup_color(sp)
 
 char *sp;				/* name to look up */
 {

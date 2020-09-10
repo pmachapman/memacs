@@ -846,7 +846,7 @@ int uefilter(f, n)
     original version didn't work.  modified idea of bill benedetto by
     doug rady.  note the use of sys($ITIME, ...)  instead of sys_itime() 
 */
-char *timeset()
+char *PASCAL NEAR timeset()
 
 {
     register char *sp;      /* temp string pointer */
@@ -1357,7 +1357,7 @@ int f,n;        /* default flag, numeric argument [unused] */
 /*
      Change the current working directory
 */
-int chdirectory()
+PASCAL NEAR int chdirectory()
 
 {
 #if CHDIR                               /* include this code?   */
@@ -1846,11 +1846,11 @@ char gnfnrbuf[NFILEN];	/* return file buffer */
 DIR *gnfndir;
 struct direct *gnfndirect;
 
-char *getnfile();
+char PASCAL NEAR *getnfile();
 
 /*  do a template directory search (for file name completion) */
 
-char *getffile(fspec)
+char *PASCAL NEAR getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
@@ -1893,7 +1893,7 @@ char *fspec;	/* pattern to match */
         return(getnfile());
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
 	register int index;		/* index into various strings */

@@ -77,7 +77,7 @@ static int  CaretCol, CaretRow;     /* caret position */
 /* BuildCellMetrics:   fills a CellMetrics structure from a font description */
 /* ================                                                          */
 
-void FAR BuildCellMetrics (CellMetrics *cm, HFONT hFont)
+void FAR PASCAL BuildCellMetrics (CellMetrics *cm, HFONT hFont)
 {
     HDC     hDC;
     TEXTMETRIC Metrics;
@@ -107,7 +107,7 @@ void FAR BuildCellMetrics (CellMetrics *cm, HFONT hFont)
 /* InvalidateCells: marks character cells for repaint */
 /* ===============                                    */
 
-void FAR InvalidateCells (HWND hWnd, int leftcol, int toprow,
+void FAR PASCAL InvalidateCells (HWND hWnd, int leftcol, int toprow,
                                  int rightcol, int bottomrow)
 {
     RECT    Rect;           /* used for Cell and Client coordinates */
@@ -144,7 +144,7 @@ void FAR InvalidateCells (HWND hWnd, int leftcol, int toprow,
 /* MinimumClientSize:  computes the minimum client area size */
 /* =================                                         */
 
-void FAR MinimumClientSize (HWND hWnd, int NCols, int NRows,
+void FAR PASCAL MinimumClientSize (HWND hWnd, int NCols, int NRows,
 				   int *Width, int *Height)
 
 /* The values pointed by Height and Width are set to the smallest value
@@ -159,7 +159,7 @@ void FAR MinimumClientSize (HWND hWnd, int NCols, int NRows,
 /* DisplayableRows: returns the number of rows displayable in the client area */
 /* ===============                                                            */
 
-int FAR DisplayableRows (HWND hWnd, int Height, CellMetrics *cm)
+int FAR PASCAL DisplayableRows (HWND hWnd, int Height, CellMetrics *cm)
 
 /* Heigh is the hypothetic heigh of the client area. If this parameter
    is 0, the real client area is measured. If it is negative, the
@@ -187,7 +187,7 @@ int FAR DisplayableRows (HWND hWnd, int Height, CellMetrics *cm)
 /* DisplayableColumns:  returns the number of columns displayable in the client area */
 /* ==================                                                                */
 
-int FAR DisplayableColumns (HWND hWnd, int Width, CellMetrics *cm)
+int FAR PASCAL DisplayableColumns (HWND hWnd, int Width, CellMetrics *cm)
 
 /* Width is the hypothetic width of the client area. If this parameter
    is 0, the real client area is measured. If it is negative, the
@@ -214,7 +214,7 @@ int FAR DisplayableColumns (HWND hWnd, int Width, CellMetrics *cm)
 /* UpdateEmacsCaretPos: position the caret according to CaretCol/CaretRow */
 /* ===================                                                    */
 
-static void UpdateEmacsCaretPos (void)
+static void PASCAL UpdateEmacsCaretPos (void)
 {
     POINT   pt;
 
@@ -232,7 +232,7 @@ static void UpdateEmacsCaretPos (void)
 /* EmacsCaret:  Creates or destroys the caret */
 /* ==========                                 */
 
-void FAR EmacsCaret (BOOL Show)
+void FAR PASCAL EmacsCaret (BOOL Show)
 
 /* the Show parameter is TRUE if the caret should be created and FALSE
    if it should be destroyed */
@@ -272,7 +272,7 @@ void FAR EmacsCaret (BOOL Show)
 /* MoveEmacsCaret:  updates the caret position */
 /* ==============                              */
 
-void FAR MoveEmacsCaret (HWND hWnd, int col, int row)
+void FAR PASCAL MoveEmacsCaret (HWND hWnd, int col, int row)
 {
     CaretCol = col;
     CaretRow = row;
@@ -289,7 +289,7 @@ void FAR MoveEmacsCaret (HWND hWnd, int col, int row)
 /* ShowEmacsCaret:  shows or hides the caret used by emacs */
 /* ==============                                          */
 
-void FAR ShowEmacsCaret (BOOL Show)
+void FAR PASCAL ShowEmacsCaret (BOOL Show)
 
 /* this function is used to make the caret visible only when waiting for
    user input */
@@ -311,7 +311,7 @@ void FAR ShowEmacsCaret (BOOL Show)
 /* InMessageLine:   non-zero if caret currently in the message line */
 /* =============                                                    */
 
-BOOL FAR InMessageLine (void)
+BOOL FAR PASCAL InMessageLine (void)
 {
     return (hCaretWnd == hFrameWnd);
 } /* InMessageLine */
@@ -319,7 +319,7 @@ BOOL FAR InMessageLine (void)
 /* CellToClient:    converts character cell coordinates into client coordinates */
 /* ============                                                                 */
 
-void FAR CellToClient (HWND hWnd, POINT Cell, LPPOINT Client)
+void FAR PASCAL CellToClient (HWND hWnd, POINT Cell, LPPOINT Client)
 
 /* The resulting Client coordinates indicate the upper left pixel one
    HalfLeadingY above the character cell */
@@ -339,7 +339,7 @@ void FAR CellToClient (HWND hWnd, POINT Cell, LPPOINT Client)
 /* ClientToCell:    converts client coordinates into character cell coordinates */
 /* ============                                                                 */
 
-void FAR ClientToCell (HWND hWnd, POINT Client, LPPOINT Cell)
+void FAR PASCAL ClientToCell (HWND hWnd, POINT Client, LPPOINT Cell)
 
 /* The area associated with a Cell is the character cell itself, plus
    the HalfLeadingY-high areas above and under the cell */
@@ -371,7 +371,7 @@ void FAR ClientToCell (HWND hWnd, POINT Client, LPPOINT Cell)
 /* GetMinMaxInfo:  processes the WM_GETMINMAXINFO message for a screen */
 /* =============                                                       */
 
-void FAR GetMinMaxInfo (HWND hWnd, LPPOINT rgpt)
+void FAR PASCAL GetMinMaxInfo (HWND hWnd, LPPOINT rgpt)
 {
     if (InternalRequest) return;	/* none of our business */
 
@@ -403,7 +403,7 @@ void FAR GetMinMaxInfo (HWND hWnd, LPPOINT rgpt)
 /* ScrReSize:    processes the WM_SIZE message */
 /* =========                                   */
 
-BOOL FAR ScrReSize (HWND hWnd, WPARAM wParam, WORD cx, WORD cy)
+BOOL FAR PASCAL ScrReSize (HWND hWnd, WPARAM wParam, WORD cx, WORD cy)
 
 /* returns TRUE only if real resizing performed */
 {
@@ -444,7 +444,7 @@ BOOL FAR ScrReSize (HWND hWnd, WPARAM wParam, WORD cx, WORD cy)
 /* ScrPaint:   processes WM_PAINT messages for emacs screens */
 /* ========                                                  */
 
-void FAR ScrPaint (HWND hWnd)
+void FAR PASCAL ScrPaint (HWND hWnd)
 {
     ESCREEN  *sp;
     PAINTSTRUCT ps;
@@ -574,7 +574,7 @@ EndScrPaint:
 /* MLPaint: processes WM_PAINT messages for the Message Line */
 /* =======                                                   */
 
-void FAR MLPaint (void)
+void FAR PASCAL MLPaint (void)
 {
     PAINTSTRUCT ps;
     HANDLE  hPrev, hPen;
@@ -615,7 +615,7 @@ void FAR MLPaint (void)
 /* spal:    set palette from $palette string */
 /* ====                                      */
 
-spal (char *pstr)
+PASCAL spal (char *pstr)
 {
 #if     COLOR
     int     pal;	/* current palette position */

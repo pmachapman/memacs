@@ -477,7 +477,7 @@ ttopen()
     if (waitstr) short_time[ 0] = -asc_int( waitstr);
 }
 
-ttclose()
+PASCAL NEAR ttclose()
 {
     if (tolen > 0)
     {	/* Buffer not empty, flush out last stuff */
@@ -493,7 +493,7 @@ ttclose()
     test( SYS$DASSGN( vms_iochan));
 }
 
-ttputc(int c)
+PASCAL NEAR ttputc(int c)
 {
     tobuf[ tolen++] = c;
     if (tolen >= sizeof( tobuf))
@@ -504,7 +504,7 @@ ttputc(int c)
     }
 }
 
-ttflush()
+PASCAL NEAR ttflush()
 {
 /*
 	I choose to ignore any flush requests if there is typeahead
@@ -529,7 +529,7 @@ ttflush()
 	Note that we also wake from hibernation if a character arrives, so
 	this never causes an undue delay if the user it actually typing.
 */
-int grabnowait()
+int PASCAL NEAR grabnowait()
 {
     if (tylen == 0)
     {	/* Nothing immediately available, hibernate for a short time */
@@ -540,12 +540,12 @@ int grabnowait()
     return ((tylen == 0)? -1: ttgetc());
 }
 
-int grabwait()
+int PASCAL NEAR grabwait()
 {
     return (ttgetc());
 }
 
-int ttgetc()
+int PASCAL NEAR ttgetc()
 {
     register unsigned ret;
 
@@ -581,7 +581,7 @@ int ttgetc()
 /*
  * Typahead - any characters pending?
  */
-int typahead()
+int PASCAL NEAR typahead()
 {
     return( tylen != 0);
 }
@@ -589,7 +589,7 @@ int typahead()
 /*
  * Shell out to DCL.
  */
-int spawncli(int f, int n)
+int PASCAL NEAR spawncli(int f, int n)
 {
     register char *cp;
 
@@ -608,7 +608,7 @@ int spawncli(int f, int n)
 /*
  * Spawn a command.
  */
-int spawn(int f, int n)
+int PASCAL NEAR spawn(int f, int n)
 {
     register int    s;
     char	    line[NLINE];
@@ -641,7 +641,7 @@ int spawn(int f, int n)
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X $".
  */
-int execprg(int f, int n)
+int PASCAL NEAR execprg(int f, int n)
 {
         register int    s;
         char            line[NLINE];
@@ -666,7 +666,7 @@ int execprg(int f, int n)
         return(TRUE);
 }
 
-int pipecmd()
+int PASCAL NEAR pipecmd()
 {
     register int    s;	    /* return status from CLI */
     register EWINDOW *wp;    /* pointer to new window */
@@ -733,7 +733,7 @@ int pipecmd()
     return(TRUE);
 }
 
-int uefilter(int f, int n)
+int PASCAL NEAR uefilter(int f, int n)
 {
         register int    s;	/* return status from CLI */
 	register BUFFER *bp;	/* pointer to buffer to zot */
@@ -805,7 +805,7 @@ int uefilter(int f, int n)
 	duplicated here.
 */
 
-char *timeset()
+char *PASCAL NEAR timeset()
 {
     register char *sp;		/* temp string pointer */
     char buf[16];		/* time data buffer */
@@ -829,7 +829,7 @@ static struct dsc$descriptor rbuf_desc;	/* descriptor for returned file name */
  * Do a wild card directory search (for file name completion)
  * fspec is the pattern to match.
  */
-char *getffile(char *fspec)
+char *PASCAL NEAR getffile(char *fspec)
 
 {
 	register int index;		/* index into various strings */
@@ -909,7 +909,7 @@ char *getffile(char *fspec)
 	return(path);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
@@ -999,7 +999,7 @@ abortrun:
     return( status);
 }
 
-bktoshell(int f, int n)
+PASCAL NEAR bktoshell(int f, int n)
 {
 /*
 	Pause this process and wait for it to be woken up
@@ -1094,7 +1094,7 @@ static struct RAB rab;		/* a record access block */
 /*
  * Open a file for reading.
  */
-ffropen(char *fn)
+PASCAL NEAR ffropen(char *fn)
 {
         unsigned long status;
 
@@ -1140,11 +1140,11 @@ ffropen(char *fn)
 }
 
 /*
- * ffwopen(char *fn, char *mode)
+ * PASCAL NEAR ffwopen(char *fn, char *mode)
  *
  * fn = file name, mode = mode to open file.
  */
-ffwopen(char *fn, char *mode)
+PASCAL NEAR ffwopen(char *fn, char *mode)
 {
 	unsigned long status;
 
@@ -1195,7 +1195,7 @@ ffwopen(char *fn, char *mode)
 /*
  * Close a file. Should look at the status in all systems.
  */
-ffclose()
+PASCAL NEAR ffclose()
 {
 	unsigned long status;
 
@@ -1222,7 +1222,7 @@ ffclose()
  * and the "nbuf" is its length, less the free newline. Return the status.
  * Check only at the newline.
  */
-ffputline(char buf[], int nbuf)
+PASCAL NEAR ffputline(char buf[], int nbuf)
 {
         register char *obuf=buf;
 
@@ -1274,7 +1274,7 @@ ffputline(char buf[], int nbuf)
  * at the end of the file that don't have a newline present. Check for I/O
  * errors too. Return status.
  */
-ffgetline(nbytes)
+PASCAL NEAR ffgetline(nbytes)
 
 int *nbytes;	/* save our caller hassle, calc the line length */
 
@@ -1314,7 +1314,7 @@ int *nbytes;	/* save our caller hassle, calc the line length */
 * FUNCTION - addspec - utility function for expandargs
 ***********************************************************/
 #define ADDSPEC_INCREMENT 10
-static void addspec(struct dsc$descriptor dsc, int *pargc,
+static void PASCAL NEAR addspec(struct dsc$descriptor dsc, int *pargc,
 				char ***pargv, int *pargcapacity)
 {
     char *s;
@@ -1335,7 +1335,7 @@ static void addspec(struct dsc$descriptor dsc, int *pargc,
 * FUNCTION - expandargs - massage argc and argv to expand
 * wildcards by calling VMS.
 ***********************************************************/
-void expandargs(int *pargc, char ***pargv)
+void PASCAL NEAR expandargs(int *pargc, char ***pargv)
 {
     int argc = *pargc;
     char **argv = *pargv;
@@ -1384,7 +1384,7 @@ void expandargs(int *pargc, char ***pargv)
 }
 
 #else
-vms_hello()
+PASCAL NEAR vms_hello()
 {
 }
 #endif

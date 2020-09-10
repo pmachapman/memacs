@@ -29,7 +29,7 @@ static HWND hPrgWnd;    /* window handle of the external program task */
 /* HandleTimer: checks the existence of the external program window */
 /* ===========                                                      */
 
-static void  HandleTimer (HWND hDlg)
+static void PASCAL  HandleTimer (HWND hDlg)
 
 /* This function uses a 200ms timeout to check the existence of the window
    indicated by hPrgWnd. When that window handle becomes invalid, it is
@@ -62,7 +62,7 @@ static void  HandleTimer (HWND hDlg)
 
 /* WAITFORPRGDlgProc:   dialog proc for WAITFORPRG dialog box */
 /* =================                                          */
-int EXPORT FAR  WAITFORPRGDlgProc (HWND hDlg, UINT wMsg,
+int EXPORT FAR PASCAL  WAITFORPRGDlgProc (HWND hDlg, UINT wMsg,
 					  WPARAM wParam, LPARAM lParam)
 {
     switch (wMsg) {
@@ -87,7 +87,7 @@ int EXPORT FAR  WAITFORPRGDlgProc (HWND hDlg, UINT wMsg,
 
 /* LaunchPrgEnumProc:   used by LaunchPrg */
 /* =================                      */
-BOOL EXPORT FAR LaunchPrgEnumProc (HWND hWnd, LPARAM lParam)
+BOOL EXPORT FAR PASCAL LaunchPrgEnumProc (HWND hWnd, LPARAM lParam)
 
 /* this function sets hPrgWnd when it finds a window that matches the
    module instance handle passed in lParam */
@@ -104,7 +104,7 @@ BOOL EXPORT FAR LaunchPrgEnumProc (HWND hWnd, LPARAM lParam)
 /* LaunchPrg:   launches and monitors an external program  */
 /* =========                                               */
 
-static BOOL  LaunchPrg (char *Cmd, BOOL DOSApp,
+static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
                                char *InFile, char *OutFile)
 
 /* Returns TRUE if all went well, FALSE if wait cancelled and FAILD if
@@ -165,7 +165,7 @@ static BOOL  LaunchPrg (char *Cmd, BOOL DOSApp,
            string) so that the shell terminates with that command. */
 	if (Cmd) {
 	    char ExecOption [10];
-
+	    
             GetPrivateProfileString (ProgName, "ShellExecOption", " /c ",
                               ExecOption, 10, IniFile);
 
@@ -291,7 +291,7 @@ static BOOL  LaunchPrg (char *Cmd, BOOL DOSApp,
 /* spawncli:    launch DOS shell. Bound to ^X-C */
 /* ========                                     */
 
-spawncli (int f, int n)
+int PASCAL spawncli (int f, int n)
 {
     /*-don't allow this command if restricted */
     if (restflag) return resterr();
@@ -302,7 +302,7 @@ spawncli (int f, int n)
 /* spawn:   run a one-liner in a DOS box. Bound to ^X-! */
 /* =====                                                */
 
-spawn (int f, int n)
+int PASCAL spawn (int f, int n)
 {
     char    Line[NLINE];
     int     Result;
@@ -321,7 +321,7 @@ spawn (int f, int n)
 /* execprg: run another program with arguments. Bound to ^X-$ */
 /* =======                                                    */
 
-execprg (int f, int n)
+int PASCAL execprg (int f, int n)
 {
     char    Line[NLINE];
     int     Result;
@@ -345,7 +345,7 @@ execprg (int f, int n)
 /* pipecmd: pipe a one-liner into a window. Bound to ^X-@ */
 /* =======                                                */
 
-pipecmd (int f, int n)
+int PASCAL pipecmd (int f, int n)
 
 /* this function fills a buffer named "command" with the output of the
    DOS one-liner. If the command buffer already exist, it is overwritten
@@ -426,7 +426,7 @@ pipecmd (int f, int n)
 /* filter:  filter a buffer through a DOS box. Bound to ^X-# */
 /* ======                                                    */
 
-uefilter(int f, int n)
+int PASCAL uefilter(int f, int n)
 {
     char    Line[NLINE];
     char    InFile[NFILEN];

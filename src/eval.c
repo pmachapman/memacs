@@ -15,7 +15,7 @@
 
 /* initialize the entries in one user variable table */
 
-VOID uv_init(ut)
+VOID PASCAL NEAR uv_init(ut)
 
 UTABLE *ut;	/* user variable table to initialize */
 
@@ -28,7 +28,7 @@ UTABLE *ut;	/* user variable table to initialize */
 	}
 }
 
-VOID varinit()	/* initialize the global user variable table */
+VOID PASCAL NEAR varinit()	/* initialize the global user variable table */
 
 {
 	/* allocate the global user variable table */
@@ -42,7 +42,7 @@ VOID varinit()	/* initialize the global user variable table */
 	uv_init(uv_head);
 }
 
-VOID uv_clean(ut)	/* discard the contents of a user variable table */
+VOID PASCAL NEAR uv_clean(ut)	/* discard the contents of a user variable table */
 
 UTABLE *ut;	/* ptr to table to clear */
 
@@ -55,7 +55,7 @@ UTABLE *ut;	/* ptr to table to clear */
 			free(ut->uv[i].u_value);
 }
 
-VOID varclean(ut)	/* discard and clear all user variable tables */
+VOID PASCAL NEAR varclean(ut)	/* discard and clear all user variable tables */
 
 UTABLE *ut;	/* table to clear */
 
@@ -71,7 +71,7 @@ UTABLE *ut;	/* table to clear */
 	free(ut);
 }
 
-CONST char *gtfun(fname)	/* evaluate a function */
+CONST char *PASCAL NEAR gtfun(fname)	/* evaluate a function */
 
 char *fname;		/* name of function to evaluate */
 
@@ -219,7 +219,8 @@ char *fname;		/* name of function to evaluate */
 					return (int_asc(-1));
 				}
 				return(int_asc(findcol(curwp->w_markp[arg], curwp->w_marko[arg])));
-		case UFMKLINE:	if ((arg = asc_int(arg1)) < 0 || arg >= NMARKS || curwp->w_markp[arg] == NULL)
+		case UFMKLINE:	if ((arg = asc_int(arg1)) < 0 || arg >= NMARKS ||
+				    curwp->w_markp[arg] == NULL)
 				{
 					mlwrite(TEXT11, arg);
 					return (int_asc(0));
@@ -237,11 +238,10 @@ char *fname;		/* name of function to evaluate */
 		case UFOR:	return(ltos(stol(arg1) || stol(arg2)));
 		case UFREVERSE: return(strrev(bytecopy(result, arg1, NSTRING * 2)));
 		case UFRIGHT:	arg = asc_int(arg2);
-
 				if (arg > strlen(arg1))
 					arg = strlen(arg1);
-
-				return(strcpy(result, &arg1[strlen(arg1) - arg]));
+				return(strcpy(result,
+					&arg1[strlen(arg1) - arg]));
 		case UFRND:	return(int_asc((int)(ernd() % (long)absv(asc_int(arg1))) + 1L));
 		case UFSEQUAL:	return(ltos(strcmp(arg1, arg2) == 0));
 		case UFSGREAT:	return(ltos(strcmp(arg1, arg2) > 0));
@@ -263,7 +263,7 @@ char *fname;		/* name of function to evaluate */
 	return fixnull(NULL);
 }
 
-char *gtusr(vname)	/* look up a user var's value */
+char *PASCAL NEAR gtusr(vname)	/* look up a user var's value */
 
 char *vname;		/* name of user variable to fetch */
 
@@ -307,7 +307,7 @@ next_ut:	ut = ut->next;
 	return ((char*) errorm);
 }
 
-char *funval(i)
+char *PASCAL NEAR funval(i)
 
 int i;
 
@@ -315,7 +315,7 @@ int i;
 	return(funcs[i].f_name);
 }
 
-char *envval(i)
+char *PASCAL NEAR envval(i)
 
 int i;
 
@@ -323,13 +323,13 @@ int i;
 	return(envars[i]);
 }
 
-int binary(key, tval, tlength, klength)
+int PASCAL NEAR binary(key, tval, tlength, klength)
 
 CONST char *key;		/* key string to look for */
 #if	THEOSC
 long (*tval)();
 #else
-char *(*tval)();	/* ptr to function to fetch table value with */
+char *(PASCAL NEAR *tval)();	/* ptr to function to fetch table value with */
 #endif
 int tlength;		/* length of table to search */
 int klength;		/* maximum length of string to compare */
@@ -363,7 +363,7 @@ int klength;		/* maximum length of string to compare */
 	return(-1);
 }
 
-CONST char *gtenv(vname)
+CONST char *PASCAL NEAR gtenv(vname)
 
 CONST char *vname;		/* name of environment variable to retrieve */
 
@@ -520,7 +520,7 @@ CONST char *vname;		/* name of environment variable to retrieve */
 	return fixnull(NULL);
 }
 
-CONST char *fixnull(s)	/* Don't return NULL pointers! */
+CONST char *PASCAL NEAR fixnull(s)	/* Don't return NULL pointers! */
 
 CONST char *s;
 
@@ -533,7 +533,7 @@ CONST char *s;
 
 /* return some of the contents of the kill buffer */
 
-char *getkill()
+char *PASCAL NEAR getkill()
 
 {
 	register int size;	/* max number of chars left to return */
@@ -598,7 +598,7 @@ char *getkill()
 	return(value);
 }
 
-char *trimstr(s)	/* trim whitespace off the end of a string */
+char *PASCAL NEAR trimstr(s)	/* trim whitespace off the end of a string */
 
 char *s;	/* string to trim */
 
@@ -612,7 +612,7 @@ char *s;	/* string to trim */
 	return(s);
 }
 
-int setvar(f, n)		/* set a variable */
+int PASCAL NEAR setvar(f, n)		/* set a variable */
 
 int f;		/* default flag */
 int n;		/* numeric arg (can overide prompted value) */
@@ -686,7 +686,7 @@ int n;		/* numeric arg (can overide prompted value) */
 	return(status);
 }
 
-int global_var(f, n)	/* declare a global variable */
+int PASCAL NEAR global_var(f, n)	/* declare a global variable */
 
 int f;		/* default flag */
 int n;		/* numeric arg (ignored here) */
@@ -745,7 +745,7 @@ int n;		/* numeric arg (ignored here) */
 	return(status);
 }
 
-int local_var(f, n)	/* declare a local variable */
+int PASCAL NEAR local_var(f, n)	/* declare a local variable */
 
 int f;		/* default flag */
 int n;		/* numeric arg (ignored here) */
@@ -806,7 +806,7 @@ int n;		/* numeric arg (ignored here) */
 
 /* find a variables type and name */
 
-VOID findvar(var, vd, size, scope)
+VOID PASCAL NEAR findvar(var, vd, size, scope)
 
 char *var;	/* name of var to get */
 VDESC *vd;	/* structure to hold type and ptr */
@@ -883,7 +883,7 @@ retvar:	vd->v_num = vnum;
 	return;
 }
 
-int svar(var, value)	/* set a variable */
+int PASCAL NEAR svar(var, value)	/* set a variable */
 
 VDESC *var;	/* variable to set */
 char *value;	/* value to set to */
@@ -1169,7 +1169,7 @@ char *value;	/* value to set to */
 /*	asc_int:	ascii string to integer......This is too
 		inconsistant to use the system's	*/
 
-int asc_int(st)
+int PASCAL NEAR asc_int(st)
 
 char *st;
 
@@ -1206,7 +1206,7 @@ char *st;
 /*	int_asc:	integer to ascii string.......... This is too
 			inconsistant to use the system's	*/
 
-char *int_asc(i)
+char *PASCAL NEAR int_asc(i)
 
 int i;	/* integer to translate to a string */
 
@@ -1249,7 +1249,7 @@ int i;	/* integer to translate to a string */
 /*	long_asc:	long to ascii string.......... This is too
 			inconsistant to use the system's	*/
 
-char *long_asc(num)
+char *PASCAL NEAR long_asc(num)
 
 long num;	/* integer to translate to a string */
 
@@ -1283,7 +1283,7 @@ long num;	/* integer to translate to a string */
 	return(sp);
 }
 
-int gettyp(token)	/* find the type of a passed token */
+int PASCAL NEAR gettyp(token)	/* find the type of a passed token */
 
 CONST char *token;	/* token to analyze */
 
@@ -1316,7 +1316,7 @@ CONST char *token;	/* token to analyze */
 	}
 }
 
-CONST char *getval(token) /* find the value of a token */
+CONST char *PASCAL NEAR getval(token) /* find the value of a token */
 
 char *token;		/* token to evaluate */
 
@@ -1391,7 +1391,7 @@ char *token;		/* token to evaluate */
 	return fixnull(NULL);
 }
 
-int stol(val)	/* convert a string to a numeric logical */
+int PASCAL NEAR stol(val)	/* convert a string to a numeric logical */
 
 char *val;	/* value to check for stol */
 
@@ -1406,7 +1406,7 @@ char *val;	/* value to check for stol */
 	return((asc_int(val) != 0));
 }
 
-CONST char *ltos(val)	/* numeric logical to string logical */
+CONST char *PASCAL NEAR ltos(val)	/* numeric logical to string logical */
 
 int val;	/* value to translate */
 
@@ -1417,7 +1417,7 @@ int val;	/* value to translate */
 		return(falsem);
 }
 
-char *mkupper(str)	/* make a string upper case */
+char *PASCAL NEAR mkupper(str)	/* make a string upper case */
 
 char *str;		/* string to upper case */
 
@@ -1430,7 +1430,7 @@ char *str;		/* string to upper case */
 	return(str);
 }
 
-char *mklower(str)	/* make a string lower case */
+char *PASCAL NEAR mklower(str)	/* make a string lower case */
 
 char *str;		/* string to lower case */
 
@@ -1443,7 +1443,7 @@ char *str;		/* string to lower case */
 	return(str);
 }
 
-int absv(x) /* take the absolute value of an integer */
+int PASCAL NEAR absv(x) /* take the absolute value of an integer */
 
 int x;
 
@@ -1451,7 +1451,7 @@ int x;
 	return(x < 0 ? -x : x);
 }
 
-long ernd()	/* returns a random integer */
+long PASCAL NEAR ernd()	/* returns a random integer */
 
 /* This function implements the "minimal standard" RNG
    from the paper "RNGs: Good Ones are Hard to Find" by Park and
@@ -1468,7 +1468,7 @@ long ernd()	/* returns a random integer */
 	return(seed);
 }
 
-int sindex(source, pattern) /* find pattern within source */
+int PASCAL NEAR sindex(source, pattern) /* find pattern within source */
 
 CONST char *source;	/* source string to search */
 CONST char *pattern;	/* string to look for */
@@ -1539,7 +1539,7 @@ CONST char *pattern;	/* string to look for */
 
 /*	Filter a string through a translation table	*/
 
-char *xlat(source, lookup, trans)
+char *PASCAL NEAR xlat(source, lookup, trans)
 
 char *source;	/* string to filter */
 char *lookup;	/* characters to translate */
@@ -1579,7 +1579,7 @@ xnext:		++sp;
 /*	setwlist:	Set an alternative list of character to be
 			considered "in a word */
 
-int setwlist(wclist)
+int PASCAL NEAR setwlist(wclist)
 
 char *wclist;	/* list of characters to consider "in a word" */
 
@@ -1607,7 +1607,7 @@ char *wclist;	/* list of characters to consider "in a word" */
 /*	getwlist:	place in a buffer a list of characters
 			considered "in a word"			*/
 
-char *getwlist(buf)
+char *PASCAL NEAR getwlist(buf)
 
 char *buf;	/* buffer to place list of characters */
 
@@ -1630,9 +1630,9 @@ char *buf;	/* buffer to place list of characters */
 
 /*	is_num: ascii string is integer......This is too
 		inconsistant to use the system's	*/
-
-int is_num(st)
-
+ 
+int PASCAL NEAR is_num(st)
+ 
 char *st;
 
 {
@@ -1664,7 +1664,7 @@ char *st;
 	return(TRUE);
 }
 
-int dispvar(f, n)		/* display a variable's value */
+int PASCAL NEAR dispvar(f, n)		/* display a variable's value */
 
 int f;		/* default flag */
 int n;		/* numeric arg (can overide prompted value) */
@@ -1714,7 +1714,7 @@ int n;		/* numeric arg (can overide prompted value) */
 				of all the environment variables
 */
 
-int desvars(f, n)
+int PASCAL NEAR desvars(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -1822,7 +1822,7 @@ int f,n;	/* prefix flag and argument */
 				names of all the functions
 */
 
-int desfunc(f, n)
+int PASCAL NEAR desfunc(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -1865,7 +1865,7 @@ int f,n;	/* prefix flag and argument */
 	return(TRUE);
 }
 
-VOID pad(s, len)	/* pad a string to indicated length */
+VOID PASCAL NEAR pad(s, len)	/* pad a string to indicated length */
 
 char *s;	/* string to add spaces to */
 int len;	/* wanted length of string */

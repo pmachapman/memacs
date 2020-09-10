@@ -50,7 +50,7 @@ static int nbuttons;	/* number of buttons on the mouse */
 static int oldright;	/* old right button status */
 static int oldleft;	/* old left button status */
 
-execprog(char *cmd);
+PASCAL NEAR execprog(char *cmd);
 
 /*	input buffers and pointers	*/
 
@@ -98,7 +98,7 @@ int in_get()	/* get an event from the input buffer */
  * This function is called once to set up the terminal device streams.
  */
 
-ttopen()
+PASCAL NEAR ttopen()
 
 {
 #if	MOUSE
@@ -185,7 +185,7 @@ int lines;	/* # of vertical lines */
  * interpreter. On VMS it puts the terminal back in a reasonable state.
  * Another no-operation on CPM.
  */
-ttclose()
+PASCAL NEAR ttclose()
 {
 #if     (HP150 == 0) & LATTICE
 	/* restore the ctrl-break interrupt */
@@ -203,7 +203,7 @@ ttclose()
  * MS-DOS (use the very very raw console output routine).
  */
 
-ttputc(c)
+PASCAL NEAR ttputc(c)
 
 int c;
 
@@ -221,7 +221,7 @@ int c;
  * Flush terminal buffer. Does real work where the terminal output is buffered
  * up. A no-operation on systems where byte at a time terminal I/O is done.
  */
-ttflush()
+PASCAL NEAR ttflush()
 {
 }
 
@@ -248,7 +248,7 @@ int doschar()	/* call the dos to get a char */
  * Read a character from the terminal, performing no editing and doing no echo
  * at all. Also mouse events are forced into the input stream here.
  */
-ttgetc()
+PASCAL NEAR ttgetc()
 
 {
 	register int c;		/* character read */
@@ -367,7 +367,7 @@ checkmouse()
 		keyboard buffer
 */
 
-typahead()
+PASCAL NEAR typahead()
 
 {
 	int flags;	/* cpu flags from dos call */
@@ -398,7 +398,7 @@ typahead()
  * repaint. Bound to "^X C".
  */
 
-spawncli(f, n)
+PASCAL NEAR spawncli(f, n)
 
 int f, n;
 
@@ -421,7 +421,7 @@ int f, n;
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X !".
  */
-spawn(f, n)
+PASCAL NEAR spawn(f, n)
 
 int f, n;
 
@@ -455,7 +455,7 @@ int f, n;
  * done. Bound to "C-X $".
  */
 
-execprg(f, n)
+PASCAL NEAR execprg(f, n)
 
 {
         register int s;
@@ -485,7 +485,7 @@ execprg(f, n)
  * Pipe a one line command into a window
  * Bound to ^X @
  */
-pipecmd(f, n)
+PASCAL NEAR pipecmd(f, n)
 
 int f, n;
 
@@ -572,7 +572,7 @@ int f, n;
  * filter a buffer through an external DOS program
  * Bound to ^X #
  */
-uefilter(f, n)
+PASCAL NEAR uefilter(f, n)
 
 int f, n;
 
@@ -652,7 +652,7 @@ extern int _doserrno;
 
 /*	SHELLPROG: Execute a command in a subshell		*/
 
-shellprog(cmd)
+PASCAL NEAR shellprog(cmd)
 
 char *cmd;	/*  Incoming command line to execute  */
 
@@ -701,7 +701,7 @@ char *cmd;	/*  Incoming command line to execute  */
 #define	CFLAG	1
 #endif
 
-execprog(cmd)
+PASCAL NEAR execprog(cmd)
 
 char *cmd;	/*  Incoming command line to execute  */
 
@@ -736,7 +736,7 @@ char *cmd;	/*  Incoming command line to execute  */
 	strcpy(&tail[1], cmd);
 	strcat(&tail[1], "\r");
 
-	/* look up the program on the path trying various extensions */
+	/* look up the program on the path trying various extentions */
 	if ((sp = flook(prog, TRUE)) == NULL)
 		if ((sp = flook(strcat(prog, ".exe"), TRUE)) == NULL) {
 			strcpy(&prog[strlen(prog)-4], ".com");
@@ -807,9 +807,9 @@ char *cmd;	/*  Incoming command line to execute  */
 	return((rval < 0) ? FALSE : TRUE);
 }
 
-/* return a system dependent string with the current time */
+/* return a system dependant string with the current time */
 
-char *timeset()
+char *PASCAL NEAR timeset()
 
 {
 #if	MWC | TURBO | IC | MSC
@@ -933,14 +933,14 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *getffile(fspec)
+char *PASCAL NEAR getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extension? */
+	register int extflag;		/* does the file have an extention? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -982,12 +982,12 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extension? */
+	register int extflag;		/* does the file have an extention? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the first file */
@@ -1011,14 +1011,14 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *getffile(fspec)
+char *PASCAL NEAR getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extension? */
+	register int extflag;		/* does the file have an extention? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -1060,12 +1060,12 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extension? */
+	register int extflag;		/* does the file have an extention? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the first file */
@@ -1081,7 +1081,7 @@ char *getnfile()
 	return(rbuf);
 }
 #else
-char *getffile(fspec)
+char *PASCAL NEAR getffile(fspec)
 
 char *fspec;	/* file to match */
 
@@ -1089,7 +1089,7 @@ char *fspec;	/* file to match */
 	return(NULL);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
 	return(NULL);

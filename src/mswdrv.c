@@ -23,28 +23,28 @@
 
 /* terminal interface table entries */
 
-static int   mswnop();
-static int   mswopen();
-static int   mswgetc();
-static int   mswputc();
-static int   mswflush();
-static int   mswbeep();
-static int   mswmove();
-static int   msweeol();
-static int   msweeop();
-static int   mswbeep();
-static int   mswrev();
-static int   mswrez();
+static int   PASCAL mswnop();
+static int   PASCAL mswopen();
+static int   PASCAL mswgetc();
+static int   PASCAL mswputc();
+static int   PASCAL mswflush();
+static int   PASCAL mswbeep();
+static int   PASCAL mswmove();
+static int   PASCAL msweeol();
+static int   PASCAL msweeop();
+static int   PASCAL mswbeep();
+static int   PASCAL mswrev();
+static int   PASCAL mswrez();
 #if COLOR
-static int   mswsetfor();
-static int   mswsetback();
+static int   PASCAL mswsetfor();
+static int   PASCAL mswsetback();
 #endif
-static int   mswsleep();
-static int   mswnewscr();
-static int   mswdelscr();
-static int   mswselscr();
-static int   mswsizscr();
-static int   mswtopscr();
+static int   PASCAL mswsleep();
+static int   PASCAL mswnewscr();
+static int   PASCAL mswdelscr();
+static int   PASCAL mswselscr();
+static int   PASCAL mswsizscr();
+static int   PASCAL mswtopscr();
 
 /* Standard terminal interface dispatch table.
 */
@@ -110,7 +110,7 @@ static int  BackColor;      /* background colors */
 /* PushMLHist:  store the last message line contents in the history */
 /* ==========                                                       */
 
-static void  PushMLHist (void)
+static void PASCAL  PushMLHist (void)
 {
     char    *ml;
     int     i, e;
@@ -133,7 +133,7 @@ static void  PushMLHist (void)
 /* MLHistDlgProc:   dialog proc for the Message Line History */
 /* =============                                             */
 
-int EXPORT FAR  MLHistDlgProc (HWND hDlg, UINT wMsg,
+int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
                                       WPARAM wParam, LPARAM lParam)
 {
     switch (wMsg) {
@@ -183,7 +183,7 @@ int EXPORT FAR  MLHistDlgProc (HWND hDlg, UINT wMsg,
    core editor loop will pop up a dialog box showing up to MAXMLHIST-1
    past messages */
 
-mlhistory (void)
+void PASCAL mlhistory (void)
 {
     FARPROC     ProcInstance;
 
@@ -195,7 +195,7 @@ mlhistory (void)
     FreeProcInstance (ProcInstance);
 } /* mlhistory */
 
-static void ChangeUpdateRow (int newrow)
+static void PASCAL ChangeUpdateRow (int newrow)
 /* Set UpdateRow to newrow, invalidating the changed cells in the
    previous update row */
 {
@@ -210,7 +210,7 @@ static void ChangeUpdateRow (int newrow)
 /* mswopen: initialize windows interface */
 /* =======                               */
 
-static int mswopen ()
+static int PASCAL mswopen ()
 {
     static BOOL FirstTime = TRUE;
 
@@ -235,7 +235,7 @@ static int mswopen ()
 /* mswgetc: get character from keyboard (or mouse) */
 /* =======                                         */
 
-static int mswgetc ()
+static int PASCAL mswgetc ()
 {
     return GetInput ();
 } /* mswgetc */
@@ -244,7 +244,7 @@ static int mswgetc ()
 /* mswputc: put character to display */
 /* =======                           */
 
-static int mswputc (c)
+static int PASCAL mswputc (c)
 int     c;  /* character to write (or 0 for dummy write) */
 {
     if (UpdateRow != CurrentRow) {
@@ -288,7 +288,7 @@ int     c;  /* character to write (or 0 for dummy write) */
 /* mswflush:    update display from output buffer */
 /* ========                                       */
 
-static int mswflush ()
+static int PASCAL mswflush ()
 {
     ChangeUpdateRow (-1);
     if (!InternalRequest && (hIOWnd == hFrameWnd)) UpdateWindow (hIOWnd);
@@ -303,7 +303,7 @@ static int mswflush ()
 /* mswmove: move the cursor */
 /* =======                  */
 
-static int mswmove (int newrow, int newcol)
+static int PASCAL mswmove (int newrow, int newcol)
 {
     /*-perform IO windows switching depending on the addressed row: if
        beyond the IO screen, the message line is addressed*/
@@ -333,7 +333,7 @@ static int mswmove (int newrow, int newcol)
 /* msweeol: erase to end of line */
 /* =======                       */
 
-static int msweeol ()
+static int PASCAL msweeol ()
 {
     mswputc (0);    /* ensure change of row is properly handled */
     UpdateCol.leftmost = min(UpdateCol.leftmost,CurrentCol);
@@ -354,7 +354,7 @@ static int msweeol ()
 /* msweeop: erase to end of page */
 /* =======                       */
 
-static int msweeop ()
+static int PASCAL msweeop ()
 {
     if (hIOWnd == hFrameWnd) {          /* message line */
 	msweeol ();     /* only one line here */
@@ -386,7 +386,7 @@ static int msweeop ()
 /* mswbeep: sound a beep */
 /* =======               */
 
-static int mswbeep ()
+static int PASCAL mswbeep ()
 {
     MessageBeep (0);
     return 0;
@@ -396,7 +396,7 @@ static int mswbeep ()
 /* mswrev:  set reverse video state */
 /* ======                           */
 
-static int mswrev (state)
+static int PASCAL mswrev (state)
 int     state;      /* TRUE = reverse, FALSE = normal */
 {
     /* nothing to do: the description of reverse video fields is kept
@@ -408,7 +408,7 @@ int     state;      /* TRUE = reverse, FALSE = normal */
 /* mswrez:  change "resolution"     */
 /* ======                           */
 
-static int mswrez (res)
+static int PASCAL mswrez (res)
 char    *res;
 {
     return TRUE;   /* $SRES is read-only in MSWIN, but returning an
@@ -419,7 +419,7 @@ char    *res;
 /* mswsetfor:   set foreground color */
 /* =========                         */
 
-static int  mswsetfor (color)
+static int  PASCAL mswsetfor (color)
 int     color;
 {
     ForgColor = color;
@@ -429,7 +429,7 @@ int     color;
 /* mswsetback:  set background color */
 /* ==========                        */
 
-static int  mswsetback (color)
+static int  PASCAL mswsetback (color)
 int     color;
 {
     BackColor = color;
@@ -440,7 +440,7 @@ int     color;
 /* mswsleep:    wait a specified time (in ms) in an unobtrusive way */
 /* ========                                                         */
 
-static int   mswsleep (int t)
+static int PASCAL   mswsleep (int t)
 {
     return TakeANap (t);
 } /* mswsleep */
@@ -448,7 +448,7 @@ static int   mswsleep (int t)
 /* mswnewscr:   create new MDI window for new screen */
 /* =========                                         */
 
-static int mswnewscr (ESCREEN *sp)
+static int PASCAL mswnewscr (ESCREEN *sp)
 /* called by screen.c after the screen structure has been allocated. The
    size of the screen will be determined by the window's size. returns
    TRUE if successful. */
@@ -501,7 +501,7 @@ static int mswnewscr (ESCREEN *sp)
 /* mswdelscr:   destroys an MDI window for a disappearing screen */
 /* =========                                                     */
 
-static int mswdelscr (ESCREEN *sp)
+static int PASCAL mswdelscr (ESCREEN *sp)
 /* called by screen.c before the screen structure is deallocated */
 {
     if (sp->s_drvhandle == hIOWnd) mswflush ();
@@ -513,7 +513,7 @@ static int mswdelscr (ESCREEN *sp)
 /* mswselscr:   select a window/screen combination for the next IOs */
 /* =========                                                        */
 
-static int mswselscr (ESCREEN *sp)
+static int PASCAL mswselscr (ESCREEN *sp)
 {
     hIOWnd = sp->s_drvhandle;
     IOScr = sp;
@@ -522,7 +522,7 @@ static int mswselscr (ESCREEN *sp)
 /* mswsizscr:   resize an MDI window to fit the associated screen */
 /* =========                                                      */
 
-static int mswsizscr (ESCREEN *sp)
+static int PASCAL mswsizscr (ESCREEN *sp)
 /* called by Emacs when the screen's dimensions have been changed. A resize
    through the MS-Windows interface is handled by the ReSize function in
    mswdisp.c */
@@ -651,7 +651,7 @@ static int mswsizscr (ESCREEN *sp)
 /* mswtopscr:   bring a screen's window to top. */
 /* =========                                    */
 
-static int mswtopscr (ESCREEN *sp)
+static int PASCAL mswtopscr (ESCREEN *sp)
 
 /* called by screen.c when selecting a screen for current */
 {
@@ -680,7 +680,7 @@ static int mswtopscr (ESCREEN *sp)
 /* mswnop:  No Operation */
 /* ======                */
 
-static int mswnop ()
+static int PASCAL mswnop ()
 {
     return 0;
 }

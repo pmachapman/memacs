@@ -2580,13 +2580,18 @@
  *	- Added Unicode support with UTF-8 files
  *	- Added Theos O.S. support (in 1988-1992)
  *	- Added Cygwin support
- *	- Added ncurses display with drop down menus (Linux and Cygwin only)
+ *	- Added ncurses display with drop down menus (Linux, XP and Cygwin only)
+ *	- Added 'ue' prefix to filter, refresh, newline, echochar and meta to avoid conflicts with curses
+ *	- Renamed SCREEN structure to ESCREEN to avoid conflicts with curses
  *	- Added file backup (likely borrowed to Mark Williams)
  *	- Added help on language keywords (currently for Theos C only) (borrowed to Mark Williams)
  *	- Added semi-graphics character entry through numeric keypad
  *	- Added dynamic load of messages from a file (in 1988-1992)
- *	- Removed all PASCAL NEAR
- *	- Some code cleanup
+ *	- Some code cleanup and miscellaneous fixes
+ *	10 Sep 2020
+ *	- Added SCO OpenServer 5 and UnixWare 7 support (2001)
+ *	- Added menudrop function bound to menu-drop to allow menu use without a mouse.
+ *	  Bound to F12 in tpage.cmd
  */
 
 void history()

@@ -204,7 +204,7 @@ abortrun:
 	own used memory, otherwise we just exit.
  */
 
-clean()
+VOID PASCAL NEAR clean()
 
 {
 	register BUFFER *bp;	/* buffer list pointer */
@@ -254,7 +254,7 @@ clean()
 
 /*	Process a command line.   May be called any time.	*/
 
-VOID dcline(argc, argv, firstflag)
+VOID PASCAL NEAR dcline(argc, argv, firstflag)
 
 int argc;
 char *argv[];
@@ -504,7 +504,7 @@ int firstflag;			/* is this the first time in? */
 
 #if	WINDOW_MSWIN
 #define GETBASEKEY getbasekey
-static int getbasekey()
+static int PASCAL NEAR getbasekey()
 
 {
 	register int c;
@@ -528,7 +528,7 @@ static int getbasekey()
 	invented the "recursive-edit" function.
  */
 
-int editloop()
+int PASCAL NEAR editloop()
 
 {
 	register int c;		/* command character */
@@ -542,14 +542,14 @@ int editloop()
 	/* setup to process commands */
 	lastflag = 0;		/* Fake last flags.	*/
 
-	loop:
+loop:
 	/* if a macro error is pending, wait for a character */
 	if (exec_error) {
 #if	WINDOW_MSWIN
 		mlhistory();
 #else
 		mlforce(TEXT227);
-		/*			"\n--- Press any key to Continue ---" */
+/*			"\n--- Press any key to Continue ---" */
 		tgetc();
 #endif
 		sgarbf = TRUE;
@@ -608,6 +608,7 @@ int editloop()
 	discmd = TRUE;
 	disinp = TRUE;
 	c = GETBASEKEY();
+
 	/* if there is something on the command line, clear it */
 	if (mpresf != FALSE) {
 		mlerase();
@@ -631,7 +632,7 @@ int editloop()
 
 	basec = c & ~META;	/* strip meta char off if there */
 	if ((c & META) && ((basec >= '0' && basec <= '9') || basec == '-') &&
-			(getbind(c) == NULL)) {
+	    (getbind(c) == NULL)) {
 		f = TRUE;		/* there is a # arg */
 		n = 0;			/* start with a zero default */
 		mflag = 1;		/* current minus flag */
@@ -724,7 +725,7 @@ int editloop()
  * to read in a file by default, and we want the buffer name to be right.
  */
 
-int edinit(bname)
+int PASCAL NEAR edinit(bname)
 
 char bname[];			/* name of buffer to initialize */
 
@@ -799,7 +800,7 @@ char bname[];			/* name of buffer to initialize */
  * look at it. Return the status of command.
  */
 
-int execute(c, f, n)
+int PASCAL NEAR execute(c, f, n)
 
 int c;					/* key to execute */
 int f;					/* prefix argument flag */
@@ -937,12 +938,12 @@ int n;					/* prefix value */
 		/* In ABBREV mode, if we are doing aggressive expansion and
 		   the current buffer is a symbol in the abbreviation table */
 		if (((curbp->b_mode & MDABBR) != 0) &&
-				(ab_quick && (ab_lookup(ab_word) != NULL)))
+			(ab_quick && (ab_lookup(ab_word) != NULL)))
 			ab_expand();
 
 		/* check for CMODE fence matching */
 		if ((c == '}' || c == ')' || c == ']') &&
-				(curbp->b_mode & MDCMOD) != 0)
+			(curbp->b_mode & MDCMOD) != 0)
 			fmatch(c);
 
 		/* check auto-save mode */
@@ -961,7 +962,7 @@ int n;					/* prefix value */
 	}
 	TTbeep();
 	mlwrite(TEXT19);	/* complain		*/
-	/*		"[Key not bound]" */
+/*		"[Key not bound]" */
 	lastflag = 0;		/* Fake last flags.	*/
 	return(FALSE);
 }
@@ -972,7 +973,7 @@ has changed do a write on that buffer and exit emacs, otherwise simply
 exit.
  */
 
-int quickexit(f, n)
+int PASCAL NEAR quickexit(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1011,16 +1012,16 @@ int f, n;				/* prefix flag and argument */
  * has been changed and not written out. Normally bound to "C-X C-C".
  */
 
-int quit(f, n)
+int PASCAL NEAR quit(f, n)
 
 int f, n;				/* prefix flag and argument */
 {
 	register int status;	/* return status */
 
 	if (f != FALSE		/* Argument forces it.	*/
-			|| anycb() == FALSE	/* All buffers clean or user says it's OK. */
-			|| (status = mlyesno(TEXT104)) == TRUE) {
-		/*			     "Modified buffers exist. Leave anyway" */
+	    || anycb() == FALSE	/* All buffers clean or user says it's OK. */
+	    || (status = mlyesno(TEXT104)) == TRUE) {
+/*			     "Modified buffers exist. Leave anyway" */
 #if	FILOCK
 		if (lockrel() != TRUE) {
 			TTputc('\n');
@@ -1039,7 +1040,7 @@ int f, n;				/* prefix flag and argument */
 	return(status);
 }
 
-int meexit(status)
+int PASCAL NEAR meexit(status)
 int status;				/* return status of emacs */
 {
 	eexitflag = TRUE;	/* flag a program exit */
@@ -1056,7 +1057,7 @@ int status;				/* return status of emacs */
  * return.
  */
 
-int ctlxlp(f, n)
+int PASCAL NEAR ctlxlp(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1079,7 +1080,7 @@ int f, n;				/* prefix flag and argument */
  * routine. Set up the variables and return to the caller.
  */
 
-int ctlxrp(f, n)
+int PASCAL NEAR ctlxrp(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1103,7 +1104,7 @@ int f, n;				/* prefix flag and argument */
  * command gets an error. Return TRUE if all ok, else FALSE.
  */
 
-int ctlxe(f, n)
+int PASCAL NEAR ctlxe(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1127,7 +1128,7 @@ int f, n;				/* prefix flag and argument */
  * Sometimes called as a routine, to do general aborting of stuff.
  */
 
-int ctrlg(f, n)
+int PASCAL NEAR ctrlg(f, n)
 
 int f, n;				/* prefix flag and argument */
 
@@ -1142,7 +1143,7 @@ int f, n;				/* prefix flag and argument */
 /* tell the user that this command is illegal while we are in
    VIEW (read-only) mode				*/
 
-int rdonly()
+int PASCAL NEAR rdonly()
 
 {
 	TTbeep();
@@ -1151,7 +1152,7 @@ int rdonly()
 	return(FALSE);
 }
 
-int resterr()
+int PASCAL NEAR resterr()
 
 {
 	TTbeep();
@@ -1160,7 +1161,7 @@ int resterr()
 	return(FALSE);
 }
 
-int nullproc(f, n)	/* user function that does NOTHING */
+int PASCAL NEAR nullproc(f, n)	/* user function that does NOTHING */
 
 int n, f;	/* yes, these are default and never used.. but MUST be here */
 
@@ -1168,7 +1169,7 @@ int n, f;	/* yes, these are default and never used.. but MUST be here */
 	return(TRUE);
 }
 
-int uemeta(f, n)	/* set META prefixing pending */
+int PASCAL NEAR uemeta(f, n)	/* set META prefixing pending */
 
 int f, n;				/* prefix flag and argument */
 
@@ -1179,7 +1180,7 @@ int f, n;				/* prefix flag and argument */
 	return(TRUE);
 }
 
-int cex(f, n)	/* set ^X prefixing pending */
+int PASCAL NEAR cex(f, n)	/* set ^X prefixing pending */
 
 int f, n;				/* prefix flag and argument */
 
@@ -1190,7 +1191,7 @@ int f, n;				/* prefix flag and argument */
 	return(TRUE);
 }
 
-int unarg()	/* dummy function for binding to universal-argument */
+int PASCAL NEAR unarg()	/* dummy function for binding to universal-argument */
 {
 	return(TRUE);
 }
@@ -1212,7 +1213,7 @@ int notavail()
 			ALWAYS null terminate
  */
 
-char *bytecopy(dst, src, maxlen)
+char *PASCAL NEAR bytecopy(dst, src, maxlen)
 
 char *dst;				/* destination of copied string */
 CONST char *src;			/* source */
@@ -1232,7 +1233,7 @@ int maxlen;				/* maximum length */
 
  */
 
-char *copystr(sp)
+char *PASCAL NEAR copystr(sp)
 
 char *sp;				/* string to copy */
 

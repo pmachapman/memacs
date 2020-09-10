@@ -32,7 +32,7 @@
 #include	<xvtmenu.h>
 #include	"uemacs.h"
 
-int fnclabel(int f, int n);
+int PASCAL NEAR fnclabel(int f, int n);
 
 #define NROW	25			/* Screen size. 		*/
 #define NCOL	80			/* Edit if you want to. 	*/
@@ -43,21 +43,21 @@ int fnclabel(int f, int n);
 #define ESC	0x1B			/* ESC character.		*/
 
 /* Forward references.		*/
-extern int xvtmove();
-extern int xvteeol();
-extern int xvteeop();
-extern int xvtbeep();
-extern int xvtopen();
-extern int xvtrev();
-extern int xvtclose();
-extern int xvtkopen();
-extern int xvtkclose();
-extern int xvtcres();
-extern int xvtgetc();
-extern int xvtputc();
-extern int xvtflush();
-extern int xvtfcol();
-extern int xvtbcol();
+extern int PASCAL NEAR xvtmove();
+extern int PASCAL NEAR xvteeol();
+extern int PASCAL NEAR xvteeop();
+extern int PASCAL NEAR xvtbeep();
+extern int PASCAL NEAR xvtopen();
+extern int PASCAL NEAR xvtrev();
+extern int PASCAL NEAR xvtclose();
+extern int PASCAL NEAR xvtkopen();
+extern int PASCAL NEAR xvtkclose();
+extern int PASCAL NEAR xvtcres();
+extern int PASCAL NEAR xvtgetc();
+extern int PASCAL NEAR xvtputc();
+extern int PASCAL NEAR xvtflush();
+extern int PASCAL NEAR xvtfcol();
+extern int PASCAL NEAR xvtbcol();
 static int rev_state = FALSE;
 
 static int cfcolor = -1;	/* current foreground color */
@@ -450,7 +450,7 @@ char **argv;
 	xvt_system(argc, argv, 0L, taskHandler, &config);
 }
 
-xvtfcol(color)		/* set the current output color */
+PASCAL NEAR xvtfcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -462,7 +462,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-xvtbcol(color)		/* set the current background color */
+PASCAL NEAR xvtbcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -474,14 +474,14 @@ int color;	/* color to set */
 	cbcolor = color;
 }
 
-xvtmove(row, col)
+PASCAL NEAR xvtmove(row, col)
 {
 	xvtflush();
 	xvt_row = row;
 	xvt_col = col;
 }
 
-xvteeol()
+PASCAL NEAR xvteeol()
 {
 	RCT rect;	/* rectangle to use to clear to end of this line */
 	CBRUSH brush;	/* brushed used for the clearing */
@@ -504,7 +504,7 @@ xvteeol()
 	win_draw_rect(xvt_win, &rect);
 }
 
-xvteeop()
+PASCAL NEAR xvteeop()
 {
 	RCT rect;	/* rectangle to use to clear to end of this line */
 	CBRUSH brush;	/* brushed used for the clearing */
@@ -538,7 +538,7 @@ xvteeop()
 	win_draw_rect(xvt_win, &rect);
 }
 
-xvtrev(state)		/* change reverse video state */
+PASCAL NEAR xvtrev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -556,24 +556,24 @@ int state;	/* TRUE = reverse, FALSE = normal */
 	}
 }
 
-xvtcres()	/* change screen resolution */
+PASCAL NEAR xvtcres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
-spal(char *dummy)		/* change pallette settings */
+PASCAL NEAR spal(char *dummy)		/* change pallette settings */
 
 {
 	/* none for now */
 }
 
-xvtbeep()
+PASCAL NEAR xvtbeep()
 {
 	xvt_beep();
 }
 
-xvtopen()
+PASCAL NEAR xvtopen()
 
 {
 	DRAW_CTOOLS dtool;
@@ -614,7 +614,7 @@ xvtopen()
 	ttopen();
 }
 
-xvtclose()
+PASCAL NEAR xvtclose()
 
 {
 	xvtfcol(7);
@@ -622,13 +622,13 @@ xvtclose()
 	ttclose();
 }
 
-xvtkopen()	/* open the keyboard (a noop here) */
+PASCAL NEAR xvtkopen()	/* open the keyboard (a noop here) */
 
 {
 
 }
 
-xvtkclose() /* close the keyboard (a noop here) */
+PASCAL NEAR xvtkclose() /* close the keyboard (a noop here) */
 
 {
 	xvtflush();
@@ -638,7 +638,7 @@ xvtkclose() /* close the keyboard (a noop here) */
  * Read a character from the terminal, performing no editing and doing no echo
  * at all. Also mouse events are forced into the input stream here.
  */
-int xvtgetc()
+int PASCAL NEAR xvtgetc()
 
 {
 	xvtflush();
@@ -663,7 +663,7 @@ int xvtgetc()
 	}
 }
 
-int xvtflush()
+int PASCAL NEAR xvtflush()
 
 {
 	/* if there's nothing to flush */
@@ -679,7 +679,7 @@ int xvtflush()
 	xvt_next = xvt_obuf;
 }
 
-int xvtputc(c)
+int PASCAL NEAR xvtputc(c)
 
 char c;	/* character to write to the current xvt window */
 
@@ -701,7 +701,7 @@ char c;	/* character to write to the current xvt window */
 }
 
 #if	FLABEL
-int fnclabel(f, n)		/* label a function key */
+int PASCAL NEAR fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

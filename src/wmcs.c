@@ -355,7 +355,7 @@ uefilter(f, n)
 
 /* return a system dependent string with the current time */
 
-char *timeset()
+char *PASCAL NEAR timeset()
 
 {
 	register char *sp;	/* temp string pointer */

@@ -57,7 +57,7 @@ static int cmd_reexecute = -1;	/* > 0 if re-executing command */
  * same code as the normal incremental search, as both can go both ways.
  */
 
-int risearch(f, n)
+int PASCAL NEAR risearch(f, n)
 int f, n;				/* prefix flag and argument */
 {
 	register int	status;
@@ -77,7 +77,7 @@ int f, n;				/* prefix flag and argument */
 
 /* Again, but for the forward direction */
 
-int fisearch(f, n)
+int PASCAL NEAR fisearch(f, n)
 int f, n;
 {
 	register int	 status;
@@ -116,7 +116,7 @@ int f, n;
  * exists (or until the search is aborted).
  */
 
-int isearch(dir)
+int PASCAL NEAR isearch(dir)
 
 int dir;
 
@@ -131,7 +131,7 @@ int dir;
 	int 		curoff;	/* Current offset on entry		  */
 	int 		init_direction;	/* The initial search direction 	  */
 	KEYTAB		*ktp;	/* The command bound to the key 	  */
-	register int (*kfunc)();	/* ptr to the requested function to bind to */
+	register int (PASCAL NEAR *kfunc)();	/* ptr to the requested function to bind to */
 
 	/* Set up the starting conditions */
 
@@ -317,7 +317,7 @@ start_over:				/* This is a good place to start a re-execution: */
  * of the matched string for reverse searches.
  */
 
-int scanmore(dir)
+int PASCAL NEAR scanmore(dir)
 int dir;				/* direction to search		*/
 {
 	register int	status;	/* search status		*/
@@ -351,7 +351,7 @@ int dir;				/* direction to search		*/
  * If the compare fails, we return FALSE and call scanmore or something.
  */
 
-int checknext(chr, dir)
+int PASCAL NEAR checknext(chr, dir)
 int chr;				/* Next char to look for	*/
 int dir;				/* Search direction 		*/
 {
@@ -422,7 +422,7 @@ int dir;				/* Search direction 		*/
  * string, so just return the next character.
  */
 
-int get_char()
+int PASCAL NEAR get_char()
 {
 	int	c;
 	KEYTAB	*key;
@@ -480,7 +480,7 @@ int get_char()
  * Come here on the next term.t_getchar call:
  */
 
-int uneat()
+int PASCAL NEAR uneat()
 {
 	int c;
 
@@ -490,7 +490,7 @@ int uneat()
 	return (c);			/* and return the last char	*/
 }
 
-VOID reeat(c)
+VOID PASCAL NEAR reeat(c)
 int	c;
 {
 	if (eaten_char != -1)	/* If we've already been here	*/
@@ -501,7 +501,7 @@ int	c;
 }
 
 #else
-int isearch(dir)
+int PASCAL NEAR isearch(dir)
 int dir;
 {
 }

@@ -15,7 +15,7 @@
  * bottom. If it is 0 the window is centered (this is what the standard
  * redisplay code does). With no argument it defaults to 0. Bound to M-!.
  */
-int reposition(f, n)
+int PASCAL NEAR reposition(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -31,7 +31,7 @@ int f, n;	/* prefix flag and argument */
  * Refresh the screen. With no argument, it just does the refresh. With an
  * argument it recenters "." in the current window. Bound to "C-L".
  */
-int uerefresh(f, n)
+int PASCAL NEAR uerefresh(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -54,7 +54,7 @@ int f, n;	/* prefix flag and argument */
  * with an argument this command finds the <n>th window from the top
  *
  */
-int nextwind(f, n)
+int PASCAL NEAR nextwind(f, n)
 
 int f, n;	/* default flag and numeric argument */
 
@@ -101,7 +101,7 @@ int f, n;	/* default flag and numeric argument */
  * current window. There arn't any errors, although the command does not do a
  * lot if there is 1 window.
  */
-int prevwind(f, n)
+int PASCAL NEAR prevwind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -135,7 +135,7 @@ int f,n;	/* prefix flag and argument */
  * a new dot. We share the code by having "move down" just be an interface to
  * "move up". Magic. Bound to "C-X C-N".
  */
-int mvdnwind(f, n)
+int PASCAL NEAR mvdnwind(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -150,7 +150,7 @@ int f, n;	/* prefix flag and argument */
  * (this command does not really move "."; it moves the frame). Bound to
  * "C-X C-P".
  */
-int mvupwind(f, n)
+int PASCAL NEAR mvupwind(f, n)
 
 int f, n;	/* prefix flag and argument */
 
@@ -197,7 +197,7 @@ int f, n;	/* prefix flag and argument */
  * the buffer structures right if the distruction of a window makes a buffer
  * become undisplayed.
  */
-int onlywind(f, n)
+int PASCAL NEAR onlywind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -381,7 +381,7 @@ int zaphelp(int f, int n)
  * or, if it is the top window, the window below. Bound to C-X 0.
  */
 
-int delwind(f,n)
+int PASCAL NEAR delwind(f,n)
 
 int f, n;	/* arguments are ignored for this command */
 
@@ -469,7 +469,7 @@ window.  Bound to "C-X 2".
 
  */
 
-int splitwind(f, n)
+int PASCAL NEAR splitwind(f, n)
 
 int f, n;	/* default flag and numeric argument */
 
@@ -561,7 +561,7 @@ int f, n;	/* default flag and numeric argument */
  * all the hard work. You don't just set "force reframe" because dot would
  * move. Bound to "C-X Z".
  */
-int enlargewind(f, n)
+int PASCAL NEAR enlargewind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -612,7 +612,7 @@ int f,n;	/* prefix flag and argument */
  * window descriptions. Ask the redisplay to do all the hard work. Bound to
  * "C-X C-Z".
  */
-int shrinkwind(f, n)
+int PASCAL NEAR shrinkwind(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -660,7 +660,7 @@ int f,n;	/* prefix flag and argument */
 
 /*	Resize the current window to the requested size */
 
-int resize(f, n)
+int PASCAL NEAR resize(f, n)
 
 int f, n;	/* default flag and numeric argument */
 
@@ -685,9 +685,9 @@ int f, n;	/* default flag and numeric argument */
  */
 
 #if	PROTO
-int wpopup(BUFFER *popbuf)
+int PASCAL NEAR wpopup(BUFFER *popbuf)
 #else
-int wpopup(popbuf)
+int PASCAL NEAR wpopup(popbuf)
 
 BUFFER *popbuf;
 #endif
@@ -706,7 +706,7 @@ BUFFER *popbuf;
 
 	/* find the window to split */
 	if (wheadp->w_wndp == NULL		/* Only 1 window	*/
-			&& splitwind(FALSE, 0) == FALSE)	/* and it won't split	*/
+	&& splitwind(FALSE, 0) == FALSE)	/* and it won't split	*/
 		return(FALSE);
 	wp = wheadp;				/* Find window to use	*/
 	while (wp!=NULL && wp == curwp)
@@ -727,7 +727,7 @@ BUFFER *popbuf;
 		++popbuf->b_nwnd;
 	}
 
-	setwin: wp = wheadp;
+setwin: wp = wheadp;
 	while (wp != NULL) {
 		if (wp->w_bufp == popbuf) {
 			wp->w_linep = lforw(popbuf->b_linep);
@@ -746,7 +746,7 @@ BUFFER *popbuf;
 	return(TRUE);
 }
 
-int nextup(f, n)	/* scroll the next window up (back) a page */
+int PASCAL NEAR nextup(f, n)	/* scroll the next window up (back) a page */
 
 int f, n;	/* prefix flag and argument */
 
@@ -756,7 +756,7 @@ int f, n;	/* prefix flag and argument */
 	return (prevwind(FALSE, 1));
 }
 
-int nextdown(f, n)	/* scroll the next window down (forward) a page */
+int PASCAL NEAR nextdown(f, n)	/* scroll the next window down (forward) a page */
 
 int f, n;	/* prefix flag and argument */
 
@@ -766,7 +766,7 @@ int f, n;	/* prefix flag and argument */
 	return(prevwind(FALSE, 1));
 }
 
-int savewnd(f, n)	/* save ptr to current window */
+int PASCAL NEAR savewnd(f, n)	/* save ptr to current window */
 
 int f, n;	/* prefix flag and argument */
 
@@ -775,7 +775,7 @@ int f, n;	/* prefix flag and argument */
 	return(TRUE);
 }
 
-int restwnd(f, n)	/* restore the saved screen */
+int PASCAL NEAR restwnd(f, n)	/* restore the saved screen */
 
 int f, n;	/* prefix flag and argument */
 
@@ -799,7 +799,7 @@ int f, n;	/* prefix flag and argument */
 	return(FALSE);
 }
 
-int newsize(f, n)	/* resize the screen, re-writing the screen */
+int PASCAL NEAR newsize(f, n)	/* resize the screen, re-writing the screen */
 
 int f;	/* default flag */
 int n;	/* numeric argument */
@@ -910,7 +910,7 @@ int n;	/* numeric argument */
 	return(TRUE);
 }
 
-int newwidth(f, n)	/* resize the screen, re-writing the screen */
+int PASCAL NEAR newwidth(f, n)	/* resize the screen, re-writing the screen */
 
 int f;	/* default flag */
 int n;	/* numeric argument */
@@ -960,7 +960,7 @@ int n;	/* numeric argument */
 	return(TRUE);
 }
 
-int new_col_org(f, n)	/* reposition the screen, re-writing the screen */
+int PASCAL NEAR new_col_org(f, n)	/* reposition the screen, re-writing the screen */
 
 int f;	/* default flag */
 int n;	/* numeric argument */
@@ -987,7 +987,7 @@ int n;	/* numeric argument */
 	return(TRUE);
 }
 
-int new_row_org(f, n)	/* reposition the screen, re-writing the screen */
+int PASCAL NEAR new_row_org(f, n)	/* reposition the screen, re-writing the screen */
 
 int f;	/* default flag */
 int n;	/* numeric argument */
@@ -1015,7 +1015,7 @@ int n;	/* numeric argument */
 	return(TRUE);
 }
 
-int getwpos()	/* get screen offset of current line in current window */
+int PASCAL NEAR getwpos()	/* get screen offset of current line in current window */
 
 {
 	register int sline;	/* screen line from top of window */
@@ -1033,7 +1033,7 @@ int getwpos()	/* get screen offset of current line in current window */
 	return(sline);
 }
 
-int getcwnum()		/* get current window number */
+int PASCAL NEAR getcwnum()		/* get current window number */
 
 {
 	register EWINDOW *wp;
@@ -1049,7 +1049,7 @@ int getcwnum()		/* get current window number */
 }
 
 
-int gettwnum()		/* get total window count */
+int PASCAL NEAR gettwnum()		/* get total window count */
 
 {
 	register EWINDOW *wp;

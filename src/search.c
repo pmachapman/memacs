@@ -33,9 +33,9 @@ static int  o = 0;	/* For longop() calls.*/
  *	the match string, and (perhaps) repaint the display.
  */
 #if PROTO
-int forwsearch(int f, int n)
+int PASCAL NEAR forwsearch(int f, int n)
 #else
-int forwsearch( f, n)
+int PASCAL NEAR forwsearch( f, n)
 int f;
 int n;
 #endif
@@ -66,9 +66,9 @@ int n;
  *	and (perhaps) repaint the display.
  */
 #if PROTO
-int forwhunt(int f, int n)
+int PASCAL NEAR forwhunt(int f, int n)
 #else
-int forwhunt( f, n)
+int PASCAL NEAR forwhunt( f, n)
 int f;
 int n;
 #endif
@@ -137,9 +137,9 @@ int n;
  *	(the last character that was matched).
  */
 #if PROTO
-int backsearch(int f, int n)
+int PASCAL NEAR backsearch(int f, int n)
 #else
-int backsearch( f, n)
+int PASCAL NEAR backsearch( f, n)
 int f;
 int n;
 #endif
@@ -171,9 +171,9 @@ int n;
  *	(the last character that was matched).
  */
 #if PROTO
-int backhunt(int f, int n)
+int PASCAL NEAR backhunt(int f, int n)
 #else
-int backhunt( f, n)
+int PASCAL NEAR backhunt( f, n)
 int f;
 int n;
 #endif
@@ -242,9 +242,9 @@ int n;
  *	and (perhaps) repaint the display.
  */
 #if PROTO
-int mcscanner(MC *mcpatrn, int direct, int beg_or_end, int repeats)
+int PASCAL NEAR mcscanner(MC *mcpatrn, int direct, int beg_or_end, int repeats)
 #else
-int mcscanner( mcpatrn, direct, beg_or_end, repeats)
+int PASCAL NEAR mcscanner( mcpatrn, direct, beg_or_end, repeats)
 MC *mcpatrn;
 int direct;
 int beg_or_end;
@@ -380,9 +380,9 @@ int repeats;
  *	in Kernighan & Plauger's "Software Tools".
  */
 #if PROTO
-int NEAR	amatch(MC *mcptr, int direct, LINE **pcwline, int *pcwoff)
+int PASCAL NEAR	amatch(MC *mcptr, int direct, LINE **pcwline, int *pcwoff)
 #else
-int NEAR	amatch( mcptr, direct, pcwline, pcwoff)
+int PASCAL NEAR	amatch( mcptr, direct, pcwline, pcwoff)
 MC *mcptr;
 int direct;
 LINE **pcwline;
@@ -528,9 +528,9 @@ success:
  *	Software-Practice and Experience, vol 10, 501-506 (1980)
  */
 #if PROTO
-int scanner(int direct, int beg_or_end, int repeats)
+int PASCAL NEAR scanner(int direct, int beg_or_end, int repeats)
 #else
-int scanner( direct, beg_or_end, repeats)
+int PASCAL NEAR scanner( direct, beg_or_end, repeats)
 int direct;
 int beg_or_end;
 int repeats;
@@ -649,9 +649,9 @@ fail:;			/* continue to search */
  *	restrictions.
  */
 #if PROTO
-int NEAR	fbound(DELTA *tbl, int jump, LINE **pcurline, int *pcuroff, int dir)
+int PASCAL NEAR	fbound(DELTA *tbl, int jump, LINE **pcurline, int *pcuroff, int dir)
 #else
-int NEAR	fbound( tbl, jump, pcurline, pcuroff, dir)
+int PASCAL NEAR	fbound( tbl, jump, pcurline, pcuroff, dir)
 DELTA *tbl;
 int jump;
 LINE **pcurline;
@@ -723,9 +723,9 @@ int dir;
  *	alone and return TRUE.  Otherwise all went well, and return FALSE.
  */
 #if PROTO
-int movelocalpoint(int n, int *pcuroff, LINE **pcurline)
+int PASCAL NEAR movelocalpoint(int n, int *pcuroff, LINE **pcurline)
 #else
-int movelocalpoint( n, pcuroff, pcurline)
+int PASCAL NEAR movelocalpoint( n, pcuroff, pcurline)
 int n;
 int *pcuroff;
 LINE **pcurline;
@@ -914,7 +914,7 @@ DELTA *tbl;
  *	purposes.  The default for any character to jump is the
  *	pattern length.
  */
-VOID setjtable()
+VOID PASCAL NEAR setjtable()
 {
 	make_delta((char*) pat, &deltapat);
 	make_delta(strrev(strcpy((char *)tap, (char *)pat)), &tapatled);
@@ -924,7 +924,7 @@ VOID setjtable()
  * eq -- Compare two characters.  The "bc" comes from the buffer, "pc"
  *	from the pattern.  If we are not in EXACT mode, fold out the case.
  */
-int eq(bc, pc)
+int PASCAL NEAR eq(bc, pc)
 register unsigned char bc;
 register unsigned char pc;
 {
@@ -974,9 +974,9 @@ int weq(unsigned int bc, unsigned int pc)
  *	string.
  */
 #if PROTO
-int readpattern(CONST char *prompt, char apat[], int srch)
+int PASCAL NEAR readpattern(CONST char *prompt, char apat[], int srch)
 #else
-int readpattern( prompt, apat, srch)
+int PASCAL NEAR readpattern( prompt, apat, srch)
 CONST char *prompt;
 char apat[];
 int srch;
@@ -1021,7 +1021,7 @@ int srch;
 /*
  * savematch -- We found the pattern?  Let's save it away.
  */
-int savematch()
+int PASCAL NEAR savematch()
 {
 	register int	j;
 	REGION		tmpreg;
@@ -1067,9 +1067,9 @@ int savematch()
  *	FALSE depending on if a boundry is hit (ouch).
  */
 #if PROTO
-int boundry(LINE *curline, int curoff, int dir)
+int PASCAL NEAR boundry(LINE *curline, int curoff, int dir)
 #else
-int boundry( curline, curoff, dir)
+int PASCAL NEAR boundry( curline, curoff, dir)
 LINE *curline;
 int curoff;
 int dir;
@@ -1098,9 +1098,9 @@ int dir;
  *	look at the character.
  */
 #if PROTO
-int nextch(LINE **pcurline, int *pcuroff, int dir)
+int PASCAL NEAR nextch(LINE **pcurline, int *pcuroff, int dir)
 #else
-int nextch( pcurline, pcuroff, dir)
+int PASCAL NEAR nextch( pcurline, pcuroff, dir)
 LINE **pcurline;
 int *pcuroff;
 int dir;
@@ -1160,9 +1160,9 @@ int dir;
  *	Returns 0 (no match) or the number of characters matched.
  */
 #if PROTO
-int liteq(LINE **curline, int *curpos, int direct, char *lstring)
+int PASCAL NEAR liteq(LINE **curline, int *curpos, int direct, char *lstring)
 #else
-int liteq( curline, curpos, direct, lstring)
+int PASCAL NEAR liteq( curline, curpos, direct, lstring)
 LINE **curline;
 int *curpos;
 int direct;
@@ -1217,7 +1217,7 @@ char *lstring;
  *	within the 64K limit.  C compilers actually do very little
  *	in the way of optimizing - they expect you to do that.
  */
-int mcstr()
+int PASCAL NEAR mcstr()
 {
 	MC	*mcptr, *rtpcm;
 	DELTA	*tbl;
@@ -1439,7 +1439,7 @@ litcase:
 /*
  * mcclear -- Free up any CCL bitmaps, and MCNIL the MC search arrays.
  */
-VOID mcclear()
+VOID PASCAL NEAR mcclear()
 {
 	register MC	*mcptr;
 	register int	j;
@@ -1494,9 +1494,9 @@ VOID mcclear()
  *	too many functions with the 'match' name already.
  */
 #if PROTO
-int NEAR	mceq(unsigned char bc, MC *mt)
+int PASCAL NEAR	mceq(unsigned char bc, MC *mt)
 #else
-int NEAR	mceq( bc, mt)
+int PASCAL NEAR	mceq( bc, mt)
 unsigned char bc;
 MC *mt;
 #endif
@@ -1545,9 +1545,9 @@ MC *mt;
  *	so that a loop may automatically increment with safety.
  */
 #if PROTO
-int NEAR	cclmake(char **ppatptr, MC *mcptr)
+int PASCAL NEAR	cclmake(char **ppatptr, MC *mcptr)
 #else
-int NEAR	cclmake( ppatptr, mcptr)
+int PASCAL NEAR	cclmake( ppatptr, mcptr)
 char **ppatptr;
 MC *mcptr;
 #endif
@@ -1642,9 +1642,9 @@ MC *mcptr;
  *	you will also need to update this function!
  */
 #if PROTO
-int NEAR	litmake(char **ppatptr, MC *mcptr)
+int PASCAL NEAR	litmake(char **ppatptr, MC *mcptr)
 #else
-int NEAR	litmake( ppatptr, mcptr)
+int PASCAL NEAR	litmake( ppatptr, mcptr)
 char **ppatptr;
 MC *mcptr;
 #endif
@@ -1738,9 +1738,9 @@ MC *mcptr;
  * biteq -- is the character in the bitmap?
  */
 #if PROTO
-int NEAR	biteq(int bc, EBITMAP cclmap)
+int PASCAL NEAR	biteq(int bc, EBITMAP cclmap)
 #else
-int NEAR	biteq( bc, cclmap)
+int PASCAL NEAR	biteq( bc, cclmap)
 int bc;
 EBITMAP cclmap;
 #endif
@@ -1755,9 +1755,9 @@ EBITMAP cclmap;
  * setbit -- Set a bit (ON only) in the bitmap.
  */
 #if PROTO
-VOID setbit(int bc, EBITMAP cclmap)
+VOID PASCAL NEAR setbit(int bc, EBITMAP cclmap)
 #else
-VOID setbit( bc, cclmap)
+VOID PASCAL NEAR setbit( bc, cclmap)
 int bc;
 EBITMAP cclmap;
 #endif
@@ -1770,9 +1770,9 @@ EBITMAP cclmap;
 #if DEBUG_SEARCH
 
 #if PROTO
-int mc_list(int f, int n)
+int PASCAL NEAR mc_list(int f, int n)
 #else
-int mc_list( f, n)
+int PASCAL NEAR mc_list( f, n)
 int f;
 int n;
 #endif
@@ -1888,9 +1888,9 @@ int n;
 }
 
 #if PROTO
-int rmc_list(int f, int n)
+int PASCAL NEAR rmc_list(int f, int n)
 #else
-int rmc_list( f, n)
+int PASCAL NEAR rmc_list( f, n)
 int f;
 int n;
 #endif
@@ -1956,9 +1956,9 @@ int n;
 }
 
 #if PROTO
-VOID mctype_cat(char pline[], int mc_type)
+VOID PASCAL NEAR mctype_cat(char pline[], int mc_type)
 #else
-VOID mctype_cat( pline, mc_type)
+VOID PASCAL NEAR mctype_cat( pline, mc_type)
 char pline[];
 int mc_type;
 #endif

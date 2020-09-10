@@ -58,11 +58,11 @@ static  char    StarName [FNAMELEN] = "*.*";    /* starname */
 static  PARAMS  *Par;
 
 /* function prototypes */
-int EXPORT FAR FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+int EXPORT FAR PASCAL FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                    LPARAM lParam);
 static void    CompletePath (char *s, char *FileName);
 static void    UpdateAll (HWND hDlg, char *s);
-
+
 /* ChangeWorkingDir:    sets the working dir to match the supplied path */
 /* ================                                                     */
 
@@ -104,7 +104,7 @@ static int ChangeWorkingDir (char * FilePath)
 /* SetWorkingDir:   sets the working dir to the current window's path */
 /* =============                                                      */
 
-int FAR SetWorkingDir (void)
+int FAR PASCAL SetWorkingDir (void)
 
 /* returns 0 if successful, -1 otherwise */
 /* this function also sets the text of the Path displayed in the FILE
@@ -120,7 +120,7 @@ int FAR SetWorkingDir (void)
 /* fullpathname:    fully qualifies the given pathname */
 /* ============                                        */
 
-char *   fullpathname (char *PathName, int Nbuf)
+char * PASCAL   fullpathname (char *PathName, int Nbuf)
 
 /* the PathName argument is assumed to be at least Nbuf characters
    long. It is modified to contain the corresponding full pathname. The
@@ -137,7 +137,7 @@ char *   fullpathname (char *PathName, int Nbuf)
 /* filenamedlg: equivalent of mlreply, but specifically to get a filename */
 /* ===========                                                            */
 
- filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
+PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
 {
     BOOL    Result;
 #if JMDEXT
@@ -195,7 +195,7 @@ char *   fullpathname (char *PathName, int Nbuf)
 /* FileDlgOK:   process OK in File Dialog */
 /* =========                              */
 
-static BOOL FileDlgOK (HWND hDlg)
+static BOOL PASCAL FileDlgOK (HWND hDlg)
 
 /* this is a service function for FileDlgProc. It processes the OK case.
    The returned value is TRUE if the dialog box is ending, FALSE
@@ -248,7 +248,7 @@ ExtractedOK:
     }
     return FALSE;
 } /* FileDlgOK */
-
+
 /* FileNameCompletion:  process filename edit box for name completion */
 /* ==================                                                 */
 
@@ -256,7 +256,7 @@ ExtractedOK:
    attempt filename completion if a space is placed at the end of the
    edit field. Returns TRUE if filename completion was attempted and
    successful, FALSE otherwise. */
-static BOOL FileNameCompletion (HWND hDlg)
+static BOOL PASCAL FileNameCompletion (HWND hDlg)
 {
     char    s [NFILEN];
     int     i;
@@ -310,7 +310,7 @@ static BOOL FileNameCompletion (HWND hDlg)
 
 /* FileDlgProc: Open file dialog function */
 /* ===========                            */
-int EXPORT FAR  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+int EXPORT FAR PASCAL  FileDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                     LPARAM lParam)
 {
     char    s [NFILEN];    /* all purpose */
@@ -450,7 +450,7 @@ NoMoreTypeAhead:
     }
     return FALSE;
 } /* FileDlgProc */
-
+
 /* CompletePath:  prepend Path to the FileName, result in s */
 /* ============                                             */
 
@@ -484,8 +484,7 @@ static void    UpdateAll (HWND hDlg, char *s)
 #endif
     }
 } /* UpdateAll */
-
-
+
 #endif // !JMDEXT
 
 #if	TURBO | IC
@@ -497,7 +496,7 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *getffile(fspec)
+char *PASCAL getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
@@ -546,7 +545,7 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *getnfile()
+char *PASCAL getnfile()
 
 {
 	register int index;		/* index into various strings */
@@ -575,7 +574,7 @@ char rbuf[NFILEN];	/* return file buffer */
 
 /*	do a wild card directory search (for file name completion) */
 
-char *getffile(fspec)
+char *PASCAL getffile(fspec)
 
 char *fspec;	/* pattern to match */
 
@@ -635,7 +634,7 @@ char *fspec;	/* pattern to match */
 	return(rbuf);
 }
 
-char *getnfile()
+char *PASCAL getnfile()
 
 {
 	register int index;		/* index into various strings */
@@ -669,7 +668,7 @@ char *getnfile()
 	return(rbuf);
 }
 #else
-char *getffile(fspec)
+char *PASCAL getffile(fspec)
 
 char *fspec;	/* file to match */
 
@@ -677,7 +676,7 @@ char *fspec;	/* file to match */
 	return(NULL);
 }
 
-char *getnfile()
+char *PASCAL getnfile()
 
 {
 	return(NULL);

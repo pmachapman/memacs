@@ -17,7 +17,7 @@
 			used by the trim/entab/detab-region commands
 */
 
-int reglines()
+int PASCAL NEAR reglines()
 
 {
 	register LINE *linep;	/* position while scanning */
@@ -53,7 +53,7 @@ int reglines()
  * Move "." to the start, and kill the characters.
  * Bound to "C-W".
  */
-int killregion(f, n)
+int PASCAL NEAR killregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -89,7 +89,7 @@ int f,n;	/* prefix flag and argument */
  * at all. This is a bit like a kill region followed
  * by a yank. Bound to "M-W".
  */
-int copyregion(f, n)
+int PASCAL NEAR copyregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -131,7 +131,7 @@ int f,n;	/* prefix flag and argument */
  * redisplay is done in all buffers. Bound to
  * "C-X C-L".
  */
-int lowerregion(f, n)
+int PASCAL NEAR lowerregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -215,7 +215,7 @@ int f,n;	/* prefix flag and argument */
  * redisplay is done in all buffers. Bound to
  * "C-X C-L".
  */
-int upperregion(f, n)
+int PASCAL NEAR upperregion(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -293,7 +293,7 @@ int f,n;	/* prefix flag and argument */
 	the current buffer invisable and unchangable
 */
 
-int narrow(f, n)
+int PASCAL NEAR narrow(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -383,7 +383,7 @@ int f,n;	/* prefix flag and argument */
 
 /*	widen-from-region (^X->) restores a narrowed region	*/
 
-int widen(f, n)
+int PASCAL NEAR widen(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -476,7 +476,7 @@ int f,n;	/* prefix flag and argument */
  * "ABORT" status; we might make this have the confirm thing later.
  */
 
-int getregion(rp)
+int PASCAL NEAR getregion(rp)
 
 register REGION *rp;
 
@@ -538,7 +538,7 @@ register REGION *rp;
  * It is assumed that the buffer size is at least one plus the
  * region size.
  */
-char *regtostr(buf, region)
+char *PASCAL NEAR regtostr(buf, region)
 
 char *buf;
 REGION *region;
@@ -568,7 +568,7 @@ REGION *region;
 	return buf;
 }
 
-char *getreg(value) /* return some of the contents of the current region */
+char *PASCAL NEAR getreg(value) /* return some of the contents of the current region */
 
 char *value;
 
@@ -586,7 +586,7 @@ char *value;
 }
 
 
-int indent_region(f, n) /* indent a region n tab-stops */
+int PASCAL NEAR indent_region(f, n) /* indent a region n tab-stops */
 
 int f,n;	/* default flag and numeric repeat count */
 
@@ -625,7 +625,7 @@ int f,n;	/* default flag and numeric repeat count */
 	return(TRUE);
 }
 
-int undent_region(f, n) /* undent a region n tab-stops */
+int PASCAL NEAR undent_region(f, n) /* undent a region n tab-stops */
 
 int f,n;	/* default flag and numeric repeat count */
 

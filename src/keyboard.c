@@ -240,9 +240,9 @@ typedef struct keyent {			/* Key mapping entry		*/
 
 /* Needed Prototype */
 #if	PROTO
-extern int rec_seq(char *buf, char *bufstart, KEYENT *node);
+extern int PASCAL NEAR rec_seq(char *buf, char *bufstart, KEYENT *node);
 #else
-extern int rec_seq();
+extern int PASCAL NEAR rec_seq();
 #endif
 
 /* some globals needed here */
@@ -255,9 +255,9 @@ static BUFFER *seqbuf;			/* For the pop-up buffer	*/
  * add-keymap "escape sequence" keyname
  */
 #if PROTO
-int addkeymap(int f, int n)
+int PASCAL NEAR addkeymap(int f, int n)
 #else
-int addkeymap( f, n)
+int PASCAL NEAR addkeymap( f, n)
 int f;
 int n;
 #endif
@@ -306,16 +306,16 @@ int n;
 	ec = stock((unsigned char*) codeseq);
 
 	ostring(codeseq);
-	return (addkey(esc_seq, ec));	/* Add to tree */
+	return (addkey((unsigned char*) esc_seq, ec));	/* Add to tree */
 }
 
 /*
  * list-keymappings
  */
 #if PROTO
-int listkeymaps(int f, int n)
+int PASCAL NEAR listkeymaps(int f, int n)
 #else
-int listkeymaps( f, n)
+int PASCAL NEAR listkeymaps( f, n)
 int f;
 int n;
 #endif
@@ -351,9 +351,9 @@ int n;
  * and their function name equivalents.
  */
 #if PROTO
-int rec_seq(char *buf, char *bufstart, KEYENT *node)
+int PASCAL NEAR rec_seq(char *buf, char *bufstart, KEYENT *node)
 #else
-int rec_seq( buf, bufstart, node)
+int PASCAL NEAR rec_seq( buf, bufstart, node)
 char *buf;
 char *bufstart;
 KEYENT *node;
@@ -396,10 +396,10 @@ KEYENT *node;
  *  fn  - Resulting keycode
  */
 #if PROTO
-int addkey(char * seq, int fn)
+int PASCAL NEAR addkey(unsigned char * seq, int fn)
 #else
-int addkey( seq, fn)
-char * seq;
+int PASCAL NEAR addkey( seq, fn)
+unsigned char * seq;
 int fn;
 #endif
 {

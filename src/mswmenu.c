@@ -182,7 +182,7 @@ static unsigned int meta_key = 0;       /* for GetKeyText */
 /* This function is called by the edit loop in main.c, when a MENU
    extended character is detected. */
 
-int execmenu (int f, int n)
+int PASCAL execmenu (int f, int n)
 /* f, n: arguments to target function */
 {
     register UINT    ID;
@@ -213,7 +213,7 @@ int execmenu (int f, int n)
 /* GenerateMenuSeq: send a menu sequence into the input stream */
 /* ===============                                             */
 
-void FAR GenerateMenuSeq (UINT ID)
+void FAR PASCAL GenerateMenuSeq (UINT ID)
 {
     if (!in_room (5)) return;
     in_put (0);             /* escape indicator */
@@ -225,7 +225,7 @@ void FAR GenerateMenuSeq (UINT ID)
 
 /* AboutDlgProc:  About box dialog function */
 /* ============                             */
-int EXPORT FAR  AboutDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+int EXPORT FAR PASCAL  AboutDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                      LPARAM lParam)
 {
     char    s [50];
@@ -276,7 +276,7 @@ int EXPORT FAR  AboutDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 /* SetCheck:    puts a check mark in a check box */
 /* ========                                      */
 
-void     SetCheck (HWND hDlg, int BoxID)
+void  PASCAL    SetCheck (HWND hDlg, int BoxID)
 {
     SendMessage (GetDlgItem (hDlg, BoxID), BM_SETCHECK, 1, 0L);
 } /* SetCheck */
@@ -284,7 +284,7 @@ void     SetCheck (HWND hDlg, int BoxID)
 /* GetCheck:    TRUE is the check box is checked */
 /* ========                                      */
 
-BOOL     GetCheck (HWND hDlg, int BoxID)
+BOOL  PASCAL    GetCheck (HWND hDlg, int BoxID)
 {
     return (SendMessage (GetDlgItem (hDlg, BoxID), BM_GETCHECK, 0, 0L) != 0);
 } /* GetCheck */
@@ -295,7 +295,7 @@ BOOL     GetCheck (HWND hDlg, int BoxID)
 /* must be invoked through DialogBoxParam, with LOWORD(dwInitParam) set
    to TRUE for global modes and FALSE for current buffer modes */
 
-int EXPORT FAR  ModeDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
+int EXPORT FAR PASCAL  ModeDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
                                     LPARAM lParam)
 {
     char    s[40+NBUFN];
@@ -372,7 +372,7 @@ int EXPORT FAR  ModeDlgProc (HWND hDlg, UINT wMsg, WPARAM wParam,
 
 /* IsMenuSeparator:  TRUE if the item is a separator */
 /* ===============                                   */
-static BOOL IsMenuSeparator (HMENU hMenu, int Position)
+static BOOL PASCAL IsMenuSeparator (HMENU hMenu, int Position)
 {
     DWORD state;
 
@@ -393,7 +393,7 @@ static BOOL IsMenuSeparator (HMENU hMenu, int Position)
    If the entry is neither an item nor a popup, an item id of 0 is
    returned */
 
-UINT     GetMenuEntryID (HMENU hMenu, int Position)
+UINT  PASCAL    GetMenuEntryID (HMENU hMenu, int Position)
 {
     UINT    id;
     HMENU   hSubMenu;
@@ -414,7 +414,7 @@ UINT     GetMenuEntryID (HMENU hMenu, int Position)
 /* If there is no match, the returned value point to the BINDNUL entry
    */
 
-KEYTAB * FAR FindKeyBinding (void *Func)
+KEYTAB * FAR PASCAL FindKeyBinding (void *Func)
 {
     register KEYTAB *KTp;
 
@@ -440,7 +440,7 @@ KEYTAB * FAR FindKeyBinding (void *Func)
    however, it looks them up. Therefore, these variables can be zeroed
    if there is a doubt about their validity */
 
-int  GetKeyText (int Key, char *Text, int TextLength)
+int  PASCAL GetKeyText (int Key, char *Text, int TextLength)
 {
     int     i;      /* index in Text */
     char    c;
@@ -552,7 +552,7 @@ all_done:
 /* UpdateMenuItemText:  sets the key binding info in a menu item */
 /* ==================                                            */
 
-void     UpdateMenuItemText (HMENU hMenu, int Position,
+void  PASCAL    UpdateMenuItemText (HMENU hMenu, int Position,
                                     MENUTAB *MTp)
 {
     KEYTAB  *KTp;
@@ -588,7 +588,7 @@ no_binding:
 /* here, we may gray menu entries that are invalid. We also try to
    display a key binding after each menu item */
 
-void FAR InitMenuPopup (HMENU hMenu, LPARAM lParam)
+void FAR PASCAL InitMenuPopup (HMENU hMenu, LPARAM lParam)
 {
     int     Position;
     int     ItemCount;
@@ -760,7 +760,7 @@ void FAR InitMenuPopup (HMENU hMenu, LPARAM lParam)
 /* SimulateExtendedKey:    feed an extended key into the input stream */
 /* ===================                                                */
 
-static void  SimulateExtendedKey (int ec)
+static void PASCAL  SimulateExtendedKey (int ec)
 {
     char    prefix;
 
@@ -786,7 +786,7 @@ static void  SimulateExtendedKey (int ec)
 /* returns TRUE if the command has been recognized and FALSE otherwise
    */
 
-BOOL FAR MenuCommand (WPARAM wParam, LPARAM lParam)
+BOOL FAR PASCAL MenuCommand (WPARAM wParam, LPARAM lParam)
 {
     FARPROC     ProcInstance;
 #if WINXP
@@ -926,7 +926,7 @@ InvokeHelp:
 /* GetScreenMenuHandle: returns the handle to the 'Screen' menu (for MDI mgt) */
 /* ===================                                                        */
 
-HMENU FAR GetScreenMenuHandle (void)
+HMENU FAR PASCAL GetScreenMenuHandle (void)
 {
     HMENU   hBaseMenu;
     int     Pos;
@@ -943,7 +943,7 @@ HMENU FAR GetScreenMenuHandle (void)
 /* MenuEntryCount:  count of menu entries, excluding the MDI buttons */
 /* ==============                                                    */
 
-static int   MenuEntryCount (HMENU hMenu)
+static int PASCAL   MenuEntryCount (HMENU hMenu)
 {
     int     Count;
 
@@ -967,7 +967,7 @@ static int   MenuEntryCount (HMENU hMenu)
 /* MenuEntryOffset:  position of the first non-MDI button menu entry */
 /* ===============                                                   */
 
-static int   MenuEntryOffset (HMENU hMenu)
+static int PASCAL   MenuEntryOffset (HMENU hMenu)
 {
     if (hMenu == GetMenu (hFrameWnd)) {
 #if WINXP
@@ -989,7 +989,7 @@ static int   MenuEntryOffset (HMENU hMenu)
 /* ParseMenu:   parse a piece of menu path */
 /* =========                               */
 
-static BOOL  ParseMenu (char *Name, char *Title, int *Posp)
+static BOOL PASCAL  ParseMenu (char *Name, char *Title, int *Posp)
 
 /* Puts the text part of the menu name in Title (at most MAXMENUTITLE
    characters including the \0) and the position number in *Posp. If no
@@ -1029,7 +1029,7 @@ static BOOL  ParseMenu (char *Name, char *Title, int *Posp)
 /* LocateMenu:  locate a menu entry matching a piece of menu path */
 /* ==========                                                     */
 
-static BOOL  LocateMenu (char *Name, CURMENU *CM)
+static BOOL PASCAL  LocateMenu (char *Name, CURMENU *CM)
 
 /* The returned BOOL is TRUE if a matching menu entry was found, FALSE
    if no such entry was found and FAILD if a syntax problem was
@@ -1089,7 +1089,7 @@ MenuLocated:
 /* AddMenuEntry:    add a menu entry (or, recursively, a cascade of entries) */
 /* ============                                                              */
 
-static BOOL  AddMenuEntry (char *Name, UINT ID, CURMENU *CM,
+static BOOL PASCAL  AddMenuEntry (char *Name, UINT ID, CURMENU *CM,
                                       WORD *MenuType)
 /* the MenuType is a set of flags set returned by this function:
    MT_DUMMY indicates that the menu item is a mere separator, MT_MENUBAR
@@ -1169,7 +1169,7 @@ static BOOL  AddMenuEntry (char *Name, UINT ID, CURMENU *CM,
 /* AddMenuBinding:  bind a menu item to an EPOINTER */
 /* ==============                                   */
 
-static BOOL  AddMenuBinding (ETYPE EPOINTER eptr, WORD type)
+static BOOL PASCAL  AddMenuBinding (ETYPE EPOINTER eptr, WORD type)
 
 /* called by bindtomenu and macrotomenu, once the function or macro name
    has been parsed */
@@ -1251,7 +1251,7 @@ static BOOL  AddMenuBinding (ETYPE EPOINTER eptr, WORD type)
 /* bindtomenu:  bind a menu item to an emacs function */
 /* ==========                                         */
 
-bindtomenu (int f, int n)
+int PASCAL bindtomenu (int f, int n)
 /* command arguments IGNORED */
 {
     ETYPE EPOINTER  e;
@@ -1267,7 +1267,7 @@ bindtomenu (int f, int n)
 /* macrotomenu: bind a menu item to a macro (i.e. a buffer) */
 /* ===========                                              */
 
-macrotomenu (int f, int n)
+int PASCAL macrotomenu (int f, int n)
 /* command arguments IGNORED */
 {
     ETYPE EPOINTER  e;
@@ -1291,7 +1291,7 @@ macrotomenu (int f, int n)
 /* DeleteMenuBinding:   remove a menu entry and its binding or sub-entries */
 /* =================                                                       */
 
-static BOOL  DeleteMenuBinding (HMENU hMenu, int Pos)
+static BOOL PASCAL  DeleteMenuBinding (HMENU hMenu, int Pos)
 /* returns TRUE except when an attempt is made to delete the 'Screen'
    menu */
 {
@@ -1330,7 +1330,7 @@ static BOOL  DeleteMenuBinding (HMENU hMenu, int Pos)
 /* unbindmenu:  remove a menu entry */
 /* ==========                       */
 
-unbindmenu (int f, int n)
+int PASCAL unbindmenu (int f, int n)
 /* command arguments IGNORED */
 {
     BOOL    Result;

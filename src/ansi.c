@@ -16,17 +16,17 @@
 #if     ANSI
 
 #if	PROTO
-int fnclabel(int f, int n);
-int readparam( int *v);
-void dobbnmouse(void);
-void docsi( int oh);
-void ttputs(char *string);
+int PASCAL NEAR fnclabel(int f, int n);
+int PASCAL NEAR readparam( int *v);
+void PASCAL NEAR dobbnmouse(void);
+void PASCAL NEAR docsi( int oh);
+void PASCAL NEAR ttputs(char *string);
 #else
-int fnclabel();
-int readparam();
-void dobbnmouse();
-void docsi();
-void ttputs();
+int PASCAL NEAR fnclabel();
+int PASCAL NEAR readparam();
+void PASCAL NEAR dobbnmouse();
+void PASCAL NEAR docsi();
+void PASCAL NEAR ttputs();
 #endif
 
 #if VMS
@@ -57,22 +57,22 @@ extern NOSHARE TTCHAR orgchar;			/* Original characteristics */
 #define ESC     0x1B                    /* ESC character.               */
 
 /* Forward references.          */
-extern int ansimove();
-extern int ansieeol();
-extern int ansieeop();
-extern int ansibeep();
-extern int ansiopen();
-extern int ansirev();
-extern int ansiclose();
-extern int ansikopen();
-extern int ansikclose();
-extern int ansicres();
-extern int ansiparm();
-extern int ansigetc();
+extern int PASCAL NEAR ansimove();
+extern int PASCAL NEAR ansieeol();
+extern int PASCAL NEAR ansieeop();
+extern int PASCAL NEAR ansibeep();
+extern int PASCAL NEAR ansiopen();
+extern int PASCAL NEAR ansirev();
+extern int PASCAL NEAR ansiclose();
+extern int PASCAL NEAR ansikopen();
+extern int PASCAL NEAR ansikclose();
+extern int PASCAL NEAR ansicres();
+extern int PASCAL NEAR ansiparm();
+extern int PASCAL NEAR ansigetc();
 
 #if	COLOR
-extern int ansifcol();
-extern int ansibcol();
+extern int PASCAL NEAR ansifcol();
+extern int PASCAL NEAR ansibcol();
 static int rev_state = FALSE;
 
 static int cfcolor = -1;	/* current foreground color */
@@ -123,7 +123,7 @@ NOSHARE TERM term    = {
 };
 
 #if	COLOR
-ansifcol(color)		/* set the current output color */
+PASCAL NEAR ansifcol(color)		/* set the current output color */
 
 int color;	/* color to set */
 
@@ -155,7 +155,7 @@ int color;	/* color to set */
 	cfcolor = color;
 }
 
-ansibcol(color)		/* set the current background color */
+PASCAL NEAR ansibcol(color)		/* set the current background color */
 
 int color;	/* color to set */
 
@@ -174,7 +174,7 @@ int color;	/* color to set */
 }
 #endif
 
-ansimove(row, col)
+PASCAL NEAR ansimove(row, col)
 {
         ttputc(ESC);
         ttputc('[');
@@ -184,14 +184,14 @@ ansimove(row, col)
         ttputc('H');
 }
 
-ansieeol()
+PASCAL NEAR ansieeol()
 {
         ttputc(ESC);
         ttputc('[');
         ttputc('K');
 }
 
-ansieeop()
+PASCAL NEAR ansieeop()
 {
 #if	COLOR
 	ansifcol(gfcolor);
@@ -203,7 +203,7 @@ ansieeop()
         ttputc('J');
 }
 
-ansirev(state)		/* change reverse video state */
+PASCAL NEAR ansirev(state)		/* change reverse video state */
 
 int state;	/* TRUE = reverse, FALSE = normal */
 
@@ -228,16 +228,16 @@ int state;	/* TRUE = reverse, FALSE = normal */
 #endif
 }
 
-ansicres()	/* change screen resolution */
+PASCAL NEAR ansicres()	/* change screen resolution */
 
 {
 	return(TRUE);
 }
 
 #if	PROTO
-spal(char *dummy)		/* change pallette settings */
+PASCAL NEAR spal(char *dummy)		/* change pallette settings */
 #else
-spal(dummy)		/* change pallette settings */
+PASCAL NEAR spal(dummy)		/* change pallette settings */
 
 char *dummy;
 #endif
@@ -246,13 +246,13 @@ char *dummy;
 	/* none for now */
 }
 
-ansibeep()
+PASCAL NEAR ansibeep()
 {
         ttputc(BEL);
         ttflush();
 }
 
-ansiparm(n)
+PASCAL NEAR ansiparm(n)
 register int    n;
 {
         register int q,r;
@@ -268,7 +268,7 @@ register int    n;
         ttputc((n%10) + '0');
 }
 
-ansiopen()
+PASCAL NEAR ansiopen()
 {
 #if     USG | AIX | AUX | HPUX8 | HPUX9 | BSD | SUN | XENIX
         register char *cp;
@@ -312,7 +312,7 @@ ansiopen()
 #endif
 }
 
-ansiclose()
+PASCAL NEAR ansiclose()
 
 {
 #if	COLOR
@@ -342,12 +342,12 @@ ansiclose()
 	ttclose();
 }
 
-ansikopen()	/* open the keyboard (a noop here) */
+PASCAL NEAR ansikopen()	/* open the keyboard (a noop here) */
 
 {
 }
 
-ansikclose()	/* close the keyboard (a noop here) */
+PASCAL NEAR ansikclose()	/* close the keyboard (a noop here) */
 
 {
 }
@@ -358,7 +358,7 @@ ansikclose()	/* close the keyboard (a noop here) */
  *
  *  Nothing returned
  ***/
-void ttputs(string)
+void PASCAL NEAR ttputs(string)
 char * string;				/* String to write		*/
 {
 	if (string)
@@ -378,7 +378,7 @@ static int inlen=0;
 
 NOSHARE int mouserow, mousecol;
 
-int readparam( v)	/* Read an ansi parameter */
+int PASCAL NEAR readparam( v)	/* Read an ansi parameter */
 int *v;	/* Place to put parameter value */
 {
     int ch;
@@ -399,7 +399,7 @@ int *v;	/* Place to put parameter value */
  *
  * The 'x' in the arrays keypad[] and dec_fnkey[] are merely placeholders.
  */
-void docsi( oh)
+void PASCAL NEAR docsi( oh)
 int oh;
 {
     static char crsr[4] = {'P', 'N', 'F', 'B'};
@@ -490,7 +490,7 @@ int oh;
     }
 }
 
-void dobbnmouse()
+void PASCAL NEAR dobbnmouse()
 {
 	int params[ 5];
 	int i, ch;
@@ -535,7 +535,7 @@ void dobbnmouse()
  *	that come from function keys, mouse reports, and cursor location
  *	reports, and return them using Emacs's coding of these events.
  */
-ansigetc()
+PASCAL NEAR ansigetc()
 {
     int ch;
 
@@ -572,11 +572,11 @@ ansigetc()
     }
 }
 #else
- ansigetc() {return( ttgetc());}
+PASCAL NEAR  ansigetc() {return( ttgetc());}
 #endif
 
 #if	FLABEL
-int fnclabel(f, n)		/* label a function key */
+int PASCAL NEAR fnclabel(f, n)		/* label a function key */
 
 int f,n;	/* default flag, numeric argument [unused] */
 

@@ -14,7 +14,8 @@
 #include	"edef.h"
 #include	"elang.h"
 
-#if	UTF8
+#if ! UTF8
+
 
 /*	is_letter()
 		Is the character a letter?  We presume a letter must
@@ -22,100 +23,7 @@
 	translated to itself).
 */
 
-int is_letter(ch)
-
-unsigned int ch;
-
-{
-	return(iswalpha(ch));
-}
-
-/*	is_lower()
-		Is the character a lower case letter?  This looks
-	in the lower to uppercase translation table.
-*/
-
-int is_lower(ch)
-
-unsigned int ch;
-
-{
-	return(iswlower(ch));
-}
-
-/*	is_upper()
-		Is the character a upper case letter?  This looks
-	in the upper to lowercase translation table.
-*/
-
-int is_upper(ch)
-
-unsigned int ch;
-
-{
-	return(iswupper(ch));
-}
-
-
-/*	chcase()
-
-		Change the case of the current character.
-	First check lower and then upper.  If it is not a letter,
-	it gets returned unchanged.
-*/
-
-unsigned int chcase(ch)
-unsigned int ch;
-{
-	/* translate lower case */
-	if (iswlower(ch))
-		return(ToWUpper(ch));
-
-	/* translate upper case */
-	if (iswupper(ch))
-		return(ToWLower(ch));
-
-	/* let the rest pass */
-	return(ch);
-}
-
-#if	PROTO
-unsigned int upperc(unsigned int ch) /* return the upper case equivalant of a character */
-#else
-int upperc(ch)	/* return the upper case equivalant of a character */
-
-unsigned int ch;	/* character to get uppercase euivalant of */
-#endif
-{
-	if (iswlower(ch))
-		return(ToWUpper(ch));
-	else
-		return(ch);
-}
-
-#if	PROTO
-unsigned int lowerc(unsigned int ch) /* return the lower case equivalant of a character */
-#else
-unsigned int lowerc(ch)	/* return the lower case equivalant of a character */
-
-unsigned int ch;	/* character to get lowercase equivalant of */
-#endif
-{
-	if (iswupper(ch))
-		return(ToWLower(ch));
-	else
-		return(ch);
-}
-
-#else
-
-/*	is_letter()
-		Is the character a letter?  We presume a letter must
-	be either in the upper or lower case tables (even if it gets
-	translated to itself).
-*/
-
-int is_letter(ch)
+int PASCAL NEAR is_letter(ch)
 
 register char ch;
 
@@ -128,7 +36,7 @@ register char ch;
 	in the lower to uppercase translation table.
 */
 
-int is_lower(ch)
+int PASCAL NEAR is_lower(ch)
 
 register char ch;
 
@@ -141,7 +49,7 @@ register char ch;
 	in the upper to lowercase translation table.
 */
 
-int is_upper(ch)
+int PASCAL NEAR is_upper(ch)
 
 register char ch;
 
@@ -156,7 +64,7 @@ register char ch;
 	it gets returned unchanged.
 */
 
-unsigned int chcase(ch)
+unsigned int PASCAL NEAR chcase(ch)
 register unsigned int	ch;
 {
 	/* translate lowercase */
@@ -171,10 +79,34 @@ register unsigned int	ch;
 	return(ch);
 }
 
+/* change *cp to an upper case character */
+
+VOID PASCAL NEAR uppercase(cp)
+
+unsigned char *cp;	/* ptr to character to uppercase */
+
+{
+	/* translate uppercase */
+	if (is_lower(*cp))
+		*cp = lowcase[*cp & 255];
+}
+
+/* change *cp to an lower case character */
+
+VOID PASCAL NEAR lowercase(cp)
+
+unsigned char *cp;	/* ptr to character to lowercase */
+
+{
+	/* translate lowercase */
+	if (is_upper(*cp))
+		*cp = upcase[*cp & 255];
+}
+
 #if	PROTO
-int upperc(char ch) /* return the upper case equivalant of a character */
+int PASCAL NEAR upperc(char ch) /* return the upper case equivalant of a character */
 #else
-int upperc(ch)	/* return the upper case equivalant of a character */
+int PASCAL NEAR upperc(ch)	/* return the upper case equivalant of a character */
 
 unsigned char ch;	/* character to get uppercase euivalant of */
 #endif
@@ -186,9 +118,9 @@ unsigned char ch;	/* character to get uppercase euivalant of */
 }
 
 #if	PROTO
-int lowerc(char ch) /* return the lower case equivalant of a character */
+int PASCAL NEAR lowerc(char ch) /* return the lower case equivalant of a character */
 #else
-int lowerc(ch)	/* return the lower case equivalant of a character */
+int PASCAL NEAR lowerc(ch)	/* return the lower case equivalant of a character */
 
 unsigned char ch;	/* character to get lowercase equivalant of */
 #endif
@@ -199,83 +131,7 @@ unsigned char ch;	/* character to get lowercase equivalant of */
 		return(ch);
 }
 
-#endif /* UTF8 */
-
-/* change *cp to an upper case character */
-
-int uppercase(cp)
-
-unsigned char *cp;	/* ptr to character to uppercase */
-
-{
-#if	UTF8
-	/* translate upper case */
-	if (is_multibyte_utf8(*cp)) {
-		char utf8[6];
-		size_t len = strlen((char*) cp);
-		unsigned int wc;
-		unsigned int bytes = utf8_to_unicode((char*) cp, 0, len, &wc);
-
-		if (iswlower(wc)) {
-			wc = ToWUpper(wc);
-			/* it's a in place conversion, so do it only if the converted
-			 * character has the same number of bytes as the original. */
-			if (unicode_to_utf8(wc, utf8) == bytes)
-				memcpy(cp, utf8, bytes);
-		}
-
-		return bytes;
-	}
-
-	if (islower(*cp))
-		*cp = toupper(*cp);
-#else
-	/* translate uppercase */
-	if (is_lower(*cp))
-		*cp = lowcase[*cp & 255];
-#endif
-	return 1;
-}
-
-/* change *cp to an lower case character */
-
-int lowercase(cp)
-
-unsigned char* cp;	/* ptr to character to lowercase */
-
-{
-#if	UTF8
-	/* translate lower case */
-	if (is_multibyte_utf8(*cp)) {
-		char utf8[6];
-		size_t len = strlen((char*) cp);
-		unsigned int wc;
-		unsigned int bytes = utf8_to_unicode((char*) cp, 0, len, &wc);
-
-		if (iswupper(wc)) {
-			wc = ToWLower(wc);
-			/* it's a in place conversion, so do it only if the converted
-			 * character has the same number of bytes as the original. */
-			if (unicode_to_utf8(wc, utf8) == bytes)
-				memcpy(cp, utf8, bytes);
-		}
-
-		return bytes;
-	}
-
-	if (isupper(*cp))
-		*cp = tolower(*cp);
-#else
-	/* translate lowercase */
-	if (is_upper(*cp))
-		*cp = upcase[*cp & 255];
-#endif
-	return 1;
-}
-
-#if ! UTF8
-
-VOID initchars()	/* initialize the character upper/lower case tables */
+VOID PASCAL NEAR initchars()	/* initialize the character upper/lower case tables */
 
 {
 	register int index;	/* index into tables */
@@ -439,7 +295,7 @@ VOID initchars()	/* initialize the character upper/lower case tables */
 
 /*	Set a character in the lowercase map */
 
-int setlower(ch, val)
+int PASCAL NEAR setlower(ch, val)
 
 char *ch;	/* ptr to character to set */
 char *val;	/* value to set it to */
@@ -450,7 +306,7 @@ char *val;	/* value to set it to */
 
 /*	Set a character in the uppercase map */
 
-int setupper(ch, val)
+int PASCAL NEAR setupper(ch, val)
 
 char *ch;	/* ptr to character to set */
 char *val;	/* value to set it to */
@@ -483,11 +339,36 @@ char *our_str;
 }
 #endif /* (ZTC | TURBO | MSC) == 0 */
 
-#else
+#if	DBCS
+/* is this character a 2 byte character prefix code? */
+
+int PASCAL NEAR is2byte(sp, cp)
+
+char *sp;	/* ptr to beginning of string containing character to test */
+char *cp;	/* ptr to charactor to test */
+
+{
+	register char *cc;	/* pointer to current character */
+
+	cc = sp;
+	while (*cc) {
+		if (cc > cp)
+			return(FALSE);
+		if (cc == cp)
+			return(is2char(*cp));
+		if (is2char(*cc))
+			++cc;
+		++cc;
+	}
+	return(FALSE);
+}
+#endif
+
+#else	/* ! UTF8 */
 
 /*	Set a character in the lowercase map */
 
-int setlower(ch, val)
+int PASCAL NEAR setlower(ch, val)
 
 char *ch;	/* ptr to character to set */
 char *val;	/* value to set it to */
@@ -509,7 +390,7 @@ char *val;	/* value to set it to */
 
 /*	Set a character in the uppercase map */
 
-int setupper(ch, val)
+int PASCAL NEAR setupper(ch, val)
 
 char *ch;	/* ptr to character to set */
 char *val;	/* value to set it to */
@@ -571,32 +452,158 @@ char *strrev(char *str)
     return str;
 }
 
-#endif /* UTF8 */
+/*	is_letter()
+		Is the character a letter?  We presume a letter must
+	be either in the upper or lower case tables (even if it gets
+	translated to itself).
+*/
 
-#if	DBCS
-/* is this character a 2 byte character prefix code? */
+int PASCAL NEAR is_letter(ch)
 
-int is2byte(sp, cp)
-
-char *sp;	/* ptr to beginning of string containing character to test */
-char *cp;	/* ptr to charactor to test */
+unsigned int ch;
 
 {
-	register char *cc;	/* pointer to current character */
-
-	cc = sp;
-	while (*cc) {
-		if (cc > cp)
-			return(FALSE);
-		if (cc == cp)
-			return(is2char(*cp));
-		if (is2char(*cc))
-			++cc;
-		++cc;
-	}
-	return(FALSE);
+	return(iswalpha(ch));
 }
+
+/*	is_lower()
+		Is the character a lower case letter?  This looks
+	in the lower to uppercase translation table.
+*/
+
+int PASCAL NEAR is_lower(ch)
+
+unsigned int ch;
+
+{
+	return(iswlower(ch));
+}
+
+/*	is_upper()
+		Is the character a upper case letter?  This looks
+	in the upper to lowercase translation table.
+*/
+
+int PASCAL NEAR is_upper(ch)
+
+unsigned int ch;
+
+{
+	return(iswupper(ch));
+}
+
+/*	chcase()
+
+		Change the case of the current character.
+	First check lower and then upper.  If it is not a letter,
+	it gets returned unchanged.
+*/
+
+unsigned int PASCAL NEAR chcase(ch)
+register unsigned int	ch;
+{
+	/* translate lower case */
+	if (iswlower(ch))
+		return(ToWUpper(ch));
+
+	/* translate upper case */
+	if (iswupper(ch))
+		return(ToWLower(ch));
+
+	/* let the rest pass */
+	return(ch);
+}
+
+#if	PROTO
+unsigned int upperc(unsigned int ch) /* return the upper case equivalant of a character */
+#else
+int upperc(ch)	/* return the upper case equivalant of a character */
+
+unsigned int ch;	/* character to get uppercase euivalant of */
 #endif
+{
+	if (iswlower(ch))
+		return(ToWUpper(ch));
+	else
+		return(ch);
+}
+
+#if	PROTO
+unsigned int PASCAL NEAR lowerc(unsigned int ch) /* return the lower case equivalant of a character */
+#else
+unsigned int PASCAL NEAR lowerc(ch)	/* return the lower case equivalant of a character */
+
+unsigned int ch;	/* character to get lowercase equivalant of */
+#endif
+{
+	if (iswupper(ch))
+		return(ToWLower(ch));
+	else
+		return(ch);
+}
+
+/* change *cp to an upper case character */
+
+int PASCAL NEAR uppercase(cp)
+
+unsigned char *cp;	/* ptr to character to uppercase */
+
+{
+	/* translate upper case */
+	if (is_multibyte_utf8(*cp)) {
+		char utf8[6];
+		size_t len = strlen((char*) cp);
+		unsigned int wc;
+		unsigned int bytes = utf8_to_unicode((char*) cp, 0, len, &wc);
+
+		if (iswlower(wc)) {
+			wc = ToWUpper(wc);
+			/* it's a in place conversion, so do it only if the converted
+			 * character has the same number of bytes as the original. */
+			if (unicode_to_utf8(wc, utf8) == bytes)
+				memcpy(cp, utf8, bytes);
+		}
+
+		return bytes;
+	}
+
+	if (islower(*cp))
+		*cp = toupper(*cp);
+
+	return 1;
+}
+
+/* change *cp to an lower case character */
+
+int PASCAL NEAR lowercase(cp)
+
+unsigned char* cp;	/* ptr to character to lowercase */
+
+{
+	/* translate lower case */
+	if (is_multibyte_utf8(*cp)) {
+		char utf8[6];
+		size_t len = strlen((char*) cp);
+		unsigned int wc;
+		unsigned int bytes = utf8_to_unicode((char*) cp, 0, len, &wc);
+
+		if (iswupper(wc)) {
+			wc = ToWLower(wc);
+			/* it's a in place conversion, so do it only if the converted
+			 * character has the same number of bytes as the original. */
+			if (unicode_to_utf8(wc, utf8) == bytes)
+				memcpy(cp, utf8, bytes);
+		}
+
+		return bytes;
+	}
+
+	if (isupper(*cp))
+		*cp = tolower(*cp);
+	return 1;
+}
+
+#endif /* ! UTF8 */
 
 #if	MDSLINE
 unsigned int theoxtosgraph(unsigned int c)
@@ -681,4 +688,4 @@ unsigned int tosgraph(unsigned int c)
 	return c;
 }
 
-#endif
+#endif	/* MDSLINE */

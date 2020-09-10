@@ -19,7 +19,7 @@
  * if the use count is 0. Otherwise, they come
  * from some other window.
  */
-int usebuffer(f, n)
+int PASCAL NEAR usebuffer(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -41,7 +41,7 @@ int f,n;	/* prefix flag and argument */
 	return(swbuffer(bp));
 }
 
-int nextbuffer(f, n)	/* switch to the next buffer in the buffer list */
+int PASCAL NEAR nextbuffer(f, n)	/* switch to the next buffer in the buffer list */
 
 int f, n;	/* default flag, numeric argument */
 {
@@ -66,7 +66,7 @@ int f, n;	/* default flag, numeric argument */
 	return(status);
 }
 
-int swbuffer(bp)	/* make buffer BP current */
+int PASCAL NEAR swbuffer(bp)	/* make buffer BP current */
 
 BUFFER *bp;
 
@@ -158,7 +158,7 @@ BUFFER *bp;
  * if the buffer has been changed). Then free the header
  * line and the buffer header. Bound to "C-X K".
  */
-int killbuffer(f, n)
+int PASCAL NEAR killbuffer(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -177,7 +177,7 @@ int f,n;	/* prefix flag and argument */
 
 /*	Allow the user to pop up a buffer, like we do.... */
 
-int popbuffer(f, n)
+int PASCAL NEAR popbuffer(f, n)
 
 int f, n;	/* default and numeric arguments */
 
@@ -198,7 +198,7 @@ int f, n;	/* default and numeric arguments */
 	return(pop(bp));
 }
 
-BUFFER *getdefb()	/* get the default buffer for a use or kill */
+BUFFER *PASCAL NEAR getdefb()	/* get the default buffer for a use or kill */
 
 {
 	BUFFER *bp;	/* default buffer */
@@ -222,7 +222,7 @@ BUFFER *getdefb()	/* get the default buffer for a use or kill */
 	return(bp);
 }
 
-int zotbuf(bp)	/* kill the buffer pointed to by bp */
+int PASCAL NEAR zotbuf(bp)	/* kill the buffer pointed to by bp */
 
 register BUFFER *bp;
 
@@ -313,7 +313,7 @@ ask:	if (mlreply(TEXT29, bufn, NBUFN) != TRUE)
 	invisible buffers as well.
 */
 
-int listbuffers(f, n)
+int PASCAL NEAR listbuffers(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -334,7 +334,7 @@ int f,n;	/* prefix flag and argument */
  * is an error (if there is no memory). Iflag
  * indicates whether to list hidden buffers.
  */
-int makelist(iflag)
+int PASCAL NEAR makelist(iflag)
 
 int iflag;	/* list hidden buffer flag */
 
@@ -473,7 +473,7 @@ int iflag;	/* list hidden buffer flag */
 /* Translate a long to ascii form. Don't trust various systems
    ltoa() routines.. they aren't consistant				*/
 
-VOID flong_asc(buf, width, num)
+VOID PASCAL NEAR flong_asc(buf, width, num)
 
 char   buf[];
 int    width;
@@ -500,7 +500,7 @@ long   num;
  * Return FALSE if no buffers
  * have been changed.
  */
-int anycb()
+int PASCAL NEAR anycb()
 {
 	register BUFFER *bp;
 
@@ -520,7 +520,7 @@ int anycb()
  * and the "cflag" is TRUE, create it. The "bflag" is
  * the settings for the flags in in buffer.
  */
-BUFFER *bfind(bname, cflag, bflag)
+BUFFER *PASCAL NEAR bfind(bname, cflag, bflag)
 
 CONST register char	*bname; /* name of buffer to find */
 int cflag;		/* create it if not found? */
@@ -610,7 +610,7 @@ int bflag;		/* bit settings for a new buffer */
  * that are required. Return TRUE if everything
  * looks good.
  */
-int bclear(bp)
+int PASCAL NEAR bclear(bp)
 register BUFFER *bp;
 {
 	register LINE	*lp;
@@ -636,7 +636,7 @@ register BUFFER *bp;
 	return(TRUE);
 }
 
-int unmark(f, n)	/* unmark the current buffers change flag */
+int PASCAL NEAR unmark(f, n)	/* unmark the current buffers change flag */
 
 int f, n;	/* unused command arguments */
 
@@ -650,7 +650,7 @@ int f, n;	/* unused command arguments */
 	return(TRUE);
 }
 
-BUFFER *getoldb()	/* get the most ancient visited buffer */
+BUFFER *PASCAL NEAR getoldb()	/* get the most ancient visited buffer */
 
 {
 	BUFFER *bp;	/* current buffer */

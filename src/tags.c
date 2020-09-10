@@ -257,7 +257,7 @@ register char pattern[];
  */
 
 static int thisfile = FALSE;	/* TRUE if curtp->t_fname equals*/
-/* curbp->fname when tagging	*/
+				/* curbp->fname when tagging	*/
 static int tagvalid = FALSE;	/* TRUE if last tag was a succes*/
 
 /*
@@ -398,7 +398,7 @@ int  retag;
  * '.' is preserved, and return information (= current filename) is saved.
  */
 
-extern int tagword(f, n)
+extern int PASCAL NEAR tagword(f, n)
 
 int f, n;
 
@@ -450,7 +450,7 @@ int f, n;
  * Note, retagword  do not mess up the return information (tagf).
  */
 
-extern int retagword(f, n)
+extern int PASCAL NEAR retagword(f, n)
 
 int f, n;
 
@@ -471,7 +471,7 @@ int f, n;
  * we just swap mark with '.' .
  */
 
-extern int backtagword(f, n)
+extern int PASCAL NEAR backtagword(f, n)
 
 int f, n;
 

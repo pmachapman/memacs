@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include "estruct.h"
 
-fix();
+PASCAL fix();
 
 /*	Table of command key name changes */
 
@@ -87,7 +87,7 @@ char *trans[][2] = {
 	"FNu",	"FN^>",
 	"FNv",	"FN^V",
 	"FNw",	"FN^<",
-	"FN�",	"FN^Z",
+	"FN",	"FN^Z",
 	"set-fill-column", "set $fillcol",
 };
 
@@ -143,7 +143,7 @@ char *argv[];	/* text of command line arguments */
 	exit(0);
 }
 
-fix(fname)
+PASCAL fix(fname)
 
 char *fname;	/* file to fix */
 

@@ -121,7 +121,6 @@ int scnothing()
 #endif /* (AVVION || TERMIOS) */
 #if CURSES
 #include <curses.h>			/* Curses screen output		*/
-#undef EWINDOW				/* Oh no!			*/
 #endif /* CURSES */
 
 /** Completion include files **/

@@ -34,7 +34,7 @@
  * repaint. Bound to "^X C". The message at the start in VMS puts out a newline.
  * Under some (unknown) condition, you don't get one free when DCL starts up.
  */
-spawncli(f, n)
+int PASCAL NEAR spawncli(f, n)
 {
         /* don't allow this command if restricted */
         if (restflag)
@@ -55,7 +55,7 @@ spawncli(f, n)
  * character to be typed, then mark the screen as garbage so a full repaint is
  * done. Bound to "C-X !".
  */
-spawn(f, n)
+int PASCAL NEAR spawn(f, n)
 {
         register int s;
         char line[NLINE];
@@ -87,7 +87,7 @@ spawn(f, n)
  * done. Bound to "C-X $".
  */
 
-execprg(f, n)
+int PASCAL NEAR execprg(f, n)
 {
         register int s;
         char line[NLINE];
@@ -118,7 +118,7 @@ execprg(f, n)
  * We use a unique temporary file name so that multiple instances of
  * MicroEMACS don't try to use the same file.
  */
-pipecmd(f, n)
+int PASCAL NEAR pipecmd(f, n)
 {
         register EWINDOW *wp;    /* pointer to new window */
         register BUFFER *bp;    /* pointer to buffer to zot */
@@ -207,7 +207,7 @@ pipecmd(f, n)
  * We use unique temporary file names so that multiple instances of
  * MicroEMACS don't try to use the same file.
  */
-uefilter(f, n)
+int PASCAL NEAR uefilter(f, n)
 
 {
         register int    s;      /* return status from CLI */
@@ -367,7 +367,7 @@ char rbuf[NFILEN];      /* return file buffer */
 
 /*      do a wild card directory search (for file name completion) */
 
-char *getffile(fspec)
+char *PASCAL NEAR getffile(fspec)
 
 char *fspec;    /* pattern to match */
 
@@ -417,7 +417,7 @@ char *fspec;    /* pattern to match */
         return(rbuf);
 }
 
-char *getnfile()
+char *PASCAL NEAR getnfile()
 
 {
         /* and call for the next file */
@@ -435,7 +435,7 @@ char *getnfile()
 
 /* return a system dependent string with the current time */
 
-char *timeset()
+char *PASCAL NEAR timeset()
 
 {
         register char *sp;      /* temp string pointer */

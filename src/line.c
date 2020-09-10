@@ -30,7 +30,7 @@ static long last_size = -1L;	/* last # of bytes yanked */
  * line if no space.
  */
 
-LINE *lalloc(used)
+LINE *PASCAL NEAR lalloc(used)
 
 register int used;
 
@@ -62,7 +62,7 @@ register int used;
  * might be in. Release the memory. The buffers are updated too; the magic
  * conditions described in the above comments don't hold here.
  */
-VOID lfree(lp)
+VOID PASCAL NEAR lfree(lp)
 register LINE	*lp;
 {
 	register BUFFER *bp;
@@ -131,7 +131,7 @@ register LINE	*lp;
  * displayed in more than 1 window we change EDIT t HARD. Set MODE if the
  * mode line needs to be updated (the "*" has to be set).
  */
-VOID lchange(flag)
+VOID PASCAL NEAR lchange(flag)
 register int	flag;
 {
 	register EWINDOW *wp;
@@ -160,7 +160,7 @@ register int	flag;
 	}
 }
 
-int insspace(f, n)	/* insert spaces forward into text */
+int PASCAL NEAR insspace(f, n)	/* insert spaces forward into text */
 
 int f, n;	/* default flag and numeric argument */
 
@@ -177,10 +177,10 @@ int f, n;	/* default flag and numeric argument */
  */
 
 #if PROTO
-int linstr(CONST char *instr)
+int PASCAL NEAR linstr(CONST char *instr)
 #else
-int linstr( instr)
-CONST char *instr;
+int PASCAL NEAR linstr( instr)
+char *instr;
 #endif
 {
 	register int status;
@@ -241,7 +241,15 @@ CONST char *instr;
  * well, and FALSE on errors.
  */
 
-static int linsert_byte(int n, unsigned char c)
+#if	PROTO
+static int PASCAL NEAR linsert_byte(int n, unsigned char c)
+#else
+static int PASCAL NEAR linsert_byte(n, c)
+
+int	n;
+char	c;
+#endif
+
 {
 	register char	*cp1;
 	register char	*cp2;
@@ -353,18 +361,18 @@ static int linsert_byte(int n, unsigned char c)
 
 #if	UTF8
 #if	PROTO
-int linsert(int n, unsigned int c)
+int PASCAL NEAR linsert(int n, unsigned int c)
 #else
-int linsert(n, c)
+int PASCAL NEAR linsert(n, c)
 
 int	n;
 unsigned int	c;
 #endif
 #else
 #if	PROTO
-int linsert(int n, char c)
+int PASCAL NEAR linsert(int n, char c)
 #else
-int linsert(n, c)
+int PASCAL NEAR linsert(n, c)
 
 int	n;
 char	c;
@@ -406,17 +414,17 @@ char	c;
  */
 #if	UTF8
 #if	PROTO
-int lowrite(unsigned int c)
+int PASCAL NEAR lowrite(unsigned int c)
 #else
-int lowrite(c)
+int PASCAL NEAR lowrite(c)
 
 char c;		/* character to overwrite on current position */
 #endif /* PROTO */
 #else
 #if	PROTO
-int lowrite(int c)
+int PASCAL NEAR lowrite(int c)
 #else
-int lowrite(c)
+int PASCAL NEAR lowrite(c)
 
 int c;		/* character to overwrite on current position */
 #endif
@@ -437,7 +445,7 @@ int c;		/* character to overwrite on current position */
  * lover -- Overwrite a string at the current point
  */
 
-int lover(ostr)
+int PASCAL NEAR lover(ostr)
 
 CONST char	*ostr;
 
@@ -492,7 +500,7 @@ CONST char	*ostr;
  * update of dot and mark is a bit easier then in the above case, because the
  * split forces more updating.
  */
-int lnewline()
+int PASCAL NEAR lnewline()
 {
 	register char	*cp1;
 	register char	*cp2;
@@ -619,7 +627,7 @@ should be put in the kill buffer.
 
 */
 
-int ldelete(n, kflag)
+int PASCAL NEAR ldelete(n, kflag)
 
 long n; 	/* # of chars to delete */
 int kflag;	/* put killed text in kill buffer flag */
@@ -848,9 +856,9 @@ int kflag;	/* put killed text in kill buffer flag */
 */
 
 #if PROTO
-char *getctext(char *rline)
+char *PASCAL NEAR getctext(char *rline)
 #else
-char *getctext( rline)
+char *PASCAL NEAR getctext( rline)
 char *rline;
 #endif
 
@@ -877,7 +885,7 @@ char *rline;
 
 /* putctext:	replace the current line with the passed in text	*/
 
-int putctext(iline)
+int PASCAL NEAR putctext(iline)
 
 char *iline;	/* contents of new line */
 
@@ -906,7 +914,7 @@ char *iline;	/* contents of new line */
  * about in memory. Return FALSE on error and TRUE if all looks ok. Called by
  * "ldelete" only.
  */
-int ldelnewline()
+int PASCAL NEAR ldelnewline()
 {
 	register char	*cp1;
 	register char	*cp2;
@@ -1022,9 +1030,9 @@ int ldelnewline()
 */
 
 #if	PROTO
-int addline(BUFFER *bp, CONST char *text)
+int PASCAL NEAR addline(BUFFER *bp, CONST char *text)
 #else
-int addline(bp, text)
+int PASCAL NEAR addline(bp, text)
 
 BUFFER *bp;	/* buffer to add text to */
 CONST char *text;	/* line to add */
@@ -1062,7 +1070,7 @@ CONST char *text;	/* line to add */
  * in case the buffer has grown to immense size. No errors.
  */
 
-VOID kdelete()
+VOID PASCAL NEAR kdelete()
 
 {
 	KILL *kp;	/* ptr to scan kill buffer chunk list */
@@ -1099,7 +1107,7 @@ VOID kdelete()
 			what will be the new kill buffer
 */
 
-VOID next_kill()
+VOID PASCAL NEAR next_kill()
 
 {
 	/* advance to the next kill ring entry */
@@ -1117,9 +1125,9 @@ VOID next_kill()
  */
 
 #if	PROTO
-int kinsert(int direct, char c)
+int PASCAL NEAR kinsert(int direct, char c)
 #else
-int kinsert(direct, c)
+int PASCAL NEAR kinsert(direct, c)
 
 int direct;	/* direction (FORWARD/REVERSE) to insert characters */
 char c;		/* character to insert in the kill buffer */
@@ -1208,7 +1216,7 @@ char c;		/* character to insert in the kill buffer */
 #define	Char_insert(a)	(a == RET_CHAR ? lnewline() : linsert(1, a))
 #endif
 
-int yank(f, n)
+int PASCAL NEAR yank(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -1290,7 +1298,7 @@ int f,n;	/* prefix flag and argument */
 	return(TRUE);
 }
 
-int cycle_ring(f, n)
+int PASCAL NEAR cycle_ring(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -1313,7 +1321,7 @@ int f,n;	/* prefix flag and argument */
 	return TRUE;
 }
 
-int yank_pop(f, n)
+int PASCAL NEAR yank_pop(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -1335,7 +1343,7 @@ int f,n;	/* prefix flag and argument */
 	return(yank(FALSE, 1));
 }
 
-int clear_ring(f, n)
+int PASCAL NEAR clear_ring(f, n)
 
 int f,n;	/* prefix flag and argument */
 

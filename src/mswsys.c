@@ -62,13 +62,13 @@ static HCURSOR  hRealHourglass;
 #endif
 
 /* prototypes */
-static void  MessageLoop (BOOL WaitMode);
-static BOOL  UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam);
-static void  SetHourglass (BOOL hg);
+static void  PASCAL MessageLoop (BOOL WaitMode);
+static BOOL  PASCAL UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam);
+static void  PASCAL SetHourglass (BOOL hg);
 
 /* timeset: return a system-dependent time string */
 /* =======                                        */
-char *timeset()
+char *PASCAL timeset()
 
 {
     register char *sp;	/* temp string pointer */
@@ -83,7 +83,7 @@ char *timeset()
 /* longop:    to be called regularly while a long operation is in progress */
 /* ========                                                                */
 
-longop (int f)
+PASCAL longop (int f)
 
 /* f is TRUE to set long operation status and FALSE to reset that status */
 /* when a long operation is signaled at least twice, the hourglass
@@ -125,7 +125,7 @@ longop (int f)
 /* mlyesno: ask a yes/no question */
 /* =======                        */
 
-mlyesno (char *prompt)
+PASCAL mlyesno (char *prompt)
 
 /* This function replaces the mlyesno from input.c. Instead of asking a
    question on the message line, it pops up a message box */
@@ -139,7 +139,7 @@ mlyesno (char *prompt)
 /* mlabort: display a serious error message (proposes abort) */
 /* =======                                                   */
 
-VOID mlabort (char *s)
+VOID PASCAL NEAR mlabort (char *s)
 {
     char    text[NSTRING];  /* hopefully sufficient! */
     
@@ -159,7 +159,7 @@ VOID mlabort (char *s)
 /* WinInit: all the window initialization crap... */
 /* =======                                        */
 
-BOOL FAR WinInit (LPSTR lpCmdLine, int nCmdShow)
+BOOL FAR PASCAL WinInit (LPSTR lpCmdLine, int nCmdShow)
 
 /* returns FALSE if failed init */
 {
@@ -348,7 +348,7 @@ ParsingDone:
 /* SetFrameCaption: sets the frame window's text according to the app Id */
 /* ===============                                                       */
 
-static void  SetFrameCaption (void)
+static void PASCAL  SetFrameCaption (void)
 {
     char    text[sizeof(PROGNAME) + sizeof(VERSION)+20];
     char    *t;
@@ -369,7 +369,7 @@ static void  SetFrameCaption (void)
 
 /* BroadcastEnumProc:   used by EmacsBroadcast */
 /* =================                           */
-BOOL EXPORT FAR BroadcastEnumProc (HWND hWnd, LPARAM lParam)
+BOOL EXPORT FAR PASCAL BroadcastEnumProc (HWND hWnd, LPARAM lParam)
 {
     char    ClassName [sizeof(FrameClassName)*4+1];
     UINT    RetVal;
@@ -397,7 +397,7 @@ BOOL EXPORT FAR BroadcastEnumProc (HWND hWnd, LPARAM lParam)
 /* EmacsBroadcast:  send a broadcast message to all Emacs applications */
 /* ==============                                                      */
 
-static DWORD   EmacsBroadcast (DWORD MsgParam)
+static DWORD PASCAL   EmacsBroadcast (DWORD MsgParam)
 
 /* If MsgParam is not zero, the broadcast is sent as an EmacsBroadcastMsg
    to all the Emacs frame windows, except the one specified by hFrameWnd.
@@ -423,7 +423,7 @@ static DWORD   EmacsBroadcast (DWORD MsgParam)
 /* MDIClientSubProc:    Subclassing window proc for the MDI Client window */
 /* ================                                                       */
 
-LONG EXPORT FAR MDIClientSubProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LONG EXPORT FAR PASCAL MDIClientSubProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				         LPARAM lParam)
 {
     switch (wMsg) {
@@ -463,7 +463,7 @@ DefaultProc:
 /* FrameInit:   Frame window's WM_CREATE */
 /* =========                             */
 
-void FAR FrameInit (CREATESTRUCT *cs)
+void FAR PASCAL FrameInit (CREATESTRUCT *cs)
 {
     RECT    Rect;
     CLIENTCREATESTRUCT  ccs;
@@ -526,7 +526,7 @@ void FAR FrameInit (CREATESTRUCT *cs)
 /* CloseEmacs:   handle WM_CLOSE of WM_QUERYENDSESSION messages */
 /* ==========                                                   */
 
-static BOOL  CloseEmacs (UINT wMsg)
+static BOOL  PASCAL CloseEmacs (UINT wMsg)
 
 /* returns TRUE if emacs should exit */
 {
@@ -558,7 +558,7 @@ static BOOL  CloseEmacs (UINT wMsg)
 
 /* ScrWndProc:  MDI child (screen) window function */
 /* ==========                                      */
-LONG EXPORT FAR ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LONG EXPORT FAR PASCAL ScrWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				   LPARAM lParam)
 {
     switch (wMsg) {
@@ -746,7 +746,7 @@ DefaultProc:
 
 /* FrameWndProc:    frame window function */
 /* ============                           */
-LONG EXPORT FAR FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
+LONG EXPORT FAR PASCAL FrameWndProc (HWND hWnd, UINT wMsg, WPARAM wParam,
 				     LPARAM lParam)
 {
     switch (wMsg) {
@@ -935,7 +935,7 @@ DefaultProc:
 /* WinMain: Application entry point */
 /* =======                          */
 
-int  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
+int PASCAL  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                      LPSTR lpCmdLine, int nCmdShow)
 {
     hEmacsInstance = hInstance;
@@ -962,7 +962,7 @@ int  WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /* ModifyCursor:    forces a WM_SETCURSOR */
 /* ============                           */
 
-static void  ModifyCursor (void)
+static void PASCAL  ModifyCursor (void)
 {
     POINT   pt;
 
@@ -973,7 +973,7 @@ static void  ModifyCursor (void)
 /* MessageLoop: Main message loop */
 /* ===========                    */
 
-static void  MessageLoop (BOOL WaitMode)
+static void  PASCAL MessageLoop (BOOL WaitMode)
 
 /* If WaitMode is TRUE this function uses GetMessage the first time and
    PeekMessage after that, until the input queue is empty and there is
@@ -1034,7 +1034,7 @@ static void  MessageLoop (BOOL WaitMode)
 
 /* The returned value is the next character from the input stream */
 
-int FAR GetInput (void)
+int FAR PASCAL GetInput (void)
 {
     if (!in_check ()) {
 	ShowEmacsCaret (TRUE);
@@ -1047,7 +1047,7 @@ int FAR GetInput (void)
 /* TakeANap:    put emacs to sleep for a few milliseconds */
 /* ========                                               */
 
-int FAR  TakeANap (int t)
+int FAR PASCAL  TakeANap (int t)
 /* this function is used by mswsleep(). It returns TRUE unless the timer
    could not be created. Note that for a null time, it simply
    relinquishes the processor */
@@ -1077,7 +1077,7 @@ int FAR  TakeANap (int t)
 /* UpdateCursor:    sets the apropriate Emacs cursor shape */
 /* ============                                            */
 
-static BOOL  UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam)
+static BOOL  PASCAL UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 /* this function should be called on each WM_SETCURSOR message, to
    display the appropriate cursor. It returns TRUE if all processing has
@@ -1140,7 +1140,7 @@ static BOOL  UpdateCursor (HWND hWnd, WPARAM wParam, LPARAM lParam)
 /* SetHourglass:    sets or removes the hourglass cursor */
 /* ============                                          */
 
-static void  SetHourglass (BOOL hg)
+static void  PASCAL SetHourglass (BOOL hg)
 
 /* hg = TRUE sets the hourglass, hg = FALSE removes it */
 {

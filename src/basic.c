@@ -21,7 +21,7 @@
  * beginning of the current line.
  * Trivial.
  */
-int gotobol(f, n)
+int PASCAL NEAR gotobol(f, n)
 
 int f,n;	/* argument flag and num */
 
@@ -36,7 +36,7 @@ int f,n;	/* argument flag and num */
  * location. Error if you try and move out of the buffer. Set the flag if the
  * line pointer for dot changes.
  */
-int backchar(f, n)
+int PASCAL NEAR backchar(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -86,7 +86,7 @@ int f,n;	/* prefix flag and argument */
 /*
  * Move the cursor to the end of the current line. Trivial. No errors.
  */
-int gotoeol(f, n)
+int PASCAL NEAR gotoeol(f, n)
 
 int f,n;	/* argument flag and num */
 
@@ -101,7 +101,7 @@ int f,n;	/* argument flag and num */
  * location, and move ".". Error if you try and move off the end of the
  * buffer. Set the flag if the line pointer for dot changes.
  */
-int forwchar(f, n)
+int PASCAL NEAR forwchar(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -148,7 +148,7 @@ int f,n;	/* prefix flag and argument */
 #endif
 }
 
-int gotoline(f, n)	/* move to a particular line.
+int PASCAL NEAR gotoline(f, n)	/* move to a particular line.
 			   argument (n) must be a positive integer for
 			   this to actually do anything		*/
 
@@ -183,7 +183,7 @@ int f,n;	/* prefix flag and argument */
  * considered to be hard motion; it really isn't if the original value of dot
  * is the same as the new value of dot. Normally bound to "M-<".
  */
-int gotobob(f, n)
+int PASCAL NEAR gotobob(f, n)
 
 int f,n;	/* argument flag and num */
 
@@ -199,7 +199,7 @@ int f,n;	/* argument flag and num */
  * (ZJ). The standard screen code does most of the hard parts of update.
  * Bound to "M->".
  */
-int gotoeob(f, n)
+int PASCAL NEAR gotoeob(f, n)
 
 int f,n;	/* argument flag and num */
 
@@ -260,7 +260,7 @@ int f,n;	/* argument flag and num */
  * alternate. Figure out the new line and call "movedot" to perform the
  * motion. No errors are possible. Bound to "C-P".
  */
-int backline(f, n)
+int PASCAL NEAR backline(f, n)
 
 int f,n;	/* argument flag and num */
 
@@ -299,7 +299,7 @@ int f,n;	/* argument flag and num */
 #endif
 }
 
-int gotobop(f, n) /* go back to the beginning of the current paragraph
+int PASCAL NEAR gotobop(f, n) /* go back to the beginning of the current paragraph
 		   here we look for a blank line or a character from
 		   $paralead to delimit the beginning of a paragraph or
 		   $fmtlead to delimit a line before the paragraph */
@@ -365,7 +365,7 @@ int f, n;	/* default Flag & Numeric argument */
 	return(TRUE);
 }
 
-int gotoeop(f, n) /* go forword to the end of the current paragraph
+int PASCAL NEAR gotoeop(f, n) /* go forword to the end of the current paragraph
 			     looking for a member of $paralead or $fmtlead
 			     or a blank line to delimit the start of the
 			     next paragraph
@@ -445,7 +445,7 @@ int f, n;	/* default Flag & Numeric argument */
  * Used by "C-N" and "C-P".
  */
 
-int getgoal(dlp)
+int PASCAL NEAR getgoal(dlp)
 
 register LINE   *dlp;
 
@@ -499,7 +499,7 @@ register LINE   *dlp;
  * is overlap between screens. This defaults to overlap value in ITS EMACS.
  *  Because this zaps the top line in the window, we have to do a hard update.
  */
-int forwpage(f, n)
+int PASCAL NEAR forwpage(f, n)
 
 int f,n;	/* prefix flag and argument */
 
@@ -532,7 +532,7 @@ int f,n;	/* prefix flag and argument */
  * EMACS manual. Bound to "M-V". We do a hard update for exactly the same
  * reason.
  */
-int backpage(f, n)
+int PASCAL NEAR backpage(f, n)
 
 register int f;
 register int n;
@@ -564,7 +564,7 @@ register int n;
  * Set the mark in the current window to the value of "." in the window. No
  * errors are possible. Bound to "M-.".
  */
-int setmark(f, n)
+int PASCAL NEAR setmark(f, n)
 
 int f,n;	/* argument flag and num */
 
@@ -585,7 +585,7 @@ int f,n;	/* argument flag and num */
  * Remove the mark in the current window.
  * Bound to ^X <space>
  */
-int remmark(f, n)
+int PASCAL NEAR remmark(f, n)
 
 int f,n;	/* argument flag and num */
 
@@ -608,7 +608,7 @@ int f,n;	/* argument flag and num */
  * that moves the mark about. The only possible error is "no mark". Bound to
  * "C-X C-X".
  */
-int swapmark(f, n)
+int PASCAL NEAR swapmark(f, n)
 
 int f,n;	/* argument flag and num */
 
@@ -641,7 +641,7 @@ int f,n;	/* argument flag and num */
  * the hard work gets done by the standard routine that moves the mark
  * about. The only possible error is "no mark". Bound to "M-^G".
  */
-int gotomark(f, n)
+int PASCAL NEAR gotomark(f, n)
 
 int f, n;	/* default and numeric args */
 
@@ -665,7 +665,7 @@ int f, n;	/* default and numeric args */
 #if	DBCS
 /* advance a char if we are on the second byte of a DBCS character */
 
-int stopforw()
+int PASCAL NEAR stopforw()
 
 {
 	/* don't stop on the second byte of a 2 byte character */
@@ -677,7 +677,7 @@ int stopforw()
 
 /* retreat a char if we are on the second byte of a DBCS character */
 
-int stopback()
+int PASCAL NEAR stopback()
 
 {
 	/* don't stop on the second byte of a 2 byte character */
