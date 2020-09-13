@@ -2592,6 +2592,8 @@
  *	- Added SCO OpenServer 5 and UnixWare 7 support (2001)
  *	- Added menudrop function bound to menu-drop to allow menu use without a mouse.
  *	  Bound to F12 in tpage.cmd
+ *	11 Sep 2020
+ *	- Changed libhelp.c, epath.h and main.c to allow use of help files based on file extension.
  */
 
 void history()

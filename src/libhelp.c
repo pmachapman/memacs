@@ -35,10 +35,8 @@
 
 #define	HELPSEP	'@'			/* marks a new help entry */
 
-#define	LOOK	0			/* d�tail */
-#define	INDEX	1			/* sommaire */
-
-extern NOSHARE CONST char *otherpath[];
+#define	LOOK	0			/* detail */
+#define	INDEX	1			/* summary */
 
 static	char	*lookfile=0;		/* Help file name ptr. */
 static	char	*lookindx=0;		/* Help index file name ptr. */
@@ -59,6 +57,18 @@ struct	look	{
 struct	look	*lread();
 
 void fastlook();
+
+// compare two strings, ignore case
+
+static int strcmpi(CONST char* s1, CONST char* s2)
+{
+	while (*s1 && *s2 && tolower(*s1) == tolower(*s2)) {
+		++s1;
+		++s2;
+	}
+
+	return *s1 - *s2;
+}
 
 /* Open the help file "name" with access "acs" along the current libpath.
  */
@@ -131,7 +141,7 @@ int (*output)(char *str);
 	while (fgets(lookline, NLINE, fp) != NULL)
 		if (lookline[0] == HELPSEP) {
 			lookline[strlen(lookline)-1] = '\0';
-			if (strcmp(com, lookline+1) == 0) {
+			if (strcmpi(com, lookline+1) == 0) {
 				while (fgets(lookline, NLINE, fp) != NULL) {
 					if (lookline[0] == HELPSEP)
 						break;
@@ -170,7 +180,7 @@ char *ind;
 		if ((ifp = hfopen(ind, "rb")) == NULL)
 			return;
 		while ((lp = lread(ifp)) != NULL)
-			if (strcmp(com, lp->l_name) == 0) {
+			if (strcmpi(com, lp->l_name) == 0) {
 				fseek(fp, lp->l_seek, 0);
 				break;
 			}
@@ -227,6 +237,8 @@ register char *s2;
 		}
 		st = s1;
 	}
+
+	return 0;
 }
 
 int doindex(com, fp, output)
@@ -318,6 +330,36 @@ int mode;
 	return (c == 0);		/* All done */
 }
 /*
+ * On GEMDOS and MSDOS, lookfiles specified on the command line
+ * are <name>.HLP for the main help, and <name>.IDX for the index file,
+ * if any.
+ */
+
+VOID initlook()
+{
+	extern char *getenv();
+	CONST char* p;
+
+	/* use file name extension in current buffer as help base file name */
+	p = curbp->b_fname ? strrchr(curbp->b_fname, '.') : NULL;
+
+	if (p) {
+		strcpy(hfname, ++p);
+	} else {
+		// no file name extension, set default.
+#if TXBASIC
+		strcpy(hfname, "basic");
+#else
+		strcpy(hfname, "c");
+#endif
+	}
+
+	strcpy(hiname, hfname);
+	lookfile = strcat(hfname, ".hlp");
+	lookindx = strcat(hiname, ".idx");
+}
+
+/*
  * Put up a help window with the text pointed to by txt (mode == LOOK)
  * or
  * Put up a help window with an index of matching topics (mode == INDEX)
@@ -334,10 +376,12 @@ int mode;
 	if (mode == INDEX || curwp->w_bufp != helpbp)
 		savewnd(TRUE, 0);
 
-	initlook(NULL);
+	initlook();
 
-	if ((s = makelook(tag, mode)) != TRUE)
+	if ((s = makelook(tag, mode)) != TRUE) {
+		lookclose();
 		return (s);
+	}
 
 	lp = lforw(helpbp->b_linep);
 
@@ -349,10 +393,14 @@ int mode;
 	}
 
 	if (helpbp->b_nwnd == 0) {		/* Not on screen yet. */
-		if (wpopup(helpbp) == FALSE)
+		if (wpopup(helpbp) == FALSE) {
+			lookclose();
 			return (FALSE);
-		if (popflag)
+		}
+		if (popflag) {
+			lookclose();
 			return (TRUE);
+		}
 	} else {
 		while (helpbp->b_nwnd > 1)
 			zaphelp(0, 0);		/* Delete windows */
@@ -365,37 +413,6 @@ int mode;
 		restwnd(TRUE, 0);
 	lookclose();
 	return (TRUE);
-}
-
-/*
- * On GEMDOS and MSDOS, lookfiles specified on the command line
- * are <name>.HLP for the main help, and <name>.IDX for the index file,
- * if any.
- */
-
-VOID initlook(lf)
-char *lf;
-{
-	extern char *getenv();
-
-	if (lookfile == NULL) {
-		if ((lookfile=lf)==NULL && (lookfile=getenv("HELP"))==NULL) {
-			lookfile = (char *) otherpath[1];
-			lookindx = (char *) otherpath[2];
-		} else {
-#if	! THEOS
-			strcat(hfname, otherpath[3]);
-			lookfile = hfname;
-			strcat(hiname, otherpath[4]);
-			lookindx = hiname;
-#else
-			strcpy(hfname, lookfile);
-			lookfile = strcat(hfname, otherpath[3]);
-			strcpy(hiname, hfname);
-			lookindx = strcat(hiname, otherpath[4]);
-#endif
-		}
-	}
 }
 
 int prompthelp(int mode)
@@ -421,7 +438,7 @@ int hlpindex(int f, int n)
 /*
  * Lookup the current word.
  * Error if you try and move past the end of the buffer.
- * Bound to "M-M-".  Count is passed to lookup routine.
+ * Bound to "M-H".  Count is passed to lookup routine.
  */
 int lookupword(int f, int n)
 {
