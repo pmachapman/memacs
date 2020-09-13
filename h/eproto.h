@@ -521,7 +521,7 @@ extern int PASCAL NEAR spal(char *pstr);
 extern int PASCAL NEAR spawn(int f, int n);
 extern int PASCAL NEAR spawncli(int f, int n);
 extern int PASCAL NEAR splitwind(int f, int n);
-extern int PASCAL NEAR startup(char *sfname);
+extern int PASCAL NEAR startup(CONST char *sfname);
 extern int PASCAL NEAR storeproc(int f, int n);
 extern int PASCAL NEAR strinc(char *source, char *sub);
 extern int PASCAL NEAR swapmark(int f, int n);
@@ -634,8 +634,6 @@ extern int promptlook(int f, int n);	/* Prompt for a word to look up	*/
 extern int zaphelp(int f, int n);	/* Zap help window		*/
 extern int hlpindex(int f, int n);	/* Help index generator		*/
 extern int hidebuffer(int f, int n);	/* Set buffer as invisible	*/
-extern VOID initlook(char* lf);
-
 #endif
 
 #if	CTAGS

@@ -20,10 +20,6 @@ NOSHARE CONST char *pathname[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -42,10 +38,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -63,10 +55,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -90,10 +78,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -114,10 +98,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -140,10 +120,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -161,10 +137,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -181,10 +153,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -205,10 +173,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
@@ -225,12 +189,8 @@ NOSHARE CONST char *otherpath[] =
 #if	JMDEXT
 NOSHARE CONST char *otherpath[] =
 {
-	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
-	"error.cmd",
+	"emacsmsg",
+	"errorcmd",
 };
 #endif
 #endif /* MPE */
@@ -246,10 +206,6 @@ NOSHARE CONST char *otherpath[] =
 NOSHARE CONST char *otherpath[] =
 {
 	"emacs.msg",
-	"c.hlp",
-	"c.idx",
-	".hlp",
-	".idx",
 	"error.cmd",
 };
 #endif
