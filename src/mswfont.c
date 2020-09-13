@@ -520,7 +520,7 @@ CancelFont:
 static void PASCAL ChangeFont (void)
 
 {
-    SCREEN  *sp, *fsp;
+    ESCREEN  *sp, *fsp;
     RECT    Rect;
 
     /*-loop through all the screens, resizing the vision that emacs has
@@ -529,7 +529,7 @@ static void PASCAL ChangeFont (void)
     fsp = first_screen;
     do {
 	sp = first_screen;
-	while (sp->s_next_screen != (SCREEN *)NULL) sp = sp->s_next_screen;
+	while (sp->s_next_screen != (ESCREEN *)NULL) sp = sp->s_next_screen;
         select_screen (sp, FALSE);
         GetClientRect (sp->s_drvhandle, &Rect);
         newwidth (TRUE, DisplayableColumns (sp->s_drvhandle,

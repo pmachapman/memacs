@@ -38,7 +38,11 @@
 #define	TEXT27	"Oppay ufferbay"
 #define	TEXT28	"Ufferbay isway eingbay isplayedday"
 #define	TEXT29	"Hangecay ufferbay amenay otay: "
+#if	JMDEXT
+#define	TEXT30	"ACTN   Odesmay    Izesay Ufferbay        Ilefay"
+#else
 #define	TEXT30	"ACTN   Odesmay   Izesay Ufferbay        Ilefay"
+#endif
 #define	TEXT31	"         Global Modes"
 #define	TEXT32	"Iscardday hangescay"
 #define	TEXT33	"Encryptionway Tringsay: "
@@ -68,7 +72,7 @@
 #define	TEXT57	"Ancay otnay isplayday ariablevay istlay"
 #define	TEXT58	"[Uildingbay ariablevay istlay]"
 #define	TEXT59	UNUSEDWAY
-#define	TEXT60	"Inelay %D/%D Olcay %d/%d Archay %D/%D (%d%%) archay = 0x%x"
+#define	TEXT60	"Inelay %D/%D Olcay %d/%d Archay %D/%D (%d%%) archay = 0x%x %d"
 #define	TEXT61	"<OTNAY USEDWAY>"
 #define	TEXT62	"Lobalgay odemay otay "
 #define	TEXT63	"Odemay otay "
@@ -256,7 +260,26 @@
 #define	TEXT248 "Enterway Abelay Ingstray: "
 #define TEXT249 "Obalglay ariablevay otay eclareday: "
 #define	TEXT250 "Ocallay ariablevay otay eclareday: "
-
+#if	JMDEXT
+#define TEXT284 "Function not available"
+#define TEXT285 "No topic"
+#define TEXT286 "Searching topic \"%s\""
+#define TEXT287 "Searching keyword \"%s\""
+#define TEXT288 "Topic: "
+#define TEXT289 "Keyword: "
+#define TEXT290 "No help for topic \"%s\""
+#define TEXT291 "No help for keyword \"%s\""
+#define TEXT292 "Unable to open the help file %s"
+#define TEXT293 "Index of "
+#define TEXT294 "[Help]"
+#define TEXT295 "[Errors]"
+#define TEXT296 "[Function Keys]"
+#define TEXT297 "%s is not a regular file"
+#endif
+#if	THEOS
+#define TEXT298 "%s is not a sequential file"
+#define TEXT299 "%s is not a library"
+#endif
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrectway enumay]"
 #define	TEXT301 "[Ootay anymay estednay opupay enusmay]"
@@ -295,4 +318,4 @@
 #define TEXT335 "Angechay eenscray amenay otay: "
 #define TEXT336 "[Eenscray amenay alreadyway inway useway]"
 #define TEXT337 "annotcay onitormay externalway ogrampray"
-
+#define TEXT338 "space for help :"

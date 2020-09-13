@@ -22,7 +22,7 @@ store-procedure	init-help
 	;make this screen the proper size for help
 	set $orgrow 0
 	set $orgcol 0
-	set $curwidth 80
+	set $curwidth 100
 	!if &not &equ $pagelen 24
 		set $pagelen 25
 	!endif
@@ -72,7 +72,7 @@ store-procedure gethscreen %helpscreen	;switch the current help screen
 			set %helpfile 1		;mark which help file we are in
 		!endif
 		delete-mode "view"		;don't lock the help file
-			
+
 		beginning-of-file
 		!force search-forward %tmp
 		!if &seq $status FALSE
@@ -428,7 +428,7 @@ store-procedure select-mouse
 			!return
 		!endif
 
-		!if &seq %cmd "F10" 
+		!if &seq %cmd "F9"
 			exit-help
 			!return
 		!endif
@@ -537,8 +537,11 @@ store-procedure exit-help
 	delete-buffer "[next-hscreen]"
 	delete-buffer "[previous-hscreen]"
 	delete-screen HELP
-	!force delete-buffer ehelp1.txt
-	!force delete-buffer ehelp2.txt
+;	!force delete-buffer ehelp1.txt
+;	!force delete-buffer ehelp2.txt
+	!force delete-buffer ehelp1
+	!force delete-buffer ehelp2
+	!force delete-buffer "Window ID"
 	set $discmd TRUE
 	set %done TRUE
 !endm

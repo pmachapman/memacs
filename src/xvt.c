@@ -71,8 +71,8 @@ static int oldrow;	/* previous y position of mouse */
 
 #define	MAXOBUF	256	/* maximum number of output characters buffered */
 
-WINDOW xvt_win;		/* current window being displayed by XVT */
-WINDOW init_win;	/* the initial window we are to toss */
+EWINDOW xvt_win;		/* current window being displayed by XVT */
+EWINDOW init_win;	/* the initial window we are to toss */
 int xvt_char_width;	/* width of characters in pixels */
 int xvt_char_height;	/* height of characters in pixels */
 int xvt_descent;	/* height of descenders (character offset) */
@@ -187,7 +187,7 @@ dump_event(char *typ, EVENT *ep)
 	}
 }
 
-static long windowHandler(WINDOW win, EVENT *ep)
+static long windowHandler(EWINDOW win, EVENT *ep)
 
 {
 	register int etype;	/* event type byte */
@@ -366,7 +366,7 @@ int xvt_code;
 
 }
 
-static long taskHandler(WINDOW win, EVENT *ep)
+static long taskHandler(EWINDOW win, EVENT *ep)
 {
 	RCT rct;
 	char aname[80]; 	/* application name */

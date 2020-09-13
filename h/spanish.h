@@ -24,7 +24,7 @@
 #define	TEXT14	"No esta declarada"
 #define	TEXT15	": declara a esta tecla"
 #define	TEXT16	"[Esa funccion no la hay!]"
-#define	TEXT17	"Tabla de declaraciones esta llena!" 
+#define	TEXT17	"Tabla de declaraciones esta llena!"
 #define	TEXT18	": unbind-key "
 #define	TEXT19	"[Tecla no declarada]"
 #define	TEXT20	"Apropos string: "
@@ -37,7 +37,11 @@
 #define	TEXT27	"Pop buffer"
 #define	TEXT28	"Buffer is being displayed"
 #define	TEXT29	"Change buffer name to: "
+#if	JMDEXT
 #define	TEXT30	"ACTN   Modes       Size Buffer          File"
+#else
+#define	TEXT30	"ACTN   Modes       Size Buffer          File"
+#endif
 #define	TEXT31	"         Global Modes"
 #define	TEXT32	"Discard changes"
 #define	TEXT33	"Encryption String: "
@@ -67,7 +71,7 @@
 #define	TEXT57	"No puedo ensenar la lista de variables"
 #define	TEXT58	"[Creando lista de variables]"
 #define	TEXT59	UNUSED
-#define	TEXT60	"Linea %D/%D Columna %d/%d Letra %D/%D (%d%%) Letra = 0x%x"
+#define	TEXT60	"Linea %D/%D Columna %d/%d Letra %D/%D (%d%%) Letra = 0x%x %d"
 #define	TEXT61	"<NOT USED>"
 #define	TEXT62	"Modo global a"
 #define	TEXT63	"Modo a"
@@ -238,6 +242,12 @@
 #define TEXT228 "[Kill ring cleared]"
 #define TEXT229 " in < "
 #define TEXT230 "> at line "
+#define	TEXT231	"Abbreviation to set: "
+#define	TEXT232	"Abbreviation to delete: "
+#define	TEXT233	"[Building Abbreviation list]"
+#define	TEXT234	"Abbreviation list"
+#define	TEXT235	"Can not display abbreviation list"
+#define TEXT236 "Define Abbreviations from buffer"
 
 #define TEXT240 "[No such screen]"
 #define TEXT241 "%%Can't delete current screen"
@@ -250,7 +260,26 @@
 #define	TEXT248 "Enter Label String: "
 #define TEXT249 "Global variable to declare: "
 #define	TEXT250 "Local variable to declare: "
-
+#if	JMDEXT
+#define TEXT284 "Function not available"
+#define TEXT285 "No topic"
+#define TEXT286 "Searching topic \"%s\""
+#define TEXT287 "Searching keyword \"%s\""
+#define TEXT288 "Topic: "
+#define TEXT289 "Keyword: "
+#define TEXT290 "No help for topic \"%s\""
+#define TEXT291 "No help for keyword \"%s\""
+#define TEXT292 "Unable to open the help file %s"
+#define TEXT293 "Index of "
+#define TEXT294 "[Help]"
+#define TEXT295 "[Errors]"
+#define TEXT296 "[Function Keys]"
+#define TEXT297 "%s is not a regular file"
+#endif
+#if	THEOS
+#define TEXT298 "%s is not a sequential file"
+#define TEXT299 "%s is not a library"
+#endif
 /* some of these are just used in the microsoft windows version */
 #define	TEXT300 "[Incorrect menu]"
 #define	TEXT301 "[Too many nested popup menus]"
@@ -289,4 +318,4 @@
 #define TEXT335 "Change screen name to: "
 #define TEXT336 "[Screen name already in use]"
 #define TEXT337 "cannot monitor external program"
-
+#define TEXT338 "space for help :"

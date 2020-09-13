@@ -1,0 +1,7 @@
+# to allow non interactive command to run, pause and return exit code 0
+#!/bin/bash
+clear
+$*
+echo "[End]"
+read -n 1
+exit 0

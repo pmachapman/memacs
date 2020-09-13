@@ -1,19 +1,19 @@
 	[ENTER]	Picks a topic	  [PG UP] Last Screen		Cursor keys
-	  [F10]	Exit Help	[PG DOWN] Next Screen		are active
+	   [F9]	Exit Help	[PG DOWN] Next Screen		are active
 	   [F6]	Index		   [HOME] Main Menu
 < >
 [ENTER]	Picks a topic	 [PG UP] Last Screen   [F6]   Index	   Cursor keys
-  [F10]	Exit Help      [PG DOWN] Next Screen   [HOME] Main Menu	   are active
+   [F9]	Exit Help      [PG DOWN] Next Screen   [HOME] Main Menu	   are active
 < >
 =>Main Menu
 NEXT[The Basics] PREV[Main Menu]
 
 
-	< > The Basics			< > Keystrokes 
+	< > THE BASICS			< > KEYSTROKES
 
-	< > Getting at Files		< > Issuing Commands
+	< > GETTING AT FILES		< > ISSUING COMMANDS
 
-	< > Searching and Replacing	< > Customizing Command Keys
+	< > SEARCHING AND REPLACING	< > CUSTOMIZING COMMAND KEYS
 
 	< > Regions			< > Using the Mouse
 
@@ -45,16 +45,17 @@ NEXT[History] PREV[Main Menu]
 	written by Daniel M. Lawrence
 
 	Major code contributions by:
-	Dave Conroy, John Gamble, Dana Hoggatt, Pierre Perret
+	Dave Conroy, John Gamble, Dana Hoggatt, Pierre Perret, Jean-Michel Dubois
 
 	Information about MicroEMACS can be obtained via:
 
-	USMAIL:	Daniel Lawrence
-		1615 Virginia Street
-		Lafayette, IN 47905
+	USMAIL:	Daniel Lawrence		BBS:	The Programmer's Room
+		617 New York St			(317) 742-5533
+		Lafayette, IN 47901		Fidonet 1:201/10
 
-	EMAIL:		dan@aquest.com
-	Phone:		(765) 426-3409
+	Internet:		mdbs!dan@dynamo.ecn.purdue.edu
+	American Online:	bardor
+	Phone (nights):		(317) 742-5153
 
 	Register MicroEMACS for prefered phone support and information
 	on new releases by sending $25 US to the address above.
@@ -99,9 +100,9 @@ NEXT[Alternative Basic Keys] PREV[Main Menu]
 		     |
 		 [CSR DOWN]
 
-		   [F9] 		This saves your file
+		   [F10] 		This saves your file
 
-		   [F10]		This leaves MicroEMACS
+		   [F9]			This leaves MicroEMACS
 
 						[PG DOWN] for other basic keys
 =>Alternative Basic Keys
@@ -248,13 +249,104 @@ NEXT[Advanced Text Editing] PREV[Advanced Text Editing]
 	M-M (add-global-mode)		Adds a global mode
 	M-^M (delete-global-mode)	Removes a global mode
 
-	These are some of MicroEMACS's modes:
+	Editing modes:
+		< >  ABBREV mode	< >  CMODE mode		< >  WRAP mode
+		< >  DLINE mode		< >  SLINE mode		< >  OVER mode
+		< >  REP mode
+	Search modes:
+		< >  EXACT mode		< >  MAGIC Mode
+	File modes:
+		< >  ASAVE mode		< >  CRYPT mode		< >  NOBAK mode
+		< >  VIEW mode
 
-	< >  ASAVE mode		< >  EXACT mode		< >  REP mode
+=>ABBREV Mode
+NEXT[Modes of Operation] PREV[Modes of Operation]
 
-	< >  CMODE mode		< >  MAGIC Mode		< >  VIEW mode
+	ABBREV mode			Don't save backup
 
-	< >  CRYPT mode		< >  OVER mode		< >  WRAP mode
+	When this mode is on, MicroEMACS expands abbreviations. Abbreviations
+	are defined, undefined, and listed with the following instructions :
+
+	add-abbrev "abbrev" "word"	Add an abbreviation
+	delete-abbrev "abbrev"		Delete an abbreviation
+	define-abbrevs buffer		Add abbreviations contained in a buffer.
+					Abbreviation definitions consists in
+					pair of lines, one for the abbreviated
+					word, one for the complete word.
+	insert-abbrevs			Insert a list of current abbreviations
+					pairs in the current buffer.
+	kill-abbrevs			Clear the list of abbreviations.
+	describe-abbrevs		Show a list of current abbreviations.
+
+
+
+
+=>NOBAK Mode
+NEXT[Modes of Operation] PREV[Modes of Operation]
+
+	NOBAK mode			Don't save backup
+
+	When this mode is on, MicroEMACS doesn't make a backup of a saved
+	file. The backup file has the same name as the original file with
+	a tilde (~) added at the end.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=>SLINE Mode
+NEXT[Modes of Operation] PREV[Modes of Operation]
+
+	SLINE mode			Single line semi-graphics
+
+	When this mode is on, MicroEMACS allows to enter single line
+	semi-graphics character with the keyboard :
+
+	7 = upper left corner  8 = upper intersection  9 = upper right corner
+	4 = left intersection  5 = four ways intersec. 6 = right intersection
+	1 = lower left corner  2 = lower intersection  3 = lower right corner
+	0 = horizontal line    + = vertical line
+
+
+
+
+
+
+
+
+
+
+
+=>DLINE Mode
+NEXT[Modes of Operation] PREV[Modes of Operation]
+
+	DLINE mode			Double line semi-graphics
+
+	When this mode is on, MicroEMACS allows to enter double line
+	semi-graphics character with the keyboard :
+
+	7 = upper left corner  8 = upper intersection  9 = upper right corner
+	4 = left intersection  5 = four ways intersec. 6 = right intersection
+	1 = lower left corner  2 = lower intersection  3 = lower right corner
+	0 = horizontal line    + = vertical line
+
+
+
+
+
+
+
+
 
 
 
@@ -320,7 +412,7 @@ NEXT[Modes of Operation] PREV[Modes of Operation]
 	written out, all the printing characters have been scrambled. To
 	read such a file back in, call up MicroEMACS like this:
 
-	emacs -k <filename>
+	me -k <filename>
 
 		and you will be asked the encryption key before the file is
 	read. The encryption algorithm is a Beaufort Cipher with a
@@ -458,7 +550,7 @@ NEXT[Modes of Operation] PREV[Modes of Operation]
 	access to, or other people have locked. To read a file in view
 	mode from the command line, type:
 
-	emacs -v <filename>
+	me -v <filename>
 
 
 
@@ -582,7 +674,7 @@ NEXT[Main Menu] PREV[Main Menu]
 	Regions are used in MicroEMACS to specify what text is acted on by
 	many commands. A region is defined as all the text between the
 	point, and the last placed MARKed. To define a region:
-	
+
 
 	1) Move the point to the beginning of the text you
 	   want to effect
@@ -604,21 +696,21 @@ NEXT[Main Menu] PREV[Main Menu]
 NEXT[Copying Text] PREV[Main Menu]
 
 	To move text from one place to another:
-	
+
 	1) Move to the beginning of the text you want to move.
-	
+
 	2) Set the mark here with the M-<space> (set-mark) command.
-	
+
 	3) Move the point to the end of the text.
-	
+
 	4) Use the ^W (kill-region) command to delete the region you just
 	   defined. The text will be saved in the "kill buffer".
-	
+
 	5) Move the point to the place you want the text to appear.
-	
+
 	6) Use the ^Y (yank) command to copy the text from the kill buffer
 	   to the current point.
-	
+
 	Repeat steps 5 and 6 to place more copies of the same text.
 
 					[PG DOWN] for more info
@@ -630,14 +722,14 @@ NEXT[Main Menu] PREV[Cutting and Pasting]
 	and pasting it, except that in place of the ^W (kill-region)
 	command, you use the M-W (copy-region) command which copies the
 	current region into the kill buffer without deleting it.
-	
+
 	The kill buffer accumulates and text which is deleted by ^W, M-W
 	or a number of other delete commands. If more than one delete
 	command is used in a row, all the text from all the commands will
 	be in the kill buffer. Using any command between deletes causes
 	the kill buffer to discard earlier deletes and just hold the most
 	recent deletions.
-	
+
 	Since there is only one kill buffer, you can switch between
 	windows, screens and files to copy text from one file to another.
 	There is no limit to the amount of text that can be stored in the
@@ -654,7 +746,7 @@ NEXT[Buffer Commands] PREV[Main Menu]
 	in buffers can also be MicroEMACS macros, temporary storage for
 	macros, or lists of screens, files, buffers, variables, functions
 	or bindings created by MicroEMACS commands. Buffer commands include:
-	
+
 	^X-B	(select-buffer)
 
 	This prompt for a buffer name, and then makes that buffer the one
@@ -1043,7 +1135,7 @@ NEXT[Main Menu] PREV[Main Menu]
 		< >	Narrowing Your Scope
 
 				[PG UP] to return to Main Menu
-	
+
 =>Controlling Tabs
 NEXT[More Tab Commands] PREV[Advanced Text Editing]
 
@@ -1066,7 +1158,7 @@ NEXT[More Tab Commands] PREV[Advanced Text Editing]
 
 				[PG DOWN] for more commands about tabs
 
-	
+
 =>More Tab Commands
 NEXT[Main Menu] PREV[Controlling Tabs]
 
@@ -1111,7 +1203,7 @@ NEXT[More External Commands] PREV[Main Menu]
 
 				[PG DOWN] for more external commands
 
-	
+
 =>More External Commands
 NEXT[Main Menu] PREV[The Outside World]
 

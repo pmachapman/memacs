@@ -121,7 +121,6 @@ int scnothing()
 #endif /* (AVVION || TERMIOS) */
 #if CURSES
 #include <curses.h>			/* Curses screen output		*/
-#undef WINDOW				/* Oh no!			*/
 #endif /* CURSES */
 
 /** Completion include files **/
@@ -1445,7 +1444,7 @@ int n;					/* Argument count		*/
 }
 
 /** Filter buffer through command **/
-int filter(f, n)
+int uefilter(f, n)
 int f;					/* Flags			*/
 int n;					/* Argument count		*/
 {

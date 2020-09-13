@@ -55,7 +55,7 @@
 #define MLSIZE  NSTRING         /* message line buffer size */
 
 /* offsets for the screen windows extra bytes */
-#define GWL_SCRPTR  0                   /* SCREEN structure pointer */
+#define GWL_SCRPTR  0                   /* ESCREEN structure pointer */
 #if WINXP
 #define GWW_SCRCX   (GWL_SCRPTR+sizeof(LONG_PTR))   /* client area width */
 #else

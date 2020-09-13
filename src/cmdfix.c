@@ -4,7 +4,7 @@
 			All Rights reserved
 
 	The names of function key command strings have been changed to
-	help make these names machine independent.  This program translates
+	help make these names machine independant.  This program translates
 	old files to new.
 
 */
@@ -87,7 +87,7 @@ char *trans[][2] = {
 	"FNu",	"FN^>",
 	"FNv",	"FN^V",
 	"FNw",	"FN^<",
-	"FN„",	"FN^Z",
+	"FNÂ„",	"FN^Z",
 	"set-fill-column", "set $fillcol",
 };
 

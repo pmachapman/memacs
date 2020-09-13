@@ -25,6 +25,9 @@
  *        to VMS ports.  (Allowing ^X as a synonym for ^S defeats some
  *        of the benefits of the first change above.)
  *
+ *	Jean-Michel Dubois March 2020
+ *	- Unicode support
+ *
  *	(Further comments are in history.c)
  */
 
@@ -40,7 +43,7 @@
 
 /* A couple of "own" variables for re-eat */
 /* Hey, BLISS user, these were "GLOBAL", I made them "OWN". */
-static int	(PASCAL NEAR *saved_get_char)();	/* Get character routine */
+static int	(*saved_get_char)();	/* Get character routine */
 static int	eaten_char = -1;	/* Re-eaten char */
 
 /* A couple more "own" variables for the command string */
@@ -64,7 +67,7 @@ int f, n;				/* prefix flag and argument */
 	 */
 	backchar(TRUE, 1);
 
-	if (status = isearch(REVERSE))
+	if ((status = isearch(REVERSE)))
 		mlerase();		/* If happy, just erase the cmd line  */
 	else
 		mlwrite(TEXT164);
@@ -79,7 +82,7 @@ int f, n;
 {
 	register int	 status;
 
-	if (status = isearch(FORWARD))
+	if ((status = isearch(FORWARD)))
 		mlerase();		/* If happy, just erase the cmd line  */
 	else
 		mlwrite(TEXT164);
@@ -186,8 +189,8 @@ start_over:				/* This is a good place to start a re-execution: */
 
 		if (expc == quotec)			/* Quote character? 	  */
 			c = ectoc(expc = get_char());	/* Get the next char		  */
-		else if ((expc > 255 || expc == 0) &&
-			(c != '\t' && c != '\r'))
+		else if ((expc > CMSK || expc == 0) &&
+			(c != '\t' && c != RET_CHAR))
 		{
 
 			kfunc = ((ktp = getbind(expc)) == NULL) ? NULL : ktp->k_ptr.fp;
@@ -291,7 +294,7 @@ start_over:				/* This is a good place to start a re-execution: */
 		TTbacg(gbcolor);
 #endif
 		movecursor(term.t_nrow, col);	/* Position the cursor	*/
-		col += echochar(c);	/* Echo the character		  */
+		col += ueechochar(c);	/* Echo the character		  */
 		if (!status)	/* If we lost last time 	  */
 			TTbeep();	/* Feep again		*/
 		else 			/* Otherwise, we must have won*/
@@ -364,12 +367,12 @@ int dir;				/* Search direction 		*/
 
 	if (dir == FORWARD)
 		{				/* If searching forward		*/
-		if (sts = !boundry(curline, curoff, FORWARD))
+		if ((sts = !boundry(curline, curoff, FORWARD)))
 			{
 			/* If it's what we're looking for, set the point
 			 * and say that we've moved.
 			 */
-			if (sts = eq(nextch(&curline, &curoff, FORWARD), chr))
+			if ((sts = eq(nextch(&curline, &curoff, FORWARD), chr)))
 				{
 				curwp->w_dotp = curline;
 				curwp->w_doto = curoff;
@@ -379,12 +382,26 @@ int dir;				/* Search direction 		*/
 		}
 	else {				/* Else, reverse search check. */
 		patrn = (char *) pat;
+#if	UTF8
+		unsigned int wc;
+		size_t len = strlen(patrn);
+#endif
 		while (*patrn)
 			{			/* Loop for all characters in patrn   */
+#if	UTF8
+			int bytes = utf8_to_unicode(patrn, 0, len, &wc);
+
+			if ((sts = !boundry(curline, curoff, FORWARD)) == FALSE ||
+				(sts = weq(nextch(&curline, &curoff, FORWARD), *patrn)) == FALSE)
+				break;	/* Nope, just punt it then */
+			patrn += bytes;
+			len -= bytes;
+#else
 			if ((sts = !boundry(curline, curoff, FORWARD)) == FALSE ||
 				(sts = eq(nextch(&curline, &curoff, FORWARD), *patrn)) == FALSE)
 				break;	/* Nope, just punt it then */
 			patrn++;
+#endif
 			}
 		}
 
@@ -437,13 +454,15 @@ int PASCAL NEAR get_char()
 		return (isterm);
 	if ((key = getbind(c)) != NULL)
 		{
-		if (key->k_ptr.fp == cex || key->k_ptr.fp == meta)
+		if (key->k_ptr.fp == cex || key->k_ptr.fp == uemeta)
 			{
 			c = get_key();
 #if	SMOS
-			c = upperc(c&255) | (c & ~255); /* Force to upper */
+			c = upperc(c&CMSK) | (c & ~CMSK); /* Force to upper */
+#elif UTF8
+			c = ToWUpper(c);
 #else
-			c = upperc(c) | (c & ~255);	/* Force to upper */
+			c = upperc(c) | (c & ~CMSK);	/* Force to upper */
 #endif
 			c |= (key->k_ptr.fp == cex) ? CTLX : META;
 			}

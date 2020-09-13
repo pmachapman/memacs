@@ -643,7 +643,7 @@ int f, n;
  * filter a buffer through an external DOS program
  * Bound to ^X #
  */
-int PASCAL NEAR filter(f, n)
+int PASCAL NEAR uefilter(f, n)
 
 int f, n;
 
@@ -810,7 +810,7 @@ char *cmd;	/*  Incoming command line to execute  */
 	strcpy(&tail[1], cmd);
 	strcat(&tail[1], "\r");
 
-	/* look up the program on the path trying various extentions */
+	/* look up the program on the path trying various extensions */
 	if ((sp = flook(prog, TRUE)) == NULL)
 		if ((sp = flook(strcat(prog, ".exe"), TRUE)) == NULL) {
 			strcpy(&prog[strlen(prog)-4], ".com");
@@ -884,7 +884,7 @@ char *cmd;	/*  Incoming command line to execute  */
 	return((rval < 0) ? FALSE : TRUE);
 }
 
-/* return a system dependant string with the current time */
+/* return a system dependent string with the current time */
 
 char *PASCAL NEAR timeset()
 
@@ -923,7 +923,7 @@ char *fspec;	/* pattern to match */
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -970,7 +970,7 @@ char *PASCAL NEAR getnfile()
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the first file */
@@ -1001,7 +1001,7 @@ char *fspec;	/* pattern to match */
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -1048,7 +1048,7 @@ char *PASCAL NEAR getnfile()
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the first file */

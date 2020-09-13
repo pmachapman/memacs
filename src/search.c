@@ -3,6 +3,8 @@
  * and backward directions.
  *
  * (History comments formerly here have been moved to history.c)
+ *
+ * Unicode support by Jean-Michel Dubois
  */
 
 #include <stdio.h>
@@ -410,7 +412,7 @@ int *pcwoff;
 		/* Is the current meta-character modified
 		 * by a closure?
 		 */
-		if (cl_type = (mcptr->mc_type & ALLCLOS)) {
+		if ((cl_type = (mcptr->mc_type & ALLCLOS))) {
 
 			/* Minimum number of characters that may
 			 * match is 0 or 1.
@@ -659,7 +661,9 @@ int dir;
 {
 	int	curoff;
 	LINE	*curline;
-
+#if	UTF8
+	unsigned int wc;
+#endif
 	curline = *pcurline;
 	curoff = *pcuroff;
 
@@ -676,9 +680,15 @@ int dir;
 				return (TRUE);	/* hit end of buffer */
 
 			if (curoff == lused(curline))
-				jump = tbl->delta[(int) '\r'];
-			else
+				jump = tbl->delta[(int) RET_CHAR];
+			else {
+#if	UTF8
+				utf8_to_unicode(ltext(curline), curoff, lused(curline), &wc);
+				jump = tbl->delta[(unsigned short) wc];
+#else
 				jump = tbl->delta[(int) lgetc(curline, curoff)];
+#endif
+			}
 		}
 	}
 	else			/* Reverse.*/
@@ -696,7 +706,7 @@ int dir;
 				return (TRUE);	/* hit end of buffer */
 
 			if (curoff == lused(curline))
-				jump = tbl->delta[(int) '\r'];
+				jump = tbl->delta[(int) RET_CHAR];
 			else
 				jump = tbl->delta[(int) lgetc(curline, curoff)];
 		}
@@ -721,6 +731,58 @@ int *pcuroff;
 LINE **pcurline;
 #endif
 {
+#if	UTF8
+	int curoff;
+	LINE *curline;
+	unsigned int wc;
+
+	curline = *pcurline;
+	curoff = *pcuroff;
+
+	if (n > 0) {
+		if (curline == curbp->b_linep)
+			return TRUE;		/* hit end of buffer */
+
+		while (n) {
+			curoff += utf8_to_unicode(ltext(curline), curoff, lused(curline), &wc);
+			n--;
+
+			if (curoff > lused(curline)) {
+				curline = lforw(curline);
+				curoff = 0;
+
+				if (curline == curbp->b_linep)
+					return (TRUE);	/* hit end of buffer */
+			}
+		}
+	} else {
+		while (n) {
+			curoff--;
+
+			if (curoff < 0) {
+				curline = lback(curline);
+				curoff = lused(curline);
+
+				if (curline == curbp->b_linep)
+					return TRUE;		/* hit end of buffer */
+			}
+
+			while (! is_beginning_utf8(lgetc(curline, curoff))) {
+				curoff--;
+
+				if (curoff < 0) {
+					curline = lback(curline);
+					curoff = lused(curline);
+
+					if (curline == curbp->b_linep)
+						return TRUE;		/* hit end of buffer */
+				}
+			}
+
+			++n;
+		}
+	}
+#else
 	register int spare;
 	register int curoff;
 	register LINE *curline;
@@ -747,6 +809,7 @@ LINE **pcurline;
 				return (TRUE);	/* hit end of buffer */
 		}
 	}
+#endif
 	*pcurline = curline;
 	*pcuroff = curoff;
 	return FALSE;
@@ -756,13 +819,58 @@ LINE **pcurline;
  * make_delta -- Create the delta tables.
  */
 #if PROTO
-VOID make_delta(char *pstring, DELTA *tbl)
+VOID make_delta(CONST char *pstring, DELTA *tbl)
 #else
 VOID make_delta( pstring, tbl)
-char *pstring;
+CONST char *pstring;
 DELTA *tbl;
 #endif
 {
+#if	UTF8
+	int	j, jump_by, pos;
+	unsigned int ch;
+	size_t len = strlen(pstring);
+
+	strcpy(tbl->patrn, pstring);
+
+	for (j = jump_by = 0; j < len; ) {
+		j += utf8_to_unicode(pstring, j, len, &ch);
+		++jump_by;
+	}
+
+	for (j = 0; j < HICHAR; j++)
+		tbl->delta[j] = jump_by;
+
+	jump_by -= 1;
+
+	/* Now put in the characters contained
+	 * in the pattern, duplicating the CASE.
+	 */
+	for (j = pos = 0; j < jump_by; ++j) {
+		unsigned int bytes = utf8_to_unicode(pstring, pos, len, &ch);
+
+		if (iswalpha(ch))
+			tbl->delta[(unsigned short) chcase(ch)] = jump_by - j;
+
+		tbl->delta[(unsigned short) ch] = jump_by - j;
+		pos += bytes;
+	}
+
+	/* The last character (left over from the loop above) will
+	 * have the pattern length, unless there are duplicates of
+	 * it.  Get the number to jump from the delta array, and
+	 * overwrite with zeroes in delta duplicating the CASE.
+	 */
+	utf8_to_unicode(pstring, pos, len, &ch);
+
+	tbl->patlen = jump_by;
+	tbl->jump = jump_by + tbl->delta[(unsigned short) ch];
+
+	if (iswalpha(ch))
+		tbl->delta[(unsigned short) chcase(ch)] = 0;
+
+	tbl->delta[(unsigned short) ch] = 0;
+#else
 	int	j, jump_by, ch;
 
 	strcpy(tbl->patrn, pstring);
@@ -778,7 +886,7 @@ DELTA *tbl;
 	 * in the pattern, duplicating the CASE.
 	 */
 	for (j = 0; j < jump_by; j++) {
-		ch = *pstring++;
+		ch = (unsigned char) *pstring++;
 		if (is_letter(ch))
 			tbl->delta[(unsigned char) chcase(ch)] = jump_by - j;
 		tbl->delta[ch] = jump_by - j;
@@ -789,17 +897,18 @@ DELTA *tbl;
 	 * it.  Get the number to jump from the delta array, and
 	 * overwrite with zeroes in delta duplicating the CASE.
 	 */
-	ch = *pstring;
+	ch = (unsigned char) *pstring;
 	tbl->patlen = jump_by;
 	tbl->jump = jump_by + tbl->delta[ch];
 
 	if (is_letter(ch))
 		tbl->delta[(unsigned char) chcase(ch)] = 0;
 	tbl->delta[ch] = 0;
+#endif
 }
 
 /*
- * setjtable -- Settting up search delta forward and delta backward
+ * setjtable -- Setting up search delta forward and delta backward
  *	tables.  The reverse search string and string lengths are
  *	set here, for table initialization and for substitution
  *	purposes.  The default for any character to jump is the
@@ -807,7 +916,7 @@ DELTA *tbl;
  */
 VOID PASCAL NEAR setjtable()
 {
-	make_delta(pat, &deltapat);
+	make_delta((char*) pat, &deltapat);
 	make_delta(strrev(strcpy((char *)tap, (char *)pat)), &tapatled);
 }
 
@@ -830,6 +939,27 @@ register unsigned char pc;
 	return (bc == pc);
 }
 
+#if	UTF8
+
+/*
+ * weq -- Compare two UTF-8 characters.  The "bc" comes from the buffer, "pc"
+ *	from the pattern.  If we are not in EXACT mode, fold out the case.
+ */
+int weq(unsigned int bc, unsigned int pc)
+{
+	if ((curwp->w_bufp->b_mode & MDEXACT) == 0) {
+		if (iswlower(bc))
+			bc = chcase(bc);
+
+		if (iswlower(pc))
+			pc = chcase(pc);
+	}
+
+	return (bc == pc);
+}
+
+#endif
+
 /*
  * readpattern -- Read a pattern.  Stash it in apat.  If it is the
  *	search string (which means that the global variable pat[]
@@ -844,10 +974,10 @@ register unsigned char pc;
  *	string.
  */
 #if PROTO
-int PASCAL NEAR readpattern(char *prompt, char apat[], int srch)
+int PASCAL NEAR readpattern(CONST char *prompt, char apat[], int srch)
 #else
 int PASCAL NEAR readpattern( prompt, apat, srch)
-char *prompt;
+CONST char *prompt;
 char apat[];
 int srch;
 #endif
@@ -858,7 +988,7 @@ int srch;
 	mlprompt(prompt, apat, sterm);
 
 	/* Read a pattern.  Either we get one,
-	 * or we just get the META charater, and use the previous pattern.
+	 * or we just get the META character, and use the previous pattern.
 	 * Then, if it's the search string, create the delta tables.
 	 * *Then*, make the meta-pattern, if we are defined that way.
 	 */
@@ -876,13 +1006,14 @@ int srch;
 	/* Only make the meta-pattern if in magic mode, since the
 	 * pattern in question might have an invalid meta combination.
 	 */
-	if (status == TRUE)
+	if (status == TRUE) {
 		if ((curwp->w_bufp->b_mode & MDMAGIC) == 0) {
 			mcclear();
 			rmcclear();
 		}
 		else
 			status = srch? mcstr(): rmcstr();
+	}
 #endif
 	return (status);
 }
@@ -977,8 +1108,11 @@ int dir;
 {
 	register LINE	*curline;
 	register int	curoff;
+#if	UTF8
+	unsigned int	c;
+#else
 	register int	c;
-
+#endif
 	curline = *pcurline;
 	curoff = *pcuroff;
 
@@ -987,20 +1121,33 @@ int dir;
 		{
 			curline = lforw(curline);	/* skip to next line */
 			curoff = 0;
-			c = '\r';			/* and return a <NL> */
+			c = RET_CHAR;			/* and return a <NL> */
 		}
 		else
+#if	UTF8
+			curoff += utf8_to_unicode(ltext(curline), curoff, lused(curline), &c);
+#else
 			c = lgetc(curline, curoff++);	/* get the char */
+#endif
 	}
 	else			/* Reverse.*/
 	{
 		if (curoff == 0) {
 			curline = lback(curline);
 			curoff = lused(curline);
-			c = '\r';
+			c = RET_CHAR;
 		}
 		else
+		{
+#if	UTF8
+			while (--curoff >= 0 && ! is_beginning_utf8(lgetc(curline, curoff)))
+				;
+
+			utf8_to_unicode(ltext(curline), curoff, lused(curline), &c);
+#else
 			c = lgetc(curline, --curoff);
+#endif
+		}
 	}
 	*pcurline = curline;
 	*pcuroff = curoff;
@@ -1024,13 +1171,31 @@ char *lstring;
 {
 	LINE	*scanline = *curline;
 	int	scanpos = *curpos;
+#if	UTF8
+	size_t len = strlen(lstring);
+#else
 	register int	c;
+#endif
 	register int	count = 0;
+	while (*lstring) {
+#if	UTF8
+		unsigned int wc;
+		unsigned int bytes = utf8_to_unicode(lstring, 0, len, &wc);
 
-	while ((c = (unsigned char)(*lstring++)) != '\0') {
+		if (! weq(wc, nextch(&scanline, &scanpos, direct)))
+			return 0;
+
+		count++;
+		lstring += bytes;
+		len -= bytes;
+#else
+		c = *lstring++;
+		
 		if (!eq(c, nextch(&scanline, &scanpos, direct)))
 			return 0;
+			
 		count++;
+#endif
 	}
 
 	*curline = scanline;
@@ -1344,7 +1509,7 @@ MC *mt;
 			break;
 
 		case ANY:
-			result = (bc != '\r');
+			result = (bc != RET_CHAR);
 			break;
 
 		case CCL:
@@ -1500,7 +1665,7 @@ MC *mcptr;
 	 * Now loop through the pattern, collecting characters until
 	 * we run into a meta-character.
 	 */
-	while (pchr = *++patptr)
+	while ((pchr = *++patptr))
 	{
 		/*
 		 * If the current character is a closure character,

@@ -7,6 +7,9 @@
 
 #include    "estruct.h"
 #include    <stdio.h>
+#if JMDEXT
+#include    <commdlg.h>
+#endif
 #include    "eproto.h"
 #include    "edef.h"
 
@@ -136,9 +139,14 @@ char * PASCAL   fullpathname (char *PathName, int Nbuf)
 
 PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
 {
+    BOOL    Result;
+#if JMDEXT
+    static OPENFILENAME ofn;
+    char szFileName[256];
+#else
     PARAMS  Parameters;
     FARPROC ProcInstance;
-    BOOL    Result;
+#endif
 
     SetWorkingDir ();
     if (clexec || (kbdmode != STOP)) {  /* not interactive */
@@ -148,6 +156,28 @@ PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
         }
         return Result;
     }
+#if JMDEXT
+    strcpy(szFileName, "*.*");
+    
+    /* Set all structure members to zero. */
+	
+    memset(&ofn, 0, sizeof(OPENFILENAME));
+	
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = hFrameWnd;
+    ofn.lpstrFilter = "All Files\0*.*\0Text Files\0*.txt\0C++ Files\0*.c;*.cpp\0C++ Headers\0*.h;*.hpp\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFile = szFileName;
+    ofn.nMaxFile = sizeof(szFileName);
+    ofn.lpstrTitle = prompt;
+    ofn.Flags = OFN_SHOWHELP | OFN_PATHMUSTEXIST;
+	
+    if (GetOpenFileName(&ofn)) {
+        strcpy(buf, ofn.lpstrFile);
+        Result = TRUE;
+    } else
+    	Result = FALSE;
+#else
     Parameters.Prompt = prompt;
     Par = &Parameters;
     ProcInstance = MakeProcInstance ((FARPROC)FileDlgProc, hEmacsInstance);
@@ -156,10 +186,12 @@ PASCAL  filenamedlg (char *prompt, char *buf, int nbuf, int fullpath)
         CompletePath (buf, Parameters.Name);
     }
     FreeProcInstance (ProcInstance);
+#endif
     SetWorkingDir ();
     return Result;
 } /* filenamedlg */
 
+#if !JMDEXT
 /* FileDlgOK:   process OK in File Dialog */
 /* =========                              */
 
@@ -453,6 +485,8 @@ static void    UpdateAll (HWND hDlg, char *s)
     }
 } /* UpdateAll */
 
+#endif // !JMDEXT
+
 #if	TURBO | IC
 /*	FILE Directory routines		*/
 /* all borrowed from MSDOS.C */
@@ -469,7 +503,7 @@ char *fspec;	/* pattern to match */
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -516,7 +550,7 @@ char *PASCAL getnfile()
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the first file */
@@ -547,7 +581,7 @@ char *fspec;	/* pattern to match */
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* first parse the file path off the file spec */
@@ -605,7 +639,7 @@ char *PASCAL getnfile()
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 
 	/* and call for the next file */
@@ -649,5 +683,4 @@ char *PASCAL getnfile()
 }
 #endif
 #endif
-
 

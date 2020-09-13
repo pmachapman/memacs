@@ -1,0 +1,6 @@
+PROD:JMD:MicroEMACS:
+description = "MicroEMACS"
+version     = 4.04
+packages    = JMD:MicroEMACS
+required    = JMD:MicroEMACS
+cmpntFiles  = MicroEMACS.cmpnt

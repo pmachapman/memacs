@@ -100,7 +100,7 @@ static struct {
     int rightmost;      /* -1 indicates the range is empty */
 } UpdateCol;                /* Columns to invalidate on UpdateRow */
 
-static SCREEN *IOScr;       /* Screen affected by the I/Os */
+static ESCREEN *IOScr;       /* Screen affected by the I/Os */
 
 #if     COLOR
 static int  ForgColor;      /* current selection of foreground and */
@@ -183,7 +183,7 @@ int EXPORT FAR PASCAL  MLHistDlgProc (HWND hDlg, UINT wMsg,
    core editor loop will pop up a dialog box showing up to MAXMLHIST-1
    past messages */
 
-PASCAL mlhistory (void)
+void PASCAL mlhistory (void)
 {
     FARPROC     ProcInstance;
 
@@ -448,7 +448,7 @@ static int PASCAL   mswsleep (int t)
 /* mswnewscr:   create new MDI window for new screen */
 /* =========                                         */
 
-static int PASCAL mswnewscr (SCREEN *sp)
+static int PASCAL mswnewscr (ESCREEN *sp)
 /* called by screen.c after the screen structure has been allocated. The
    size of the screen will be determined by the window's size. returns
    TRUE if successful. */
@@ -501,7 +501,7 @@ static int PASCAL mswnewscr (SCREEN *sp)
 /* mswdelscr:   destroys an MDI window for a disappearing screen */
 /* =========                                                     */
 
-static int PASCAL mswdelscr (SCREEN *sp)
+static int PASCAL mswdelscr (ESCREEN *sp)
 /* called by screen.c before the screen structure is deallocated */
 {
     if (sp->s_drvhandle == hIOWnd) mswflush ();
@@ -513,7 +513,7 @@ static int PASCAL mswdelscr (SCREEN *sp)
 /* mswselscr:   select a window/screen combination for the next IOs */
 /* =========                                                        */
 
-static int PASCAL mswselscr (SCREEN *sp)
+static int PASCAL mswselscr (ESCREEN *sp)
 {
     hIOWnd = sp->s_drvhandle;
     IOScr = sp;
@@ -522,7 +522,7 @@ static int PASCAL mswselscr (SCREEN *sp)
 /* mswsizscr:   resize an MDI window to fit the associated screen */
 /* =========                                                      */
 
-static int PASCAL mswsizscr (SCREEN *sp)
+static int PASCAL mswsizscr (ESCREEN *sp)
 /* called by Emacs when the screen's dimensions have been changed. A resize
    through the MS-Windows interface is handled by the ReSize function in
    mswdisp.c */
@@ -651,7 +651,7 @@ static int PASCAL mswsizscr (SCREEN *sp)
 /* mswtopscr:   bring a screen's window to top. */
 /* =========                                    */
 
-static int PASCAL mswtopscr (SCREEN *sp)
+static int PASCAL mswtopscr (ESCREEN *sp)
 
 /* called by screen.c when selecting a screen for current */
 {

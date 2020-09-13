@@ -235,7 +235,7 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
 
     /* start the process and get a handle on it */
     if (CreateProcess (NULL, DOSApp ? FullCmd : Cmd, NULL, NULL,
-                       DETACHED_PROCESS, 
+                       DETACHED_PROCESS,
                        FALSE, NULL, NULL, &suInfo, &pInfo)) {
         int Result;
 
@@ -291,7 +291,7 @@ static BOOL PASCAL  LaunchPrg (char *Cmd, BOOL DOSApp,
 /* spawncli:    launch DOS shell. Bound to ^X-C */
 /* ========                                     */
 
-PASCAL spawncli (int f, int n)
+int PASCAL spawncli (int f, int n)
 {
     /*-don't allow this command if restricted */
     if (restflag) return resterr();
@@ -302,7 +302,7 @@ PASCAL spawncli (int f, int n)
 /* spawn:   run a one-liner in a DOS box. Bound to ^X-! */
 /* =====                                                */
 
-PASCAL spawn (int f, int n)
+int PASCAL spawn (int f, int n)
 {
     char    Line[NLINE];
     int     Result;
@@ -321,7 +321,7 @@ PASCAL spawn (int f, int n)
 /* execprg: run another program with arguments. Bound to ^X-$ */
 /* =======                                                    */
 
-PASCAL execprg (int f, int n)
+int PASCAL execprg (int f, int n)
 {
     char    Line[NLINE];
     int     Result;
@@ -345,7 +345,7 @@ PASCAL execprg (int f, int n)
 /* pipecmd: pipe a one-liner into a window. Bound to ^X-@ */
 /* =======                                                */
 
-PASCAL pipecmd (int f, int n)
+int PASCAL pipecmd (int f, int n)
 
 /* this function fills a buffer named "command" with the output of the
    DOS one-liner. If the command buffer already exist, it is overwritten
@@ -426,7 +426,7 @@ PASCAL pipecmd (int f, int n)
 /* filter:  filter a buffer through a DOS box. Bound to ^X-# */
 /* ======                                                    */
 
-PASCAL filter (int f, int n)
+int PASCAL uefilter(int f, int n)
 {
     char    Line[NLINE];
     char    InFile[NFILEN];

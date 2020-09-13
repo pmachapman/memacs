@@ -1,8 +1,9 @@
 /*
  *	HISTORY.C:	Revision History for
  *
- *	MicroEMACS 5.00
+ *	MicroEMACS 4.00
  *		written by Daniel M. Lawrence
+ *		based on code by Dave G. Conroy.
  *
  *	(C)Copyright 2008 by Daniel M. Lawrence
  *	MicroEMACS 5.00 can be copied and distributed freely for any
@@ -184,7 +185,7 @@
  *	- added an output flush in vttidy(). Unix really appreciates this.
  *	- added filter-buffer (^X#) command to send a buffer through
  *	  a DOS filter
- *	- made automatic CMODE on .c and .h file compilation dependant
+ *	- made automatic CMODE on .c and .h file compilation dependent
  *	  in estruct.h
  *	1-may-86
  *	- optimized some code in update(). It certainly needs a lot more.
@@ -319,7 +320,7 @@
  *	  for the use of the menu script. Save-window remembers which window
  *	  is current, and restore-window returns the cursor to that window.
  *	20-jun-86
- *	- fixed a bug with the fence matching locking up PASCAL NEAR the beginning
+ *	- fixed a bug with the fence matching locking up the beginning
  *	  of a buffer
  *	- added argument to update to selectively force a complete update
  *	- added update-screen (unbound) command so macros can force a
@@ -421,7 +422,7 @@
  *	10-oct-86
  *	- removed references to lflick....it just won't work that way.
  *	- removed defines LAT2 and LAT3...the code no longer is Lattice
- *	  version dependant.
+ *	  version dependent.
  *	14-oct-86
  *	- changed spawn so that it will not not pause if executed from
  *	  a command line
@@ -740,7 +741,7 @@
  *	  getting rid of a lot of junk and making the result smaller
  *	  than it started.....(yea!)
  *	- added $tpause to control the fence flashing time in CMODE.
- *	  The value is machine dependant, but you can multiply the
+ *	  The value is machine dependent, but you can multiply the
  *	  original in macros to stay machine independant. (as
  *	  suggested by Baron O.A. Grey)
  *	- added hook to execute M-FNR (null) during a file read, after
@@ -944,7 +945,7 @@
  *	28-dec-87
  *	- added new prefix MOUS (coded as MS-) for dealing with mice
  *	29-dec-87
- *	- vastly reorginized machine dependant code. Put termio.c and
+ *	- vastly reorginized machine dependent code. Put termio.c and
  *	  spawn.c together and then pulled out msdos.c, unix.c, wmcs.c,
  *	  atari.c, amigados.c, and vms.c. These are the operating specific
  *	  source files now.
@@ -1072,7 +1073,7 @@
  *	- added binary search to fncmatch()
  *	28-mar-88
  *	- optimized the IBMPC version in TURBO C by supplying mixed memory
- *	  mode information (NEAR and PASCAL). The executable is down to
+ *	  mode information (and PASCAL). The executable is down to
  *	  89K..but remember to name the code segment (from the options menu)
  *	1-apr-88
  *	- added remove-mark (^X<space>) to allow you to unset the mark
@@ -1277,14 +1278,14 @@
  *	- finished changes for the new KEYTAB structure.
  *	- modified describe-bindings to display the bound macroes.
  *	- added arguments to nullproc() in main.c (BUG FIX!)
- *	- tried (and succeeded) in defining the pascal keyword
+ *	- tried (and succeeded) in defining the keyword
  *	  for MSDOS & TURBO. A 2k reduction in the executable was nice.
  *	- added macro-to-key (^X^K) function to bind a macro to a key.
  *	19-jan-89
  *	- made numeric arguments to keys bound to macroes repeat those
  *	  macroes n times.
  *	- modified docmd() to look for a macro name if it could not find
- *	  a function name. Again a numeric leadin implies repitition.
+ *	  a function name. Again a numeric leadin implies repetition.
  *	- added machine code execpr() function to the IBMPC version
  *	  because under NOVELL Netware, the DOS 4B exec call does not
  *	  preserve the stack on exit... thus execprog() would die.  This
@@ -1296,7 +1297,7 @@
  *	  compiler on the IBM-RT
  *	1-feb-89
  *	- changed the fgetc() in unix.c to a read() under V7 and BSD so
- *	  the time dependant function key checking works.
+ *	  the time dependent function key checking works.
  *	- added a support for Hewlet Packard's UNIX system which
  *	  is a System V with BSD 4.3 enhancements.  This is controled
  *	  by the HPUX symbol in estruct.h.
@@ -1442,7 +1443,7 @@
  *	22-mar-90
  *	- changed line buffer allocation scheme during file reading to
  *	  use realloc() and always double the buffer size.  Much faster
- *	  on long line reads. 
+ *	  on long line reads.
  *	01-may-90
  *	- added code to allow SUN verion to work properly
  *	- added .xlk style file locking for unix systems
@@ -1460,7 +1461,7 @@
  *	6-jun-90
  *	- modified ansi.c into fmr.c for the Fujitsu FMR-70 series
  *	  msdos machines.  Extensive modifications to msdos.c were
- *	  needed to accomodate this machine. 
+ *	  needed to accomodate this machine.
  *	16-jun-90
  *	- modified swbuffer() to not check locks on an inactive buffer
  *	  in view mode.  This allows the -v switch to work from the
@@ -1543,7 +1544,7 @@
  *	- changed search order of files to look in current directory
  *	  before HOME and PATH dirs.
  *	24-mar-91
- *	- command file names default to a .cmd extention from the command
+ *	- command file names default to a .cmd extension from the command
  *	  line and from the source command.
  *	[released BETA version 3.11]
  *	02-apr-91
@@ -1617,7 +1618,7 @@
  *	- in BASIC.C in gotobop/eop() changed some offests to zero constants
  *	  speeding things up.
  *	- also added $scribe so I can add in scribe specific formatting
- *	  features, like deciding @commands at the begining of lines delimit
+ *	  features, like deciding @commands at the beginning of lines delimit
  *	  paragraphs.
  *	26-jun-91	John Gamble
  *	- added check for isearch and risearch binding in the incremental
@@ -1707,7 +1708,7 @@
  *	- screen resolution changes on the IBMPC force the screen back
  *	  to the upper left corner. This may change in the future.
  *	8-Oct-91
- *	- size and position of screen maintained in the SCREEN structure
+ *	- size and position of screen maintained in the ESCREEN structure
  *	  so switching screen resets these.
  *	- Mousing code now switches screens if mouse is used outside of
  *	  current screen.
@@ -1783,7 +1784,7 @@
  *	  suggested by Brian Casiello, defaults to on.
  *	19-jan-92 John M. Gamble
  *	- On some otherwise ANSI C compilers, __STDC__ is not 1, because we
- *	  also make use of the PASCAL modifier, which is not ANSI.  So in
+ *	  also make use of the modifier, which is not ANSI.  So in
  *	  ESTRUCT.H, where there is a check on __STDC__, we also list the
  *	  other ANSI C compilers.  This turns on VOID, CONST, and makes
  *	  ETYPE a union instead of a struct.
@@ -1849,7 +1850,7 @@
  *	  suggested by Bruce Momjian <pure-ee!jabber.BTS.COM!candle!root>
  *	31-Jul-92
  *	- in display.c, added line to vtputc() to mask off upper 8 bits of
- *	  passed in int to defeat sign extention of characters. Using the
+ *	  passed in int to defeat sign extension of characters. Using the
  *	  char as unsigned char switch on a lot of compilers should no
  *	  longer be neccessay
  *	- fixed a bug in file.c where a chmod() call needed to be changed
@@ -1883,7 +1884,7 @@
  *	- Fixed bug as pointed out by Pierre Perret in MAGIC mode search.
  *	  My match length was not getting reset properly after a failed
  *	  recursive amatch() call.
- *	- Declared VOID PASCAL NEAR kdelete() and next_kill() in line.c.  The
+ *	- Declared VOID kdelete() and next_kill() in line.c.  The
  *	  compiler should have fewer complaints now.
  *	6 Nov 92 Daniel Lawrence
  *	- Added support for Rational Systems, Inc's DOS/16M package. With this
@@ -1994,7 +1995,7 @@
  *	- bound all controlled and shifted mouse moves to mouse-move to
  *	  make the mouse work all the time (suggested by Paul Gomme)
  *	- expanded max file spec size to 256 for all UNIX style systems
- *	- expanded number of file locks per session to 255 (I've gotta make 
+ *	- expanded number of file locks per session to 255 (I've gotta make
  *	  this dynamic at some point)
  *	- eliminated the lowercasing of filenames for OS/2 in makename()
  *	  in file.c
@@ -2266,7 +2267,7 @@
  *	  instead of one character at a time.  Many changes to handle
  *	  string allocation/deallocation.
  *	17 Apr 94 John Gamble
- *	- Merged in Pascal Mehuet's AIX and AIX windows changes.
+ *	- Merged in Mehuet's AIX and AIX windows changes.
  *	1-jun-94 Daniel Lawrence
  *	- started work on XVT windowing driver. added XVT.c.
  *	6 Jun 94
@@ -2393,7 +2394,7 @@
  *	  signed/unsigned cahr and sign extension problems.
  *	25 Feb 95 John Gamble
  *	- "sys$sysdevice:[vmstools]" removed from *pathname in epath.h.
- *	- Pascal Mehuet's AIX windows changes work for HPUX9 too.
+ *	- Mehuet's AIX windows changes work for HPUX9 too.
  *	  Changes in display.c, edef.h, main.c, and unix.c.
  *	- Hitting a space for a completion list when no prior characters
  *	  had been typed gave unpredictable results, now check for this.
@@ -2574,9 +2575,28 @@
  *	- added mouse-resize2-window as a new simpler mouse resize command for XP to use
  *	- caused XP code (in XPCONIO.C) to create new mouse input sequence
  *	  [0 MOUS #col #row 2] as MS2 and bound it to mouse-resize2-window
+ *	Sep 2020 Jean-Michel Dubois
+ *	- Changed minor version number to 5.10
+ *	- Added Unicode support with UTF-8 files
+ *	- Added Theos O.S. support (in 1988-1992)
+ *	- Added Cygwin support
+ *	- Added ncurses display with drop down menus (Linux, XP and Cygwin only)
+ *	- Added 'ue' prefix to filter, refresh, newline, echochar and meta to avoid conflicts with curses
+ *	- Renamed SCREEN structure to ESCREEN to avoid conflicts with curses
+ *	- Added file backup (likely borrowed to Mark Williams)
+ *	- Added help on language keywords (currently for Theos C only) (borrowed to Mark Williams)
+ *	- Added semi-graphics character entry through numeric keypad
+ *	- Added dynamic load of messages from a file (in 1988-1992)
+ *	- Some code cleanup and miscellaneous fixes
+ *	10 Sep 2020
+ *	- Added SCO OpenServer 5 and UnixWare 7 support (2001)
+ *	- Added menudrop function bound to menu-drop to allow menu use without a mouse.
+ *	  Bound to F12 in tpage.cmd
+ *	11 Sep 2020
+ *	- Changed libhelp.c, epath.h and main.c to allow use of help files based on file extension.
  */
 
-history()
+void history()
 
 {
 	/* this is here to keep compilers from complaining... it's not needed */

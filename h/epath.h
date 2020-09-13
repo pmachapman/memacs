@@ -1,5 +1,5 @@
 /*	EPATH:	This file contains certain info needed to locate the
-		MicroEMACS files on a system dependant basis.
+		MicroEMACS files on a system dependent basis.
 
 									*/
 
@@ -16,6 +16,13 @@ NOSHARE CONST char *pathname[] =
 	":t/",
 	":s/"
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
 #endif
 
 #if	TOS
@@ -27,8 +34,15 @@ NOSHARE CONST char *pathname[] =
 	"\\util\\",
 	""
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
 #endif
- 
+#endif
+
 #if	FINDER
 {
 	"emacs.rc",
@@ -37,11 +51,22 @@ NOSHARE CONST char *pathname[] =
 	"/sys/public",
 	""
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
 #endif
 
 #if	MSDOS || WINNT || WINXP
 {
+#if WINDOW_MSWIN || WINDOW_MSWIN32
+	"mewin.cmd",
+#else
 	"emacs.rc",
+#endif
 	"emacs.hlp",
 	"\\sys\\public\\",
 	"\\usr\\bin\\",
@@ -49,6 +74,13 @@ NOSHARE CONST char *pathname[] =
 	"\\",
 	""
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
 #endif
 
 #if OS2
@@ -62,16 +94,35 @@ NOSHARE CONST char *pathname[] =
         "\\",
         ""
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
 #endif
 
 #if	V7 | BSD | FREEBSD | USG | AIX | SMOS | HPUX8 | HPUX9 | XENIX | SUN | AVIION
 {
 	".emacsrc",
 	"emacs.hlp",
+#if	JMDEXT
+	"/usr/local/share/uemacs/",
+	"/opt/lib/uemacs/",
+	"/usr/lib/uemacs/",
+#endif
 	"/usr/local/",
 	"/usr/lib/",
 	""
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
 #endif
 
 #if	VMS
@@ -82,6 +133,13 @@ NOSHARE CONST char *pathname[] =
 	"SYS$LOGIN:",
 	""
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
 #endif
 
 #if WMCS
@@ -91,6 +149,13 @@ NOSHARE CONST char *pathname[] =
 	"",
 	"sys$disk/syslib.users/"
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
 #endif
 
 #if AOSVS
@@ -104,6 +169,13 @@ NOSHARE CONST char *pathname[] =
     "/macros/",
     "/help/"
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
 #endif
 
 #if MPE
@@ -114,6 +186,29 @@ NOSHARE CONST char *pathname[] =
 	".pub.sys",
 	""
 };
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacsmsg",
+	"errorcmd",
+};
+#endif
 #endif /* MPE */
+
+#if	THEOS
+{
+	"emacs.rc",
+	"system.help386 ._me",
+	"/usr/local/lib/emacs/",
+	""
+};
+#if	JMDEXT
+NOSHARE CONST char *otherpath[] =
+{
+	"emacs.msg",
+	"error.cmd",
+};
+#endif
+#endif
 
 #define	NPNAMES	(sizeof(pathname)/sizeof(char *))

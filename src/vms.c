@@ -364,7 +364,7 @@ static mbreadast()
 		LIB$SIGNAL( mbiosb.status);
 }
 
-PASCAL NEAR ttopen()
+ttopen()
 {
     TTCHAR newchar;		/* Adjusted characteristics */
     int status;
@@ -733,7 +733,7 @@ int PASCAL NEAR pipecmd()
     return(TRUE);
 }
 
-int PASCAL NEAR filter(int f, int n)
+int PASCAL NEAR uefilter(int f, int n)
 {
         register int    s;	/* return status from CLI */
 	register BUFFER *bp;	/* pointer to buffer to zot */
@@ -834,7 +834,7 @@ char *PASCAL NEAR getffile(char *fspec)
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	register int verflag;		/* does the file have a version? */
 	register char *cp, c;
 
@@ -913,7 +913,7 @@ char *PASCAL NEAR getnfile()
 {
 	register int index;		/* index into various strings */
 	register int point;		/* index into other strings */
-	register int extflag;		/* does the file have an extention? */
+	register int extflag;		/* does the file have an extension? */
 	char fname[NFILEN];		/* file/path for DOS call */
 	register char *cp;
 

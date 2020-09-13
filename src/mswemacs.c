@@ -255,7 +255,7 @@ int PASCAL helpengine (int f, int n)
 /* minimizescreen:  turn the current screen into an icon */
 /* ==============                                        */
 
-PASCAL  minimizescreen (int f, int n)
+void PASCAL  minimizescreen (int f, int n)
 {
     BOOL    nq;
 
@@ -269,7 +269,7 @@ PASCAL  minimizescreen (int f, int n)
 /* ForceMessage:    do a SendMessage, forcing quiescent mode */
 /* ============                                              */
 
-static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
+static void PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     BOOL    nq;
 
@@ -282,7 +282,7 @@ static PASCAL ForceMessage (HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 /* maximizescreen:  maximize the current screen */
 /* ==============                               */
 
-PASCAL  maximizescreen (int f, int n)
+int PASCAL  maximizescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIMAXIMIZE,
                   (UINT)first_screen->s_drvhandle, 0L);
@@ -292,7 +292,7 @@ PASCAL  maximizescreen (int f, int n)
 /* restorescreen:   restore the current screen from maximized/minimized state */
 /* =============                                                              */
 
-PASCAL  restorescreen (int f, int n)
+int PASCAL  restorescreen (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDIRESTORE,
                   (UINT)first_screen->s_drvhandle, 0L);
@@ -302,7 +302,7 @@ PASCAL  restorescreen (int f, int n)
 /* tilescreens: tile the non-iconized screens */
 /* ===========                                */
 
-PASCAL  tilescreens (int f, int n)
+int PASCAL  tilescreens (int f, int n)
 
 /* without a numeric argument, tile horizontally. With a numeric argument
    of 1, tile vertically */
@@ -317,7 +317,7 @@ PASCAL  tilescreens (int f, int n)
 /* cascadescreens:  position the non-iconized screens in cascade */
 /* ==============                                                */
 
-PASCAL  cascadescreens (int f, int n)
+int PASCAL  cascadescreens (int f, int n)
 {
     ForceMessage (hMDIClientWnd, WM_MDICASCADE, 0, 0L);
     return TRUE;
@@ -413,13 +413,13 @@ void FAR PASCAL ScrollBars (void)
     static int HScroll = TRUE;
     static int Enabled = TRUE;
     int     Quiescence;
-    SCREEN  *sp;
+    ESCREEN  *sp;
 
     if (vscrollbar) vscrollbar = TRUE;  /* normalize... */
     if (hscrollbar) hscrollbar = TRUE;
     Quiescence = (notquiescent == 0);
 
-    for (sp = first_screen; sp != (SCREEN*)NULL; sp = sp->s_next_screen) {
+    for (sp = first_screen; sp != (ESCREEN*)NULL; sp = sp->s_next_screen) {
         if (vscrollbar != VScroll) {
             ShowScrollBar ((HWND)sp->s_drvhandle, SB_VERT, vscrollbar);
         }
@@ -444,7 +444,7 @@ void FAR PASCAL ScrollBars (void)
 
 /* updscrollbars:      updates the scroll bars for a screen */
 /* =============                                            */
-PASCAL  updscrollbars (SCREEN *sp, char w_flag)
+void PASCAL  updscrollbars (ESCREEN *sp, char w_flag)
 
 /* the w_flag is used to determine what needs updating: if the WFHARD
    bit is set, both scroll bars need an update. If the WFMOVE bit

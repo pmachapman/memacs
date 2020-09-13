@@ -90,7 +90,7 @@ int in_get (void)
 /* typahead:    TRUE if there are typeahead characters in the input stream */
 /* ========                                                                */
 
-PASCAL typahead (void)
+int PASCAL typahead (void)
 {
     if (in_check()) return TRUE;
     else return FALSE;
@@ -356,9 +356,9 @@ void FAR PASCAL DropMessage (HWND hWnd, HDROP hDrop)
         else {
             /* the drop occured on a screen */
 #if WINXP
-			addline(DropBuf, ((SCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR))->s_screen_name);
+			addline(DropBuf, ((ESCREEN*)GetWindowLongPtr(hWnd, GWL_SCRPTR))->s_screen_name);
 #else
-			addline(DropBuf, ((SCREEN*)GetWindowLong (hWnd, GWL_SCRPTR))->s_screen_name);
+			addline(DropBuf, ((ESCREEN*)GetWindowLong (hWnd, GWL_SCRPTR))->s_screen_name);
 #endif
             if (DragQueryPoint (hDrop, &Point)) {
                 ClientToCell (hWnd, Point, &Point);

@@ -39,21 +39,21 @@ int n;					/* # of repetitions wanted */
  *	string.  Query might be enabled (according to kind).
  */
 int PASCAL NEAR	replaces(kind, f, n)
-int	kind;				/* Query enabled flag */
-int	f;					/* default flag */
-int	n;					/* # of repetitions wanted */
+int	kind;			/* Query enabled flag */
+int	f;			/* default flag */
+int	n;			/* # of repetitions wanted */
 {
 	register int status;	/* success flag on pattern inputs */
 	register int nummatch;	/* number of found matches */
-	long numsub;			/* number of substitutions */
-	int nlflag;			/* last char of search string a <NL>? */
-	int nlrepl;			/* was a replace done on the last line? */
-	char c;				/* input char for query */
+	long numsub;		/* number of substitutions */
+	int nlflag;		/* last char of search string a <NL>? */
+	int nlrepl;		/* was a replace done on the last line? */
+	char c;			/* input char for query */
 	LINE *origline;		/* original "." position */
 	int origoff;		/* and offset (for . query option) */
 	LINE *lastline;		/* position of last replace and */
-	int lastoff;		/* offset (for 'u' query option) */
-	int oldmatchlen;	/* Closure may alter the match length.*/
+	int lastoff = 0;	/* offset (for 'u' query option) */
+	int oldmatchlen = 0;	/* Closure may alter the match length.*/
 
 	/*
 	 * Don't allow this command if we are
@@ -83,7 +83,7 @@ int	n;					/* # of repetitions wanted */
 	/* Set up flags so we can make sure not to do a recursive
 	 * replace on the last line.
 	 */
-	nlflag = (pat[strlen(pat) - 1] == '\r');
+	nlflag = (pat[strlen((CONST char*) pat) - 1] == RET_CHAR);
 	nlrepl = FALSE;
 
 	/* Save original . position, reset the number of matches and
@@ -340,7 +340,7 @@ char	*instr;
 int	use_rmc;
 {
 	register int	status;
-	register char	*rstr;
+	register CONST char	*rstr;
 #if	MAGIC
 	register RMC	*rmcptr;
 #endif

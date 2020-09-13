@@ -172,7 +172,7 @@ int f, n;	/* numeric flag and argument */
 		/* add in the abbreviation symbol name */
 		strcpy(outseq, cur_node->ab_sym);
 		pad(outseq, 20);
-	        
+
 		/* add it's expansion */
 		strncat(outseq, cur_node->ab_exp, NSTRING - 20);
 		outseq[NSTRING - 1] = 0;
@@ -206,7 +206,7 @@ int f, n;	/* numeric flag and argument */
 		/* insert the abbreviation symbol as a line */
 		if (addline(curbp, cur_node->ab_sym) != TRUE)
 			return(FALSE);
-	        
+
 		/* now a line with the expansion */
 		if (addline(curbp, cur_node->ab_exp) != TRUE)
 			return(FALSE);
@@ -224,18 +224,18 @@ int f,n;	/* prefix flag and argument */
 {
 	register BUFFER *bp;	/* ptr to buffer to dump */
 	register LINE *lp;	/* ptr to current line in our buffer */
-	register llength;	/* length of the current line being examined */
+	register int llength;	/* length of the current line being examined */
 	char cur_sym[MAXSYM+1];	/* current symbol being defined */
 	char cur_exp[NSTRING];	/* current expansion */
-	
+
 	/* get the buffer to load abbreviations from */
 	bp = getdefb();
 	bp = getcbuf(TEXT236, bp ? bp->b_bname : mainbuf, TRUE);
-/*		     "Define Abbreviations in buffer" */
+/*		     "Define Abbreviations from buffer" */
 	if (bp == NULL)
 		return(ABORT);
 
-	/* step throught the buffer */
+	/* step through the buffer */
 	lp = lforw(bp->b_linep);
 	while (lp != bp->b_linep) {
 
@@ -264,6 +264,8 @@ int f,n;	/* prefix flag and argument */
 		/* on to the next pair */
 		lp = lforw(lp);
 	}
+
+	return(TRUE);
 }
 
 VOID PASCAL NEAR ab_init()
@@ -271,7 +273,7 @@ VOID PASCAL NEAR ab_init()
 {
 	ab_head = (ABBREV *)NULL; /* abbreviation list empty */
  	ab_bell = FALSE;	/* no ringing please! */
-	ab_cap = FALSE;		/* don't match capatilization on expansion */
+	ab_cap = FALSE;		/* don't match capitalization on expansion */
 	ab_quick = FALSE;	/* no aggressive expansion */
 	ab_pos = ab_word;	/* no word accumulated yet */
 	ab_end = &ab_word[NSTRING - 1];	/* ptr to detect end of this buffer */
@@ -328,7 +330,7 @@ char *expansion;	/* string to expand to */
 			cur_node = ab_head;
 			while (cur_node->ab_next != NULL) {
 
-				if (strcmp(sym, cur_node->ab_next->ab_sym) > 0) {
+				if (strcmp(sym, cur_node->ab_next->ab_sym) < 0) {
 
 					/* insert after cur_node */
 					new_node->ab_next = cur_node->ab_next;
@@ -403,7 +405,7 @@ char *sym;
 
 		} else if (strcmp(sym,cur_node->ab_sym) == 0
 			    && cur_node != NULL) {
-			previous->ab_next=NULL;			
+			previous->ab_next=NULL;
 			free(cur_node);
 			return(TRUE);
 		}

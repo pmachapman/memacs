@@ -2,6 +2,8 @@
 		written by Daniel Lawrence
 		(C)Copyright 1995 by Daniel M. Lawrence
 
+ 	Unicode support by Jean-Michel Dubois
+
 	Notes:
 
 	MicroEMACS's kernel processes two distinct forms of
@@ -59,9 +61,9 @@ extern struct passwd *getpwnam();
  */
 
 #if	!WINDOW_MSWIN	/* for MS Windows, mlyesno is defined in mswsys.c */
-PASCAL NEAR mlyesno(prompt)
+int PASCAL NEAR mlyesno(prompt)
 
-char *prompt;
+CONST char *prompt;
 
 {
 	int  c;			/* input character */
@@ -81,6 +83,17 @@ char *prompt;
 		if (c == ectoc(abortc))		/* Bail out! */
 			return(ABORT);
 
+#if	DYNMSGS
+	        if  (c & (SPEC|ALTD|CTRL|META|CTLX|MOUS))
+                	return(FALSE);  /* ONLY 'y' or 'Y' allowed!!! */
+#if	UTF8
+                if (c == tolower(TEXT162[2]) || c == toupper(TEXT162[2]))
+                	return(TRUE);
+#else
+                if (c == lowerc(TEXT162[2]) || c == upperc(TEXT162[2]))
+                	return(TRUE);
+#endif
+#else	/* ?DYNMSGS */
 	        if  ((c == 'n') || (c == 'N')
         	    || (c & (SPEC|ALTD|CTRL|META|CTLX|MOUS)))
                 	return(FALSE);  /* ONLY 'y' or 'Y' allowed!!! */
@@ -92,9 +105,11 @@ char *prompt;
 
 		if (c=='y' || c=='Y')
 			return(TRUE);
-
-		return(FALSE);
+#endif	/* !DYNMSGS */
+		break;
 	}
+
+	return(FALSE);
 }
 #endif
 
@@ -106,20 +121,20 @@ char *prompt;
  * return. Handle erase, kill, and abort keys.
  */
 
-PASCAL NEAR mlreply(prompt, buf, nbuf)
+int PASCAL NEAR mlreply(prompt, buf, nbuf)
 
-char *prompt;
+CONST char *prompt;
 char *buf;
 int nbuf;
 
 {
-	return(nextarg(prompt, buf, nbuf, ctoec((int) '\r')));
+	return(nextarg(prompt, buf, nbuf, ctoec((int) RET_CHAR)));
 }
 
 /*	ectoc:	expanded character to character
 		collapse the CTRL and SPEC flags back into an ascii code   */
 
-PASCAL NEAR ectoc(c)
+int PASCAL NEAR ectoc(c)
 
 int c;
 
@@ -129,14 +144,14 @@ int c;
 	if (c & CTRL)
 		c = c ^ (CTRL | 0x40);
 	if (c & SPEC)
-		c = c & 255;
+		c = c & CMSK;
 	return(c);
 }
 
 /*	ctoec:	character to extended character
 		pull out the CTRL and SPEC prefixes (if possible)	*/
 
-PASCAL NEAR ctoec(c)
+int PASCAL NEAR ctoec(c)
 
 int c;
 
@@ -153,12 +168,15 @@ int c;
    name if it is unique.
 */
 
-#if	MSC
-int (PASCAL NEAR *PASCAL NEAR getname(char *prompt))(void)
+#if	MSC || GCC
+int (PASCAL NEAR *PASCAL NEAR getname(CONST char *prompt))(void)
 #else
-int (PASCAL NEAR *PASCAL NEAR getname(prompt))()
-
-char *prompt;	/* string to prompt with */
+#if	THEOS
+int *getname(CONST char* prompt)
+#else
+int (PASCAL NEAR *PASCAL NEAR getname(CONST char* prompt))()
+#endif
+CONST char *prompt;	/* string to prompt with */
 #endif
 
 {
@@ -179,7 +197,7 @@ char *prompt;	/* string to prompt with */
 
 BUFFER *PASCAL NEAR getcbuf(prompt, defval, createflag)
 
-char *prompt;		/* prompt to user on command line */
+CONST char *prompt;		/* prompt to user on command line */
 char *defval;		/* default value to display to user */
 int createflag;		/* should this create a new buffer? */
 
@@ -195,7 +213,7 @@ int createflag;		/* should this create a new buffer? */
 
 char *PASCAL NEAR gtfilename(prompt)
 
-char *prompt;		/* prompt to user on command line */
+CONST char *prompt;		/* prompt to user on command line */
 
 {
 #if	MSDOS | OS2
@@ -231,7 +249,7 @@ char *prompt;		/* prompt to user on command line */
 
 char *PASCAL NEAR complete(prompt, defval, type, maxlen)
 
-char *prompt;		/* prompt to user on command line */
+CONST char *prompt;		/* prompt to user on command line */
 char *defval;		/* default value to display to user */
 int type;		/* type of what we are completing */
 int maxlen;		/* maximum length of input field */
@@ -259,27 +277,27 @@ int maxlen;		/* maximum length of input field */
 	cpos = 0;
 
 	/* if it exists, prompt the user for a buffer name */
-	if (prompt)
+	if (prompt) {
 		if (type == CMP_COMMAND)
 			mlwrite("%s", prompt);
 		else if (defval)
 			mlwrite("%s[%s]: ", prompt, defval);
 		else
 			mlwrite("%s: ", prompt);
-
+	}
 	/* build a name string from the keyboard */
 	while (TRUE) {
 
 		/* get the keystroke and decode it */
 		ec = get_key();
-		c = ectoc(ec);		
+		c = ectoc(ec);
 
 		/* if it is from the mouse, or is a function key, blow it off */
 		if ((ec & MOUS) || (ec & SPEC))
 			continue;
 
 		/* if we are at the end, just match it */
-		if (c == '\n'  ||  c == '\r') {
+		if (c == '\n'  ||  c == RET_CHAR) {
 			if (defval && cpos==0)
 				return(defval);
 			else {
@@ -312,7 +330,7 @@ int maxlen;		/* maximum length of input field */
 			}
 			TTflush();
 
-		} else if ((c == ' ') || (ec == sterm) || (c == '\t')) {	
+		} else if ((c == ' ') || (ec == sterm) || (c == '\t')) {
 			/* attempt a completion */
 			switch (type) {
 				case CMP_BUFFER:
@@ -732,12 +750,12 @@ char *name;	/* file containing the current name to complete */
 int *cpos;	/* ptr to position of next character to insert */
 
 {
-	register char *fname;	/* trial file to complete */
-	register int index;	/* index into strings to compare */
+	register char *fname;		/* trial file to complete */
+	register int index;		/* index into strings to compare */
 
-	register int matches;	/* number of matches for name */
-	char longestmatch[NSTRING]; /* temp buffer for longest match */
-	int longestlen; 	/* length of longest match (always > *cpos) */
+	register int matches;		/* number of matches for name */
+	char longestmatch[NSTRING];	/* temp buffer for longest match */
+	int longestlen = 0;		/* length of longest match (always > *cpos) */
 
 	/* everything (or nothing) matches an empty string */
 	if (*cpos == 0)
@@ -791,12 +809,21 @@ int *cpos;	/* ptr to position of next character to insert */
 	}
 
 	name[*cpos] = 0;
-
+#if	THEOS
+	/* if only one file matched then increment cpos to signal complete() */
+	/* that this was a complete match.  If a directory was matched then */
+	/* 3 from last character will be the DIRSEPCHAR.  In this case we do NOT */
+	/* want to signal a complete match. */
+	if ((matches == 1)
+     && (name[(*cpos)-3] != DIRSEPCHAR)
+     && (name[(*cpos)-3] != '.'))
+#else
 	/* if only one file matched then increment cpos to signal complete() */
 	/* that this was a complete match.  If a directory was matched then */
 	/* last character will be the DIRSEPCHAR.  In this case we do NOT */
 	/* want to signal a complete match. */
 	if ((matches == 1) && (name[(*cpos)-1] != DIRSEPCHAR))
+#endif
 		(*cpos)++;
 
 	TTflush();
@@ -848,8 +875,11 @@ int *cpos;	/* ptr to position of next character to insert */
 /*	tgetc:	Get a key from the terminal driver, resolve any keyboard
 		macro action					*/
 
+#if	THEOX
+int tgetcraw()
+#else
 int PASCAL NEAR tgetc()
-
+#endif
 {
 	int c;	/* fetched character */
 
@@ -860,7 +890,7 @@ int PASCAL NEAR tgetc()
 		if (kbdptr < kbdend)
 			return((int)*kbdptr++);
 
-		/* at the end of last repitition? */
+		/* at the end of last repetition? */
 		if (--kbdrep < 1) {
 			kbdmode = STOP;
 #if	VISMAC == 0
@@ -869,7 +899,7 @@ int PASCAL NEAR tgetc()
 #endif
 		} else {
 
-			/* reset the macro to the begining for the next rep */
+			/* reset the macro to the beginning for the next rep */
 			kbdptr = &kbdm[0];
 			return((int)*kbdptr++);
 		}
@@ -882,7 +912,7 @@ int PASCAL NEAR tgetc()
 		c = TTgetc();
 
 	} else {
-		
+
 		c = charpending;
 		cpending = FALSE;
 	}
@@ -906,7 +936,21 @@ int PASCAL NEAR tgetc()
 	return(c);
 }
 
-/*	get_key:	Get one keystroke. The legal prefixs here
+#if	THEOX
+
+int tgetc()
+{
+	int c = tgetcraw();
+
+	if ((curbp->b_mode & MDTHEOX) && (c & ~CMSK) == 0)
+		c = _b_wchar2theox(c & CMSK);
+
+	return c;
+}
+
+#endif
+
+/*	get_key:	Get one keystroke. The legal prefixes here
 			are the SPEC, MOUS and CTRL prefixes.
 */
 
@@ -923,25 +967,40 @@ int PASCAL NEAR get_key()
 	if (c == 0) {
 
 		/* get the event type */
+#if	THEOX
+		upper = tgetcraw();
+#else
 		upper = tgetc();
-
+#endif
 		/* mouse events need us to read in the row/col */
-		if (upper & (MOUS >> 8)) {
+		if (upper & (MOUS >> SHIFTPFX)) {
 			/* grab the x/y position of the mouse */
+#if	THEOX
+			xpos = tgetcraw();
+			ypos = tgetcraw();
+#else
 			xpos = tgetc();
 			ypos = tgetc();
+#endif
 		}
 
 		/* get the event code */
+#if	THEOX
+		c = tgetcraw();
+#else
 		c = tgetc();
-
+#endif
+		if (upper & (MOUS >> SHIFTPFX)) {
+			if (! strchr("abcdefm", c))
+				return 0;
+		}
 		/* if it is a function key... map it */
-		c = (upper << 8) | c;
+		c = (upper << SHIFTPFX) | c;
 	}
 
 	/* yank out the control prefix */
-        if (((c & 255) >=0x00 && (c & 255) <= 0x1F) || (c & 255) == 0x7F)
-                c = CTRL | (c ^ 0x40);
+	if (((c & CMSK) >= 0x00 && (c & CMSK) <= 0x1F) || (c & CMSK) == 0x7F)
+		c = CTRL | (c ^ 0x40);
 
 	/* return the character */
         return(c);
@@ -962,21 +1021,13 @@ int PASCAL NEAR getcmd()
 
 	/* resolve META and CTLX prefixes */
 	if (key) {
-		if (key->k_ptr.fp == meta) {
+		if (key->k_ptr.fp == uemeta) {
 			c = get_key();
-#if	SMOS
-			c = upperc(c&255) | (c & ~255); /* Force to upper */
-#else
-			c = upperc(c) | (c & ~255);	/* Force to upper */
-#endif
+			c = upperc(c & CMSK) | (c & ~CMSK);	/* Force to upper */
 			c |= META;
 		} else if (key->k_ptr.fp == cex) {
 			c = get_key();
-#if	SMOS
-			c = upperc(c&255) | (c & ~255); /* Force to upper */
-#else
-			c = upperc(c) | (c & ~255);	/* Force to upper */
-#endif
+			c = upperc(c & CMSK) | (c & ~CMSK);	/* Force to upper */
 			c |= CTLX;
 		}
 	}
@@ -987,7 +1038,7 @@ int PASCAL NEAR getcmd()
 
 /*	A more generalized prompt/reply function allowing the caller
 	to specify the proper terminator. If the terminator is not
-	a return('\r'), return will echo as "<NL>"
+	a return(RET_CHAR), return will echo as "<NL>"
 							*/
 int PASCAL NEAR getstring(buf, nbuf, eolchar)
 
@@ -1049,10 +1100,19 @@ int eolchar;
 					--ttcol;
 				}
 
-				if (buf[cpos] == '\r') {
+				if (buf[cpos] == RET_CHAR) {
 					outstring("\b\b  \b\b");
 					ttcol -= 2;
 				}
+#if	UTF8
+
+				while (cpos) {
+					if (is_beginning_utf8(buf[cpos]))
+						break;
+
+					cpos--;
+				}
+#endif
 				TTflush();
 			}
 			continue;
@@ -1063,7 +1123,7 @@ int eolchar;
 
  			/* clear the buffer */
  			buf[0] = 0;
- 
+
  			/* clear the message line and return */
  			mlwrite("");
  			TTflush();
@@ -1081,7 +1141,7 @@ int eolchar;
 					outstring("\b \b");
 					--ttcol;
 				}
-				if (buf[cpos] == '\r') {
+				if (buf[cpos] == RET_CHAR) {
 					outstring("\b\b  \b\b");
 					ttcol -= 2;
 				}
@@ -1116,17 +1176,25 @@ int eolchar;
 		}
 
 		/* insert the character in the string! */
-		if (cpos < nbuf-1) {
+#if	UTF8
+		char utf8[6];
+		int bytes = unicode_to_utf8(c, utf8);
+
+		if (cpos + bytes < nbuf) {
+			memcpy(buf + cpos, utf8, bytes);
+			cpos += bytes;
+#else
+		if (cpos + 1 < nbuf) {
 
 			buf[cpos++] = c;
-
-			if ((c < ' ') && (c != '\r')) {
+#endif
+			if ((c < ' ') && (c != RET_CHAR)) {
 				outstring("^");
 				++ttcol;
 				c ^= 0x40;
 			}
 
-			if (c != '\r') {
+			if (c != RET_CHAR) {
 				if (disinp)
 					mlout(c);
 			} else {	/* put out <NL> for <ret> */
@@ -1137,11 +1205,13 @@ int eolchar;
 			TTflush();
 		}
 	}
+
+	return(0);
 }
 
-PASCAL NEAR outstring(s) /* output a string of input characters */
+VOID PASCAL NEAR outstring(s) /* output a string of input characters */
 
-char *s;	/* string to output */
+CONST char *s;	/* string to output */
 
 {
 	if (disinp)
@@ -1149,14 +1219,27 @@ char *s;	/* string to output */
 			mlout(*s++);
 }
 
-PASCAL NEAR ostring(s)	/* output a string of output characters */
+VOID PASCAL NEAR ostring(s)	/* output a string of output characters */
 
-char *s;	/* string to output */
+CONST char *s;	/* string to output */
 
 {
-	if (discmd)
-		while (*s)
+#if	UTF8
+	size_t len = strlen(s);
+#endif
+	if (discmd) {
+		while (*s) {
+#if	UTF8
+			unsigned int c;
+			unsigned int bytes = utf8_to_unicode(s, 0, len, &c);
+			mlout(c);
+			s += bytes;
+			len -= bytes;
+#else
 			mlout(*s++);
+#endif
+		}
+	}
 }
 
 /*
@@ -1164,7 +1247,7 @@ char *s;	/* string to output */
  *	input terminator.
  */
 int PASCAL NEAR mlprompt(prompt, dflt, iterm)
-char *prompt;
+CONST char *prompt;
 char *dflt;
 int iterm;
 {
@@ -1204,7 +1287,7 @@ int iterm;
 }
 
 /*
- * echostring -- Use echochar() to put out a string.  Checks for NULL.
+ * echostring -- Use ueechochar() to put out a string.  Checks for NULL.
  */
 int PASCAL NEAR echostring(str, tcol, uptocol)
 char *str;	/* characters to be echoed */
@@ -1212,9 +1295,21 @@ int tcol;	/* column to be echoed in */
 int uptocol;	/* last column to be echoed in */
 {
 	if (str != NULL) {
+#if	UTF8
+		unsigned int c;
+		unsigned int bytes;
+		int len = strlen(str);
+#endif
 		while (*str) {
 			movecursor(term.t_nrow, tcol);	/* Position the cursor	*/
-			tcol += echochar(*str++);
+#if	UTF8
+			bytes = utf8_to_unicode(str, 0, len, &c);
+			str += bytes;
+			len -= bytes;
+			tcol += ueechochar(c);
+#else
+			tcol += ueechochar(*str++);
+#endif
 			if (tcol >= uptocol) {
 				mlout('$');
 				tcol++;
@@ -1229,14 +1324,14 @@ int uptocol;	/* last column to be echoed in */
 /*
  * Routine to echo i-search and message-prompting characters.
  */
-int PASCAL NEAR echochar(c)
+int PASCAL NEAR ueechochar(c)
 
 unsigned char c;	/* character to be echoed */
 
 {
 	int col = 0;			/* column to be echoed in */
 
-	if (c == '\r') {		/* Newline character?	*/
+	if (c == RET_CHAR) {		/* Newline character?	*/
 		mlout('<');
 		mlout('N');
 		mlout('L');

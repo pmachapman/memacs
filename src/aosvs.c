@@ -722,7 +722,7 @@ int execprg(f, n)
 int pipecmd(f, n)
 {
     register int    s;      /* return status from CLI */
-    register WINDOW *wp;    /* pointer to new window */
+    register EWINDOW *wp;    /* pointer to new window */
     register BUFFER *bp;    /* pointer to buffer to zot */
     char    line[NLINE];    /* command line send to shell */
     const char pipecmd_bname[] = "command";
@@ -831,7 +831,7 @@ fubar:
  * filter a buffer through an external DOS program
  * Bound to ^X #
  */
-int filter(f, n)
+int uefilter(f, n)
 
 {
     mlwrite(TEXT217);
@@ -842,7 +842,7 @@ int filter(f, n)
 
 
 /*
-    return a system dependant string with the current time
+    return a system dependent string with the current time
     original version didn't work.  modified idea of bill benedetto by
     doug rady.  note the use of sys($ITIME, ...)  instead of sys_itime() 
 */
@@ -894,7 +894,7 @@ VOID do_system_end()
         mlputs(TEXT188);
 /*        mlputs("[End]");*/
         TTflush();
-        while ((s = tgetc()) != '\r' && s != ' ')
+        while ((s = tgetc()) != RET_CHAR && s != ' ')
             ;
     }
     return;

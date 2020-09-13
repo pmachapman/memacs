@@ -206,7 +206,7 @@ PASCAL NEAR pipecmd(f, n)
  * We use unique temporary file names so that multiple instances of
  * MicroEMACS don't try to use the same file.
  */
-PASCAL NEAR filter(f, n)
+PASCAL NEAR uefilter(f, n)
 
 {
         register int    s;      /* return status from CLI */
@@ -337,7 +337,7 @@ execprog( char *cmd)
         args[i] = args[i + 1] = 0;      /* terminate with 2 nulls */
 
 
-        /* look up the program on the path, trying various extentions */
+        /* look up the program on the path, trying various extensions */
         if ((sp = flook(prog, TRUE)) == NULL)
                 if ((sp = flook(strcat(prog, ".exe"), TRUE)) == NULL) {
                         return(FALSE);
@@ -370,7 +370,7 @@ char *fspec;    /* pattern to match */
 {
         register int index;             /* index into various strings */
         register int point;             /* index into other strings */
-        register int extflag;           /* does the file have an extention? */
+        register int extflag;           /* does the file have an extension? */
         char fname[NFILEN];             /* file/path for DOS call */
 
         /* first parse the file path off the file spec */
@@ -429,7 +429,7 @@ char *PASCAL NEAR getnfile()
         return(rbuf);
 }
 
-/* return a system dependant string with the current time */
+/* return a system dependent string with the current time */
 
 char *PASCAL NEAR timeset()
 
@@ -543,4 +543,21 @@ int extcode(
 }
 #endif  /* obsolete */
 #endif
+
+#undef va_start
+#undef va_end
+#include <varargs.h>
+int dprintf(va_alist, ...)
+va_dcl
+{
+    va_list arg_ptr;
+    char buffer[200];
+    char *fmt;
+
+    va_start(arg_ptr);
+    fmt = va_arg(arg_ptr, char *);
+
+    vsprintf(buffer, fmt, arg_ptr);
+    SetConsoleTitle(buffer);
+}
 

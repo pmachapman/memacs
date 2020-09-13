@@ -28,8 +28,8 @@ char file_buffer[FILE_BUFSIZE];
  */
 #if !(VMS & RMSIO)	/* if using RMS under VMS, the code */
 			/* is in VMS.C */
-PASCAL NEAR ffropen(fn)
-char    *fn;
+int PASCAL NEAR ffropen(fn)
+CONST char    *fn;
 {
 	if ((ffp=fopen(fn, "r")) == NULL)
 		return(FIOFNF);
@@ -51,9 +51,9 @@ char    *fn;
  * (cannot create).
  */
 #if	AOSVS == 0
-PASCAL NEAR ffwopen(fn, mode)
-char    *fn;
-char *mode;	/* mode to open file for */
+int PASCAL NEAR ffwopen(fn, mode)
+CONST char    *fn;
+CONST char *mode;	/* mode to open file for */
 {
 	char xmode[6];		/* extended file open mode */
 
@@ -91,7 +91,7 @@ char *mode;	/* mode to open file for */
 /*
  * Close a file. Should look at the status in all systems.
  */
-PASCAL NEAR ffclose()
+int PASCAL NEAR ffclose()
 {
 	/* free this since we do not need it anymore */
 	if (fline) {
@@ -105,7 +105,7 @@ PASCAL NEAR ffclose()
 #if	MSDOS & CTRLZ
 	putc(26, ffp);		/* add a ^Z at the end of the file */
 #endif
-	
+
 #if     USG | AIX | AUX | SMOS | HPUX8 | HPUX9 | SUN | XENIX | BSD || FREEBSD | WMCS | VMS | (MSDOS & (LATTICE | MSC | TURBO | IC | ZTC)) | WINNT | WINXP | OS2 | (TOS & MWC) | AVIION
         if (fclose(ffp) != FALSE) {
                 mlwrite(TEXT156);
@@ -124,7 +124,7 @@ PASCAL NEAR ffclose()
  * and the "nbuf" is its length, less the free newline. Return the status.
  * Check only at the newline.
  */
-PASCAL NEAR ffputline(buf, nbuf)
+int PASCAL NEAR ffputline(buf, nbuf)
 
 char    buf[];
 int nbuf;
@@ -183,7 +183,7 @@ int nbuf;
  * at the end of the file that don't have a newline present. Check for I/O
  * errors too. Return status.
  */
-PASCAL NEAR ffgetline(nbytes)
+int PASCAL NEAR ffgetline(nbytes)
 
 int *nbytes;
 

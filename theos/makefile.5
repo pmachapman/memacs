@@ -1,0 +1,124 @@
+#	Theos makefile for
+#		MicroEMACS 3.12
+#		(C)Copyright 1993 by Daniel Lawrence
+#		all rights reserved
+
+# modify the following lines with the proper relative directories
+
+# object file directory
+OBJD = obj
+# source file directory
+SRCD = ../src
+# header file directory
+HDIR = ../h
+
+# options and arguments to the C compiler
+
+CC=	cl
+CFLAGS= -W0 -FPi87 -DUSE_JMDEXT -DMAINWA_BUG
+LD=	cl
+
+# list of header files
+
+HFILES = estruct.h edef.h eproto.h elang.h
+
+#list of object files
+
+F1 = main.o abbrev.o basic.o bind.o
+F2 = char.o crypt.o display.o dolock.o
+F3 = buffer.o eval.o exec.o file.o 
+F4 = fileio.o input.o
+F5 = isearch.o libhelp.o line.o lock.o
+F6 = message.o mouse.o screen.o
+F7 = random.o region.o search.o replace.o
+F8 = tags.o theos.o undo.o window.o word.o _setargv.o
+
+# product list
+
+#all:	bin/me.cmd
+all:	me.cmd
+
+OFILES =	$(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8)
+
+#bin/me.cmd:	$(OFILES)
+#		$(LD) $(LDFLAGS) $(OFILES) -Febin/me.cmd
+
+me.cmd:	$(OFILES)
+	echo >emacs.link name me.cmd
+	echo >>emacs.link inc $(F1)
+	echo >>emacs.link inc $(F2)
+	echo >>emacs.link inc $(F3)
+	echo >>emacs.link inc $(F4)
+	echo >>emacs.link inc $(F5)
+	echo >>emacs.link inc $(F6)
+	echo >>emacs.link inc $(F7)
+	echo >>emacs.link inc $(F8)
+	link32 emacs.link(file symbol
+
+abbrev.o: $(SRCD)/abbrev.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foabbrev.o $(SRCD)/abbrev.c
+basic.o: $(SRCD)/basic.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fobasic.o $(SRCD)/basic.c
+bind.o: $(SRCD)/bind.c $(HFILES) epath.h
+	$(CC) $(CFLAGS) -c -Fobind.o $(SRCD)/bind.c
+buffer.o: $(SRCD)/buffer.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fobuffer.o $(SRCD)/buffer.c
+char.o: $(SRCD)/char.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fochar.o $(SRCD)/char.c
+crypt.o: $(SRCD)/crypt.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Focrypt.o $(SRCD)/crypt.c
+cmdfix.o: $(SRCD)/cmdfix.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Focmdfix.o $(SRCD)/cmdfix.c
+display.o: $(SRCD)/display.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fodisplay.o $(SRCD)/display.c
+dolock.o: $(SRCD)/dolock.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fodolock.o $(SRCD)/dolock.c
+eval.o: $(SRCD)/eval.c $(HFILES) evar.h
+	$(CC) $(CFLAGS) -c -Foeval.o $(SRCD)/eval.c
+exec.o: $(SRCD)/exec.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foexec.o $(SRCD)/exec.c
+file.o: $(SRCD)/file.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fofile.o $(SRCD)/file.c
+fileio.o: $(SRCD)/fileio.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fofileio.o $(SRCD)/fileio.c
+input.o: $(SRCD)/input.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foinput.o $(SRCD)/input.c
+isearch.o: $(SRCD)/isearch.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foisearch.o $(SRCD)/isearch.c
+libhelp.o: $(SRCD)/libhelp.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Folibhelp.o $(SRCD)/libhelp.c
+line.o: $(SRCD)/line.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foline.o $(SRCD)/line.c
+lock.o: $(SRCD)/lock.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Folock.o $(SRCD)/lock.c
+main.o: $(SRCD)/main.c $(HFILES) efunc.h ebind.h
+	$(CC) $(CFLAGS) -c -Fomain.o $(SRCD)/main.c
+message.o: $(SRCD)/message.c $(HFILES) epath.h
+	$(CC) $(CFLAGS) -c -Fomessage.o $(SRCD)/message.c
+mouse.o: $(SRCD)/mouse.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fomouse.o $(SRCD)/mouse.c
+random.o: $(SRCD)/random.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Forandom.o $(SRCD)/random.c
+region.o: $(SRCD)/region.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foregion.o $(SRCD)/region.c
+screen.o: $(SRCD)/screen.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foscreen.o $(SRCD)/screen.c
+search.o: $(SRCD)/search.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fosearch.o $(SRCD)/search.c
+replace.o: $(SRCD)/replace.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foreplace.o $(SRCD)/replace.c
+tags.o: $(SRCD)/tags.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fotags.o $(SRCD)/tags.c
+theos.o: $(SRCD)/theos.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fotheos.o $(SRCD)/theos.c
+undo.o: $(SRCD)/undo.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foundo.o $(SRCD)/undo.c
+window.o: $(SRCD)/window.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fowindow.o $(SRCD)/window.c
+word.o: $(SRCD)/word.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Foword.o $(SRCD)/word.c
+_setargv.o: $(SRCD)/_setargv.c $(HFILES)
+	$(CC) $(CFLAGS) -c -Fo_setargv.o $(SRCD)/_setargv.c
+
+install:
+	c me.cmd /Programs/Jmd/=.=:s(rep

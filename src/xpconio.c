@@ -3,6 +3,8 @@
  *                      for MicroEMACS 5.00
  *                      (C)Copyright 2008 by Daniel M. Lawrence
  *
+ *                      Unicode support by Jean-Michel Dubois
+ *
  * The routines in this file provide video and keyboard support using the
  * Windows XP/Visual Studio 2008 console functions.
  *
@@ -123,8 +125,11 @@ static int oldrow;	/* previous y position of mouse */
 /*	input buffers and pointers	*/
 
 #define	IBUFSIZE	64	/* this must be a power of 2 */
-
+#if	UTF8
+unsigned int in_buf[IBUFSIZE];	/* input character buffer */
+#else
 unsigned char in_buf[IBUFSIZE];	/* input character buffer */
+#endif
 int in_next = 0;		/* pos to retrieve next input character */
 int in_last = 0;		/* pos to place most recent input character */
 
@@ -292,13 +297,13 @@ static void near MouseEvent(void)
 #endif
 
 	/* get the shift key status as well */
-	etype = MOUS >> 8;
+	etype = MOUS >> SHIFTPFX;
 	sstate = m_event->dwControlKeyState;
 	if (sstate & SHIFT_PRESSED)		/* shifted? */
-		etype |= (SHFT >> 8);
+		etype |= (SHFT >> SHIFTPFX);
 	if ((sstate & RIGHT_CTRL_PRESSED) ||
 	    (sstate & LEFT_CTRL_PRESSED))	/* controled? */
-		etype |= (CTRL >> 8);
+		etype |= (CTRL >> SHIFTPFX);
 
 	/* no buttons changes */
 	if (oldbut == newbut) {
@@ -350,7 +355,7 @@ static void near WindowSizeEvent(void)
 	GetConsoleScreenBufferInfo(hOutput, &Console);
 
 	in_put(0);
-	in_put(MOUS >> 8);
+	in_put(MOUS >> SHIFTPFX);
 	in_put(Console.srWindow.Right+1);
 	in_put(Console.srWindow.Bottom);
 	in_put('2');
@@ -375,7 +380,11 @@ static void near KeyboardEvent()
 		return(FALSE);
 
 	/* If this is an extended character, process it */
+#if	UTF8
+	c = ir.Event.KeyEvent.uChar.UnicodeChar;
+#else
 	c = ir.Event.KeyEvent.uChar.AsciiChar;
+#endif
 	state = ir.Event.KeyEvent.dwControlKeyState;
 	prefix = 0;
 
@@ -476,7 +485,7 @@ pastothers:	/* shifted special key? */
 	/* if there is a prefix, insert it in the input stream */
 	if (prefix != 0) {
 		in_put(0);
-		in_put(prefix >> 8);
+		in_put(prefix >> SHIFTPFX);
 	}
 
 	/* place the ascii character in the input queue */
@@ -607,7 +616,11 @@ PASCAL NEAR ntputc(int c)
 	}
 
 	wScreenPos = (ntrow * term.t_ncol) + ntcol++;
+#if	UTF8
+	ciScreenBuffer[wScreenPos].Char.UnicodeChar = c;
+#else
 	ciScreenBuffer[wScreenPos].Char.AsciiChar = c;
+#endif
 	ciScreenBuffer[wScreenPos].Attributes = ntAttribute();
 	ntSetUpdateValues();
 }
@@ -632,7 +645,11 @@ PASCAL NEAR nteeol()
 	wScreenPos = ntrow * term.t_ncol + ntcol;
 	wAttribute = ntAttribute();
 	for (; wNum; wNum--) {
+#if	UTF8
+		ciScreenBuffer[wScreenPos].Char.UnicodeChar = ' ';
+#else
 		ciScreenBuffer[wScreenPos].Char.AsciiChar = ' ';
+#endif
 		ciScreenBuffer[wScreenPos].Attributes = wAttribute;
 		wScreenPos++, ntcol++;
 	}
@@ -660,7 +677,11 @@ PASCAL NEAR nteeop()
 	wScreenPos = ntrow * term.t_ncol + ntcol;
 	wAttribute = ntAttribute();
 	for (; wNum; wNum--) {
+#if	UTF8
+		ciScreenBuffer[wScreenPos].Char.UnicodeChar = ' ';
+#else
 		ciScreenBuffer[wScreenPos].Char.AsciiChar = ' ';
+#endif
 		ciScreenBuffer[wScreenPos].Attributes = wAttribute;
 		wScreenPos++, ntcol++;
 	}

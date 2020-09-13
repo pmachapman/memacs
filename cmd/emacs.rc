@@ -13,13 +13,14 @@ write-message "[Setting up....]"
 ;	set $sres "EGA"
 
 ;	If you hate clocks or position counters, comment these
-set $timeflag TRUE
+;set $timeflag TRUE
 set $posflag TRUE
+set $sscroll TRUE
 
 ;	Set Default Global modes
 
-add-global-mode "blue"
-add-global-mode "WHITE"
+add-global-mode "white"
+add-global-mode "BLACK"
 ;bind-to-key meta-prefix `	;for annoying keyboards with ` at the top left
 
 ;	Toggle function key window display
@@ -35,16 +36,17 @@ store-procedure toggle-fkeys
 	!if &sequal $cbufname "emacs.hlp"
 		delete-window
 	!endif
-	!if &not &sequal $cbufname "Function Keys"
+	!if &not &sequal $cbufname "[Function Keys]"
 		1 split-current-window
-		1 select-buffer "Function Keys"
-		add-mode "red"
+		1 select-buffer "[Function Keys]"
+		add-mode "blue"
+		add-mode "WHITE"
 		!force 5 resize-window
 		1 goto-line
 	!endif
 	set %rcfkeys TRUE
 	!force restore-window
-	!if &sequal $cbufname "Function Keys"
+	!if &sequal $cbufname "[Function Keys]"
 		next-window
 	!endif
 	write-message "[Function key window ON]"
@@ -54,7 +56,7 @@ store-procedure toggle-fkeys
 *rcfoff
 	save-window
 	1 next-window
-	!if &sequal "Function Keys" $cbufname
+	!if &sequal "[Function Keys]" $cbufname
 		delete-window
 	!endif
 	!force restore-window
@@ -93,15 +95,29 @@ store-procedure set-default-mode
 	!if &equ %rctmp 0
 		!return
 	!endif
-	set %rctmp &mid $cfname &add %rctmp 1 5
-	!if &or &seq %rctmp "c" &seq %rctmp "h"
-		add-mode "cmode"
-	!endif
-	!if &or &seq %rctmp "cpp" &seq %rctmp "hpp"
-		add-mode "cmode"
-	!endif
-	!if &or &seq %rctmp "mss" &seq %rctmp "txt"
-		add-mode "wrap"
+	!if &seq $os "THEOS"
+		set %rctmp &mid $cfname &add %rctmp 1 2
+		!if &or &seq %rctmp "c:" &seq %rctmp "h:"
+			add-mode "cmode"
+		!endif
+		set %rctmp &mid $cfname &add %rctmp 1 4
+		!if &or &seq %rctmp "cpp:" &seq %rctmp "hpp:"
+			add-mode "cmode"
+		!endif
+		!if &seq %rctmp "txt:"
+			add-mode "wrap"
+		!endif
+	!else
+		set %rctmp &mid $cfname &add %rctmp 1 5
+		!if &or &seq %rctmp "c" &seq %rctmp "h"
+			add-mode "cmode"
+		!endif
+		!if &or &seq %rctmp "cpp" &seq %rctmp "hpp"
+			add-mode "cmode"
+		!endif
+		!if &or &seq %rctmp "mss" &seq %rctmp "txt"
+			add-mode "wrap"
+		!endif
 	!endif
 !endm
 set $readhook set-default-mode
@@ -116,7 +132,7 @@ store-procedure mouse-clicks
 	!force mouse-move-down
 
 	;If not in the function key window... leave
-	!if &not &sequal $cbufname "Function Keys"
+	!if &not &sequal $cbufname "[Function Keys]"
 		!return
 	!endif
 
@@ -188,23 +204,38 @@ macro-to-key toggle-fkeys		FN5
 macro-to-key get-help			FN6
 bind-to-key next-window 		FN7
 macro-to-key get-page-loader		FN8
-bind-to-key save-file			FN9
-bind-to-key exit-emacs			FN0
+bind-to-key exit-emacs			FN9
+bind-to-key save-file			FN0
+
+bind-to-key move-window-up		FN^P
+bind-to-key move-window-down		FN^N
+bind-to-key scroll-next-up		M-FNZ
+bind-to-key scroll-next-down		M-FNV
+
+!if &seq $os "UNIX"
+	bind-to-key delete-next-character	^?
+	bind-to-key delete-next-word		M-^?
+	bind-to-key delete-previous-word	M-^H
+!else
+	bind-to-key delete-previous-character	^?
+	bind-to-key delete-previous-word	M-^?
+	bind-to-key delete-next-word		M-FND
+!endif
 
 ;	bring up the function key window
 
 	1 split-current-window
-	1 select-buffer "Function Keys"
-	insert-string "f1 search-> f2 <-search Û    MicroEMACS:  Text Editor~n"
-	insert-string "f3 hunt->   f4 <-hunt   Û ~n"
-	insert-string "f5 fkeys    f6 help     Û  Available function key Pages include:~n"
-	insert-string "f7 nxt wind f8 pg[    ] Û    Word  Box  Emacs  Pascal  C  cObol Lisp~n"
-	insert-string "f9 save     f10 exit    Û  [use the f8 key to load Pages]~n"
+	1 select-buffer "[Function Keys]"
+	insert-string "f1 search-> f2 <-search |    MicroEMACS:  Text Editor~n"
+	insert-string "f3 hunt->   f4 <-hunt   | ~n"
+	insert-string "f5 fkeys    f6 help     |  Available function key Pages include:~n"
+	insert-string "f7 nxt wind f8 pg[    ] |    Word  Box  Emacs  Pascal  C  cObol Lisp~n"
+	insert-string "f9 exit    f10 save     |  [use the f8 key to load Pages]~n"
 	unmark-buffer
 	delete-window
 	set %rcfkeys FALSE
 
-	!if &seq $os "UNIX"
+	!if &seq $os "unix"
 
 		;Allow mainframes to simulate function
 		;keys with ^C<n> and ^C shifted-<n>
@@ -249,4 +280,31 @@ bind-to-key exit-emacs			FN0
 	set $sres CGA
 !endif
 
-	set $discmd TRUE
+store-procedure toggle-insert
+	!if &gre &mod $cmode 64 31
+		delete-mode "over"
+	!else
+		add-mode "over"
+	!endif
+!endm
+macro-to-key toggle-insert	FNC
+
+store-procedure single-graphics
+	!force delete-mode "GRD"
+	add-mode "GRS"
+!endm
+macro-to-key single-graphics	FN-
+
+store-procedure double-graphics
+	!force delete-mode "GRS"
+	add-mode "GRD"
+!endm
+macro-to-key double-graphics	S-FN-
+
+store-procedure no-graphics
+	!force add-mode "GRS"
+	!force add-mode "GRD"
+!endm
+macro-to-key no-graphics	FN^-
+
+set $discmd TRUE

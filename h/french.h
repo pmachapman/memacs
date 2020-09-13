@@ -4,7 +4,7 @@
 			(C)opyright 1995 by Daniel Lawrence
 			Translated by Bertrand DECOUTY, 10/88
 			Modified 12/89 (accent...)
-			decouty@caroline.irisa.fr, 
+			decouty@caroline.irisa.fr,
 			{uunet,mcvax,inria}!irisa!decouty
 			IRISA-INRIA, Campus de Beaulieu, F-35042 Rennes Cedex
 			Modified 02/93 (code page 850, 8 bits chars)
@@ -45,7 +45,11 @@
 #define	TEXT29	"Changer le nom du tampon en: "			/*"Change buffer name to: "*/
 
 /*		"ACTN   Modes      Size  Buffer          File"*/
+#if	JMDEXT
+#define	TEXT30	"ACTN   Modes     Taille  Tampon          Fichier"
+#else
 #define	TEXT30	"ACTN   Modes    Taille  Tampon          Fichier"
+#endif
 #define	TEXT31	"         Modes Globaux"			/*"         Global Modes"*/
 #define	TEXT32	"Annuler les modifications"			/*"Discard changes"*/
 #define	TEXT33	"Cha\214ne d'encryptage: "				/*"Encryption String: "*/
@@ -284,7 +288,8 @@
 #define TEXT233 "[Construction liste des abr\202viations]"	/*"[Building Abbreviation list]"*/
 #define TEXT234 "Liste des abr\202viations"			/*"Abbreviation list"*/
 #define TEXT235 "Impossible d'afficher la liste des abr\202viations"	/*"Can not display abbreviation list"*/
-#define TEXT236 "D\202finition abr\202viations dans un tampon"	/*"Define Abbreviations in buffer"*/
+#define TEXT236 "D\202finition abr\202viations depuis le tampon"	/*"Define Abbreviations from buffer"*/
+
 #define TEXT240 "[Aucun \202cran de ce nom]"                            /*"[No such screen]"*/
 #define TEXT241 "%%Impossible de supprimer l'\202cran courant"     /*"%%Can't delete current screen"*/
 #define TEXT242 "Chercher l'\202cran: "                           /*"Find Screen: "*/
@@ -296,7 +301,26 @@
 #define	TEXT248 "Entrer une \202tiquette: "			/*"Enter Label String: "*/
 #define TEXT249 "Variable globale \205 d\202clarer : "
 #define	TEXT250 "Variable locale \205 d\202clarer : "
-
+#if	JMDEXT
+#define TEXT284 "Fonction non disponible"
+#define TEXT285 "Aucun sujet indiqu\202"
+#define TEXT286 "Recherche du sujet \"%s\""
+#define TEXT287 "Recherche du mot-cl\202 \"%s\""
+#define TEXT288 "Sujet: "
+#define TEXT289 "Mot-cl\202: "
+#define TEXT290 "Pas d'aide pour le sujet \"%s\""
+#define TEXT291 "Pas d'aide pour le mot-cl\202 \"%s\""
+#define TEXT292 "Ouverture du fichier d'aide %s impossible"
+#define TEXT293 "Index de "
+#define TEXT294 "[Help]"
+#define TEXT295 "[Errors]"
+#define TEXT296 "[Function Keys]"
+#define TEXT297 "%s n'est pas un fichier"
+#if	THEOS
+#define TEXT298 "%s n'est pas un fichier s\202quentiel"
+#define TEXT299 "%s n'est pas une biblioth\212que"
+#endif
+#endif
 /* some of these are just used in the microsoft windows version */
 #define TEXT300 "[Menu incorrect]"                              /*"[Incorrect menu]"*/
 #define TEXT301 "[Trop de menus imbriqu\202s]"                     /*"[Too many nested popup menus]"*/
@@ -336,3 +360,4 @@
 #define TEXT335 "Changer le nom de l'\202cran en: "             	/*"Change screen name to: "*/
 #define TEXT336 "[Nom d'\202cran d\202j\205 utilis\202]"                   	/*"[Screen name already in use]"*/
 #define TEXT337 "impossible de contr\223ler un programme externe" 	/*"cannot monitor external program"*/
+#define TEXT338 "space for help :"

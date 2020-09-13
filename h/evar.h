@@ -4,13 +4,13 @@
 		written 1993 by Daniel Lawrence
 */
 
-#define MAXVARS 	512	/* Maximum number of global user variables */
+#define MAXVARS 	512 /* Maximum number of global user variables */
 
 /*	list of recognized environment variables	*/
 
 NOSHARE char *envars[] = {
 	"abbell",		/* ring bell on abbreviation expansion? */
-	"abcap",		/* match capitolization in expansions */
+	"abcap",		/* match capitalization in expansions */
 	"abquick",		/* quick, aggressive expansions enabled? */
 	"acount",		/* # of chars until next auto-save */
 	"asave",		/* # of chars between auto-saves */
@@ -18,12 +18,14 @@ NOSHARE char *envars[] = {
 	"cbflags",		/* current buffer flags */
 	"cbufname",		/* current buffer name */
 	"cfname",		/* current file name */
+	"class",		/* screen class code */
 	"cmdhook",		/* command loop hook */
 	"cmode",		/* mode of current buffer */
 	"cquote",		/* close quote character */
 	"curchar",		/* current character under the cursor */
 	"curcol",		/* current column pos of cursor */
 	"curline",		/* current line in file */
+	"curoffs",		/* current offset in line */
 	"curwidth",		/* current screen width */
 	"curwind",		/* current window ordinal on current screen */
 	"cwline",		/* current screen line in window */
@@ -36,10 +38,11 @@ NOSHARE char *envars[] = {
 	"dispundo",		/* display undo depth on command line */
 	"exbhook",		/* exit buffer switch hook */
 	"exithook",		/* exiting emacs hook */
-	"fcol",			/* first displayed column in curent window */
+	"fcol",			/* first displayed column in current window */
 	"fillcol",		/* current fill column */
-	"flicker",		/* flicker supression */
+	"flicker",		/* flicker suppression */
 	"fmtlead",		/* format command lead characters */
+	"found",		/* last search status */
 	"gflags",		/* global internal emacs flags */
 	"gmode",		/* global modes */
 	"hardtab",		/* current hard tab size */
@@ -55,7 +58,10 @@ NOSHARE char *envars[] = {
 	"line", 		/* text of current line */
 	"lterm",		/* current line terminator for writes */
 	"lwidth",		/* width of current line */
+	"margin",		/* minimum margin for extended lines */
 	"match",		/* last matched magic pattern */
+	"mcol", 		/* mark column */
+	"mline",		/* mark line */
 	"mmove",		/* mouse moves events style */
 	"modeflag",		/* Modelines displayed flag */
 	"msflag",		/* activate mouse? */
@@ -68,8 +74,9 @@ NOSHARE char *envars[] = {
 	"overlap",		/* line overlap when paging */
 	"pagelen",		/* number of lines used by editor */
 	"palette",		/* current palette string */
-	"paralead",		/* paragraph leadin characters */
+	"paralead",		/* paragraph leading characters */
 	"pending",		/* type ahead pending flag */
+	"pid",			/* process id */
 	"popflag",		/* pop-up windows active? */
 	"popwait",		/* user wait on end of pop-up window? */
 	"posflag",		/* display point position on modeline? */
@@ -80,6 +87,7 @@ NOSHARE char *envars[] = {
 	"replace",		/* replacement pattern */
 	"rval", 		/* child process return value */
 	"scrname",		/* current screen name */
+	"scrsiz",		/* size of scroll region  */
 	"search",		/* search pattern */
 	"searchpnt",		/* differing search styles (term point) */
 	"seed", 		/* current random number seed */
@@ -89,11 +97,13 @@ NOSHARE char *envars[] = {
 	"sscroll",		/* smooth scrolling flag */
 	"status",		/* returns the status of the last command */
 	"sterm",		/* search terminator character */
+	"syslang",		/* system language */
 	"target",		/* target for line moves */
 	"time",			/* date and time */
 	"timeflag",		/* display time? */
-	"tpause",		/* length to pause for paren matching */
-	"undoflag",		/* currently processing undos */
+	"tmpnam",		/* temporary file name */
+	"tpause",		/* length to pause for fences matching */
+	"undoflag",		/* currently processing undoes */
 	"version",		/* current version number */
 	"vscrlbar",		/* vertical scroll bar flag */
 	"wchars",		/* set of characters legal in words */
@@ -107,7 +117,7 @@ NOSHARE char *envars[] = {
 
 #define NEVARS	sizeof(envars) / sizeof(char *)
 
-/*	and its preprocesor definitions 	*/
+/*	and its preprocessor definitions	*/
 
 #define EVABBELL	0
 #define EVABCAP		1
@@ -118,97 +128,107 @@ NOSHARE char *envars[] = {
 #define EVCBFLAGS	6
 #define EVCBUFNAME	7
 #define EVCFNAME	8
-#define EVCMDHK 	9
-#define EVCMODE 	10
-#define	EVCQUOTE	11
-#define EVCURCHAR	12
-#define EVCURCOL	13
-#define EVCURLINE	14
-#define EVCURWIDTH	15
-#define EVCURWIND	16
-#define EVCWLINE	17
-#define EVDEBUG         18
-#define EVDESKCLR	19
-#define EVDIAGFLAG      20
-#define EVDISCMD        21
-#define EVDISINP        22
-#define EVDISPHIGH	23
-#define EVDISPUNDO	24
-#define EVEXBHOOK       25
-#define EVEXITHOOK	26
-#define EVFCOL		27
-#define EVFILLCOL	28
-#define EVFLICKER	29
-#define EVFMTLEAD	30
-#define EVGFLAGS	31
-#define EVGMODE 	32
-#define EVHARDTAB	33
-#define EVHILITE	34
-#define EVHJUMP		35
-#define EVHSCRLBAR      36
-#define EVHSCROLL	37
-#define EVISTERM	38
-#define EVKILL          39
-#define EVLANG          40
-#define EVLASTKEY       41
-#define EVLASTMESG      42
-#define EVLINE          43
-#define EVLTERM		44
-#define EVLWIDTH        45
-#define EVMATCH         46
-#define EVMMOVE		47
-#define EVMODEFLAG      48
-#define EVMSFLAG        49
-#define EVNEWSCRN	50
-#define EVNUMWIND	51
-#define	EVOQUOTE	52
-#define EVORGCOL	53
-#define EVORGROW	54
-#define EVOS		55
-#define EVOVERLAP	56
-#define EVPAGELEN       57
-#define EVPALETTE       58
-#define EVPARALEAD	59
-#define EVPENDING       60
-#define EVPOPFLAG	61
-#define EVPOPWAIT	62
-#define EVPOSFLAG	63
-#define EVPROGNAME      64
-#define EVRAM           65
-#define EVREADHK        66
-#define EVREGION	67
-#define EVREPLACE       68
-#define EVRVAL          69
-#define EVSCRNAME	70
-#define EVSEARCH        71
-#define EVSEARCHPNT	72
-#define EVSEED          73
-#define EVSOFTTAB	74
-#define EVSRES          75
-#define EVSSAVE         76
-#define EVSSCROLL	77
-#define EVSTATUS	78
-#define EVSTERM 	79
-#define EVTARGET	80
-#define EVTIME		81
-#define EVTIMEFLAG	82
-#define EVTPAUSE	83
-#define EVUNDOFLAG	84
-#define EVVERSION	85
-#define EVVSCRLBAR      86
-#define EVWCHARS	87
-#define EVWLINE 	88
-#define EVWRAPHK	89
-#define EVWRITEHK	90
-#define EVXPOS		91
-#define EVYANKFLAG	92
-#define EVYPOS		93
+#define EVCLASS 	9
+#define EVCMDHK 	10
+#define EVCMODE 	11
+#define EVCQUOTE	12
+#define EVCURCHAR	13
+#define EVCURCOL	14
+#define EVCURLINE	15
+#define EVCUROFFS	16
+#define EVCURWIDTH	17
+#define EVCURWIND	18
+#define EVCWLINE	19
+#define EVDEBUG 	20
+#define EVDESKCLR	21
+#define EVDIAGFLAG	22
+#define EVDISCMD	23
+#define EVDISINP	24
+#define EVDISPHIGH	25
+#define EVDISPUNDO	26
+#define EVEXBHOOK	27
+#define EVEXITHOOK	28
+#define EVFCOL		29
+#define EVFILLCOL	30
+#define EVFLICKER	31
+#define EVFMTLEAD	32
+#define EVFOUND 	33
+#define EVGFLAGS	34
+#define EVGMODE 	35
+#define EVHARDTAB	36
+#define EVHILITE	37
+#define EVHJUMP 	38
+#define EVHSCRLBAR	39
+#define EVHSCROLL	40
+#define EVISTERM	41
+#define EVKILL		42
+#define EVLANG		43
+#define EVLASTKEY	44
+#define EVLASTMESG	45
+#define EVLINE		46
+#define EVLTERM 	47
+#define EVLWIDTH	48
+#define EVMARGIN	49
+#define EVMATCH 	50
+#define EVMCOL		51
+#define EVMLINE 	52
+#define EVMMOVE 	53
+#define EVMODEFLAG	54
+#define EVMSFLAG	55
+#define EVNEWSCRN	56
+#define EVNUMWIND	57
+#define EVOQUOTE	58
+#define EVORGCOL	59
+#define EVORGROW	60
+#define EVOS		61
+#define EVOVERLAP	62
+#define EVPAGELEN	63
+#define EVPALETTE	64
+#define EVPARALEAD	65
+#define EVPENDING	66
+#define EVPID		67
+#define EVPOPFLAG	68
+#define EVPOPWAIT	69
+#define EVPOSFLAG	70
+#define EVPROGNAME	71
+#define EVRAM		72
+#define EVREADHK	73
+#define EVREGION	74
+#define EVREPLACE	75
+#define EVRVAL		76
+#define EVSCRNAME	77
+#define EVSCRSIZ	78
+#define EVSEARCH	79
+#define EVSEARCHPNT	80
+#define EVSEED		81
+#define EVSOFTTAB	82
+#define EVSRES		83
+#define EVSSAVE 	84
+#define EVSSCROLL	85
+#define EVSTATUS	86
+#define EVSTERM 	87
+#define EVSYSLANG	88
+#define EVTARGET	89
+#define EVTIME		90
+#define EVTIMEFLAG	91
+#define EVTMPNAM	92
+#define EVTPAUSE	93
+#define EVUNDOFLAG	94
+#define EVVERSION	95
+#define EVVSCRLBAR	96
+#define EVWCHARS	97
+#define EVWLINE 	98
+#define EVWRAPHK	99
+#define EVWRITEHK	100
+#define EVXPOS		101
+#define EVYANKFLAG	102
+#define EVYPOS		103
 
 /*	list of recognized user functions	*/
 
 typedef struct UFUNC {
 	char *f_name;  /* name of function */
-	int f_type;	/* 1 = monamic, 2 = dynamic */
+	int f_type; /* 1 = monamic, 2 = dynamic */
 } UFUNC;
 
 #define NILNAMIC	0
@@ -217,61 +237,62 @@ typedef struct UFUNC {
 #define TRINAMIC	3
 
 NOSHARE UFUNC funcs[] = {
-	"abbrev", MONAMIC,	/* look up abbreviation */
-	"abs", MONAMIC, 	/* absolute value of a number */
-	"add", DYNAMIC,		/* add two numbers together */
-	"and", DYNAMIC, 	/* logical and */
-	"ascii", MONAMIC, 	/* char to integer conversion */
-	"band", DYNAMIC, 	/* bitwise and	 9-10-87  jwm */
-	"bind", MONAMIC, 	/* loopup what function name is bound to a key */
-	"bnot", MONAMIC, 	/* bitwise not */
-	"bor", DYNAMIC, 	/* bitwise or	 9-10-87  jwm */
-	"bxor", DYNAMIC, 	/* bitwise xor	 9-10-87  jwm */
-	"call", MONAMIC,	/* call a procedure */
-	"cat", DYNAMIC, 	/* concatenate string */
-	"chr", MONAMIC, 	/* integer to char conversion */
-	"divide", DYNAMIC, 	/* division */
-	"env", MONAMIC, 	/* retrieve a system environment var */
-	"equal", DYNAMIC, 	/* logical equality check */
-	"exist", MONAMIC, 	/* check if a file exists */
-	"find", MONAMIC, 	/* look for a file on the path... */
-	"greater", DYNAMIC, 	/* logical greater than */
-	"group", MONAMIC,	/* return group match in MAGIC mode */
-	"gtc", NILNAMIC,	/* get 1 emacs command */
-	"gtk", NILNAMIC,	/* get 1 charater */
-	"indirect", MONAMIC, 	/* evaluate indirect value */
-	"isnum", MONAMIC,	/* is the arg a number? */
-	"left", DYNAMIC, 	/* left string(string, len) */
-	"length", MONAMIC, 	/* string length */
-	"less", DYNAMIC, 	/* logical less than */
-	"lower", MONAMIC, 	/* lower case string */
-	"mid", TRINAMIC,	/* mid string(string, pos, len) */
-	"mkcol", MONAMIC,	/* column position of a mark */
-	"mkline", MONAMIC,	/* line number of a mark */
-	"modulo", DYNAMIC, 	/* mod */
-	"negate", MONAMIC, 	/* negate */
-	"not", MONAMIC, 	/* logical not */
-	"or",  DYNAMIC, 	/* logical or */
-	"reverse", MONAMIC,	/* reverse */
-	"right", DYNAMIC, 	/* right string(string, pos) */
-	"rnd", MONAMIC, 	/* get a random number */
-	"sequal", DYNAMIC, 	/* string logical equality check */
-	"sgreater", DYNAMIC, 	/* string logical greater than */
-	"sindex", DYNAMIC, 	/* find the index of one string in another */
-	"sless", DYNAMIC, 	/* string logical less than */
-	"slower", DYNAMIC,	/* set lower to upper char translation */
-	"subtract", DYNAMIC, 	/* subtraction */
-	"supper", DYNAMIC,	/* set upper to lower char translation */
-	"times", DYNAMIC, 	/* multiplication */
-	"trim", MONAMIC,	/* trim whitespace off the end of a string */
-	"true", MONAMIC, 	/* Truth of the universe logical test */
-	"upper", MONAMIC, 	/* uppercase string */
-	"xlate", TRINAMIC	/* XLATE character string translation */
+	{ "abbrev", MONAMIC },	/* look up abbreviation */
+	{ "abs", MONAMIC }, 	/* absolute value of a number */
+	{ "add", DYNAMIC },	/* add two numbers together */
+	{ "and", DYNAMIC }, 	/* logical and */
+	{ "ascii", MONAMIC },	/* char to integer conversion */
+	{ "band", DYNAMIC },	/* bitwise and	 9-10-87  jwm */
+	{ "bind", MONAMIC },	/* loopup what function name is bound to a key */
+	{ "bnot", MONAMIC },	/* bitwise not */
+	{ "bor", DYNAMIC }, 	/* bitwise or	 9-10-87  jwm */
+	{ "bxor", DYNAMIC },	/* bitwise xor	 9-10-87  jwm */
+	{ "call", MONAMIC },	/* call a procedure */
+	{ "cat", DYNAMIC }, 	/* concatenate string */
+	{ "chr", MONAMIC }, 	/* integer to char conversion */
+	{ "divide", DYNAMIC },	/* division */
+	{ "env", MONAMIC }, 	/* retrieve a system environment var */
+	{ "equal", DYNAMIC },	/* logical equality check */
+	{ "exist", MONAMIC },	/* check if a file exists */
+	{ "find", MONAMIC },	/* look for a file on the path... */
+	{ "greater", DYNAMIC }, /* logical greater than */
+	{ "group", MONAMIC },	/* return group match in MAGIC mode */
+	{ "gtc", NILNAMIC },	/* get 1 emacs command */
+	{ "gtk", NILNAMIC },	/* get 1 character */
+	{ "indirect", MONAMIC },/* evaluate indirect value */
+	{ "isnum", MONAMIC },	/* is the arg a number? */
+	{ "left", DYNAMIC },	/* left string(string, len) */
+	{ "length", MONAMIC },	/* string length */
+	{ "less", DYNAMIC },	/* logical less than */
+	{ "lower", MONAMIC },	/* lower case string */
+	{ "mid", TRINAMIC },	/* mid string(string, pos, len) */
+	{ "mkcol", MONAMIC },	/* column position of a mark */
+	{ "mkline", MONAMIC },	/* line number of a mark */
+	{ "modulo", DYNAMIC },	/* mod */
+	{ "negate", MONAMIC },	/* negate */
+	{ "not", MONAMIC }, 	/* logical not */
+	{ "or",  DYNAMIC }, 	/* logical or */
+	{ "reverse", MONAMIC }, /* reverse */
+	{ "right", DYNAMIC },	/* right string(string, pos) */
+	{ "rnd", MONAMIC }, 	/* get a random number */
+	{ "sequal", DYNAMIC },	/* string logical equality check */
+	{ "sgreater", DYNAMIC },/* string logical greater than */
+	{ "sindex", DYNAMIC },	/* find the index of one string in another */
+	{ "sless", DYNAMIC },	/* string logical less than */
+	{ "slower", DYNAMIC },	/* set lower to upper char translation */
+	{ "srindex", DYNAMIC }, /* find the last index of one string in another */
+	{ "subtract", DYNAMIC },/* subtraction */
+	{ "supper", DYNAMIC },	/* set upper to lower char translation */
+	{ "times", DYNAMIC },	/* multiplication */
+	{ "trim", MONAMIC },	/* trim whitespace off the end of a string */
+	{ "true", MONAMIC },	/* Truth of the universe logical test */
+	{ "upper", MONAMIC },	/* uppercase string */
+	{ "xlate", TRINAMIC },	/* XLATE character string translation */
 };
 
 #define NFUNCS	sizeof(funcs) / sizeof(UFUNC)
 
-/*	and its preprocesor definitions 	*/
+/*	and its preprocessor definitions	*/
 
 #define UFABBREV	0
 #define UFABS		1
@@ -316,10 +337,11 @@ NOSHARE UFUNC funcs[] = {
 #define UFSINDEX	40
 #define UFSLESS 	41
 #define UFSLOWER	42
-#define UFSUB		43
-#define UFSUPPER	44
-#define UFTIMES 	45
-#define UFTRIM		46
-#define UFTRUTH 	47
-#define UFUPPER 	48
-#define UFXLATE 	49
+#define UFSRINDEX	43
+#define UFSUB		44
+#define UFSUPPER	45
+#define UFTIMES 	46
+#define UFTRIM		47
+#define UFTRUTH 	48
+#define UFUPPER 	49
+#define UFXLATE 	50
