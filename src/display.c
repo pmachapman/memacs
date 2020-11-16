@@ -383,8 +383,12 @@ int force;	/* force update past type ahead? */
 	/* if we are not forcing the update, and there are keystrokes
 	   waiting to be processed, skip the update */
 	if (force == FALSE && typahead())
+	{
+		dbprintf(("update(FALSE) && typahead == TRUE\n"));
 		return;
+	}
 #endif
+	dbprintf(("update\n"));
 
 #if	VISMAC == 0
 	/* if we are replaying a keyboard macro, don't bother keeping updated */
@@ -522,6 +526,7 @@ WINDOW *wp;
 	register int i;		/* general index/# lines to scroll */
 	register int nlines;	/* number of lines in current window */
 
+	dbprintf(("reframe\n"));
 	/* figure out our window size */
 	nlines = wp->w_ntrows;
 	if (modeflag == FALSE)
@@ -632,6 +637,7 @@ VOID PASCAL NEAR update_hilite()
 	if (hilite > NMARKS)
 		return;
 
+	dbprintf(("updhilite\n"));
 	/* Both marks must be set to define a highlighted region */
 	first_mark = curwp->w_markp[hilite];
 	last_mark = curwp->w_markp[hilite+1];
@@ -754,6 +760,8 @@ WINDOW *wp;     /* window to update current line in */
         register int sline;     /* physical screen line to update */
         register int i;
 
+	dbprintf(("updone\n"));
+
         /* search down the line we want */
         lp = wp->w_linep;
         sline = wp->w_toprow;
@@ -789,6 +797,8 @@ WINDOW *wp;     /* window to update lines in */
         register int sline;     /* physical screen line to update */
         register int i;
         register int nlines;    /* number of lines in the current window */
+
+	dbprintf(("updall\n"));
 
         /* search down the lines, updating them */
         lp = wp->w_linep;
@@ -836,6 +846,7 @@ VOID PASCAL NEAR updpos()
         register int c;
         register int i;
 
+	dbprintf(("updpos\n"));
         /* find the current row */
         lp = curwp->w_linep;
         currow = curwp->w_toprow;
@@ -904,6 +915,7 @@ VOID PASCAL NEAR upddex()
         register int i,j;
         register int nlines;    /* number of lines in the current window */
 
+	dbprintf(("upddex\n"));
         wp = wheadp;
 
         while (wp != NULL) {
@@ -948,6 +960,7 @@ VOID PASCAL NEAR updgar()
         register int j;
         register char *txt;
 #endif
+	dbprintf(("updgar\n"));
 
         for (i = 0; i < term.t_nrow; ++i) {
                 vscreen[i]->v_flag |= VFCHG;
@@ -1113,6 +1126,7 @@ int force;      /* forced update flag */
         register VIDEO *vp1;
         register int i;
 
+	dbprintf(("updupd\n"));
         for (i = 0; i < term.t_nrow; ++i) {
                 vp1 = vscreen[i];
 
@@ -1144,6 +1158,7 @@ VOID PASCAL NEAR updext()
         register LINE *lp;      /* pointer to current line */
         register int j;         /* index into line */
 
+	dbprintf(("updext\n"));
         /* calculate what column the real cursor will end up in */
         rcursor = ((curcol - term.t_ncol) % term.t_scrsiz)
                         + term.t_margin;
@@ -1215,6 +1230,7 @@ struct VIDEO *pp;       /* physical screen image */
         int old_rev_state = FALSE;      /* reverse video states */
         int new_rev_state;
 
+	dbprintf(("updline\n"));
         /* set up pointers to virtual and physical lines */
         vir_left = &vp->v_text[0];
         vir_right = &vp->v_text[term.t_ncol];
@@ -1417,6 +1433,7 @@ WINDOW *wp;	/* window to update modeline for */
 	char tline[NLINE];	/* buffer for part of mode line */
 	char time[6];		/* to hold current time */
 
+	dbprintf(("modeline\n"));
 	/* don't bother if there is none! */
 	if (modeflag == FALSE)
 		return;
@@ -1522,13 +1539,14 @@ WINDOW *wp;	/* window to update modeline for */
 		}
 	strcat(tline,") ");
 
+	dbprintf(("modeline: tline = %s\n", tline));
 	cp = &tline[0];
 	while ((c = *cp++) != 0) {
 		vtputc(c);
 		++n;
 	}
 
-#if	0	/* display internal modes on modeline */
+#if	1	/* display internal modes on modeline */
 	vtputc(lchar);
 	vtputc((wp->w_flag&WFCOLR) != 0  ? 'C' : lchar);
 	vtputc((wp->w_flag&WFMODE) != 0  ? 'M' : lchar);
@@ -1618,6 +1636,7 @@ VOID PASCAL NEAR upmode()	/* update all the mode lines */
         vtscreen (sp);
         wheadp = sp->s_first_window;
 #endif
+    dbprintf(("updmode\n"));
 
 	wp = wheadp;
 	while (wp != NULL) {
@@ -1645,6 +1664,8 @@ VOID PASCAL NEAR upwind()	/* force hard updates on all windows */
         vtscreen (sp);
         wheadp = sp->s_first_window;
 #endif
+
+    dbprintf(("updwind\n"));
 
 	wp = wheadp;
 	while (wp != NULL) {

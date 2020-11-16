@@ -899,6 +899,15 @@ int scopen()
 	/* Get size from termcap */
 	term.t_nrow = tgetnum("li") - 1;
 	term.t_ncol = tgetnum("co");
+
+	if (NULL!=(cp=getenv("LINES"))) { int row;
+		sscanf (cp, "%d", &row);
+		if (row) {
+			term.t_mrow= row-1;
+			term.t_nrow= row-1;
+		}
+	}
+
 	if (term.t_nrow < 3 || term.t_ncol < 3) {
 		puts("Screen size is too small!");
 		exit(1);
@@ -1325,8 +1334,8 @@ char * timeset()
 #if USG || AUX || SMOS || HPUX8 || XENIX
 /** Rename a file **/
 int rename(file1, file2)
-char * file1;				/* Old file name		*/
-char * file2;				/* New file name		*/
+const char *file1;				/* Old file name		*/
+const char *file2;				/* New file name		*/
 {
 	struct stat buf1;
 	struct stat buf2;

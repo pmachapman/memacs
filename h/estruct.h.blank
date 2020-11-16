@@ -40,7 +40,7 @@
 /*	Machine/OS definitions			*/
 /*	[Set one of these!!]			*/
 
-#define AMIGA	1			/* AmigaDOS			*/
+#define AMIGA	0			/* AmigaDOS			*/
 #define AOSVS	0			/* Data General AOS/VS		*/
 #define AUX     0                       /* Apple UNIX for Macintosh     */
 #define AVIION	0			/* Data General AViiON		*/
@@ -67,7 +67,7 @@
 #define AZTEC	0	/* Aztec C 3.20e */
 #define DGC	0	/* Data General AOS/VS C... */
 #define DTL	0	/* DataLight C v3.12 */
-#define GCC	1	/* the GNU C compiler */
+#define GCC	0	/* the GNU C compiler */
 #define IC	0	/* Rational Systems Instant C */
 #define LATTICE 0	/* Lattice 2.14 through 3.0 compilers */
 #define MSC	0	/* MicroSoft C compile version 3 thru 7 */
@@ -110,7 +110,7 @@
 /*	Terminal Output definitions		*/
 /*	[Set one of these!!]			*/
 
-#define ANSI	1			/* ANSI escape sequences	*/
+#define ANSI	0			/* ANSI escape sequences	*/
 #define DASHER	0			/* DG Dasher 2xx/4xx crts	*/
 #define DG10	0			/* Data General system/10	*/
 #define FMR	0			/* Fujitsu FMR series driver	*/
@@ -132,7 +132,6 @@
 /*	Windowing system style (pick one)				*/
 
 #define WINDOW_TEXT	1		/* [default] Text mode		*/
-#define WINDOW_AMIGA	1		/* Amiga Intuition [TEXT too!]  */
 #define WINDOW_XVT	0		/* using XVT/any platform	*/
 #define WINDOW_MSWIN	0		/* MicroSoft Windows		*/
 #define WINDOW_MSWIN32	0		/* MicroSoft Windows 32 bit API */
@@ -160,9 +159,9 @@
 #define CALLED	0	/* is emacs a called subroutine? or stand alone */
 
 #define REVSTA	1	/* Status line appears in reverse video 	*/
-#define COLOR	0	/* color commands and windows			*/
+#define COLOR	1	/* color commands and windows			*/
 
-#define FILOCK	0	/* file locking under unix BSD 4.2		*/
+#define FILOCK	1	/* file locking under unix BSD 4.2		*/
 #define ISRCH	1	/* Incremental searches like ITS EMACS		*/
 #define FLABEL	0	/* function key label code [HP150]		*/
 #define CRYPT	1	/* file encryption enabled?			*/
@@ -220,7 +219,7 @@
 
 /*	Prototypes in use?	*/
 
-#if	MSC || TURBO || IC || DTL || VMS || GCC || ZTC || __SASC
+#if	MSC || TURBO || IC || DTL || VMS || GCC || ZTC
 #define PROTO	1
 #else
 #define PROTO	0
@@ -239,10 +238,6 @@
 #if	IC && MSDOS
 #undef FILOCK
 #define FILOCK	0
-#endif
-
-#if	AMIGA
-#include <edebug.h>
 #endif
 
 /* Mark Williams/Atari has no standard or varargs or directory functions */
@@ -510,7 +505,7 @@ union REGS {
 /*	internal constants	*/
 
 #define NBINDS	300			/* max # of bound keys		*/
-#if	AOSVS | VMS | WINNT | SUN | BSD | V7 | ZENIX | OS2 | AMIGA
+#if	AOSVS | VMS | WINNT | SUN | BSD | V7 | ZENIX | OS2
 #define NFILEN	256
 #else
 #define NFILEN	80			/* # of bytes, file name	*/

@@ -1,0 +1,49 @@
+Short:    AmigaDOS port of MicroEmacs 3.12
+Kurz:     AmigaDOS Portierung von MicroEmacs 3.12
+Uploader: mh@ceres.stuttgart.netsurf.de (Martin Hohl)
+Author:   martinh@caverna.tynet.sub.org (Martin Hohl)
+Type:     text/edit
+
+Requires: AmigaDOS 2.04 or newer, never tested with 1.3 (maybe it runs)
+
+Version:  3.12g
+
+MicroEmacs 3.12 ported to AmigaDOS
+==================================
+
+This port of the MicroEmacs editor is currently unfinished (The binary runs,
+but there are some bugs to be fixed). I currently do not have the time to
+finish the port, so maybe someone else would like to do this (which is the
+reason, why I publish it in this state, together with the source code).
+
+Changes:
+========
+1) MicroEmacs now opens its window on an own Screen (see ttopen() ...)
+2) It is now font sensitive (you can use Courier 13 as system default
+   font instead of Topaz 8, as I do)
+3) It runs on my Picasso II (it's graphics board compatible)
+4) It has some support for international keyboards now (previously it was
+   nearly completely useless for users with non-US keyboards).
+5) It compiles with SAS/C 6.56 now (previously the makefile was for
+   Aztec 3.6a)
+
+Bugs to be fixed:
+=================
+1) After pressing Ctrl-X Ctrl-R (open file) and answering the file requester
+   MicroEmacs keyboard is in Ctrl mode (you have to press the Ctrl-key again
+   to switch it back to the normal mode). See filereq() in amigados.c and
+   call to filereq() in input.c
+
+Todo list:
+==========
+Menu system like in the Windows port (Should be not too complicated).
+AREXX port (this could be difficult).
+
+
+The port was done using SAS/C 6.56 for AmigaDOS.
+
+EMail address of the author of this port:
+"Martin Hohl <mh@ceres.stuttgart.netsurf.de>"
+or
+"Martin Hohl <mh@caverna.tynet.sub.org>"
+(the latter address may be invalid at the end of 1996)

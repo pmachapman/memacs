@@ -1,3 +1,12 @@
+/* The routines in this file provide menu-related functions under the
+   Microsoft Windows environment on an IBM-PC or compatible computer.
+
+   This module also contains the code for the About and Modes dialog
+   boxes.
+
+   Must be compiled with Borland C++ 2.0 or MSC 6.0 or later versions.
+
+   It should not be compiled if the WINDOW_MSWIN symbol is not set */
 
 #include    "estruct.h"
 #include    "elang.h"
@@ -5,8 +14,9 @@
 #include    "eproto.h"
 #include    "edef.h"
 
-#include    "amimenu.h"
-#include    "amihelp.h"
+#include    "mswin.h"
+#include    "mswmenu.h"
+#include    "mswhelp.h"
 
 #define MAXMENUTITLE 50
 
@@ -22,6 +32,33 @@ typedef struct   {
 #define MB_FNC  0x4000
 #define MB_BUF  0x8000  /* static IDs should not look like they carry
 			   this flag */
+/*      Amiga Menu */
+
+struct NewMenu MicroEmacsMenu[] = {
+	NM_TITLE, (STRPTR)"File", NULL, 0, NULL, NULL,
+	NM_ITEM, (STRPTR)"Open ...     ^X^F", NULL, 0, 0L, (APTR)Project0Item0,
+	NM_ITEM, (STRPTR)"Save         ^X^S", NULL, 0, 0L, (APTR)Project0Item1,
+	NM_ITEM, (STRPTR)"Save as ...  ^X^W", NULL, 0, 0L, (APTR)Project0Item2,
+	NM_ITEM, (STRPTR)"List Buffers ^X^B", NULL, 0, 0L, (APTR)Project0Item3,
+	NM_ITEM, (STRPTR)"Quit         ^X^C", NULL, 0, 0L, (APTR)Project0Item4,
+	NM_TITLE, (STRPTR)"Edit", NULL, 0, NULL, NULL,
+	NM_ITEM, (STRPTR)"Set Mark     ^@", (STRPTR)"C", 0, 0L, (APTR)Project0Item5,
+	NM_ITEM, (STRPTR)"Cut Region   M-W", NULL, 0, 0L, (APTR)Project0Item6,
+	NM_ITEM, (STRPTR)"Copy Region  M-Y", NULL, 0, 0L, (APTR)Project0Item7,
+	NM_ITEM, (STRPTR)"Transpose    ^T", NULL, 0, 0L, (APTR)Project0Item8,
+	NM_ITEM, (STRPTR)"Quote Char   ^Q", NULL, 0, 0L, (APTR)Project0Item9,
+	NM_ITEM, (STRPTR)"Uppercase Rg ^X^U", NULL, 0, 0L, (APTR)Project0Item10,
+	NM_ITEM, (STRPTR)"Lowercase Rg ^X^L", NULL, 0, 0L, (APTR)Project0Item11,
+	NM_TITLE, (STRPTR)"Buffers", NULL, 0, NULL, NULL,
+	NM_ITEM, (STRPTR)"List         ^X^B", NULL, 0, 0L, (APTR)Project0Item12,
+	NM_ITEM, (STRPTR)"Select       ^Xb", NULL, 0, 0L, (APTR)Project0Item13,
+	NM_ITEM, (STRPTR)"Kill         ^Xk", NULL, 0, 0L, (APTR)Project0Item14,
+	NM_ITEM, (STRPTR)"Insert       M-^Y", NULL, 0, 0L, (APTR)Project0Item15,
+	NM_ITEM, (STRPTR)"Justify      ^XJ", NULL, 0, 0L, (APTR)Project0Item16,
+	NM_TITLE, (STRPTR)"Extras", NULL, 0, NULL, NULL,
+	NM_ITEM, (STRPTR)"Redisplay    ^L", NULL, 0, 0L, (APTR)Project0Item17,
+	NM_END, NULL, NULL, 0, 0L, NULL };
+
 
 #define MAXDYNMENU  256
 
@@ -213,7 +250,6 @@ void FAR PASCAL GenerateMenuSeq (UINT ID)
     in_put (ID & 0xFF);     /* menu ID low byte (--> ypos) */
     in_put ('m');           /* dummy event */
 } /* GenerateMenuSeq */
-
 
 /* AboutDlgProc:  About box dialog function */
 /* ============                             */

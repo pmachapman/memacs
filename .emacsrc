@@ -1,0 +1,8 @@
+bind-to-key previous-page S-FNP
+bind-to-key next-page S-FNN
+bind-to-key beginning-of-line S-FNB
+bind-to-key end-of-line S-FNF
+bind-to-key save-file FN9
+bind-to-key exit-emacs FN0
+bind-to-key split-current-window FN2
+bind-to-key select-buffer S-FN2

@@ -36,6 +36,12 @@ extern int PASCAL updscrollbars (SCREEN *sp, char w_flag);
 extern VOID PASCAL NEAR vtscreen (SCREEN *sp);
 #endif
 
+#if AMIGA
+#ifdef __SASC
+int FileReq(char *, char *, unsigned);
+#endif
+#endif
+
 #if CALLED
 extern int emacs(int argc, char *argv[]);
 #endif
@@ -541,12 +547,14 @@ char *strrev(char *);
 #include <stdlib.h>
 #include <string.h>
 #else
+#if !(defined(__SASC) && defined(_STRING_H))
 char *strcat(char *, char *);
 char *strcpy(char *, char *);
 int  strlen(char *);
 int  strncmp(char *, char *, int);
 char *strchr(char *, int);
 int  strcmp(char *, char *);
+#endif
 char *realloc(char *block, int siz);
 #if RAMSIZE == 0
 char *malloc(int);

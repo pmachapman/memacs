@@ -6,6 +6,9 @@
  */
 
 #include <stdio.h>
+#ifdef __STDC__
+#include <string.h>
+#endif
 #include "estruct.h"
 #include "eproto.h"
 #include "edef.h"

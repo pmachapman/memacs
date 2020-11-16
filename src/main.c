@@ -98,6 +98,11 @@ char *argv[];	/* argument strings */
 
 	/* Initialize the editor */
 	eexitflag = FALSE;
+	
+#if	WINDOW_AMIGA
+	amiga_init(argc, argv);
+#endif
+
 #if	!WINDOW_MSWIN
 	vtinit();		/* Terminal */
 #endif
@@ -672,7 +677,7 @@ int n;		/* prefix value */
 	int schar;		/* second key in 2 byte sequence */
 #endif
 
-#if	WINDOW_MSWIN
+#if	WINDOW_MSWIN /* | WINDOW_AMIGA */
 	/* if it is a menu command, go for it... */
 	if ((c & MENU) == MENU) {
 		thisflag = 0;

@@ -435,7 +435,7 @@ BOOL FAR PASCAL ScrReSize (HWND hWnd, UINT wParam, WORD cx, WORD cy)
     }
     return TRUE;
 } /* ScrReSize */
-
+
 /* ScrPaint:   processes WM_PAINT messages for emacs screens */
 /* ========                                                  */
 
