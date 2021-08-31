@@ -1,13 +1,3 @@
-https://www.ibm.com/developerworks/cn/education/linux/l-emacs/l-emacs.html
-https://www.ibm.com/developerworks/cn/education/aix/emacs1/index.html
-https://www.ibm.com/developerworks/cn/education/aix/emacs2/index.html
-https://www.ibm.com/developerworks/cn/education/aix/au-emacs3/index.html
-https://www.ibm.com/developerworks/cn/education/aix/au-emacs4/index.html
-https://www.ibm.com/developerworks/cn/education/aix/au-emacs5/index.html
-https://www.ibm.com/developerworks/cn/education/aix/au-emacs6/index.html
-https://www.ibm.com/developerworks/cn/education/aix/au-emacs7/index.html
-
-
 # MicroEMACS
 This is an unofficial repository for the MicroEMACS Editor by Daniel Lawrence.
 
