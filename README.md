@@ -22,9 +22,6 @@ http://dfrench.hypermart.net/js/Downloads/Editors/MicroEMACS/index.content.shtml
 
 
 ```
-(setenv "HOME" "D:/WinImage/Programs/emacs")
-(setenv "PATH" "D:/WinImage/Programs/emacs")
-
 (prefer-coding-system 'utf-8)
 (set-language-environment "Chinese-GB")
 (set-locale-environment "Chinese-GB")
@@ -45,5 +42,5 @@ http://dfrench.hypermart.net/js/Downloads/Editors/MicroEMACS/index.content.shtml
                     (font-spec :family "Consolas" :size 14)))
 
 (setq default-frame-alist
-'((height . 36) (width . 120) (menu-bar-lines . 20) (tool-bar-lines . 0)))
+'((height . 32) (width . 100) (menu-bar-lines . 20) (tool-bar-lines . 0)))
 ```
