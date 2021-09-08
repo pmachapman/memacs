@@ -29,18 +29,23 @@ http://dfrench.hypermart.net/js/Downloads/Editors/MicroEMACS/index.content.shtml
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
-(dolist (charset '(ascii iso-8859-1 latin))
-  (set-fontset-font "fontset-startup" charset 
-                    "Microsoft Yahei UI" nil 'append)
-  (set-fontset-font "fontset-default" charset
-                    (font-spec :family "Consolas" :size 14)))
+(when (eq system-type 'windows-nt)
+ (setq fonts '("Consolas NF" "Microsoft YaHei-X"))
+ (set-face-attribute 'default nil :font
+                     (format "%s:pixelsize=%d" (car fonts) 16))
+ ;; (setq face-font-rescale-alist '(("微软雅黑". 1.1)))
+ )
 
-(dolist (charset '(kana han cjk-misc bopomofo))
-  (set-fontset-font "fontset-startup" charset 
-                    "Microsoft Yahei UI" nil 'append)
-  (set-fontset-font "fontset-default" charset
-                    (font-spec :family "Consolas" :size 14)))
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+ (set-fontset-font (frame-parameter nil 'font) charset
+                   (font-spec :family (car (cdr fonts)))))
 
 (setq default-frame-alist
 '((height . 32) (width . 100) (menu-bar-lines . 20) (tool-bar-lines . 0)))
+
+(setq package-gnupghome-dir "/c/Users/polaris/AppData/Roaming/.emacs.d/elpa/gnupg")
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(load-theme 'monokai t)
 ```
