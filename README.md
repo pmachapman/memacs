@@ -30,10 +30,9 @@ http://dfrench.hypermart.net/js/Downloads/Editors/MicroEMACS/index.content.shtml
 (set-keyboard-coding-system 'utf-8)
 
 (when (eq system-type 'windows-nt)
- (setq fonts '("Consolas NF" "Microsoft YaHei-X"))
+ (setq fonts '("Consolas" "微软雅黑"))
  (set-face-attribute 'default nil :font
                      (format "%s:pixelsize=%d" (car fonts) 16))
- ;; (setq face-font-rescale-alist '(("微软雅黑". 1.1)))
  )
 
 (dolist (charset '(kana han symbol cjk-misc bopomofo))
@@ -47,5 +46,5 @@ http://dfrench.hypermart.net/js/Downloads/Editors/MicroEMACS/index.content.shtml
 (require 'package)
 (package-initialize)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(load-theme 'monokai t)
+(load-theme 'monokai t) ;; M-x package-install RET monokai-theme RET
 ```
