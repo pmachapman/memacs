@@ -95,6 +95,7 @@ This function should only modify configuration layer settings."
      git
      helm
      lsp
+     (c-c++ :variables c-c++-backend 'lsp-clangd)
      markdown
      multiple-cursors
      org
