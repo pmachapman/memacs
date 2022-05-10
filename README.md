@@ -42,7 +42,8 @@ http://dfrench.hypermart.net/js/Downloads/Editors/MicroEMACS/index.content.shtml
 (setq default-frame-alist
 '((height . 32) (width . 100) (menu-bar-lines . 20) (tool-bar-lines . 0)))
 
-(setq package-gnupghome-dir "/c/Users/polaris/AppData/Roaming/.emacs.d/elpa/gnupg")
+;; (setq package-gnupghome-dir "/c/Users/polaris/AppData/Roaming/.emacs.d/elpa/gnupg")
+(setq package-check-signature nil)
 (require 'package)
 (package-initialize)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -599,7 +600,8 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
       ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
       ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
       ("nongnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")))
-(setq package-gnupghome-dir "/c/Users/polaris/AppData/Roaming/.emacs.d/elpa/gnupg")
+;; (setq package-gnupghome-dir "/c/Users/polaris/AppData/Roaming/.emacs.d/elpa/gnupg")
+(setq package-check-signature nil)
 (setq byte-compile-warnings '(cl-functions))
 )
 
