@@ -33,6 +33,14 @@ int f, n;	/* command arguments [passed through to command executed] */
 
 		/* and look it up */
 		if ((kfunc = fncmatch(buffer)) == NULL) {
+#if	LUASCRIPT
+			if (elua_iscommand(buffer)) {
+				clexec = FALSE;
+				status = elua_runcmd(buffer, f, n);
+				clexec = TRUE;
+				return(status);
+			}
+#endif
 			mlwrite(TEXT16);
 /*      	                "[No such Function]" */
 			return(FALSE);
@@ -47,7 +55,22 @@ int f, n;	/* command arguments [passed through to command executed] */
 
 	/* prompt the user to type a named command */
 	/* and get the function name to execute */
+#if	LUASCRIPT
+	{
+		char *sp;
+
+		sp = complete(": ", NULL, CMP_COMMAND, NSTRING);
+		if (sp == NULL)
+			return(ABORT);
+		kfunc = fncmatch(sp);
+		if (kfunc == NULL && elua_iscommand(sp)) {
+			strcpy(buffer, sp);
+			return(elua_runcmd(buffer, f, n));
+		}
+	}
+#else
 	kfunc = getname(": ");
+#endif
 	if (kfunc == NULL) {
 		mlwrite(TEXT16);
 /*                      "[No such function]" */
@@ -136,6 +159,19 @@ char *cline;	/* command line to execute */
 
 	/* and match the token to see if it exists */
 	if ((fnc = fncmatch(tkn)) == NULL) {
+
+#if	LUASCRIPT
+		/* a command written in Lua? */
+		if (elua_iscommand(tkn)) {
+			oldcle = clexec;
+			clexec = TRUE;
+			status = elua_runcmd(tkn, f, n);
+			cmdstatus = status;
+			clexec = oldcle;
+			execstr = oldestr;
+			return(status);
+		}
+#endif
 
 		/* construct the buffer name */
 		strcpy(bufn, "[");
@@ -375,6 +411,12 @@ int f, n;	/* default flag and numeric arg */
 /*                            "Execute procedure: " */
                 return(status);
 
+#if	LUASCRIPT
+	/* a command written in Lua? */
+	if (elua_iscommand(&bufn[1]))
+		return(elua_runcmd(&bufn[1], f, n));
+#endif
+
 	/* construct the buffer name */
 	bufn[0] = '[';
 	strcat(bufn, "]");
@@ -407,6 +449,16 @@ int f, n;	/* default flag and numeric arg */
 	if ((bp = getcbuf(TEXT117, curbp->b_bname, FALSE)) == NULL)
 /*                        "Execute buffer: " */
 		return(ABORT);
+
+#if	LUASCRIPT
+	/* a buffer holding a .lua file is run as Lua */
+	if (elua_isluafile(bp->b_fname) || elua_isluafile(bp->b_bname)) {
+		while (n-- > 0)
+			if ((status = elua_dobuf(bp)) != TRUE)
+				return(status);
+		return(TRUE);
+	}
+#endif
 
 	/* and now execute it as asked */
 	while (n-- > 0)
@@ -1137,6 +1189,13 @@ int f, n;	/* default flag and numeric arg to pass on to file */
 
 		/* try to default the extension */
 		if (sindex(fname, ".") == 0) {
+#if	LUASCRIPT
+			strcat(fname, ".lua");
+			fspec = flook(fname, TRUE);
+			if (fspec != NULL)
+				goto exec1;
+			fname[strlen(fname) - 4] = 0;
+#endif
 			strcat(fname, ".cmd");
 			fspec = flook(fname, TRUE);
 			if (fspec != NULL)
@@ -1170,6 +1229,12 @@ char *fname;	/* file name to execute */
 	register BUFFER *cb;	/* temp to hold current buf while we read */
 	register int status;	/* results of various calls */
 	char bname[NBUFN];	/* name of buffer */
+
+#if	LUASCRIPT
+	/* Lua scripts are run straight from the file */
+	if (elua_isluafile(fname))
+		return(elua_dofile(fname));
+#endif
 
 	makename(bname, fname);		/* derive the name of the buffer */
 	unqname(bname);			/* make sure we don't stomp things */

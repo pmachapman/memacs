@@ -26,15 +26,32 @@ F4 = $(OBJD)/input.o $(OBJD)/isearch.o $(OBJD)/keyboard.o $(OBJD)/line.o
 F5 = $(OBJD)/lock.o $(OBJD)/main.o $(OBJD)/mouse.o $(OBJD)/screen.o
 F6 = $(OBJD)/random.o $(OBJD)/region.o $(OBJD)/search.o $(OBJD)/replace.o
 F7 = $(OBJD)/tags.o $(OBJD)/undo.o $(OBJD)/unix.o $(OBJD)/window.o $(OBJD)/word.o
+F8 = $(OBJD)/elua.o
+
+# the Lua interpreter (src/lua)
+
+LUAD = $(SRCD)/lua
+LUACFLAGS = -O2 -DLUA_USE_POSIX
+LUAOBJS = lapi.o lauxlib.o lbaselib.o lcode.o lcorolib.o lctype.o ldblib.o \
+	ldebug.o ldo.o ldump.o lfunc.o lgc.o linit.o liolib.o llex.o \
+	lmathlib.o lmem.o loadlib.o lobject.o lopcodes.o loslib.o lparser.o \
+	lstate.o lstring.o lstrlib.o ltable.o ltablib.o ltm.o lundump.o \
+	lutf8lib.o lvm.o lzio.o
+LFILES = $(addprefix $(OBJD)/,$(LUAOBJS))
 
 # product list
 
 all:	emacs
 
-OFILES =	$(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7)
+OFILES =	$(F1) $(F2) $(F3) $(F4) $(F5) $(F6) $(F7) $(F8) $(LFILES)
 
 emacs:	$(OFILES)
-		$(CC) $(CFLAGS) $(OFILES) -lncurses -lc -o emacs
+		$(CC) $(CFLAGS) $(OFILES) -lncurses -lm -lc -o emacs
+
+$(OBJD)/elua.o: $(SRCD)/elua.c
+	$(CC) $(CFLAGS) -c -o $(OBJD)/elua.o $(SRCD)/elua.c
+$(LFILES): $(OBJD)/%.o: $(LUAD)/%.c
+	$(CC) $(LUACFLAGS) -c -o $@ $<
 
 $(OBJD)/abbrev.o: $(SRCD)/abbrev.c
 	$(CC) $(CFLAGS) -c -o $(OBJD)/abbrev.o $(SRCD)/abbrev.c

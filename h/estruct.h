@@ -167,6 +167,7 @@
 #define CTAGS	1	/* include vi-like tagging?			*/
 #define SPEECH	0	/* spoken EMACS, for the sight impared [not ready] */
 #define VARARG	1	/* use varargs.h for mlwrite()			*/
+#define LUASCRIPT 1	/* Lua scripting (32/64 bit targets only)	*/
 
 #if	XVT
 #undef	COLOR
@@ -347,6 +348,22 @@
 #endif
 #endif
 
+#endif
+
+/*	Lua needs a 32 or 64 bit compiler. Leave it out of the 16 bit
+	MS-DOS and Windows 3.x builds and the other legacy systems,
+	which keep only the original procedure language.	*/
+
+#if	(MSDOS && !WINDOW_MSWIN32) || (WINDOW_MSWIN && !WINDOW_MSWIN32) || AMIGA || TOS || FINDER || AOSVS || MPE || WMCS || VMS || OS2 || XENIX
+#undef	LUASCRIPT
+#define	LUASCRIPT 0
+#endif
+
+/*	The Borland C++ 5.5 makefiles do not build the Lua sources	*/
+
+#ifdef	__BORLANDC__
+#undef	LUASCRIPT
+#define	LUASCRIPT 0
 #endif
 
 #if	TURBO
@@ -559,6 +576,7 @@ union REGS {
 #define BINDNUL 0		/* not bound to anything		*/
 #define BINDFNC 1		/* key bound to a function		*/
 #define BINDBUF 2		/* key bound to a buffer		*/
+#define BINDLUA 3		/* key bound to a Lua command		*/
 
 #ifdef	FALSE
 #undef	FALSE
@@ -1086,6 +1104,7 @@ typedef struct	{
 ETYPE EPOINTER {
 	int (PASCAL NEAR *fp)();	/* C routine to invoke */
 	BUFFER *buf;			/* buffer to execute */
+	char *lname;			/* name of Lua command to execute */
 };
 
 typedef struct	{

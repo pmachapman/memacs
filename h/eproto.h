@@ -158,6 +158,19 @@ extern int PASCAL NEAR echostring(char *, int, int);
 extern int PASCAL NEAR eq(register unsigned char bc, register unsigned char pc);
 extern long PASCAL NEAR ernd(VOID);
 extern int PASCAL NEAR execkey(KEYTAB *key, int f, int n);
+#if	LUASCRIPT
+extern int PASCAL NEAR elua_init(VOID);
+extern VOID PASCAL NEAR elua_close(VOID);
+extern int PASCAL NEAR elua_iscommand(char *name);
+extern int PASCAL NEAR elua_runcmd(char *name, int f, int n);
+extern int PASCAL NEAR elua_isluafile(char *fname);
+extern int PASCAL NEAR elua_dofile(char *fname);
+extern int PASCAL NEAR elua_dobuf(BUFFER *bp);
+extern int PASCAL NEAR elua_evalcmd(int f, int n);
+extern int PASCAL NEAR elua_buildlist(BUFFER *listbuf, int type, char *mstring);
+extern char *PASCAL NEAR elua_startname(VOID);
+extern char *PASCAL NEAR elua_intern(char *name);
+#endif
 extern int PASCAL NEAR fbound(DELTA *tbl, int jump, LINE **pcurline, int *pcuroff, int dir);
 extern int PASCAL NEAR fexist(char *fname);
 extern int PASCAL NEAR findcol(LINE *lp, int pos);
@@ -698,6 +711,19 @@ extern int PASCAL NEAR echostring();
 extern int PASCAL NEAR eq();
 extern long PASCAL NEAR ernd();
 extern int PASCAL NEAR execkey();
+#if	LUASCRIPT
+extern int PASCAL NEAR elua_init();
+extern VOID PASCAL NEAR elua_close();
+extern int PASCAL NEAR elua_iscommand();
+extern int PASCAL NEAR elua_runcmd();
+extern int PASCAL NEAR elua_isluafile();
+extern int PASCAL NEAR elua_dofile();
+extern int PASCAL NEAR elua_dobuf();
+extern int PASCAL NEAR elua_evalcmd();
+extern int PASCAL NEAR elua_buildlist();
+extern char *PASCAL NEAR elua_startname();
+extern char *PASCAL NEAR elua_intern();
+#endif
 extern int PASCAL NEAR fbound();
 extern int PASCAL NEAR fexist();
 extern int PASCAL NEAR findcol();

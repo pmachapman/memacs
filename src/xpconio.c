@@ -551,6 +551,32 @@ ttc:	ntflush();
 	goto ttc;
 }
 
+#if LUASCRIPT
+/*----------------------------------------------------------------------*/
+/*	ttpoll()							*/
+/* Move any waiting keyboard/mouse events into the input queue without	*/
+/* waiting, and say if any keys are there. This lets ^G interrupt a	*/
+/* running Lua script.							*/
+/*----------------------------------------------------------------------*/
+
+int PASCAL NEAR ttpoll()
+
+{
+	DWORD count;
+
+	while (in_check() == FALSE &&
+	       GetNumberOfConsoleInputEvents(hInput, &count) && count > 0) {
+		if (ReadConsoleInput(hInput, &ir, 1, &count) == FALSE)
+			break;
+		if (ir.EventType == KEY_EVENT)
+			KeyboardEvent();
+		else if (ir.EventType == MOUSE_EVENT)
+			MouseEvent();
+	}
+	return(in_check());
+}
+#endif
+
 #if TYPEAH
 /*----------------------------------------------------------------------*/
 /*	typahead()							*/

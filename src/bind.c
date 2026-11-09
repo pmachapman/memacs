@@ -178,6 +178,53 @@ int f, n;	/* command arguments [IGNORED] */
 	return(TRUE);
 }
 
+#if	LUASCRIPT
+/* bindlua:	finish macro-to-key for a Lua command: get the key and
+		bind it */
+
+static int PASCAL NEAR bindlua(name, outseq)
+
+char *name;	/* name of the Lua command */
+char *outseq;	/* prompt so far */
+
+{
+	register unsigned int c;/* command key to bind */
+	register KEYTAB *ktp;	/* pointer into the command table */
+	char *lname;		/* saved copy of the name */
+
+	if ((lname = elua_intern(name)) == NULL)
+		return(FALSE);
+
+	strcat(outseq, " ");
+	mlwrite(outseq);
+
+	/* get the command sequence to bind */
+	c = getckey(FALSE);
+	ostring(cmdstr(c, &outseq[0]));
+
+	/* search the table to see if it exists */
+	for (ktp = &keytab[0]; ktp->k_type != BINDNUL; ++ktp)
+		if (ktp->k_code == c)
+			break;
+
+	if (ktp->k_type == BINDNUL) {
+		/* if we run out of binding room, bitch */
+		if (ktp >= &keytab[NBINDS]) {
+			mlwrite(TEXT17);
+/*				"Binding table FULL!" */
+			return(FALSE);
+		}
+		ktp[1].k_code = 0;
+		ktp[1].k_type = BINDNUL;
+		ktp[1].k_ptr.fp = NULL;
+	}
+	ktp->k_code = c;
+	ktp->k_ptr.lname = lname;
+	ktp->k_type = BINDLUA;
+	return(TRUE);
+}
+#endif
+
 /* macrotokey:	Bind a key to a macro in the key binding table */
 
 PASCAL NEAR macrotokey(f, n)
@@ -207,6 +254,12 @@ int f, n;	/* command arguments [IGNORED] */
 	bufn[0] = '[';
 	strcat(bufn, "]");
 	if ((kmacro=bfind(bufn, FALSE, 0)) == NULL) {
+#if	LUASCRIPT
+		/* a Lua command can be bound the same way */
+		bufn[strlen(bufn) - 1] = 0;
+		if (elua_iscommand(&bufn[1]))
+			return(bindlua(&bufn[1], outseq));
+#endif
 		mlwrite(TEXT130);
 /*		"Macro not defined"*/
 		return(FALSE);
@@ -323,6 +376,10 @@ int c;		/* command key to unbind */
 		sktp->k_ptr.fp	 = ktp->k_ptr.fp;
 	else if (sktp->k_type == BINDBUF)
 		sktp->k_ptr.buf   = ktp->k_ptr.buf;
+#if	LUASCRIPT
+	else if (sktp->k_type == BINDLUA)
+		sktp->k_ptr.lname = ktp->k_ptr.lname;
+#endif
 
 	/* null out the last one */
 	ktp->k_code = 0;
@@ -514,6 +571,12 @@ bfail:		/* and on to the next buffer */
 		bp = bp->b_bufp;
 	}
 
+#if	LUASCRIPT
+	/* and the commands written in Lua */
+	if (elua_buildlist(listbuf, type, mstring) != TRUE)
+		return(FALSE);
+#endif
+
 	wpopup(listbuf);
 	mlerase();	/* clear the mode line */
 	return(TRUE);
@@ -592,12 +655,26 @@ char *sfname;	/* name of startup file (null if default) */
 
 	 	/* default the extention */
 		strcpy(name, sfname);
-		if (sindex(name, ".") == 0)
+		if (sindex(name, ".") == 0) {
+#if	LUASCRIPT
+			/* prefer a Lua script */
+			strcat(name, ".lua");
+			if ((fname = flook(name, TRUE)) != NULL)
+				return(dofile(fname));
+			name[strlen(name) - 4] = 0;
+#endif
 			strcat(name, ".cmd");
+		}
 
 		fname = flook(name, TRUE);
-	} else
+	} else {
+#if	LUASCRIPT
+		/* emacs.lua (.emacs.lua on UNIX) replaces emacs.rc */
+		if ((fname = flook(elua_startname(), TRUE)) != NULL)
+			return(dofile(fname));
+#endif
 		fname = flook(pathname[0], TRUE);
+	}
 
 	/* if it isn't around, don't sweat it */
 	if (fname == NULL)
@@ -869,6 +946,11 @@ KEYTAB *key;	/* key binding to return a name of */
 		}
 		return(NULL);
 	}
+
+#if	LUASCRIPT
+	if (key->k_type == BINDLUA)
+		return(key->k_ptr.lname);
+#endif
 	return(NULL);
 }
 
@@ -1038,6 +1120,13 @@ int f, n;	/* agruments to C function */
 				return(status);
 		}
 	}
+
+#if	LUASCRIPT
+	if (key->k_type == BINDLUA) {
+		undo_insert(OP_CMND, 1, obj);
+		return(elua_runcmd(key->k_ptr.lname, f, n));
+	}
+#endif
 	return(TRUE);
 }
 
@@ -1078,6 +1167,16 @@ char *name;		/* name of function or buffer */
 		key->k_type = BINDBUF;
 		return(TRUE);
 	}
+
+#if	LUASCRIPT
+	/* is it a Lua command? */
+	if (elua_iscommand(name)) {
+		if ((key->k_ptr.lname = elua_intern(name)) == NULL)
+			return(FALSE);
+		key->k_type = BINDLUA;
+		return(TRUE);
+	}
+#endif
 
 	/* not anything we can bind to */
 	mlwrite(TEXT16);

@@ -7,6 +7,10 @@ and with Daniel's passing I have noticed that links from his home page are break
 
 This project seeks to collect the source code and binaries for MicroEMACS, and provide them all from one place
 
+## Lua scripting
+
+This version embeds Lua 5.4 as its main scripting language, alongside the original procedure language. Put your setup in `emacs.lua` (`.emacs.lua` on UNIX) instead of `emacs.rc`, and press `M-:` to run a line of Lua. See [doc/lua.md](doc/lua.md) for the details, and [cmd/emacs.lua](cmd/emacs.lua) for the standard startup file written in Lua.
+
 ## Readme
 
 Please refer to [DOC/README](doc/readme) for the complete MicroEMACS readme file.

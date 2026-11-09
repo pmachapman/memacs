@@ -89,6 +89,9 @@ NOSHARE NBIND	names[] = {
 	{"end-of-line",			gotoeol},
 	{"end-of-word",			endword},
 	{"entab-region",		entab},
+#if	LUASCRIPT
+	{"eval-lua",			elua_evalcmd},
+#endif
 	{"exchange-point-and-mark",	swapmark},
 	{"execute-buffer",		execbuf},
 	{"execute-command-line",	execcmd},

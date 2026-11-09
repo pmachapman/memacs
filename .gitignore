@@ -46,3 +46,7 @@
 # Microsoft MASM Files
 *.lst
 *.sbr
+
+# GCC build output
+/xp/gcc/obj
+/xp/gcc/emacs.exe

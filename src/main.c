@@ -121,6 +121,9 @@ char *argv[];			/* argument strings */
 	ab_init();		/* initialize the abbreviation behavior */
 	varinit();		/* user variables */
 	initchars();		/* character set definitions */
+#if	LUASCRIPT
+	elua_init();		/* the Lua interpreter */
+#endif
 
 #if MAGIC
 	mcdeltapat[0].mc_type = tapatledcm[0].mc_type = JMPTABLE;
@@ -205,6 +208,11 @@ PASCAL NEAR clean()
 
 	/* dump the abbreviation list */
 	ab_clean();
+
+#if	LUASCRIPT
+	/* shut down Lua */
+	elua_close();
+#endif
 
 	/* dealloc the user variables */
 	varclean(uv_head);

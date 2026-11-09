@@ -133,6 +133,9 @@ NOSHARE KEYTAB	keytab[NBINDS] = {
 	{META|CTRL|'\\', 	BINDFNC,	execfile},
 	{META|' ',		BINDFNC,	setmark},
 	{META|'?',		BINDFNC,	help},
+#if	LUASCRIPT
+	{META|':',		BINDFNC,	elua_evalcmd},
+#endif
 	{META|'!',		BINDFNC,	reposition},
 	{META|')',		BINDFNC,	indent_region},
 	{META|'(',		BINDFNC,	undent_region},
