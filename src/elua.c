@@ -76,9 +76,11 @@ static lua_State *thread(void)
 
 #if	XPCON
 extern int PASCAL NEAR ttpoll();	/* in xpconio.c */
+extern VOID PASCAL NEAR ttkreset();	/* in xpconio.c */
 #define	keywaiting()	ttpoll()
 #else
 #define	keywaiting()	typahead()
+#define	ttkreset()
 #endif
 
 static void interrupt_hook(lua_State *L, lua_Debug *ar)
@@ -146,6 +148,7 @@ static int docall(lua_State *L, int nargs, int nres)
 	curL = L;
 	status = lua_pcall(L, nargs, nres, base);
 	curL = oldL;
+	ttkreset();	/* a program the script ran may have changed it */
 	lua_remove(L, base);
 	if (status != LUA_OK) {
 		report(L);

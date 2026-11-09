@@ -575,6 +575,20 @@ int PASCAL NEAR ttpoll()
 	}
 	return(in_check());
 }
+
+/*----------------------------------------------------------------------*/
+/*	ttkreset()							*/
+/* Put back the console mode MicroEMACS needs. A Lua script that runs	*/
+/* a program (io.popen, os.execute) lets CMD.EXE turn line input back	*/
+/* on, and then ^S pauses the console instead of reaching the editor.	*/
+/*----------------------------------------------------------------------*/
+
+VOID PASCAL NEAR ttkreset()
+
+{
+	if (ConsoleMode != 0)
+		SetConsoleMode(hInput, ConsoleMode);
+}
 #endif
 
 #if TYPEAH
