@@ -127,8 +127,11 @@ int f,n;	/* prefix flag and argument */
 	return(s);
 }
 
-#if	CRYPT
-PASCAL NEAR resetkey()	/* reset the encryption key if needed */
+#if	CRYPT && !CRYPT2	/* ecrypt2.c has the new version */
+PASCAL NEAR resetkey(fname, mode)	/* reset the encryption key if needed */
+
+char *fname;	/* file about to be read or written [unused] */
+int mode;	/* 'r', 'w' or 'a' [unused] */
 
 {
 	register int s; /* return status */
@@ -278,7 +281,7 @@ int	lockfl;		/* check for file locks? */
 	bp = curbp;				/* Cheap.		*/
 	if ((s=bclear(bp)) != TRUE)		/* Might be old.	*/
 		return(s);
-	bp->b_flag &= ~(BFINVS|BFCHG);
+	bp->b_flag &= ~(BFINVS|BFCHG|BFTRUNC);
 	strcpy(bp->b_fname, fname);
 
 	/* let a user macro get hold of things...if he wants */
@@ -286,7 +289,7 @@ int	lockfl;		/* check for file locks? */
 
 #if	CRYPT
 	/* set up for decryption */
-	s = resetkey();
+	s = resetkey(fname, 'r');
 	if (s != TRUE)
 		return(s);
 #endif
@@ -294,8 +297,12 @@ int	lockfl;		/* check for file locks? */
 	/* turn off ALL keyboard translation in case we get a dos error */
 	TTkclose();
 
-	if ((s=ffropen(fname)) == FIOERR)	/* Hard file open.	*/
+	if ((s=ffropen(fname)) == FIOERR) {	/* Hard file open.	*/
+		/* (a wrong encryption key) don't let an empty buffer
+		   be saved over the file without asking */
+		curbp->b_flag |= BFTRUNC;
 		goto out;
+	}
 
 	if (s == FIOFNF) {			/* File not found.	*/
 		mlwrite(TEXT138);
@@ -614,7 +621,7 @@ char *mode;	/* mode to open file (w = write a = append) */
 
 #if	CRYPT
 	/* set up for file encryption */
-	status = resetkey();
+	status = resetkey(fn, *mode);
 	if (status != TRUE)
 		return(status);
 #endif
@@ -700,6 +707,10 @@ char *mode;	/* mode to open file (w = write a = append) */
 				status = FIODEL;	    /* failed */
 			}
 		}
+#if	CRYPT2
+		if (cr_upgraded())
+			strcat(buf, ", now in the new encrypted format");
+#endif
 		strcat(buf, "]");
 		mlwrite(buf);
 	}
@@ -764,6 +775,12 @@ char	fname[];
 	bp = curbp;				/* Cheap.		*/
 	bp->b_flag |= BFCHG;			/* we have changed	*/
 	bp->b_flag &= ~BFINVS;			/* and are not temporary*/
+#if	CRYPT
+	/* set up for decryption (this may ask for the key) */
+	s = resetkey(fname, 'i');
+	if (s != TRUE)
+		return(s);
+#endif
 	if ((s=ffropen(fname)) == FIOERR)	/* Hard file open.	*/
 		goto out;
 	if (s == FIOFNF) {			/* File not found.	*/
@@ -774,11 +791,6 @@ char	fname[];
 	mlwrite(TEXT153);
 /*              "[Inserting file]" */
 
-#if	CRYPT
-	s = resetkey();
-	if (s != TRUE)
-		return(s);
-#endif
 	/* back up a line and save the mark here */
 	curwp->w_dotp = lback(curwp->w_dotp);
 	curwp->w_doto = 0;

@@ -388,9 +388,15 @@ int firstflag;			/* is this the first time in? */
 #if	CRYPT
 			if (cryptflag) {
 				bp->b_mode |= MDCRYPT;
+#if	CRYPT2
+				/* ecrypt2.c keeps the plain password
+				   until it has made a key from it */
+				bytecopy(bp->b_key, ekey, NPAT);
+#else
 				ecrypt((char *) NULL, 0);
 				ecrypt(ekey, strlen(ekey));
 				bytecopy(bp->b_key, ekey, NPAT);
+#endif
 			}
 #endif
 		}

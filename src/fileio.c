@@ -18,6 +18,18 @@
 NOSHARE FILE *ffp;		/* File pointer, all functions. */
 static int eofflag;		/* end-of-file flag */
 
+#if	CRYPT2
+/* In CRYPT mode the file's text is held in memory (see ecrypt2.c) */
+extern int cr_active;
+#define	FFGETC()	(cr_active ? cr_getc() : getc(ffp))
+#define	FFPUTC(c)	(cr_active ? cr_putc(c) : putc((c), ffp))
+#define	FFERROR()	(cr_active ? 0 : ferror(ffp))
+#else
+#define	FFGETC()	getc(ffp)
+#define	FFPUTC(c)	putc((c), ffp)
+#define	FFERROR()	ferror(ffp)
+#endif
+
 #if	(MSC || TURBO || IC) && MSDOS
 #define	FILE_BUFSIZE	4096
 char file_buffer[FILE_BUFSIZE];
@@ -31,6 +43,19 @@ char file_buffer[FILE_BUFSIZE];
 PASCAL NEAR ffropen(fn)
 char    *fn;
 {
+#if	CRYPT2
+	if (cryptflag) {
+		int s;
+
+		if ((s = cr_ropen(fn)) != FIOSUC)
+			return(s);
+#if	WINDOW_MSWIN
+		fbusy = FREADING;
+#endif
+		eofflag = FALSE;
+		return(FIOSUC);
+	}
+#endif
 	if ((ffp=fopen(fn, "r")) == NULL)
 		return(FIOFNF);
 
@@ -56,6 +81,17 @@ char    *fn;
 char *mode;	/* mode to open file for */
 {
 	char xmode[6];		/* extended file open mode */
+
+#if	CRYPT2
+	if (cryptflag) {
+		if (cr_wopen(fn, mode) != FIOSUC)
+			return(FIOERR);
+#if	WINDOW_MSWIN
+		fbusy = FWRITING;
+#endif
+		return(FIOSUC);
+	}
+#endif
 
 	/* nonstandard line terminators? */
 	if (*lterm) {
@@ -102,6 +138,11 @@ PASCAL NEAR ffclose()
 #if	WINDOW_MSWIN
 	fbusy = FALSE;
 #endif
+#if	CRYPT2
+	if (cr_active)
+		return(cr_close());
+	cryptflag = FALSE;	/* don't let it affect the next file */
+#endif
 #if	MSDOS & CTRLZ
 	putc(26, ffp);		/* add a ^Z at the end of the file */
 #endif
@@ -132,7 +173,11 @@ int nbuf;
 {
         register int i;		/* index into line to write */
 	register char *lptr;	/* ptr into the line terminator */
-#if	CRYPT
+#if	CRYPT2
+	/* (encryption happens in ffclose) */
+        for (i = 0; i < nbuf; ++i)
+                FFPUTC(buf[i]);
+#elif	CRYPT
 	char c;		/* character to translate */
 
 	if (cryptflag) {
@@ -153,13 +198,13 @@ int nbuf;
 	if (*lterm) {
 		lptr = &lterm[0];
 		while (*lptr)
-			putc(*lptr++, ffp);
+			FFPUTC(*lptr++);
 	} else {
-	        putc('\n', ffp);
+	        FFPUTC('\n');
 	}
 
 	/* check for write errors */
-        if (ferror(ffp)) {
+        if (FFERROR()) {
                 mlwrite(TEXT157);
 /*                      "Write I/O error" */
                 return(FIOERR);
@@ -208,7 +253,7 @@ int *nbytes;
 
 	/* read the line in */
         i = 0;
-        while ((c = getc(ffp)) != EOF && c != '\n') {
+        while ((c = FFGETC()) != EOF && c != '\n') {
                 fline[i++] = c;
 		/* if it's longer, get more room */
                 if (i >= flen) {
@@ -234,7 +279,7 @@ int *nbytes;
 
 	/* test for any errors that may have occured */
         if (c == EOF) {
-                if (ferror(ffp)) {
+                if (FFERROR()) {
                         mlwrite(TEXT158);
 /*                              "File read error" */
                         return(FIOERR);
@@ -248,7 +293,7 @@ int *nbytes;
 
 	/* terminate and decrypt the string */
         fline[i] = 0;
-#if	CRYPT
+#if	CRYPT && !CRYPT2	/* (ecrypt2.c decrypts the whole file) */
 	if (cryptflag)
 		ecrypt(fline, strlen(fline));
 #endif

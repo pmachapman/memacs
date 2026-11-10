@@ -18,6 +18,8 @@
 		D03D7E951EB044800072A7F6 /* eval.c in Sources */ = {isa = PBXBuildFile; fileRef = D03D7E6F1EB044800072A7F6 /* eval.c */; };
 		D03D7E961EB044800072A7F6 /* exec.c in Sources */ = {isa = PBXBuildFile; fileRef = D03D7E701EB044800072A7F6 /* exec.c */; };
 		4C5541000000000000010001 /* elua.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C5541000000000000000001 /* elua.c */; };
+		4C5541000000000000010022 /* ecrypt2.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C5541000000000000000022 /* ecrypt2.c */; };
+		4C5541000000000000010023 /* monocypher.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C5541000000000000000023 /* monocypher.c */; };
 		4C5541000000000000010002 /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C5541000000000000000002 /* lapi.c */; };
 		4C5541000000000000010003 /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C5541000000000000000003 /* lauxlib.c */; };
 		4C5541000000000000010004 /* lbaselib.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C5541000000000000000004 /* lbaselib.c */; };
@@ -119,6 +121,8 @@
 		D03D7E6F1EB044800072A7F6 /* eval.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = eval.c; path = ../src/eval.c; sourceTree = "<group>"; };
 		D03D7E701EB044800072A7F6 /* exec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = exec.c; path = ../src/exec.c; sourceTree = "<group>"; };
 		4C5541000000000000000001 /* elua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = elua.c; path = ../src/elua.c; sourceTree = "<group>"; };
+		4C5541000000000000000022 /* ecrypt2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ecrypt2.c; path = ../src/ecrypt2.c; sourceTree = "<group>"; };
+		4C5541000000000000000023 /* monocypher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = monocypher.c; path = ../src/monocypher/monocypher.c; sourceTree = "<group>"; };
 		4C5541000000000000000002 /* lapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lapi.c; path = ../src/lua/lapi.c; sourceTree = "<group>"; };
 		4C5541000000000000000003 /* lauxlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lauxlib.c; path = ../src/lua/lauxlib.c; sourceTree = "<group>"; };
 		4C5541000000000000000004 /* lbaselib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lbaselib.c; path = ../src/lua/lbaselib.c; sourceTree = "<group>"; };
@@ -243,6 +247,8 @@
 				D03D7E6F1EB044800072A7F6 /* eval.c */,
 				D03D7E701EB044800072A7F6 /* exec.c */,
 				4C5541000000000000000001 /* elua.c */,
+				4C5541000000000000000022 /* ecrypt2.c */,
+				4C5541000000000000000023 /* monocypher.c */,
 				4C5541000000000000000002 /* lapi.c */,
 				4C5541000000000000000003 /* lauxlib.c */,
 				4C5541000000000000000004 /* lbaselib.c */,
@@ -381,6 +387,8 @@
 				D03D7E9C1EB044800072A7F6 /* keyboard.c in Sources */,
 				D03D7E961EB044800072A7F6 /* exec.c in Sources */,
 				4C5541000000000000010001 /* elua.c in Sources */,
+				4C5541000000000000010022 /* ecrypt2.c in Sources */,
+				4C5541000000000000010023 /* monocypher.c in Sources */,
 				4C5541000000000000010002 /* lapi.c in Sources */,
 				4C5541000000000000010003 /* lauxlib.c in Sources */,
 				4C5541000000000000010004 /* lbaselib.c in Sources */,

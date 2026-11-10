@@ -421,7 +421,16 @@ extern int PASCAL NEAR readin(char fname[], int lockfl);
 extern int PASCAL NEAR refresh(int f, int n);
 extern int PASCAL NEAR remmark(int f, int n);
 extern int PASCAL NEAR reposition(int f, int n);
-extern int PASCAL NEAR resetkey(VOID);
+extern int PASCAL NEAR resetkey(char *fname, int mode);
+#if	CRYPT2
+extern int PASCAL NEAR cr_ropen(char *fn);
+extern int PASCAL NEAR cr_getc(VOID);
+extern int PASCAL NEAR cr_wopen(char *fn, char *mode);
+extern int PASCAL NEAR cr_putc(int c);
+extern int PASCAL NEAR cr_close(VOID);
+extern VOID PASCAL NEAR cr_freekey(BUFFER *bp);
+extern int PASCAL NEAR cr_upgraded(VOID);
+#endif
 extern int PASCAL NEAR resize(int f, int n);
 extern int PASCAL NEAR resizm(int f, int n);
 extern int PASCAL NEAR resizm2(int f, int n);
@@ -969,6 +978,15 @@ extern int PASCAL NEAR refresh();
 extern int PASCAL NEAR remmark();
 extern int PASCAL NEAR reposition();
 extern int PASCAL NEAR resetkey();
+#if	CRYPT2
+extern int PASCAL NEAR cr_ropen();
+extern int PASCAL NEAR cr_getc();
+extern int PASCAL NEAR cr_wopen();
+extern int PASCAL NEAR cr_putc();
+extern int PASCAL NEAR cr_close();
+extern VOID PASCAL NEAR cr_freekey();
+extern int PASCAL NEAR cr_upgraded();
+#endif
 extern int PASCAL NEAR resize();
 extern int PASCAL NEAR resizm();
 extern int PASCAL NEAR resterr();

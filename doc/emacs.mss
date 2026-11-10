@@ -1539,15 +1539,30 @@ line with the -k switch, or with the @b(M-E) @i(set-encryption-key)
 buffer in crypt mode and now key has not been set, EMACS will execute
 @i(set-encryption-key) automatically, prompting you for the needed key. 
 Whenever EMACS prompts you for a key, it will not echo the key to your
-screen as you type it (IE make SURE you get it right when you set it
-originally).
+screen as you type it. When you set a new key, EMACS asks you to type
+it twice, so a typing mistake cannot lock you out of the file.
 
-	The encryption algorithm used changes all characters into normal
-printing characters, thus the resulting file is suitable for sending via
-electronic mail. All version of MicroEMACS should be able decrypt the
-resulting file regardless of what machine encrypted it. Also available
-with EMACS is the stand alone program, MicroCRYPT, which can en/decrypt
-the files produced by CRYPT mode in EMACS.
+	The 32 and 64 bit versions of MicroEMACS encrypt files with
+XChaCha20-Poly1305, using a key made from your password with Argon2id
+(from the Monocypher library). The whole file is encrypted, including
+line endings and accented characters. If the key is wrong, or the file
+has been changed since it was saved, EMACS says so and does not load
+it. Encrypted files are binary, so send them by email as attachments.
+
+	EMACS recognizes the files it has encrypted. When you read one
+into a buffer, the buffer is put in CRYPT mode by itself and EMACS asks
+for the key, so you do not need to turn CRYPT mode on first. When you
+insert one into a buffer that is not in CRYPT mode, EMACS asks for that
+file's key and the buffer stays unencrypted. EMACS will not append a
+buffer that is not in CRYPT mode to an encrypted file. Files in the old
+format described below are not recognized, so turn on CRYPT mode before
+reading them.
+
+	Files encrypted by older versions of MicroEMACS, and by the 16 bit
+MS-DOS and Windows 3.x versions, use a much weaker cipher. The 32 and
+64 bit versions still read them, and save them in the new format, asking
+you to retype the key first. The older versions, and the stand alone
+MicroCRYPT program, cannot read files in the new format.
 
 @section(EXACT mode)@index(EXACT mode)
 

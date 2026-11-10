@@ -7,6 +7,7 @@
 SRCD = ../../src
 HDIR = ../../h
 LUAD = $(SRCD)/lua
+MONOD = $(SRCD)/monocypher
 OBJD = obj
 
 CC = gcc
@@ -14,7 +15,7 @@ CFLAGS = -O2 -w -I$(HDIR)
 LUACFLAGS = -O2
 
 EMACSOBJS = abbrev.o basic.o bind.o buffer.o char.o crypt.o display.o \
-	dolock.o elua.o eval.o exec.o file.o fileio.o input.o isearch.o \
+	dolock.o ecrypt2.o elua.o eval.o exec.o file.o fileio.o input.o isearch.o \
 	keyboard.o line.o lock.o main.o mouse.o random.o region.o replace.o \
 	screen.o search.o tags.o undo.o window.o word.o xp.o xpconio.o
 
@@ -26,17 +27,21 @@ LUAOBJS = lapi.o lauxlib.o lbaselib.o lcode.o lcorolib.o lctype.o ldblib.o \
 
 EOBJS = $(addprefix $(OBJD)/,$(EMACSOBJS))
 LOBJS = $(addprefix $(OBJD)/lua_,$(LUAOBJS))
+MOBJS = $(OBJD)/monocypher.o
 
 all: emacs.exe
 
-emacs.exe: $(EOBJS) $(LOBJS)
-	$(CC) -o $@ $(EOBJS) $(LOBJS)
+emacs.exe: $(EOBJS) $(LOBJS) $(MOBJS)
+	$(CC) -o $@ $(EOBJS) $(LOBJS) $(MOBJS) -lbcrypt
 
 $(OBJD)/%.o: $(SRCD)/%.c $(wildcard $(HDIR)/*.h) | $(OBJD)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(OBJD)/lua_%.o: $(LUAD)/%.c | $(OBJD)
 	$(CC) $(LUACFLAGS) -c -o $@ $<
+
+$(OBJD)/monocypher.o: $(MONOD)/monocypher.c $(MONOD)/monocypher.h | $(OBJD)
+	$(CC) -O2 -c -o $@ $<
 
 $(OBJD):
 	mkdir $(OBJD)

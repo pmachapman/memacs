@@ -16,6 +16,7 @@ static int PASCAL NEAR mod95(int);
 static int PASCAL NEAR mod95();
 #endif
 
+#if	!CRYPT2	/* ecrypt2.c has the new version */
 PASCAL NEAR setekey(f, n)	/* reset encryption key of current buffer */
 
 int f;		/* default flag */
@@ -46,6 +47,7 @@ int n;		/* numeric argument */
 	mlwrite(" ");		/* clear it off the bottom line */
 	return(TRUE);
 }
+#endif
 
 /**********
  *

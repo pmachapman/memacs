@@ -154,7 +154,9 @@
     <ClCompile Include="..\..\src\dolock.c" />
     <ClCompile Include="..\..\src\eval.c" />
     <ClCompile Include="..\..\src\exec.c" />
+    <ClCompile Include="..\..\src\ecrypt2.c" />
     <ClCompile Include="..\..\src\elua.c" />
+    <ClCompile Include="..\..\src\monocypher\monocypher.c" />
     <ClCompile Include="..\..\src\lua\lapi.c" />
     <ClCompile Include="..\..\src\lua\lauxlib.c" />
     <ClCompile Include="..\..\src\lua\lbaselib.c" />

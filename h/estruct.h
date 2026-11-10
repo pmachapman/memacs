@@ -161,6 +161,7 @@
 #define ISRCH	1	/* Incremental searches like ITS EMACS		*/
 #define FLABEL	0	/* function key label code [HP150]		*/
 #define CRYPT	1	/* file encryption enabled?			*/
+#define CRYPT2	1	/* modern encryption (32/64 bit targets only)	*/
 #define MAGIC	1	/* include regular expression matching? 	*/
 #define MOUSE	1	/* Include routines for mouse actions		*/
 #define NOISY	1	/* Use a fancy BELL if it exists		*/
@@ -350,20 +351,30 @@
 
 #endif
 
-/*	Lua needs a 32 or 64 bit compiler. Leave it out of the 16 bit
+/*	Lua and the modern encryption (CRYPT2) need a 32 or 64 bit compiler.
+	Leave them out of the 16 bit
 	MS-DOS and Windows 3.x builds and the other legacy systems,
-	which keep only the original procedure language.	*/
+	which keep only the procedure language and the old cipher.	*/
 
 #if	(MSDOS && !WINDOW_MSWIN32) || (WINDOW_MSWIN && !WINDOW_MSWIN32) || AMIGA || TOS || FINDER || AOSVS || MPE || WMCS || VMS || OS2 || XENIX
 #undef	LUASCRIPT
 #define	LUASCRIPT 0
+#undef	CRYPT2
+#define	CRYPT2 0
 #endif
 
-/*	The Borland C++ 5.5 makefiles do not build the Lua sources	*/
+/*	The Borland C++ 5.5 makefiles do not build the Lua or Monocypher sources */
 
 #ifdef	__BORLANDC__
 #undef	LUASCRIPT
 #define	LUASCRIPT 0
+#undef	CRYPT2
+#define	CRYPT2 0
+#endif
+
+#if	CRYPT == 0
+#undef	CRYPT2
+#define	CRYPT2 0
 #endif
 
 #if	TURBO
@@ -884,6 +895,9 @@ typedef struct	BUFFER {
 	char	b_bname[NBUFN]; 	/* Buffer name			*/
 #if	CRYPT
 	char   b_key[NPAT];		/* current encrypted key        */
+#endif
+#if	CRYPT2
+	char   *b_ckey;			/* key state (ecrypt2.c)	*/
 #endif
 	int b_numargs;			/* number of arguments to procedure */
 	PARG *b_args;			/* ptr to the first argument	*/

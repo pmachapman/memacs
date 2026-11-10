@@ -26,7 +26,7 @@ F4 = $(OBJD)/input.o $(OBJD)/isearch.o $(OBJD)/keyboard.o $(OBJD)/line.o
 F5 = $(OBJD)/lock.o $(OBJD)/main.o $(OBJD)/mouse.o $(OBJD)/screen.o
 F6 = $(OBJD)/random.o $(OBJD)/region.o $(OBJD)/search.o $(OBJD)/replace.o
 F7 = $(OBJD)/tags.o $(OBJD)/undo.o $(OBJD)/unix.o $(OBJD)/window.o $(OBJD)/word.o
-F8 = $(OBJD)/elua.o
+F8 = $(OBJD)/elua.o $(OBJD)/ecrypt2.o $(OBJD)/monocypher.o
 
 # the Lua interpreter (src/lua)
 
@@ -50,6 +50,10 @@ emacs:	$(OFILES)
 
 $(OBJD)/elua.o: $(SRCD)/elua.c
 	$(CC) $(CFLAGS) -c -o $(OBJD)/elua.o $(SRCD)/elua.c
+$(OBJD)/ecrypt2.o: $(SRCD)/ecrypt2.c
+	$(CC) $(CFLAGS) -c -o $(OBJD)/ecrypt2.o $(SRCD)/ecrypt2.c
+$(OBJD)/monocypher.o: $(SRCD)/monocypher/monocypher.c
+	$(CC) -O2 -c -o $(OBJD)/monocypher.o $(SRCD)/monocypher/monocypher.c
 $(LFILES): $(OBJD)/%.o: $(LUAD)/%.c
 	$(CC) $(LUACFLAGS) -c -o $@ $<
 

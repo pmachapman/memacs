@@ -267,6 +267,9 @@ register BUFFER *bp;
 		bheadp = bp2;
 	else
 		bp1->b_bufp = bp2;
+#if	CRYPT2
+	cr_freekey(bp);				/* Wipe its keys	*/
+#endif
 	free((char *) bp);			/* Release buffer block */
 	return(TRUE);
 }
@@ -579,6 +582,9 @@ int bflag;		/* bit settings for a new buffer */
 		strcpy(bp->b_bname, bname);
 #if	CRYPT
 		bp->b_key[0] = 0;
+#endif
+#if	CRYPT2
+		bp->b_ckey = NULL;
 #endif
 		bp->b_numargs = NOTPROC;
 		bp->b_args = (PARG *)NULL;

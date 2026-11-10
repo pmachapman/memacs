@@ -17,6 +17,10 @@
       <UniqueIdentifier>{6C7A1E52-3F0B-4B8E-9D47-5A2E8C1B4F30}</UniqueIdentifier>
       <Extensions>c;h</Extensions>
     </Filter>
+    <Filter Include="Monocypher">
+      <UniqueIdentifier>{2B9F4D61-7C3A-4E15-A8D2-9E6F0C3B7A14}</UniqueIdentifier>
+      <Extensions>c;h</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\h\dutch.h">
@@ -120,8 +124,14 @@
     <ClCompile Include="..\..\src\exec.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ecrypt2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\elua.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\monocypher\monocypher.c">
+      <Filter>Monocypher</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\lua\lapi.c">
       <Filter>Lua</Filter>
