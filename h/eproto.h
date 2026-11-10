@@ -171,6 +171,22 @@ extern int PASCAL NEAR elua_buildlist(BUFFER *listbuf, int type, char *mstring);
 extern char *PASCAL NEAR elua_startname(VOID);
 extern char *PASCAL NEAR elua_intern(char *name);
 #endif
+#if	PROCESS
+extern VOID PASCAL NEAR elua_procexit(int id, long code);
+extern int PASCAL NEAR proc_start(char *cmdline, char *dir, BUFFER *bp, char *errmsg);
+extern char *PASCAL NEAR proc_find(BUFFER *bp);
+extern int PASCAL NEAR proc_ofbuf(BUFFER *bp);
+extern int PASCAL NEAR proc_send(int id, char *text, int len);
+extern int PASCAL NEAR proc_eof(int id);
+extern int PASCAL NEAR proc_interrupt(int id);
+extern int PASCAL NEAR proc_kill(int id);
+extern int PASCAL NEAR proc_info(int id, int *running, long *code, long *mline, int *mcol, BUFFER **bpp);
+extern int PASCAL NEAR proc_setmark(int id, long line, int col);
+extern VOID PASCAL NEAR proc_bufgone(BUFFER *bp);
+extern int PASCAL NEAR proc_poll(VOID);
+extern int PASCAL NEAR proc_wait(long ms);
+extern int proc_toplevel;
+#endif
 extern int PASCAL NEAR fbound(DELTA *tbl, int jump, LINE **pcurline, int *pcuroff, int dir);
 extern int PASCAL NEAR fexist(char *fname);
 extern int PASCAL NEAR findcol(LINE *lp, int pos);
@@ -732,6 +748,22 @@ extern int PASCAL NEAR elua_evalcmd();
 extern int PASCAL NEAR elua_buildlist();
 extern char *PASCAL NEAR elua_startname();
 extern char *PASCAL NEAR elua_intern();
+#endif
+#if	PROCESS
+extern VOID PASCAL NEAR elua_procexit();
+extern int PASCAL NEAR proc_start();
+extern char *PASCAL NEAR proc_find();
+extern int PASCAL NEAR proc_ofbuf();
+extern int PASCAL NEAR proc_send();
+extern int PASCAL NEAR proc_eof();
+extern int PASCAL NEAR proc_interrupt();
+extern int PASCAL NEAR proc_kill();
+extern int PASCAL NEAR proc_info();
+extern int PASCAL NEAR proc_setmark();
+extern VOID PASCAL NEAR proc_bufgone();
+extern int PASCAL NEAR proc_poll();
+extern int PASCAL NEAR proc_wait();
+extern int proc_toplevel;
 #endif
 extern int PASCAL NEAR fbound();
 extern int PASCAL NEAR fexist();

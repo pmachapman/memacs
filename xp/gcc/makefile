@@ -15,7 +15,7 @@ CFLAGS = -O2 -w -I$(HDIR)
 LUACFLAGS = -O2
 
 EMACSOBJS = abbrev.o basic.o bind.o buffer.o char.o crypt.o display.o \
-	dolock.o ecrypt2.o elua.o eval.o exec.o file.o fileio.o input.o isearch.o \
+	dolock.o ecrypt2.o elua.o eproc.o eval.o exec.o file.o fileio.o input.o isearch.o \
 	keyboard.o line.o lock.o main.o mouse.o random.o region.o replace.o \
 	screen.o search.o tags.o undo.o window.o word.o xp.o xpconio.o
 

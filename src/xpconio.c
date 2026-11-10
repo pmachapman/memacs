@@ -523,6 +523,13 @@ ttc:	ntflush();
 			WindowSizeEvent();
 			goto ttc;
 		}
+#if	PROCESS
+		/* show output from programs running in buffers */
+		if (proc_poll()) {
+			update(FALSE);
+			goto ttc;
+		}
+#endif
 	}
 
 	/* get the next keyboard/mouse/resize event */

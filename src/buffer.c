@@ -270,6 +270,9 @@ register BUFFER *bp;
 #if	CRYPT2
 	cr_freekey(bp);				/* Wipe its keys	*/
 #endif
+#if	PROCESS
+	proc_bufgone(bp);			/* End its process	*/
+#endif
 	free((char *) bp);			/* Release buffer block */
 	return(TRUE);
 }

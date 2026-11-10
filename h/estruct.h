@@ -377,6 +377,15 @@
 #define	CRYPT2 0
 #endif
 
+/*	Programs running live in a buffer (me.process in Lua, eproc.c).
+	Only the Windows console version has them for now.	*/
+
+#if	LUASCRIPT && XPCON
+#define	PROCESS	1
+#else
+#define	PROCESS	0
+#endif
+
 #if	TURBO
 #include      <dos.h>
 #include      <mem.h>

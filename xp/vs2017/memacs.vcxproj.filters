@@ -115,6 +115,9 @@
     <ClCompile Include="..\..\src\ecrypt2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\eproc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\elua.c">
       <Filter>Source Files</Filter>
     </ClCompile>

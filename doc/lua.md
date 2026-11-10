@@ -87,6 +87,36 @@ Switch buffers with `me.command("select-buffer", name)`.
 | `me.update()` | Redraw the screen now. |
 | `me.beep()` | Ring the bell. |
 
+## Programs in buffers
+
+`M-X shell` opens a live command prompt in the `*shell*` buffer. Type a command after the prompt and press Enter to run it. The output appears as it is produced, even while you work in other buffers. Pressing Enter on an earlier line runs that line again. `^C` stops the command that is running, but not the shell. Running `shell` again goes back to the same buffer. In other buffers, Enter and `^C` keep their usual commands.
+
+The shell can't run programs that take over the whole screen or read keys from the console (`edit`, `more`, `choice`). If one of these is waiting, press `^C`. Programs that hold back their output when it goes to a file show it in larger pieces.
+
+`me.shelloptions` sets up the shell: `program` (default `%COMSPEC%`, normally `cmd.exe`), `buffer` (default `"*shell*"`), `dir` (the folder to start in), and `echoes` (true if the program prints each command it reads, as `cmd.exe` does; the typed copy is then removed).
+
+The shell is built on these functions, which can run any program in a buffer:
+
+| Function | Meaning |
+|---|---|
+| `me.process(command, [options])` | Start a program, given as a Windows command line. Its output goes into a buffer. `options` can have `buffer` (a buffer name, made if needed; default the current buffer), `dir` (the folder to run in) and `onexit` (a function called with the process and its exit code when it finishes). Returns a process, or nil and a reason. A buffer can have only one running process. |
+| `me.getprocess([buffer])` | The process in a buffer (default the current one), or nil. |
+| `me.waitoutput([seconds])` | Let output arrive for up to `seconds` (default 1). Returns true as soon as any does. Output normally arrives while the editor waits for a key, so scripts only need this when they wait for a program themselves. |
+| `p:send(s)` | Send text to the program's input. Send `"\r\n"` to end a line. |
+| `p:eof()` | Close the program's input. |
+| `p:interrupt()` | Stop the programs this one has started, such as the command a shell is running. Returns how many were stopped. |
+| `p:kill()` | Stop the program and everything it started. |
+| `p:running()` | True while the program is running. |
+| `p:exitcode()` | Exit code once it has finished, nil before that. |
+| `p:mark()` | Line and column where the next output will go. Output goes before anything typed after this point. |
+| `p:setmark(line, [col])` | Move that point. |
+| `p:buffer()` | Name of the process's buffer, or nil if the buffer has been deleted. |
+| `p:id()` | A number that identifies the process. |
+
+When a program finishes, `[Process finished, exit code N]` is added to its buffer. Deleting the buffer stops the program, and programs still running when the editor exits are stopped too. Output is shown as plain text: carriage returns, bells and terminal escape codes (colours, window titles) are removed.
+
+Programs in buffers are only in the Windows console version for now. Elsewhere `me.process` returns nil and a reason.
+
 ## Variables
 
 `me.var` reads and sets the `$` environment variables, without the `$`: `me.var.fillcol = 64` is `set $fillcol 64`. All of the variables in the manual are available. Values come back as Lua types:
@@ -172,3 +202,5 @@ emacs @test/luatest.lua
 ```
 
 The editor runs the checks and exits. The exit status is the number of failures, and the full report is in `melua-test/results.txt` in the temp folder.
+
+`test/shelltest.lua` checks programs in buffers and the shell in the same way (Windows console version only). Its report is in `meshell-test/results.txt`.

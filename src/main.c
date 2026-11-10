@@ -554,7 +554,13 @@ loop:
 	/* get the next command from the keyboard */
 	discmd = TRUE;
 	disinp = TRUE;
+#if	PROCESS
+	proc_toplevel = TRUE;	/* process output may arrive meanwhile */
 	c = GETBASEKEY();
+	proc_toplevel = FALSE;
+#else
+	c = GETBASEKEY();
+#endif
 
 	/* if there is something on the command line, clear it */
 	if (mpresf != FALSE) {

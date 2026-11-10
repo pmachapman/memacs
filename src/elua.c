@@ -1315,7 +1315,298 @@ int PASCAL NEAR elua_evalcmd(int f, int n)
 /*	Setting up							*/
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/*	Programs running in buffers (eproc.c)				*/
+/* ------------------------------------------------------------------ */
+
+#if	PROCESS
+
+#define	PROCMETA	"me.process"	/* metatable of process objects */
+#define	PROCEXIT	"me.procexit"	/* registry: id -> onexit function */
+
+static VOID pushproc(lua_State *L, int id)
+{
+	int *ud;
+
+	ud = (int *)lua_newuserdatauv(L, sizeof(int), 0);
+	*ud = id;
+	luaL_setmetatable(L, PROCMETA);
+}
+
+static int checkproc(lua_State *L)
+{
+	return(*(int *)luaL_checkudata(L, 1, PROCMETA));
+}
+
+/* me.process(command, [options]): start a program in a buffer.
+   options: buffer (name, default the current one), dir, onexit.
+   Returns a process object, or nil and a reason. */
+
+static int l_process(lua_State *L)
+{
+	const char *cmd, *bname = NULL, *dir = NULL;
+	BUFFER *bp;
+	char err[NSTRING];
+	int id;
+
+	cmd = luaL_checkstring(L, 1);
+	if (!lua_isnoneornil(L, 2)) {
+		luaL_checktype(L, 2, LUA_TTABLE);
+		lua_getfield(L, 2, "buffer");
+		bname = lua_tostring(L, -1);
+		lua_getfield(L, 2, "dir");
+		dir = lua_tostring(L, -1);
+		lua_getfield(L, 2, "onexit");
+		if (!lua_isnil(L, -1))
+			luaL_checktype(L, -1, LUA_TFUNCTION);
+		/* (the three values stay on the stack until we return) */
+	}
+	if (bname) {
+		if ((bp = bfind((char *)bname, TRUE, 0)) == NULL)
+			return(luaL_error(L, "can't make buffer %s", bname));
+	} else
+		bp = curbp;
+	err[0] = 0;
+	if ((id = proc_start((char *)cmd, (char *)dir, bp, err)) == 0) {
+		lua_pushnil(L);
+		lua_pushstring(L, err);
+		return(2);
+	}
+	if (!lua_isnoneornil(L, 2) && lua_isfunction(L, -1)) {
+		lua_getfield(L, LUA_REGISTRYINDEX, PROCEXIT);
+		lua_pushvalue(L, -2);
+		lua_rawseti(L, -2, id);
+		lua_pop(L, 1);
+	}
+	pushproc(L, id);
+	return(1);
+}
+
+/* me.getprocess([buffer]): the process in a buffer, or nil */
+
+static int l_getprocess(lua_State *L)
+{
+	BUFFER *bp;
+	int id;
+
+	if ((bp = optbuffer(L, 1)) == NULL || (id = proc_ofbuf(bp)) == 0)
+		lua_pushnil(L);
+	else
+		pushproc(L, id);
+	return(1);
+}
+
+/* me.waitoutput([seconds]): let output arrive for up to the given
+   time (default 1 second). Returns true if any did. */
+
+static int l_waitoutput(lua_State *L)
+{
+	lua_Number secs = luaL_optnumber(L, 1, 1.0);
+
+	lua_pushboolean(L, proc_wait((long)(secs * 1000)));
+	return(1);
+}
+
+static int p_send(lua_State *L)
+{
+	int id = checkproc(L);
+	size_t len;
+	const char *s = luaL_checklstring(L, 2, &len);
+	int running, mcol;
+	long code, mline;
+	BUFFER *bp;
+
+	lua_pushboolean(L, proc_send(id, (char *)s, (int)len));
+	/* the typing that was sent doesn't make it a changed file */
+	if (proc_info(id, &running, &code, &mline, &mcol, &bp) && bp) {
+		bp->b_flag &= ~BFCHG;
+		upmode();
+	}
+	return(1);
+}
+
+static int p_eof(lua_State *L)
+{
+	lua_pushboolean(L, proc_eof(checkproc(L)));
+	return(1);
+}
+
+static int p_interrupt(lua_State *L)
+{
+	lua_pushinteger(L, proc_interrupt(checkproc(L)));
+	return(1);
+}
+
+static int p_kill(lua_State *L)
+{
+	lua_pushboolean(L, proc_kill(checkproc(L)));
+	return(1);
+}
+
+static int p_running(lua_State *L)
+{
+	int running, mcol;
+	long code, mline;
+	BUFFER *bp;
+
+	lua_pushboolean(L, proc_info(checkproc(L), &running, &code, &mline,
+				     &mcol, &bp) && running);
+	return(1);
+}
+
+static int p_exitcode(lua_State *L)
+{
+	int running, mcol;
+	long code, mline;
+	BUFFER *bp;
+
+	if (proc_info(checkproc(L), &running, &code, &mline, &mcol, &bp) &&
+	    !running)
+		lua_pushinteger(L, code);
+	else
+		lua_pushnil(L);
+	return(1);
+}
+
+/* p:mark(): line and column (both from 1) where output goes next */
+
+static int p_mark(lua_State *L)
+{
+	int running, mcol;
+	long code, mline;
+	BUFFER *bp;
+
+	if (!proc_info(checkproc(L), &running, &code, &mline, &mcol, &bp))
+		return(0);
+	lua_pushinteger(L, mline);
+	lua_pushinteger(L, mcol + 1);
+	return(2);
+}
+
+static int p_setmark(lua_State *L)
+{
+	int id = checkproc(L);
+
+	lua_pushboolean(L, proc_setmark(id, (long)luaL_checkinteger(L, 2),
+					(int)luaL_optinteger(L, 3, 1) - 1));
+	return(1);
+}
+
+static int p_buffer(lua_State *L)
+{
+	int running, mcol;
+	long code, mline;
+	BUFFER *bp;
+
+	if (proc_info(checkproc(L), &running, &code, &mline, &mcol, &bp) && bp)
+		lua_pushstring(L, bp->b_bname);
+	else
+		lua_pushnil(L);
+	return(1);
+}
+
+static int p_id(lua_State *L)
+{
+	lua_pushinteger(L, checkproc(L));
+	return(1);
+}
+
+static int p_eq(lua_State *L)
+{
+	lua_pushboolean(L, *(int *)luaL_checkudata(L, 1, PROCMETA) ==
+			   *(int *)luaL_checkudata(L, 2, PROCMETA));
+	return(1);
+}
+
+static int p_tostring(lua_State *L)
+{
+	lua_pushfstring(L, "process %d", checkproc(L));
+	return(1);
+}
+
+static CONST luaL_Reg procmethods[] = {
+	{"send",	p_send},
+	{"eof",		p_eof},
+	{"interrupt",	p_interrupt},
+	{"kill",	p_kill},
+	{"running",	p_running},
+	{"exitcode",	p_exitcode},
+	{"mark",	p_mark},
+	{"setmark",	p_setmark},
+	{"buffer",	p_buffer},
+	{"id",		p_id},
+	{NULL,		NULL}
+};
+
+/* A process has finished (called from proc_poll): run its onexit */
+
+VOID PASCAL NEAR elua_procexit(id, code)
+
+int id;
+long code;
+
+{
+	lua_State *L = Lmain;
+	int top;
+
+	if (L == NULL)
+		return;
+	top = lua_gettop(L);
+	lua_getfield(L, LUA_REGISTRYINDEX, PROCEXIT);
+	lua_rawgeti(L, -1, id);
+	lua_pushnil(L);
+	lua_rawseti(L, -3, id);		/* it only runs once */
+	if (lua_isfunction(L, -1)) {
+		pushproc(L, id);
+		lua_pushinteger(L, code);
+		docall(L, 2, 0);
+	}
+	lua_settop(L, top);
+}
+
+static VOID setupproc(lua_State *L)
+{
+	lua_newtable(L);
+	lua_setfield(L, LUA_REGISTRYINDEX, PROCEXIT);
+	luaL_newmetatable(L, PROCMETA);
+	luaL_newlib(L, procmethods);
+	lua_setfield(L, -2, "__index");
+	lua_pushcfunction(L, p_eq);
+	lua_setfield(L, -2, "__eq");
+	lua_pushcfunction(L, p_tostring);
+	lua_setfield(L, -2, "__tostring");
+	lua_pop(L, 1);
+}
+
+#else	/* PROCESS */
+
+static int l_process(lua_State *L)
+{
+	lua_pushnil(L);
+	lua_pushstring(L, "processes in buffers are not available on this system");
+	return(2);
+}
+
+static int l_getprocess(lua_State *L)
+{
+	lua_pushnil(L);
+	return(1);
+}
+
+static int l_waitoutput(lua_State *L)
+{
+	lua_pushboolean(L, 0);
+	return(1);
+}
+
+#define	setupproc(L)
+
+#endif	/* PROCESS */
+
 static CONST luaL_Reg melib[] = {
+	{"process",	l_process},
+	{"getprocess",	l_getprocess},
+	{"waitoutput",	l_waitoutput},
 	{"command",	l_command},
 	{"defcommand",	l_defcommand},
 	{"bind",	l_bind},
@@ -1462,7 +1753,76 @@ static CONST char prelude[] =
 "    for i = #list, 1, -1 do if list[i] == fn then table.remove(list, i) end end\n"
 "  end\n"
 "  if #list == 0 then hooks[event] = nil; _sethook(var, nil) end\n"
-"end\n";
+"end\n"
+"\n"
+"-- A live shell in a buffer: the shell command\n"
+"me.shelloptions = { program = os.getenv('COMSPEC') or 'cmd.exe', buffer = '*shell*', echoes = true }\n"
+"local shellkeys, oldret, oldint = false, nil, nil\n"
+"local function fallback(name, default, n, f)\n"
+"  if type(name) ~= 'string' or name == 'a Lua function' or name:find('^%[') then name = default end\n"
+"  if f then return me.command(name, n) end\n"
+"  return me.command(name)\n"
+"end\n"
+"local function shellsend(p)\n"
+"  local ml, mc = p:mark()\n"
+"  local l, c = me.point()\n"
+"  local lines = me.buffer().lines\n"
+"  -- what has been typed after the process mark\n"
+"  local t = {}\n"
+"  if ml <= lines then\n"
+"    me.moveto(ml, mc)\n"
+"    t[1] = me.line():sub(mc)\n"
+"    for i = ml + 1, lines do me.moveto(i); t[#t + 1] = me.line() end\n"
+"  end\n"
+"  local typed = table.concat(t, '\\n')\n"
+"  local input = typed\n"
+"  if l < ml or (l == ml and c < mc) then\n"
+"    -- on earlier text: send that line again, without a cmd prompt\n"
+"    me.moveto(l, 1)\n"
+"    input = (me.line():gsub('^%a:\\\\[^>]*>', '', 1))\n"
+"  end\n"
+"  if me.shelloptions.echoes then\n"
+"    -- the shell shows the command itself\n"
+"    me.moveto(ml, mc)\n"
+"    if #typed > 0 then me.delete(#typed) end\n"
+"  else\n"
+"    me.moveto(lines, 1)\n"
+"    me.command('end-of-line')\n"
+"    if input ~= typed then me.insert(input) end\n"
+"    me.insert('\\n')\n"
+"    p:setmark(lines + 1, 1)\n"
+"  end\n"
+"  return p:send((input:gsub('\\n', '\\r\\n')) .. '\\r\\n')\n"
+"end\n"
+"local function shellreturn(n, f)\n"
+"  local p = me.getprocess()\n"
+"  if not (p and p:running()) then return fallback(oldret, 'newline', n, f) end\n"
+"  return shellsend(p)\n"
+"end\n"
+"local function shellinterrupt(n, f)\n"
+"  local p = me.getprocess()\n"
+"  if not (p and p:running()) then return fallback(oldint, 'insert-space', n, f) end\n"
+"  if p:interrupt() == 0 then me.message('[Nothing to interrupt]') end\n"
+"  return true\n"
+"end\n"
+"me.defcommand('shell', function()\n"
+"  local o = me.shelloptions\n"
+"  local p = me.getprocess(o.buffer)\n"
+"  if not (p and p:running()) then\n"
+"    local err\n"
+"    p, err = me.process(o.program, { buffer = o.buffer, dir = o.dir })\n"
+"    if not p then me.message('[%s]', err) return false end\n"
+"  end\n"
+"  if not shellkeys then\n"
+"    shellkeys = true\n"
+"    oldret, oldint = me.binding('^M'), me.binding('^C')\n"
+"    me.bind('^M', shellreturn)\n"
+"    me.bind('^C', shellinterrupt)\n"
+"  end\n"
+"  me.command('select-buffer', o.buffer)\n"
+"  me.command('end-of-file')\n"
+"  return true\n"
+"end)\n";
 
 static int setup(lua_State *L)
 {
@@ -1471,6 +1831,7 @@ static int setup(lua_State *L)
 	/* the command table */
 	lua_newtable(L);
 	lua_setfield(L, LUA_REGISTRYINDEX, CMDTABLE);
+	setupproc(L);
 
 	/* the me library */
 	luaL_newlib(L, melib);
